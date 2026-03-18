@@ -1,15 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://chorus-protocol.org/schemas/agent-card/v0.1",
+  "$id": "https://chorus-protocol.org/schemas/agent-card/v0.2",
   "title": "Chorus Agent Card Extension",
-  "description": "Chorus Agent Card extension, embedded in A2A AgentCapabilities.extensions[].params.",
+  "description": "Chorus Agent Card extension v0.2, embedded in A2A AgentCapabilities.extensions[].params.",
   "type": "object",
   "required": ["chorus_version", "user_culture", "supported_languages"],
-  "additionalProperties": false,
+  "additionalProperties": true,
   "properties": {
     "chorus_version": {
       "type": "string",
-      "const": "0.1",
+      "const": "0.2",
       "description": "Protocol version."
     },
     "user_culture": {
@@ -22,23 +22,6 @@
       "items": { "type": "string" },
       "minItems": 1,
       "description": "Languages this Agent can handle (BCP47 tags)."
-    },
-    "communication_preferences": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "directness": {
-          "type": "string",
-          "enum": ["direct", "indirect", "adaptive"],
-          "description": "Communication directness preference."
-        },
-        "formality_default": {
-          "type": "string",
-          "enum": ["formal", "semi-formal", "casual"],
-          "description": "Default formality level."
-        }
-      },
-      "description": "Communication preferences."
     }
   }
 }

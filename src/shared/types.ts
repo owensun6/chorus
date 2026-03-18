@@ -62,7 +62,7 @@ const ChorusAgentCardSchema = z
     chorus_version: z.literal("0.2"),
     user_culture: bcp47String,
     supported_languages: z
-      .array(z.string())
+      .array(bcp47String)
       .min(1, "At least one language required"),
   })
   .passthrough();

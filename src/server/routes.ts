@@ -1,7 +1,7 @@
 // Author: be-api-router
 import { Hono } from "hono";
 import { AgentRegistry } from "./registry";
-import { RegisterAgentBodySchema } from "./validation";
+import { RegisterAgentBodySchema, MessagePayloadBodySchema } from "./validation";
 
 const successResponse = (data: unknown) => ({
   success: true as const,
@@ -73,6 +73,80 @@ const createApp = (registry: AgentRegistry): Hono => {
       successResponse({ deleted: true, agent_id: c.req.param("id") }),
       200
     );
+  });
+
+  app.post("/messages", async (c) => {
+    let body: unknown;
+    try {
+      body = await c.req.json();
+    } catch {
+      return c.json(
+        errorResponse("ERR_INVALID_BODY", "Invalid JSON body"),
+        400
+      );
+    }
+
+    const parsed = MessagePayloadBodySchema.safeParse(body);
+    if (!parsed.success) {
+      const message = parsed.error.issues
+        .map((i) => `${i.path.join(".")}: ${i.message}`)
+        .join("; ");
+      return c.json(errorResponse("ERR_INVALID_BODY", message), 400);
+    }
+
+    const { sender_agent_id, target_agent_id, message } = parsed.data;
+
+    if (!registry.get(sender_agent_id)) {
+      return c.json(
+        errorResponse("ERR_INVALID_BODY", "Sender agent not registered"),
+        400
+      );
+    }
+
+    const target = registry.get(target_agent_id);
+    if (!target) {
+      return c.json(
+        errorResponse("ERR_AGENT_NOT_FOUND", "Target agent not found"),
+        404
+      );
+    }
+
+    const TIMEOUT_MS = 10_000;
+
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+      const targetRes = await fetch(target.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender_agent_id, message }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timer);
+
+      if (targetRes.status >= 500) {
+        return c.json(
+          errorResponse(
+            "ERR_AGENT_UNREACHABLE",
+            "Target agent returned a server error"
+          ),
+          502
+        );
+      }
+
+      const targetBody = await targetRes.json();
+      return c.json(successResponse({ target_response: targetBody }), 200);
+    } catch {
+      return c.json(
+        errorResponse(
+          "ERR_AGENT_UNREACHABLE",
+          "Failed to reach target agent"
+        ),
+        502
+      );
+    }
   });
 
   return app;

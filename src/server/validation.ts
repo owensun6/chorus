@@ -10,5 +10,16 @@ const RegisterAgentBodySchema = z.object({
 
 type RegisterAgentBody = z.infer<typeof RegisterAgentBodySchema>;
 
-export { RegisterAgentBodySchema };
-export type { RegisterAgentBody };
+const MessagePayloadBodySchema = z.object({
+  sender_agent_id: z.string().min(1),
+  target_agent_id: z.string().min(1),
+  message: z.object({
+    role: z.string(),
+    parts: z.array(z.unknown()).min(1),
+  }).passthrough(),
+});
+
+type MessagePayloadBody = z.infer<typeof MessagePayloadBodySchema>;
+
+export { RegisterAgentBodySchema, MessagePayloadBodySchema };
+export type { RegisterAgentBody, MessagePayloadBody };

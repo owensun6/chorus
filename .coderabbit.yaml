@@ -1,0 +1,27 @@
+# CodeRabbit AI Code Review Configuration
+version: 2
+language: "zh-CN"
+tone: "professional"
+summary:
+  enabled: true
+  generate_release_notes: true
+review:
+  enabled: true
+  auto_review: true
+  review_status: true
+  request_changes_workflow: true
+  paths:
+    - "**/*.md"
+    - "**/*.js"
+    - "**/*.ts"
+    - "**/*.sh"
+chat:
+  enabled: true
+  auto_reply: true
+prompts:
+  # Instruct CodeRabbit to enforce Fusion-Core's Zero-Noise style
+  custom_prompt: >
+    You are an AI Reviewer for Fusion-Core.
+    Enforce BM-AD Diátaxis format for ANY documentation changes in `docs/`.
+    Enforce the presence of `<Author: XXX>` tags on newly added markdown files.
+    Reject soft "helpful" language in prompts; require strict, precise logic.

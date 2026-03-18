@@ -1,0 +1,347 @@
+# Fusion Workflow — 全局 8 阶段融合工作流
+
+> **[!] CRITICAL**: 本文件是所有项目的工作流中枢。取代 `00-superpowers-workflow.md`。
+> **融合来源**: Superpowers + CC-Best + ECC + BMAD → Fusion（替换，非补丁）
+
+---
+
+## 融合原则
+
+```
+❌ 错误: 旧系统保留 + 注入片段 = 制造冲突
+✅ 正确: 读取所有系统原材料 → 逐阶段对比 → 保留最优/合并互补 → 产出唯一一套规则
+
+最终状态: Commander 机器上只有 Fusion。
+Superpowers/CC-Best/ECC/BMAD 规则文件不再独立存在。
+```
+
+---
+
+## 8 阶段流水线总览
+
+```
+Stage 0 ──Gate 0──▶ Stage 0.5 ──Gate 0.5──▶ Stage 1 ──Gate 1──▶ Stage 1.5 ──Gate 1.5──▶
+         (条件必选: 含UI)                                      (条件触发: 架构冲突)
+
+──▶ Stage 2 ──▶ Stage 3 ──Gate 2──▶ Stage 4 ──▶ Stage 5 ──▶ Stage 6 ──Gate 3──▶ Stage 7
+```
+
+| Stage | 角色               | 调用技能                                               |
+| ----- | ------------------ | ------------------------------------------------------ |
+| 0     | PM                 | `fusion-compile-req` (快速) 或 `fusion-clarify` (多轮) |
+| 0.5   | UX Designer        | `fusion-ux` (含 Stitch MCP 强制出图)                   |
+| 1     | Lead               | `fusion-lead` → `fusion-arch-blueprint`                |
+| 1.5   | Lead               | 条件触发，定点修订冲突屏幕                             |
+| 2     | Lead               | `brainstorming`                                        |
+| 3     | Lead               | `fusion-task` → `fusion-swarm`                         |
+| 4     | Dev                | `using-git-worktrees`                                  |
+| 5     | Dev (各兵种)       | `fusion-tdd` + 各兵种 `SKILL.md`                       |
+| 6     | Reviewer (7道漏斗) | qa-01→qa-02→qa-03→qa-04→iv-01→iv-02→iv-03              |
+| 7     | Lead               | `finishing-a-development-branch`                       |
+
+---
+
+## Stage 0 — 需求深度解构 `[Gate 0]`
+
+**角色**: PM
+
+### 路径选择
+
+| 条件               | 路径         | 技能                                                      |
+| ------------------ | ------------ | --------------------------------------------------------- |
+| 需求清晰、边界明确 | V4 快速路径  | `fusion-compile-req` 一步直出 PRD+BDD，Commander 确认假设 |
+| 需求模糊、有歧义   | 苏格拉底路径 | `fusion-clarify` 多轮四维度逼问                           |
+
+两条路径在 Gate 0 汇合，审批标准一致。
+
+### PM 四纪律（强制，无论哪条路径）
+
+**A. 原始对话全量保存**
+
+- 每轮 Q&A 实时逐字追加 `pipeline/0_requirements/RAW_CONVERSATION.md`
+- 此文件只允许追加，禁止删除。是第一手史料，PRD 丢失时可凭此重建。
+
+**B. 知识盲区检测**
+
+- 检测到"大概/应该是/好像/可能"等模糊词 → 标记 `[待验证]`，强制暂停，等待 Commander 回到真实环境确认后再继续
+- 禁止基于猜测推进
+
+**C. 文档增量同步**
+
+- 每完成 **最多 3 轮** Q&A → 暂停，将已获取信息写入 PRD.md / DISCUSSION_LOG.md
+- 每完成一个维度 → 执行全量文档同步
+- 禁止"攒着最后写"
+
+**D. 四维度导航**
+
+- 四个维度必须逐一执行：`UX 用户体验` → `TECH 技术约束` → `DATA 数据与合规` → `EVO 产品演进`
+- 每个维度进入/离开时必须宣告，禁止静默跳过
+- 四维度全部完成前，禁止进入产出物编写阶段
+
+### 产出链（强制三连，不可跳中间步骤）
+
+```
+PRD.md → FEATURE_LIST.md → BDD_Scenarios.md
+```
+
+FEATURE_LIST.md 是 PRD 与 BDD 之间的桥梁。BDD 必须基于 FEATURE_LIST 逐条生成，不允许直接从 PRD 跳 BDD。
+
+### Gate 0 条件
+
+```
+[x] PRD.md + FEATURE_LIST.md + BDD_Scenarios.md 已创建
+[x] PM Consultant 审查完成（PASS 或 Commander 知情下的 HIGH/MEDIUM）
+[x] Commander 签字
+```
+
+---
+
+## Stage 0.5 — 低保真原型 `[Gate 0.5]` `[条件必选]`
+
+**触发条件**: 项目包含 UI 界面或重客户端交互。纯后端/CLI/API 项目由 Commander 标记 SKIP。
+
+**角色**: UX Designer
+
+**核心原则**: 原型定义用户体验，架构服务于已确认的体验。不是"技术能做什么 → 体验来迁就"。
+
+### 产出物
+
+| 产出物                  | 说明                                                               |
+| ----------------------- | ------------------------------------------------------------------ |
+| `Feature_Screen_Map.md` | 功能点 → 屏幕映射表（Stage 0.5 强制产出，追溯链起点）              |
+| `User_Flow.md`          | 所有用户角色的核心路径 + 异常路径                                  |
+| `Wireframes/`           | Stitch MCP 生成初稿，禁止手动从零绘制                              |
+| `UI_CONTRACT.md`        | Wireframe → 组件映射；对前端的约束力 = INTERFACE.md 对后端的约束力 |
+
+**Stitch MCP 铁律**: AI 生成初稿 → 人工审查调整 → Commander 确认，三步不可合并。
+
+### Gate 0.5 条件
+
+```
+[x] Feature_Screen_Map.md 覆盖所有 F-ID
+[x] UI_CONTRACT.md 已创建
+[x] UX Consultant 审查通过（PASS）
+[x] Commander 确认："这就是我想要的"
+```
+
+---
+
+## Stage 1 — 系统架构设计 `[Gate 1]`
+
+**角色**: Lead (Architect)
+
+**铁律**: INTERFACE.md 中每个接口必须标注来源 F-ID，确保 FE/BE 兵种可完全独立开发，不互相等待。
+
+### 产出物
+
+| 产出物             | 说明                                                      |
+| ------------------ | --------------------------------------------------------- |
+| `ADR/`             | 每个重大技术选型一份 ADR（背景+决策+后果+被拒方案及原因） |
+| `System_Design.md` | 系统边界、组件图、关键流程                                |
+| `INTERFACE.md`     | 每个接口标注 F-ID，F-ID 覆盖率 100%，FE/BE 读完可独立开发 |
+| `Data_Models.md`   | 核心实体、字段规格、并发保护方案（乐观锁/悲观锁/版本号）  |
+
+### Gate 1 条件
+
+```
+[x] System_Design.md + INTERFACE.md + Data_Models.md + ADR/ 已创建
+[x] F-ID 覆盖率 100%（INTERFACE.md 中每个 F-ID 至少有 1 个接口）
+[x] Architecture Consultant 审查通过（PASS）
+[x] Commander 签字
+```
+
+---
+
+## Stage 1.5 — 高保真原型修订 `[条件触发]`
+
+**触发条件**: Stage 1 架构发现 Stage 0.5 原型中有技术不可行的交互。无冲突则 Commander 标记 SKIP。
+
+**铁律**: Stage 1.5 只修改有架构冲突的屏幕，禁止借机重新设计无关交互。
+
+### 产出物
+
+| 产出物             | 说明                                          |
+| ------------------ | --------------------------------------------- |
+| 冲突清单           | 屏幕名称 + 不可行原因 + 建议调整方向          |
+| `Revised_Mockups/` | 数量 = 冲突屏幕数量，文件名加 `-revised` 后缀 |
+| `State_Flow.md`    | 仅受影响屏幕的状态流（若有状态转换变更）      |
+
+### Gate 1.5 条件
+
+```
+[x] Revised_Mockups/ 文件数 = 冲突屏幕数（不多不少）
+[x] UX Consultant 审查通过（PASS）
+[x] Commander 确认："调整后的体验仍可接受"
+```
+
+---
+
+## Stage 2 — 头脑风暴与设计
+
+**角色**: Lead
+**技能**: `brainstorming`
+
+探索 2-3 种实现路径，附权衡分析与推荐方案。不包含实现代码。
+
+**产出物**: `pipeline/1_architecture/YYYY-MM-DD-<topic>-design.md`
+
+**硬闸**: 设计文档未经 Commander 认可，禁止进入 Stage 3。
+
+---
+
+## Stage 3 — 微粒规划与 DAG 兵力分配 `[Gate 2]`
+
+**角色**: Lead
+**技能**: `fusion-task` → `fusion-swarm`
+
+### Task 三问过滤（通不过不得写入 task.md）
+
+```
+问题一：这个 Task 的存在理由是什么？
+问题二：删掉它，上游 Purpose 还能达成吗？（能 → 删除）
+问题三：它的粒度已经不可再分了吗？（2-5 分钟内可完成 → 正确）
+```
+
+### 产出物
+
+| 产出物                                          | 说明                                                     |
+| ----------------------------------------------- | -------------------------------------------------------- |
+| `pipeline/2_planning/task.md`                   | 每任务标注 Assignee（具体兵种）+ Blocker（唯一调度依据，禁止 Phase 闸门） |
+| `pipeline/2_planning/dependency_graph.md`       | 有向无环图（DAG），无环验证                              |
+| `pipeline/2_planning/specs/TASK_SPEC_T-{ID}.md` | 每任务独立规格说明书（输入/输出/验收标准/F-ID）          |
+
+**并行调度**: 使用 `fusion-swarm`。`dispatching-parallel-agents` 已废弃，禁止使用。
+
+### Gate 2 条件
+
+```
+[x] task.md 中每任务有 Assignee + Blocker
+[x] 无 Phase 闸门语法（调度完全由 Blocker 字段驱动，Phase 仅为视觉分组）
+[x] dependency_graph.md 无环
+[x] TASK_SPEC 数量 = task.md 中的任务数
+[x] Commander 签字
+```
+
+---
+
+## Stage 4 — Git Worktree 物理隔离
+
+**技能**: `using-git-worktrees`
+
+创建物理隔离的开发环境，验证测试基线在隔离环境中完整通过后再开始 Stage 5。
+
+---
+
+## Stage 5 — TDD 并发实施
+
+**角色**: Dev（6 名专职特种兵按 DAG 并发作业）
+**技能**: `fusion-tdd` + 各兵种 SKILL.md
+
+**铁律**: `NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST`
+
+### 每名特种兵的完整生命周期（不可省略任何步骤）
+
+```
+① 读取 pipeline/monitor.md 上游行 QA 状态，确认为 [✓] 后方可启动
+② RED:     编写失败测试，确认失败原因正确
+③ GREEN:   编写最简实现，确认测试通过
+④ REFACTOR: 清理代码，保持绿灯
+⑤ 将交付物写入指定路径
+⑥ 在 monitor.md 本行将 Worker 状态标为 [x]
+⑦ 进入轮询循环，读取本行 QA 状态:
+   [✓] → 正常退出，通知 DAG 调度器下游可启动
+   [✗] 或 [!] → 读取 pipeline/5_dev/audit/<task-id>-audit.md → 按 CRITICAL 问题修改 → 回到步骤 ①
+   [ ]  → QA 尚未完成，继续轮询
+```
+
+**⑥⑦ 在 Stage 5 绝对不可省略**。交付后直接退出 = 监控链断裂 = 整个并发流程卡死。
+
+---
+
+## Stage 6 — 代码审查与集成测试 `[Gate 3]`
+
+**角色**: Reviewer（7 道漏斗）
+
+### 串行管道（前一道 FAIL，后续道次不得启动）
+
+```
+qa-01 (功能逻辑) → qa-02 (性能+UI/UX批判) → qa-03 (安全零信任) → qa-04 (领域法务)
+                                                                      ↓
+                                              iv-01 (E2E端到端连通) → iv-02 (数据穿透) → iv-03 (混沌破坏)
+```
+
+### QA 写回义务（审计完成后强制执行）
+
+1. 将完整审计报告写入 `pipeline/5_dev/audit/<task-id>-audit.md`（格式: CRITICAL/HIGH/MEDIUM + 整体结论 PASS/FAIL）
+2. 在 monitor.md 更新对应任务行 QA 状态:
+   - `[✓]` 通过 → Worker 可正常退出，下游可启动
+   - `[✗]` 不通过 → Worker 状态回滚为 `[!]`，必须返工
+
+**整合**: 接收代码审查时须遵循技术严谨性纪律（`receiving-code-review`）：不因审查意见"听起来合理"就盲目执行，须独立验证技术准确性。
+
+### Gate 3 条件
+
+```
+[x] 7 道漏斗全部 PASS
+[x] Audit_Report.md + Integration_Report.md 已创建
+[x] Commander 签字
+```
+
+---
+
+## Stage 7 — 完成分支
+
+**技能**: `finishing-a-development-branch`
+
+确认所有测试通过 → 确认无 CRITICAL/HIGH 问题 → 清理调试代码/临时文件 → 提供合并选项（本地合并 / 创建 PR / 保留分支待审）。
+
+**Gene 提取**: 战役结束时（可选）调用 `/fusion-extract-genes`，提取本次战役的跨项目可复用经验写入 Gene Bank。
+
+---
+
+## Gene Extractor — 随时可用
+
+**不限于 Stage 7**。建议每完成 2-3 轮实质性工作后即触发一次，避免战役中途停止导致经验丢失。
+
+```
+触发: /fusion-extract-genes
+```
+
+Gene Bank 由 Commander 在 fusion-method 孵化器中定期人工 review → 手动更新 workflow/skill 库 → 方法论迭代闭环。
+
+---
+
+## 缩放模式 (`/scale` 命令)
+
+| 命令                | 效果                                          |
+| ------------------- | --------------------------------------------- |
+| `/scale quick`      | 跳过 Stage 1/1.5，直接进入 Stage 2 或 Stage 3 |
+| `/scale standard`   | 完整流程（默认）                              |
+| `/scale enterprise` | 强制完整流程，不可快速通道                    |
+
+**物理锁（任何模式均生效）**:
+
+- Stage 0 需求解构**永远不可跳过**
+- 任务涉及 2 名及以上跨端兵种并行协同（FE + BE 同时修改）→ `/scale quick` 自动失效，强制执行 Stage 1
+
+---
+
+## Gate 审批协议
+
+| 决策                 | 后续动作                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| **Approve**          | 进入下一阶段；产出物首行标记 `<!-- status: APPROVED -->`                             |
+| **Reject**           | 强制闭环: Reject → Rework → Re-submit；拒绝理由记录到 `pipeline/monitor.md` 风险日志 |
+| **连续 3 次 Reject** | 触发 Escalation：暂停该 Epic，Commander 决定是否退回 Stage 0 重新定义需求            |
+| **SKIP**             | 仅适用于 Stage 0.5（纯后端项目）和 Stage 1.5（无架构冲突）                           |
+
+详细协议见 `gate-approval-protocol.md`。
+
+---
+
+## 约束防线 (Anti-Hallucination Firewall)
+
+1. **禁止盲目写码**: 收到"帮我写个 XX 功能"的模糊指令，必须退回 Stage 0，不得直接写代码
+2. **产出物签名**: 所有阶段产出物首行必须 `<!-- Author: [角色名] -->`，下游接手前必须验证
+3. **看板强制更新**: 每个 Gate 通过/拒绝后，立即更新 `pipeline/monitor.md` 对应槽位状态
+4. **Stage 5 监控链**: Dev 兵种交付后不得退出，必须轮询 QA 状态直到 `[✓]` 或处理 `[✗]`

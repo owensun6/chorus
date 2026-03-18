@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chorus Protocol — Architecture Overview</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    line-height: 1.6;
+    padding: 40px 60px;
+  }
+  h1 {
+    font-size: 2.4em;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #ff6b6b, #ffd700, #4ecdc4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    color: #888;
+    font-size: 1.1em;
+    margin-bottom: 48px;
+  }
+  h2 {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: #fff;
+    margin: 48px 0 24px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333;
+  }
+  h3 {
+    font-size: 1.1em;
+    color: #ccc;
+    margin: 32px 0 16px;
+  }
+  .diagram-container {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 32px;
+    margin: 24px 0;
+    overflow-x: auto;
+  }
+  .mermaid {
+    display: flex;
+    justify-content: center;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+  }
+  th {
+    background: #1a1a1a;
+    color: #ffd700;
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    border-bottom: 2px solid #333;
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #222;
+    vertical-align: top;
+  }
+  tr:hover td { background: #1a1a1a; }
+  .layer-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+  }
+  .l1 { background: #ff6b6b33; color: #ff6b6b; border: 1px solid #ff6b6b55; }
+  .l2 { background: #ffd70033; color: #ffd700; border: 1px solid #ffd70055; }
+  .l3 { background: #4ecdc433; color: #4ecdc4; border: 1px solid #4ecdc455; }
+  .transport { background: #88888833; color: #aaa; border: 1px solid #88888855; }
+  .phase0-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #ff6b6b22;
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b44;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  .flow-box {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 24px;
+    margin: 16px 0;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 0.9em;
+    line-height: 2;
+    white-space: pre;
+    overflow-x: auto;
+    color: #ccc;
+  }
+  .highlight { color: #ffd700; font-weight: 600; }
+  .dim { color: #666; }
+  .note {
+    background: #1a1a2e;
+    border-left: 3px solid #4ecdc4;
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-radius: 0 8px 8px 0;
+    color: #bbb;
+  }
+  .note strong { color: #4ecdc4; }
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid #222;
+    color: #555;
+    font-size: 0.85em;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chorus Protocol</h1>
+<p class="subtitle">AI Agent 跨文化通信协议 — 架构全景图</p>
+
+<!-- ============================================ -->
+<h2>1. 端到端通信流程</h2>
+
+<div class="diagram-container">
+<pre class="mermaid">
+graph LR
+    subgraph UA["🇨🇳 Alice (中文)"]
+        U1["输入: 能不能帮我<br/>约个时间聊聊？"]
+    end
+
+    subgraph AgentA["Agent A"]
+        A1["LLM 提取语义"]
+        A2["封装 Chorus 信封"]
+    end
+
+    subgraph Protocol["Chorus Protocol"]
+        P1["DataPart<br/>原始语义 + 文化元数据"]
+    end
+
+    subgraph Transport["A2A Transport"]
+        T1["HTTP / JSON-RPC"]
+    end
+
+    subgraph AgentB["Agent B"]
+        B1["解析 Chorus 信封"]
+        B2["LLM 文化适配"]
+    end
+
+    subgraph UB["🇯🇵 Bob (日文)"]
+        U2["看到: お時間を<br/>いただけますでしょうか"]
+    end
+
+    U1 --> A1 --> A2 --> P1 --> T1 --> B1 --> B2 --> U2
+
+    style Protocol fill:#ff6b6b,stroke:#ff6b6b,color:#fff
+    style Transport fill:#555,stroke:#888,color:#fff
+    style AgentA fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style AgentB fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style UA fill:#1a1a1a,stroke:#666,color:#e0e0e0
+    style UB fill:#1a1a1a,stroke:#666,color:#e0e0e0
+</pre>
+</div>
+
+<!-- ============================================ -->
+<h2>2. 平台在哪里发挥作用</h2>
+
+<div class="diagram-container">
+<pre class="mermaid">
+graph TB
+    subgraph Users["用户层"]
+        UA["🇨🇳 Alice"]
+        UB["🇯🇵 Bob"]
+        UC["🇫🇷 Claire"]
+        UD["🇧🇷 Diego"]
+    end
+
+    subgraph Agents["Agent 层"]
+        AA["Alice 的 Agent"]
+        AB["Bob 的 Agent"]
+        AC["Claire 的 Agent"]
+        AD["Diego 的 Agent"]
+    end
+
+    subgraph Platform["🏨 The Idle Resort (度假村平台)"]
+        direction TB
+        REG["📋 Agent 注册<br/>托管 Agent Cards"]
+        MATCH["🔍 文化匹配引擎<br/>帮 Agent 找到聊天对象"]
+        ROOM["🏖️ 社交空间<br/>群聊 · 话题 · 活动 · 兴趣圈"]
+        ANALYTICS["📊 对话质量监控<br/>文化适配评分追踪"]
+    end
+
+    subgraph L1["Chorus Protocol (开源协议)"]
+        ENV["📨 语义信封格式"]
+        CARD["🪪 Agent Card 扩展"]
+        PROMPT["💡 提示词模板"]
+    end
+
+    subgraph L3["Cultural Models (商业模型)"]
+        CM["🧠 微调文化适配模型<br/>95分 vs 通用LLM 80分"]
+    end
+
+    subgraph A2A["A2A Protocol (Google)"]
+        TRANS["🔌 传输 · 发现 · 安全"]
+    end
+
+    UA --> AA
+    UB --> AB
+    UC --> AC
+    UD --> AD
+
+    AA <--> Platform
+    AB <--> Platform
+    AC <--> Platform
+    AD <--> Platform
+
+    AA <-->|Chorus 信封| TRANS
+    AB <-->|Chorus 信封| TRANS
+    AC <-->|Chorus 信封| TRANS
+    AD <-->|Chorus 信封| TRANS
+
+    Platform -.->|定义通信标准| L1
+    AA -.->|使用| L1
+    AB -.->|使用| L1
+
+    AA -.->|可选增强| L3
+    AB -.->|可选增强| L3
+
+    style Platform fill:#ffd700,stroke:#b8860b,color:#000
+    style L1 fill:#ff6b6b,stroke:#cc5555,color:#fff
+    style L3 fill:#4ecdc4,stroke:#3ba89f,color:#000
+    style A2A fill:#555,stroke:#888,color:#fff
+    style Users fill:#1a1a1a,stroke:#444,color:#e0e0e0
+    style Agents fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+</pre>
+</div>
+
+<!-- ============================================ -->
+<h2>3. 三层架构：谁做什么</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>层</th>
+      <th>名称</th>
+      <th>干什么</th>
+      <th>类比</th>
+      <th>许可证</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="layer-tag l1">L1 协议</span></td>
+      <td><strong>Chorus Protocol</strong></td>
+      <td>定义信封格式 + Agent Card 扩展 + 提示词模板<br/><em>让任何 Agent 都能"说同一种文化语言"</em></td>
+      <td>像 HTTP — 定义消息长什么样</td>
+      <td>Apache 2.0</td>
+    </tr>
+    <tr>
+      <td><span class="layer-tag l2">L2 平台</span></td>
+      <td><strong>The Idle Resort</strong></td>
+      <td>托管 Agent Card · 匹配对话对象 · 提供社交空间<br/><em>你不知道世界上有谁想跟你聊天，平台帮你找到</em></td>
+      <td>像微信/Discord — 你在上面找人</td>
+      <td>AGPL</td>
+    </tr>
+    <tr>
+      <td><span class="layer-tag l3">L3 模型</span></td>
+      <td><strong>Cultural Models</strong></td>
+      <td>微调的文化适配模型，比通用 LLM 更精准<br/><em>通用 LLM 做 80 分，微调模型做 95 分</em></td>
+      <td>像专业同声传译 vs Google Translate</td>
+      <td>商业</td>
+    </tr>
+    <tr>
+      <td><span class="layer-tag transport">传输层</span></td>
+      <td><strong>A2A Protocol</strong></td>
+      <td>Agent 间的传输、发现、安全机制<br/><em>我们不造这个，Google 已经造好了</em></td>
+      <td>像 TCP/IP — 负责把包送到</td>
+      <td>Apache 2.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================ -->
+<h2>4. 平台的三大核心能力</h2>
+
+<div class="diagram-container">
+<pre class="mermaid">
+graph LR
+    subgraph DISCOVER["1️⃣ 发现"]
+        D1["Agent 注册 Agent Card"]
+        D2["平台索引文化背景 + 语言"]
+        D3["用户搜索: '找个日本人聊动漫'"]
+        D1 --> D2 --> D3
+    end
+
+    subgraph CONNECT["2️⃣ 匹配"]
+        C1["文化兴趣匹配算法"]
+        C2["语言能力校验"]
+        C3["推荐对话对象"]
+        C1 --> C2 --> C3
+    end
+
+    subgraph ENGAGE["3️⃣ 社交"]
+        E1["1v1 跨文化对话"]
+        E2["兴趣圈群聊"]
+        E3["文化活动/话题广场"]
+        E1 --- E2 --- E3
+    end
+
+    D3 --> C1
+    C3 --> E1
+
+    style DISCOVER fill:#1a1a2e,stroke:#ff6b6b,color:#e0e0e0
+    style CONNECT fill:#1a1a2e,stroke:#ffd700,color:#e0e0e0
+    style ENGAGE fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+</pre>
+</div>
+
+<div class="note">
+  <strong>关键区分：</strong>没有平台也能用协议 — 两个人各自跑 Agent，点对点通信。
+  平台的价值是<strong>网络效应</strong>：帮你发现、匹配、组织社交场景。就像没有微信也能发邮件，但微信让你找到人。
+</div>
+
+<!-- ============================================ -->
+<h2>5. 一条消息的完整旅程</h2>
+
+<div class="diagram-container">
+<pre class="mermaid">
+sequenceDiagram
+    participant Alice as 🇨🇳 Alice
+    participant AgentA as Agent A
+    participant LLM_A as LLM (A's Key)
+    participant Resort as 🏨 The Idle Resort
+    participant A2A as A2A Transport
+    participant AgentB as Agent B
+    participant LLM_B as LLM (B's Key)
+    participant Bob as 🇯🇵 Bob
+
+    Note over Resort: 【事先】Agent 注册
+
+    AgentA->>Resort: 注册 Agent Card (文化:中国, 语言:zh/en/ja)
+    AgentB->>Resort: 注册 Agent Card (文化:日本, 语言:ja/en/zh)
+
+    Note over Resort: 【匹配】平台推荐
+
+    Alice->>Resort: "找个日本人聊聊"
+    Resort->>Resort: 匹配算法: 语言兼容 + 兴趣匹配
+    Resort-->>Alice: 推荐 Bob 的 Agent
+
+    Note over AgentA, AgentB: 【对话】Chorus 协议生效
+
+    Alice->>AgentA: "能不能帮我约个时间聊聊？"
+    AgentA->>LLM_A: 提取语义 + 生成信封字段
+    LLM_A-->>AgentA: semantic="请求会面", tone="polite"
+
+    AgentA->>A2A: A2A Message (TextPart + Chorus DataPart)
+
+    A2A->>AgentB: 转发消息
+    AgentB->>AgentB: 按 mediaType 提取 Chorus 信封
+    AgentB->>LLM_B: 信封 + 提示词 → 文化适配
+    LLM_B-->>AgentB: "お時間をいただけますでしょうか"
+    AgentB->>Bob: 显示日文
+
+    Note over Alice, Bob: Bob 看到的是自然的日文商务请求，而非中文直译
+</pre>
+</div>
+
+<!-- ============================================ -->
+<h2>6. Phase 0 聚焦范围</h2>
+
+<div class="diagram-container">
+<pre class="mermaid">
+graph TB
+    subgraph FULL["完整愿景"]
+        subgraph PH0["Phase 0 ✅ 现在做"]
+            L1_SPEC["L1: 协议规范<br/>信封 JSON Schema<br/>Agent Card 扩展<br/>提示词模板"]
+            L1_REF["L1: 参考实现<br/>TypeScript SDK"]
+            L1_VAL["L1: 验证实验<br/>200条 × 3组对比"]
+        end
+
+        subgraph PH1["Phase 1+ 后续"]
+            L2_RESORT["L2: The Idle Resort<br/>Agent 注册/发现/匹配/社交空间"]
+            L3_MODEL["L3: Cultural Models<br/>微调文化适配模型"]
+            L1_MULTI["L1: 多语言对扩展<br/>不只中↔日"]
+        end
+    end
+
+    L1_SPEC --> L1_REF --> L1_VAL
+    L1_VAL -->|"假设验证通过"| L2_RESORT
+    L1_VAL -->|"假设验证通过"| L3_MODEL
+    L2_RESORT --> L1_MULTI
+
+    style PH0 fill:#ff6b6b22,stroke:#ff6b6b,color:#e0e0e0
+    style PH1 fill:#33333322,stroke:#555,color:#888
+    style L1_SPEC fill:#ff6b6b,stroke:#cc5555,color:#fff
+    style L1_REF fill:#ff6b6b,stroke:#cc5555,color:#fff
+    style L1_VAL fill:#ff6b6b,stroke:#cc5555,color:#fff
+    style L2_RESORT fill:#ffd700,stroke:#b8860b,color:#000
+    style L3_MODEL fill:#4ecdc4,stroke:#3ba89f,color:#000
+    style L1_MULTI fill:#ff6b6b55,stroke:#ff6b6b,color:#ccc
+</pre>
+</div>
+
+<div class="note">
+  <strong>Phase 0 的唯一使命：</strong>证明"有了 Chorus 信封 + 几行提示词，跨文化对话质量显著超越机械翻译"。
+  <br/>如果这个被证明了，L2 平台和 L3 模型才值得投资。如果证明不了，整个项目需要重新定义。
+</div>
+
+<footer>
+  Chorus Protocol v0.1 &mdash; Architecture Overview &mdash; 2026-03-17
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background: '#141414',
+      primaryColor: '#ff6b6b',
+      primaryTextColor: '#fff',
+      primaryBorderColor: '#ff6b6b',
+      lineColor: '#666',
+      secondaryColor: '#ffd700',
+      tertiaryColor: '#4ecdc4',
+      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+      fontSize: '14px'
+    },
+    sequence: {
+      mirrorActors: false,
+      actorMargin: 30,
+      messageMargin: 30
+    },
+    flowchart: {
+      curve: 'basis',
+      padding: 20
+    }
+  });
+</script>
+</body>
+</html>

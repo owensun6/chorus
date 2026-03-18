@@ -1,0 +1,1602 @@
+[
+  {
+    "id": 1,
+    "category": "taboo",
+    "input_text": "你看起来胖了不少啊",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "在中国部分场景中（长辈、老友间）评论体重变化可作为寒暄（暗示生活条件好），但并非普遍正面；在日本文化中评论他人体重属于严重冒犯。翻译时应传达关心意图但避开体重话题"
+  },
+  {
+    "id": 2,
+    "category": "taboo",
+    "input_text": "你工资多少钱一个月？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "在中国文化中朋友间常见的关心话题，在日本文化中询问收入属于极度隐私的禁忌"
+  },
+  {
+    "id": 3,
+    "category": "taboo",
+    "input_text": "つまらないものですが、どうぞ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本送礼时的谦虚表达（'这是不值一提的东西，请收下'），直译成中文会让人觉得送礼者看不起自己的礼物"
+  },
+  {
+    "id": 4,
+    "category": "taboo",
+    "input_text": "不好意思，这个方案我觉得不太行，得重新来",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人的直接拒绝在日本商务场景中会被视为非常失礼，日本人习惯用极度间接的方式表达否定"
+  },
+  {
+    "id": 5,
+    "category": "taboo",
+    "input_text": "今度飲みに行きましょう",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本职场中的社交邀约往往是礼节性的（建前 tatemae），不一定真的期待对方赴约。中国文化中这种邀约通常被当真"
+  },
+  {
+    "id": 6,
+    "category": "slang",
+    "input_text": "这人太卷了，把我们都卷死了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'卷'（内卷）是中国特有的竞争焦虑用语，指过度竞争导致所有人疲惫，日语中无直接对应概念"
+  },
+  {
+    "id": 7,
+    "category": "slang",
+    "input_text": "空気を読んでよ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'空気を読む'（读空气/读懂气氛）是日本文化核心概念，强调不言自明的社交默契。中文可用'有眼力见''察言观色'近似"
+  },
+  {
+    "id": 8,
+    "category": "slang",
+    "input_text": "这件事我们就睁一只眼闭一只眼吧",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国式的灵活处事哲学，暗示故意忽略某些问题。日本文化中类似概念是'見て見ぬふり'但语境和社会态度不同"
+  },
+  {
+    "id": 9,
+    "category": "slang",
+    "input_text": "しょうがないね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'しょうがない'（没办法）是日本文化中接受无法改变之事的哲学态度，比中文'没办法'含更深的文化接纳意味"
+  },
+  {
+    "id": 10,
+    "category": "slang",
+    "input_text": "你这人真够意思！下次有事尽管找我",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'够意思'是中国人际关系中的义气表达，承诺回报。日本文化中类似的'義理'（giri）有更强的社会义务含义"
+  },
+  {
+    "id": 11,
+    "category": "taboo",
+    "input_text": "你怎么还不结婚啊？年纪不小了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国长辈催婚是常见的关心方式，但在日本直接催促婚姻被视为侵犯个人隐私，尤其对女性更加敏感"
+  },
+  {
+    "id": 12,
+    "category": "taboo",
+    "input_text": "你家孩子成绩怎么样？考上重点了吗？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国社交中询问孩子成绩很普遍，日本人极少在公开场合比较子女学业表现，认为这会给对方施压"
+  },
+  {
+    "id": 13,
+    "category": "taboo",
+    "input_text": "お箸の持ち方、ちょっと変ですね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "在日本指出别人筷子拿法不正确是严肃的礼仪纠正，暗示家教不好。在中国文化中这通常只是轻松的观察"
+  },
+  {
+    "id": 14,
+    "category": "taboo",
+    "input_text": "你这房子多少钱买的？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "在中国询问房价是聊天常见话题，显示对对方生活的兴趣。日本人认为询问不动产价格是极度失礼的行为"
+  },
+  {
+    "id": 15,
+    "category": "taboo",
+    "input_text": "名刺を片手で渡すなんて失礼だ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本商务中名片必须双手递交，单手递名片被视为严重失礼。中国商务虽也讲究双手，但单手递送不会上升到冒犯层面"
+  },
+  {
+    "id": 16,
+    "category": "taboo",
+    "input_text": "来来来，我帮你夹菜",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国餐桌上用自己的筷子给客人夹菜是热情好客的表现。在日本用私人筷子给他人夹菜是严格的卫生禁忌"
+  },
+  {
+    "id": 17,
+    "category": "taboo",
+    "input_text": "すみません、その日はちょっと…",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本人用'那天有点...'的模糊说法委婉拒绝，中国人可能理解为对方还在犹豫，继续追问反而让日方尴尬"
+  },
+  {
+    "id": 18,
+    "category": "taboo",
+    "input_text": "你看起来好年轻，完全看不出年纪",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人赞美对方年轻是社交礼貌，但日本人会认为这暗示对方实际很老，反而是隐性冒犯"
+  },
+  {
+    "id": 19,
+    "category": "taboo",
+    "input_text": "ご結婚されていますか？お子さんは？",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "在日本职场中询问婚姻和子女状况可能涉及セクハラ（性骚扰）嫌疑，但在中国这是建立关系的常见寒暄"
+  },
+  {
+    "id": 20,
+    "category": "taboo",
+    "input_text": "这个价格太贵了，能不能便宜点？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人普遍习惯讨价还价，视为商业互动的一部分。在日本正规商店砍价被视为对商家的侮辱"
+  },
+  {
+    "id": 21,
+    "category": "taboo",
+    "input_text": "お風呂に入る前に体を洗わないの？",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本泡澡文化严格要求先洗净身体再入浴缸，不洗就泡是严重禁忌。中国浴室文化没有这种强制顺序"
+  },
+  {
+    "id": 22,
+    "category": "taboo",
+    "input_text": "你爸妈是做什么工作的？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "在中国询问父母职业是了解对方背景的常见方式，日本人认为这涉及家庭阶层和出身的敏感话题"
+  },
+  {
+    "id": 23,
+    "category": "taboo",
+    "input_text": "靴のまま家に上がらないでください",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "在日本穿鞋进屋是绝对禁忌，是对主人家的严重不尊重。中国部分地区虽然也脱鞋但并不构成文化禁忌级别的冒犯"
+  },
+  {
+    "id": 24,
+    "category": "taboo",
+    "input_text": "我觉得你的想法有问题，你再想想",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "在中国直接指出同事想法有问题算正常讨论。日本职场中当面否定他人想法会让对方严重丢面子(面子/メンツ)"
+  },
+  {
+    "id": 25,
+    "category": "taboo",
+    "input_text": "割り勘にしましょう",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本AA制（割り勘）是餐饮常态，提议AA制很自然。中国文化中提出AA制可能被认为小气或关系疏远"
+  },
+  {
+    "id": 26,
+    "category": "taboo",
+    "input_text": "你皮肤好黑啊，是不是去旅游晒的？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人评论肤色较为随意，日本人对皮肤颜色评价极其敏感，任何暗示皮肤黑的评论都可能被视为歧视"
+  },
+  {
+    "id": 27,
+    "category": "taboo",
+    "input_text": "チップは要りませんよ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "在日本给小费被视为对服务者的侮辱，暗示对方需要施舍。中国虽不流行小费但不会觉得被冒犯"
+  },
+  {
+    "id": 28,
+    "category": "taboo",
+    "input_text": "你今年多大了？属什么的？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人通过生肖聊年龄很常见。日本虽然也有十二生肖但直接问年龄在成年人社交中被视为不礼貌"
+  },
+  {
+    "id": 29,
+    "category": "taboo",
+    "input_text": "お先に失礼します",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本人下班说'先走一步'含有歉疚和对留下加班同事的抱歉。中国职场下班说'我走了'不需要这种仪式感的愧疚"
+  },
+  {
+    "id": 30,
+    "category": "taboo",
+    "input_text": "帮我把这个白事的礼金红包包好",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国丧事随礼用白色信封。日本丧事（不祝儀）信封有严格规格要求，用错水引（装饰结）或写法会严重冒犯丧家"
+  },
+  {
+    "id": 31,
+    "category": "taboo",
+    "input_text": "四つください",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语中'四'（し）与'死'同音，在送礼和医院场景中严格避讳。中国文化也忌讳四，但日本的避讳程度更深入日常生活"
+  },
+  {
+    "id": 32,
+    "category": "taboo",
+    "input_text": "这次先这样吧，下次我请你",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人抢着买单并承诺下次请是人情交换的核心。日本人更倾向AA制，'下次我请'的承诺不会像中国那样被记住和期待"
+  },
+  {
+    "id": 33,
+    "category": "taboo",
+    "input_text": "上司より先に帰るのは気まずい",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本职场中比上司先下班被视为不尊重团队精神，存在强烈的'空气压力'。中国虽有加班文化但这种压力不以上下级为轴"
+  },
+  {
+    "id": 34,
+    "category": "taboo",
+    "input_text": "你是不是又瘦了？要多吃点啊！",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人说'多吃点'是关心的表现。日本人认为评论体型变化和指示别人的饮食习惯都属于侵犯个人领域"
+  },
+  {
+    "id": 35,
+    "category": "taboo",
+    "input_text": "音を立てて食べないでください",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本文化中吃面发出声音是赞美食物美味的表现，但其他食物不能出声。中国餐桌上对进食声音的宽容度较高"
+  },
+  {
+    "id": 36,
+    "category": "taboo",
+    "input_text": "你老公/老婆是哪里人？做什么的？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人初次见面就询问配偶信息是建立关系的方式。日本人认为询问他人配偶的具体信息是越界行为"
+  },
+  {
+    "id": 37,
+    "category": "taboo",
+    "input_text": "ご祝儀に四万円は縁起が悪い",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本婚礼红包金额有严格规矩：偶数（特别是四）代表'可分割'暗示分离。中国红包忌单数（丧事除外）但逻辑完全相反"
+  },
+  {
+    "id": 38,
+    "category": "taboo",
+    "input_text": "你一个月能存多少钱？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人讨论储蓄是理财话题的常见切入。日本人将个人储蓄视为绝对隐私，即使亲密朋友间也不会讨论"
+  },
+  {
+    "id": 39,
+    "category": "taboo",
+    "input_text": "玄関で靴を揃えてください",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本人脱鞋后必须将鞋子朝外整齐摆放，不整理鞋子被认为缺乏教养。中国虽脱鞋但没有如此严格的摆放规矩"
+  },
+  {
+    "id": 40,
+    "category": "taboo",
+    "input_text": "哎，你脸色不太好，是不是没睡好？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人指出别人气色不好是关心的表现。日本人认为指出他人外貌上的负面变化是不礼貌的，会让对方感到尴尬"
+  },
+  {
+    "id": 41,
+    "category": "taboo",
+    "input_text": "遠慮しないでと言われても、遠慮するのが礼儀です",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本'遠慮'（客气/克制）文化中，即便被说'别客气'也仍需保持克制。中国人说'别客气'时真的希望对方放松"
+  },
+  {
+    "id": 42,
+    "category": "taboo",
+    "input_text": "这孩子长得真像爸爸/妈妈",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人评论孩子像谁是常见的赞美。日本人对此较敏感，可能暗含对不像的一方的否定，且涉及隐私"
+  },
+  {
+    "id": 43,
+    "category": "taboo",
+    "input_text": "残業代が出ないのに残業するの？",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本的サービス残業（无偿加班）是职场潜规则，公开质疑会被视为不合群。中国996文化虽类似但抱怨加班更被社会接受"
+  },
+  {
+    "id": 44,
+    "category": "taboo",
+    "input_text": "你这衣服多少钱？在哪买的？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人问衣服价格和购买地点是赞美的延伸。日本人认为询问他人物品价格等同于评估其消费水平，非常无礼"
+  },
+  {
+    "id": 45,
+    "category": "taboo",
+    "input_text": "お茶碗にご飯を残さないでね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本文化要求将碗中米饭吃干净，剩饭是对农民和食物的不敬。中国部分地区吃完所有饭菜反而暗示主人准备不够"
+  },
+  {
+    "id": 46,
+    "category": "taboo",
+    "input_text": "老板，这不是我的错，是小王那边出了问题",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国职场中撇清责任是自我保护方式。日本职场中公开推卸责任给同事会被视为严重破坏团队和谐（和を乱す）"
+  },
+  {
+    "id": 47,
+    "category": "taboo",
+    "input_text": "年賀状をメールで済ませるなんて",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本年贺状（新年贺卡）传统要求手写邮寄，用电子邮件代替被长辈视为失礼。中国微信拜年已成为主流且完全被接受"
+  },
+  {
+    "id": 48,
+    "category": "taboo",
+    "input_text": "你租房还是买房了？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人经常讨论住房状况，买房被视为人生成就。日本人将住房状况视为隐私，且日本租房文化发达不存在买房焦虑"
+  },
+  {
+    "id": 49,
+    "category": "taboo",
+    "input_text": "すみません、お名前は何とお読みするのですか",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本姓名读法（読み方）极其重要，读错名字是严重失礼。中国人对名字发音容错度高，且汉字读音较统一不易出错"
+  },
+  {
+    "id": 50,
+    "category": "taboo",
+    "input_text": "你们日本人是不是都很变态？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文'变态'在网络语境中有时是调侃义，但翻译成日语'変態'会被视为严重侮辱，涉及对整个民族的刻板印象攻击"
+  },
+  {
+    "id": 51,
+    "category": "taboo",
+    "input_text": "本音を言うと、このプロジェクトは失敗だと思います",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本文化区分本音（真心话）和建前（场面话），公开表达本音在正式场合令人不安。中国直接表达看法反而被欣赏"
+  },
+  {
+    "id": 52,
+    "category": "taboo",
+    "input_text": "快来快来，我们一起合个影",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人热情邀请合影是友好表现。日本人对拍照较谨慎，尤其被突然邀请合影会感到不适，需要更正式的许可程序"
+  },
+  {
+    "id": 53,
+    "category": "taboo",
+    "input_text": "電車の中で電話するのはマナー違反です",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本电车内打电话是严格的社会禁忌，会被其他乘客厌恶。中国地铁/公交上打电话虽不提倡但社会宽容度远高于日本"
+  },
+  {
+    "id": 54,
+    "category": "taboo",
+    "input_text": "你怎么一个人来的？对象呢？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国社交中询问他人的伴侣在哪是常见寒暄。日本人会认为这暗示独自来是不正常的，且涉及隐私"
+  },
+  {
+    "id": 55,
+    "category": "taboo",
+    "input_text": "敬語を使えない若者は困りますね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本敬语系统（尊敬语/谦让语/丁寧語）极其复杂，不会用敬语被视为教养问题。中国虽有礼貌用语但没有语法级的敬语体系"
+  },
+  {
+    "id": 56,
+    "category": "taboo",
+    "input_text": "你这个人真直接，说话不拐弯",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人说'直接'可能是褒义（爽快）。在日本文化中'直接'几乎等于'粗鲁'，暗示不懂空气、不会做人"
+  },
+  {
+    "id": 57,
+    "category": "taboo",
+    "input_text": "先輩の言うことは絶対です",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本先辈/后辈制度中服从先辈接近绝对义务。中国虽有尊师重道但不存在这种程度的年功序列强制服从"
+  },
+  {
+    "id": 58,
+    "category": "taboo",
+    "input_text": "你是独生子女吗？爸妈压力大吧？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国独生子女政策是常见话题。日本人认为询问家庭结构和子女数量涉及极其敏感的私人领域"
+  },
+  {
+    "id": 59,
+    "category": "taboo",
+    "input_text": "お中元とお歳暮を忘れるなんて",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本中元和�的暮（年中/年末礼）是严格的社交义务，遗忘会严重损害关系。中国虽有送礼文化但没有如此制度化的季节性义务"
+  },
+  {
+    "id": 60,
+    "category": "taboo",
+    "input_text": "你们公司效益怎么样？发年终奖了吗？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人讨论公司效益和奖金是职场社交的一部分。日本人极少与外人讨论公司内部财务状况和个人收入"
+  },
+  {
+    "id": 61,
+    "category": "taboo",
+    "input_text": "手土産も持ってこないで訪問するのは失礼だ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本拜访他人必须带手土産（伴手礼），空手上门被视为失礼。中国虽也有带礼物的习惯但空手去朋友家不算大问题"
+  },
+  {
+    "id": 62,
+    "category": "taboo",
+    "input_text": "没事，这东西不值钱，随便送你的",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人送礼时说'不值钱'是谦虚。日本虽也有'つまらないものですが'但太过直白地贬低礼物会让日本人觉得不尊重自己"
+  },
+  {
+    "id": 63,
+    "category": "taboo",
+    "input_text": "写真を撮る時にピースサインは古い",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本年轻人认为拍照比V是过时的行为。在中国V手势仍然非常流行且不存在年龄代沟的尴尬"
+  },
+  {
+    "id": 64,
+    "category": "taboo",
+    "input_text": "你是几零后的？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国用'80后/90后'划分世代是常见社交话题。日本人认为直接询问年龄段是不礼貌的，且日本世代划分方式（ゆとり/Z世代）有不同的文化内涵"
+  },
+  {
+    "id": 65,
+    "category": "taboo",
+    "input_text": "初対面で下の名前で呼ばないで",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本人初次见面必须用姓氏+さん称呼，直接叫名字被视为过分亲密。中国人之间用名字甚至昵称拉近关系很正常"
+  },
+  {
+    "id": 66,
+    "category": "taboo",
+    "input_text": "哎呀，你这也太客气了，下次别带东西了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人客套说'别带东西'但内心认为对方有礼貌。日本人若真的下次不带东西来会被视为严重失礼"
+  },
+  {
+    "id": 67,
+    "category": "taboo",
+    "input_text": "会議中にあくびするなんて信じられない",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本会议中打哈欠被视为对发言者和整个团队的极度不尊重。中国虽不提倡但社会容忍度更高"
+  },
+  {
+    "id": 68,
+    "category": "taboo",
+    "input_text": "你这人真会来事儿",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文'会来事儿'是褒义，称赞对方会做人。日本文化中被说'あなたは如才ない'虽近似但带有圆滑的负面含义"
+  },
+  {
+    "id": 69,
+    "category": "taboo",
+    "input_text": "ご飯に箸を突き立てないでください",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本将筷子直插米饭中视为供奉亡者的行为（箸立て），日常这样做是严重禁忌。中国也有类似忌讳但很多年轻人已不在意"
+  },
+  {
+    "id": 70,
+    "category": "taboo",
+    "input_text": "这事儿我说了算，不用跟他们商量",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国式果断决策在某些场景被欣赏。日本文化强调根回し（事前沟通）和合意形成（共识构建），一人独断被视为专制"
+  },
+  {
+    "id": 71,
+    "category": "taboo",
+    "input_text": "お辞儀の角度が浅すぎます",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本鞠躬角度有严格标准：15度会釈/30度敬礼/45度最敬礼，角度不够被视为傲慢。中国鞠躬文化没有如此精确的角度区分"
+  },
+  {
+    "id": 72,
+    "category": "taboo",
+    "input_text": "你这菜做得不行啊，盐放多了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人对食物的直接评价是家庭/朋友间的正常互动。日本文化中批评主人准备的食物是极大的不尊重"
+  },
+  {
+    "id": 73,
+    "category": "taboo",
+    "input_text": "転職を考えていると上司に言ったら大変なことになる",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本传统中向上司透露跳槽意向等同于背叛，会立即被边缘化。中国职场中讨论跳槽虽需谨慎但社会接受度更高"
+  },
+  {
+    "id": 74,
+    "category": "taboo",
+    "input_text": "你信什么教？去不去教堂/庙里？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人询问宗教信仰相对随意。日本人将宗教视为极度私人的事务，且日本宗教观（神道+佛教混合）复杂，被外人简单归类会不适"
+  },
+  {
+    "id": 75,
+    "category": "taboo",
+    "input_text": "神社でお寺の作法をしないでください",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本神社（拍手礼拝）和寺院（合掌）的参拜方式严格不同，混淆会被视为不敬。中国寺庙参拜方式相对统一"
+  },
+  {
+    "id": 76,
+    "category": "taboo",
+    "input_text": "你买车了吗？什么牌子的？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人聊车是常见的社交话题和身份象征。日本人（尤其年轻世代）对汽车无执念，询问车辆信息被视为评估经济实力"
+  },
+  {
+    "id": 77,
+    "category": "taboo",
+    "input_text": "空気が読めない人は困りますね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本将'不会读空气'(KY)视为严重的社交缺陷。中国文化虽也看重察言观色但不会将其上升到人格否定的程度"
+  },
+  {
+    "id": 78,
+    "category": "taboo",
+    "input_text": "我随便说说，你也随便听听",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人'随便说说'是减轻建议分量的套话。日本人会认真对待每句话的分量，'随便说说'会让日方困惑：到底要不要当真？"
+  },
+  {
+    "id": 79,
+    "category": "taboo",
+    "input_text": "贈り物を目の前で開けないのが日本のマナーです",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本收到礼物不当面拆开是礼仪。中国文化中当面拆开礼物表示重视和喜悦，不拆反而显得不在乎"
+  },
+  {
+    "id": 80,
+    "category": "taboo",
+    "input_text": "这人能力不行，就靠关系上去的",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人私下评论他人靠关系较常见。日本文化中公开质疑他人的能力和晋升方式是严重的对人攻击(人格攻撃)"
+  },
+  {
+    "id": 81,
+    "category": "taboo",
+    "input_text": "有給休暇を取るのに理由を聞かないでください",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本法律保障年假但职场潜规则中请假需给理由且会被另眼看待。中国企业文化中请假原因也常被追问但程度不同"
+  },
+  {
+    "id": 82,
+    "category": "taboo",
+    "input_text": "你儿子/女儿谈对象了没？介绍一个呗",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国热心长辈做媒是社交常态。日本人认为主动为他人子女做媒（除非被请求）是越界行为"
+  },
+  {
+    "id": 83,
+    "category": "taboo",
+    "input_text": "名前を間違えられるのは本当に失礼だ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本人对名字错误极度敏感，叫错名字会被视为不尊重对方的存在。中国人对叫错名字的容忍度相对较高"
+  },
+  {
+    "id": 84,
+    "category": "taboo",
+    "input_text": "别生气，我开玩笑的",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人用'开玩笑'来化解可能冒犯的言论。日本人认为'我在开玩笑'不能作为说了失礼话之后的免责声明"
+  },
+  {
+    "id": 85,
+    "category": "taboo",
+    "input_text": "遅刻は1分でも許されません",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本对守时的要求近乎苛刻，迟到1分钟都需要郑重道歉。中国商务场合虽重视准时但迟到几分钟通常可以接受"
+  },
+  {
+    "id": 86,
+    "category": "taboo",
+    "input_text": "你是学什么专业的？学校好不好？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人爱聊学历和院校。日本虽有学歴社会但直接问学校等级暗示在评判对方背景，属于失礼"
+  },
+  {
+    "id": 87,
+    "category": "taboo",
+    "input_text": "飲み会で上司のグラスが空いていたら注ぐのが当然だ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本酒席中下属必须随时关注上司酒杯并主动斟酒（お酌），这是严格的礼仪义务。中国虽有敬酒文化但没有如此时刻注意的义务"
+  },
+  {
+    "id": 88,
+    "category": "taboo",
+    "input_text": "看你忙得连饭都没时间吃，太拼了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人称赞工作拼命是正面评价。日本近年对過労死（过劳死）高度敏感，说人太拼可能触及社会创伤点"
+  },
+  {
+    "id": 89,
+    "category": "taboo",
+    "input_text": "内定をもらったら他の会社の選考は辞退するべきだ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本就活（求职）文化中接受一家内定后辞退其他面试是暗规则。中国求职者同时拿多个offer比较再选是正常策略"
+  },
+  {
+    "id": 90,
+    "category": "taboo",
+    "input_text": "你们日本人送礼是不是都送很少？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人可能觉得日本礼物金额低。日本送礼重在心意和仪式感（包装/时节/等级），金额并非核心。暗示礼轻会让日方很不舒服"
+  },
+  {
+    "id": 91,
+    "category": "taboo",
+    "input_text": "仏滅の日に結婚式を挙げるなんて",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本六曜中的仏滅是最不吉利的日子，在此日办婚礼被视为大忌。中国有类似的黄道吉日概念但具体禁忌日完全不同"
+  },
+  {
+    "id": 92,
+    "category": "taboo",
+    "input_text": "下次你来北京，住我家就行，别住酒店",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人邀请朋友住家里是热情的表现。日本人极其注重个人空间，被邀请住他人家反而感到压力和不适"
+  },
+  {
+    "id": 93,
+    "category": "taboo",
+    "input_text": "電車で席を譲ろうとしたら断られた",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本老年人拒绝让座是因为不想被视为'老人'，让座反而可能冒犯他们。中国文化中让座是美德，拒绝通常只是客气"
+  },
+  {
+    "id": 94,
+    "category": "taboo",
+    "input_text": "你这么优秀怎么还没男朋友/女朋友？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国长辈常用'优秀'搭配催促恋爱。日本人认为将单身与个人能力挂钩是逻辑混乱且侵犯隐私的"
+  },
+  {
+    "id": 95,
+    "category": "taboo",
+    "input_text": "飲み会に参加しないと出世できないよ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本饮み会（聚餐）是职场晋升的隐性条件，不参加会被边缘化。中国职场应酬虽重要但没有如此系统性的绑定"
+  },
+  {
+    "id": 96,
+    "category": "taboo",
+    "input_text": "你这方案行不行啊，我怎么觉得有点悬",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国同事间直接质疑方案可行性是工作讨论。日本文化中需要先认可对方努力再极其委婉地提出改进意见"
+  },
+  {
+    "id": 97,
+    "category": "taboo",
+    "input_text": "すみませんが、少し考えさせてください",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本人说'让我想想'往往是婉拒的表达。中国人会理解为对方真的在考虑，等待回复结果"
+  },
+  {
+    "id": 98,
+    "category": "taboo",
+    "input_text": "你这车是贷款买的还是全款？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人讨论购车方式是消费经验分享。日本人认为讨论他人的贷款和支付方式是极度侵犯财务隐私"
+  },
+  {
+    "id": 99,
+    "category": "taboo",
+    "input_text": "結婚式のスピーチで「切れる」「別れる」は禁句です",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本婚礼中有严格的忌み言葉（禁忌词），'切断''分离''重复'等词绝不能用。中国婚礼虽有忌讳但范围和严格程度不同"
+  },
+  {
+    "id": 100,
+    "category": "taboo",
+    "input_text": "你不喝酒？那来杯饮料，大家热闹热闹",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国酒桌文化中劝酒/劝喝是社交热情的体现。日本虽有饮酒文化但强迫他人喝酒（アルハラ）在现代被视为骚扰"
+  },
+  {
+    "id": 101,
+    "category": "taboo",
+    "input_text": "你吃饭吃这么少，是在减肥吗？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人关心朋友饮食量是表达亲近。日本人认为评论他人的食量暗示对身材的批判，涉及饮食障碍等敏感话题"
+  },
+  {
+    "id": 102,
+    "category": "taboo",
+    "input_text": "おみやげの包装を開けずに捨てるなんて",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本送礼的包装本身就是礼仪的一部分，随意丢弃包装被视为不尊重送礼者的心意。中国更重视礼物内容而非包装"
+  },
+  {
+    "id": 103,
+    "category": "taboo",
+    "input_text": "你是做什么生意的？一年赚多少？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国商人间直接谈生意规模和收入是社交常态。日本商务人士将具体收益数字视为商业机密和个人隐私，公开询问极其失礼"
+  },
+  {
+    "id": 104,
+    "category": "taboo",
+    "input_text": "お葬式で白い服を着てはいけません",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本葬礼严格要求黑色着装，白色在葬礼中不合适。中国传统葬礼反而以白色为主要丧服颜色，两种文化对丧葬颜色的认知完全相反"
+  },
+  {
+    "id": 105,
+    "category": "taboo",
+    "input_text": "你在哪个医院看的？什么毛病？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人得知朋友看病后追问细节是关心的表达。日本人将健康问题视为高度隐私，主动追问病情被视为侵犯个人领域"
+  },
+  {
+    "id": 106,
+    "category": "slang",
+    "input_text": "それな",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'それな'是日本年轻人表示'就是那样/对对对'的极简附和语。中文'确实'或'真的'接近但缺少'それな'的那种一个词就完成社交的效率感"
+  },
+  {
+    "id": 107,
+    "category": "slang",
+    "input_text": "这个项目纯属在画饼，落不了地的",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'画饼'指空许诺、无法实现的计划。日语'絵に描いた餅'（画在纸上的年糕）含义相似但是正式谚语而非网络俚语"
+  },
+  {
+    "id": 108,
+    "category": "slang",
+    "input_text": "草生える",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'草'（くさ）源自网络用语wwww（笑い），w看起来像草。'草生える'意为'太好笑了'。中文'笑死'功能相近但生成机制完全不同"
+  },
+  {
+    "id": 109,
+    "category": "slang",
+    "input_text": "这波操作属于是降维打击了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'降维打击'源自《三体》科幻小说，现指用压倒性优势碾压对手。日语中无对应概念，需解释科幻背景才能传达含义"
+  },
+  {
+    "id": 110,
+    "category": "slang",
+    "input_text": "エモい写真だね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'エモい'源自英语emotional，日本年轻人用来形容怀旧/感性/有氛围感的事物。中文'有感觉'或'氛围感拉满'接近但缺少这个词的文化厚度"
+  },
+  {
+    "id": 111,
+    "category": "slang",
+    "input_text": "他天天在公司里PUA别人",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文'PUA'已从搭讪术语演变为泛指精神控制/打压。日语中PUA不常用，需解释为'モラハラ'（moral harassment）但失去了PUA的特定含义"
+  },
+  {
+    "id": 112,
+    "category": "slang",
+    "input_text": "ガチでやばい",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ガチ'（真的/认真地）+'やばい'（厉害/糟糕，正反皆可）。'やばい'的褒贬双义是日语俚语的核心难点，中文很难一词兼顾"
+  },
+  {
+    "id": 113,
+    "category": "slang",
+    "input_text": "我真的栓Q了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'栓Q'是'thank you'的谐音恶搞，实际表达无奈/讽刺感谢。日语中这种利用谐音反转含义的网络梗文化完全不同"
+  },
+  {
+    "id": 114,
+    "category": "slang",
+    "input_text": "沼にハマった",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'沼にハマる'（掉进沼泽）意为深深沉迷于某个爱好/推し无法自拔。中文'入坑'含义类似但'沼'比'坑'更深重、更无法脱身"
+  },
+  {
+    "id": 115,
+    "category": "slang",
+    "input_text": "老板格局打开了，这次不小气",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'格局'在中国网络中指视野和胸怀，'格局打开'指思路开阔不拘小节。日语'器が大きい'接近但缺少网络梗的戏谑色彩"
+  },
+  {
+    "id": 116,
+    "category": "slang",
+    "input_text": "マジ卍",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'マジ卍'是日本JK（女高中生）用语，'卍'表示情绪高涨/兴奋/酷。在中国'卍'主要与佛教符号关联，作为口语表达完全不通"
+  },
+  {
+    "id": 117,
+    "category": "slang",
+    "input_text": "这人属于是人间清醒了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'人间清醒'指在复杂社会中保持清醒认知的人。日语无直接对应，最近的可能是'現実を見ている'但缺少褒义的崇拜感"
+  },
+  {
+    "id": 118,
+    "category": "slang",
+    "input_text": "陽キャと陰キャの違いがわかる",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'陽キャ'（阳角/外向活跃）和'陰キャ'（阴角/内向安静）是日本校园社交的核心分类。中文'社牛/社恐'接近但日本的分类更固化且带有社交阶层含义"
+  },
+  {
+    "id": 119,
+    "category": "slang",
+    "input_text": "这事有点抽象了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国网络中'抽象'已演变为'离谱/荒诞/魔幻'的意思。日语'抽象的'仍保持原义（非具象的），不具备中文的网络含义"
+  },
+  {
+    "id": 120,
+    "category": "slang",
+    "input_text": "コスパが良い居酒屋を探している",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'コスパ'（cost performance的缩写）日本人高频使用来评价性价比。中文'性价比'虽对应但日本人对コスパ的执着程度远超中国人的日常使用频率"
+  },
+  {
+    "id": 121,
+    "category": "slang",
+    "input_text": "这个博主也太能整活了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'整活'指搞出有创意/搞笑的内容。日语中无直接对应，'面白いことをする'太平淡，缺少'整活'那种技术含量加搞笑的综合感"
+  },
+  {
+    "id": 122,
+    "category": "slang",
+    "input_text": "既読スルーされた",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'既読スルー'（已读不回）是日本LINE社交中的重大社交事件，被已读不回是明确的冷暴力信号。中国微信虽也有类似焦虑但程度轻于日本"
+  },
+  {
+    "id": 123,
+    "category": "slang",
+    "input_text": "他这人挺social的，到哪都能聊起来",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文混用英语'social'表示善于社交。日语虽也借用英语但'ソーシャル'主要指社交媒体，形容人会用'社交的'或'人付き合いがいい'"
+  },
+  {
+    "id": 124,
+    "category": "slang",
+    "input_text": "リア充爆発しろ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'リア充'（现实生活充实的人）+'爆発しろ'（去爆炸吧）是单身/宅人对情侣的戏谑嫉妒。中文'狗粮又撒了一地'功能类似但文化表达方式不同"
+  },
+  {
+    "id": 125,
+    "category": "slang",
+    "input_text": "他说的这些话纯属凡尔赛",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'凡尔赛'指以谦虚的方式炫耀，源自漫画《凡尔赛玫瑰》。日语中这个概念需要用'マウンティング'或'自慢'来近似但都不精确"
+  },
+  {
+    "id": 126,
+    "category": "slang",
+    "input_text": "空気を読みすぎて疲れた",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'空気を読みすぎる'（过度读空气）反映日本人对社交压力的疲惫。中文'太会察言观色反而累'可以意译但缺少日本集体主义压力的文化厚度"
+  },
+  {
+    "id": 127,
+    "category": "slang",
+    "input_text": "这个需求太离谱了，纯纯的天方夜谭",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'纯纯的'是网络强调语气词，加强'天方夜谭'（不切实际）的程度。日语'ありえない'（不可能）缺少'纯纯的'这种叠加修饰的网络用法"
+  },
+  {
+    "id": 128,
+    "category": "slang",
+    "input_text": "今日はワーケーションで仕事する",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ワーケーション'（work+vacation）是日本流行的度假工作模式。中文'边旅游边工作'可以表达但缺少日本将其制度化的文化背景"
+  },
+  {
+    "id": 129,
+    "category": "slang",
+    "input_text": "我不想上班，就想躺平",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'躺平'指年轻人拒绝内卷、选择低欲望生活。日本'寝そべり族'是直译但流行度远低于中文原词，日本自己的对应概念是'さとり世代'（悟代）"
+  },
+  {
+    "id": 130,
+    "category": "slang",
+    "input_text": "あの人はコミュ障だから",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'コミュ障'（communication障害的缩写）指社交能力差的人。中文'社恐'功能最近但'コミュ障'在日本带有更强的自嘲标签文化"
+  },
+  {
+    "id": 131,
+    "category": "slang",
+    "input_text": "这波属于是血赚，不亏",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'血赚'源自游戏用语，指大赚特赚。日语'大儲け'可以对应但缺少游戏文化的带入感和网络梗的活力"
+  },
+  {
+    "id": 132,
+    "category": "slang",
+    "input_text": "飯テロの写真を送らないで",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'飯テロ'（饭恐怖主义）指在深夜发美食照片折磨看到的人。中文'深夜放毒'功能相同但'テロ'（恐怖主义）的夸张程度不同"
+  },
+  {
+    "id": 133,
+    "category": "slang",
+    "input_text": "他这种操作属于教科书级别的",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'教科书级别'指完美到可以作为教材的操作。日语'お手本のような'（像范本一样）语义对应但缺少中国网络语境中的夸张赞美感"
+  },
+  {
+    "id": 134,
+    "category": "slang",
+    "input_text": "サビ残は当たり前じゃない",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'サビ残'（サービス残業的缩写，无偿加班）曾是日本职场默认规则。现在年轻世代开始反抗。中文'义务加班'对应但缺少日本代际冲突的文化张力"
+  },
+  {
+    "id": 135,
+    "category": "slang",
+    "input_text": "这问题不大，我来搞定",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'问题不大'是中国人轻描淡写困难并表示自信的口头禅。日语'大したことない'虽类似但日本人说这话通常是在安慰别人而非自己逞强"
+  },
+  {
+    "id": 136,
+    "category": "slang",
+    "input_text": "今の仕事、ブラック企業すぎる",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ブラック企業'（黑心企业）是日本特有概念，指剥削员工的公司。中文'血汗工厂'或'黑心公司'接近但日本有官方认定标准，概念更制度化"
+  },
+  {
+    "id": 137,
+    "category": "slang",
+    "input_text": "哥们太猛了，纯纯大佬",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'大佬'指某领域的厉害人物，带崇拜和尊敬。日语'ガチ勢'或'すごい人'可近似但'大佬'那种江湖气和网络梗的混合感无法传达"
+  },
+  {
+    "id": 138,
+    "category": "slang",
+    "input_text": "パリピの集まりは苦手だ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'パリピ'（party people缩写）指爱派对/社交的人群。中文'蹦迪族'或'嗨咖'勉强对应但缺少日本阳キャ/陰キャ文化分层的背景含义"
+  },
+  {
+    "id": 139,
+    "category": "slang",
+    "input_text": "别来碰瓷了，这锅我不背",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'碰瓷'原指故意制造碰撞讹诈钱财，网络上泛指恶意攻击。'甩锅'指推卸责任。日语需分别翻译'当たり屋'和'責任転嫁'但组合的网络讽刺感消失"
+  },
+  {
+    "id": 140,
+    "category": "slang",
+    "input_text": "あの映画は神作だった",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'神作'（神级作品）是日本御宅族对优秀作品的最高评价。中文'神作'已借用但日本二次元文化中'神'的评价体系（神作→良作→凡作→クソ作）更系统化"
+  },
+  {
+    "id": 141,
+    "category": "slang",
+    "input_text": "这个东西太上头了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'上头'原指喝酒上头（酒精冲脑），现指对某事物极度上瘾/兴奋。日语'ハマりすぎ'（太沉迷）接近但缺少从酒精到泛用的语义演变层"
+  },
+  {
+    "id": 142,
+    "category": "slang",
+    "input_text": "今日は無理ゲーだった",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'無理ゲー'（不可能通关的游戏）用来形容极度困难的日常任务。中文'地狱难度'接近但'無理ゲー'特有的游戏比喻感在中文语境中少见"
+  },
+  {
+    "id": 143,
+    "category": "slang",
+    "input_text": "这波反转太大了，剧本都不敢这么写",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'反转'加'剧本'构成的网络评论模板表示事情发展出乎意料。日语'まさかの展開'（意外展开）功能类似但缺少中国网络评论文化的套路感"
+  },
+  {
+    "id": 144,
+    "category": "slang",
+    "input_text": "ドタキャンされて最悪",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ドタキャン'（土壇場キャンセル的缩写，临时取消约定）在日本社交中是严重的信任破坏。中文'放鸽子'功能对应但日本文化中的严重程度更高"
+  },
+  {
+    "id": 145,
+    "category": "slang",
+    "input_text": "我佛了，这都能出错",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'我佛了'是'我服了'的谐音梗，表达无奈和放弃。日语中没有这种通过谐音双关产生新含义的对等表达"
+  },
+  {
+    "id": 146,
+    "category": "slang",
+    "input_text": "あの人は天然だから許して",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'天然'（てんねん）在日语中指天然呆/自然犯傻的人，是一种可爱的人设。中文'天然'无此含义，需翻译为'呆萌'但失去了日本独特的人设标签感"
+  },
+  {
+    "id": 147,
+    "category": "slang",
+    "input_text": "搞了半天原来是个大冤种",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'大冤种'（东北方言）指被冤枉/倒霉/无辜受害的人。日语'ハズレくじを引いた人'（抽到差签的人）勉强对应但缺少方言+网络梗的混合风味"
+  },
+  {
+    "id": 148,
+    "category": "slang",
+    "input_text": "この曲はエンドレスリピートしている",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'エンドレスリピート'（endless repeat）是日式英语拼合词，指无限循环听一首歌。中文'单曲循环'功能对应但缺少日式和制英语的独特语感"
+  },
+  {
+    "id": 149,
+    "category": "slang",
+    "input_text": "遥遥领先！国货之光",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'遥遥领先'因华为发布会成为国产品牌自豪的代名词，'国货之光'是国潮文化的标签。日语中无对应的民族品牌自豪网络梗文化"
+  },
+  {
+    "id": 150,
+    "category": "slang",
+    "input_text": "KYな人だと思われたくない",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'KY'（空気読めない的缩写）指不会读空气的人。这是日本最核心的社交标签之一，中文'没眼力见'接近但在日本KY是可以导致社交死亡的严重标签"
+  },
+  {
+    "id": 151,
+    "category": "slang",
+    "input_text": "这事做的很接地气",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'接地气'指贴近普通人生活、不脱离实际。日语'庶民的'（庶民的/平民的）接近但缺少中文'接地气'那种从高处下来亲近群众的动态感"
+  },
+  {
+    "id": 152,
+    "category": "slang",
+    "input_text": "今の彼氏とは友達以上恋人未満",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'友達以上恋人未満'（超越朋友但未到恋人）是日本描述暧昧关系的经典表达。中文'暧昧期'功能接近但日本这个表达更诗意且被广泛文化化"
+  },
+  {
+    "id": 153,
+    "category": "slang",
+    "input_text": "他整天阴阳怪气的",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'阴阳怪气'指说话暗含讽刺但不明说。日语'皮肉を言う'（说讽刺话）接近但'阴阳怪气'更强调那种让人不舒服又不好发作的感觉"
+  },
+  {
+    "id": 154,
+    "category": "slang",
+    "input_text": "メンヘラの彼女と付き合うのは大変だ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'メンヘラ'（mental health的变体缩写）指有情绪不稳定倾向的人。中文'作精'功能接近但'メンヘラ'带有日本对精神健康标签化的独特文化背景"
+  },
+  {
+    "id": 155,
+    "category": "slang",
+    "input_text": "这老板天天画大饼，我已经免疫了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'画大饼'指描绘虚假美好蓝图，'免疫了'指不再上当。日语'空手形を切る'（开空头支票）对应前者但整个句式的职场吐槽感难以完整传达"
+  },
+  {
+    "id": 156,
+    "category": "slang",
+    "input_text": "ぴえん超えてぱおん",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ぴえん'（哭哭）是可爱的伤心拟声词，'ぱおん'是比'ぴえん'更强的悲伤。这种拟声词的情感梯度系统在中文中没有对应"
+  },
+  {
+    "id": 157,
+    "category": "slang",
+    "input_text": "别整那些有的没的，直接说重点",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'有的没的'指无关紧要的废话。日语'つべこべ言わないで'（别啰嗦）接近但中文这个表达特有的北方口语直爽感无法复制"
+  },
+  {
+    "id": 158,
+    "category": "slang",
+    "input_text": "ノリが悪いと言われても気にしない",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ノリが悪い'（不配合气氛/扫兴）在日本社交中是严重的负面评价。中文'扫兴'轻得多，日本的'ノリ'文化要求每个人都必须配合团体气氛"
+  },
+  {
+    "id": 159,
+    "category": "slang",
+    "input_text": "这事有点炸裂了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'炸裂'从字面的爆炸义延伸为'太厉害了/太离谱了'的极致表达。日语'すごすぎ'功能接近但缺少'炸裂'那种视觉冲击的力量感"
+  },
+  {
+    "id": 160,
+    "category": "slang",
+    "input_text": "ツンデレな態度がかわいい",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ツンデレ'（傲娇）指先冷淡后亲近的性格类型。中文'傲娇'已借用但日本二次元的萌属性分类体系（ヤンデレ/クーデレ等）更系统化"
+  },
+  {
+    "id": 161,
+    "category": "slang",
+    "input_text": "谁还不是个宝宝呢",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'宝宝'在中国网络中已不限于婴儿，成年人自称'宝宝'表示撒娇/装可爱。日语'赤ちゃん'没有这种自称用法，'甘える'（撒娇）也不完全对应"
+  },
+  {
+    "id": 162,
+    "category": "slang",
+    "input_text": "今回の旅行は弾丸だった",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'弾丸旅行'（子弹旅行）指极短时间内高强度的旅行。中文'特种兵旅游'是2023年流行的对应概念但比喻方式完全不同"
+  },
+  {
+    "id": 163,
+    "category": "slang",
+    "input_text": "这件事我要吐槽一下",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'吐槽'已从日语'ツッコミ'借入中文但含义扩大了。日语'ツッコミ'限于漫才（双人喜剧）的捧哏角色，中文'吐槽'泛指任何抱怨/评论"
+  },
+  {
+    "id": 164,
+    "category": "slang",
+    "input_text": "あの二人はイチャイチャしすぎ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'イチャイチャ'是拟态词，形容情侣间腻歪/打情骂俏的样子。中文'撒狗粮'或'秀恩爱'功能接近但日语拟态词的感觉无法复制"
+  },
+  {
+    "id": 165,
+    "category": "slang",
+    "input_text": "小镇做题家也有春天",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'小镇做题家'指小城市出身靠刷题考入名校的学生，带有自嘲和阶层固化的无奈。日语中无对应概念，日本教育焦虑的表现形式不同"
+  },
+  {
+    "id": 166,
+    "category": "slang",
+    "input_text": "この店の雰囲気がエモくて最高",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'エモい'的形容词变化'エモくて'，用来描述有怀旧+文艺+感性氛围的场所。中文'氛围感'接近但'エモい'特有的日本审美(わびさび)底色不同"
+  },
+  {
+    "id": 167,
+    "category": "slang",
+    "input_text": "真的绷不住了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'绷不住'指忍不住笑/忍不住崩溃，根据语境可指正面（太好笑）或负面（太难受）。日语中需要根据语境选择完全不同的表达"
+  },
+  {
+    "id": 168,
+    "category": "slang",
+    "input_text": "タイパを重視する世代",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'タイパ'（time performance）是Z世代高频使用的效率评价词，指时间性价比。中文尚无一词概括，日本将效率评价从コスパ扩展到タイパ反映了独特的世代价值观"
+  },
+  {
+    "id": 169,
+    "category": "slang",
+    "input_text": "这人是懂整活的，蹭热度一把好手",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'蹭热度'指借助热门话题为自己引流。日语'炎上商法'（靠争议获取关注）近似但更负面，中文'蹭热度'可正可负"
+  },
+  {
+    "id": 170,
+    "category": "slang",
+    "input_text": "あの先生の授業はガチで神",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ガチで神'（真的是神级的）是日本年轻人的最高评价叠加。'ガチ'强调真实性+'神'是最高等级。中文'真的yyds'功能接近但生成逻辑不同"
+  },
+  {
+    "id": 171,
+    "category": "slang",
+    "input_text": "我直接一个地铁老人看手机表情",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "这是中国网络表情包梗的文字化，指看到不可思议内容时的困惑表情。日语中表情包梗的表达方式不同，这种'用文字描述表情包'的用法较少"
+  },
+  {
+    "id": 172,
+    "category": "slang",
+    "input_text": "マウンティングされるのが嫌",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'マウンティング'（从动物行为借用）指通过言行暗示自己地位/经验更高来压制对方。中文'秀优越感'接近但日本将其命名为动物行为带有更强的批判意味"
+  },
+  {
+    "id": 173,
+    "category": "slang",
+    "input_text": "这份报告属于是缝合怪了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'缝合怪'源自游戏/动漫，指拼凑多种元素却缺乏原创性的东西。日语'ツギハギ'（补丁拼合）可对应但缺少'怪'这个人格化的嘲讽"
+  },
+  {
+    "id": 174,
+    "category": "slang",
+    "input_text": "公式が病気",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'公式が病気'（官方有病）是日本网民赞美官方出了意想不到的疯狂内容。中文'官方最为致命'或'官方整活'功能对应但比喻方式不同"
+  },
+  {
+    "id": 175,
+    "category": "slang",
+    "input_text": "属于是典中典了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'典中典'（经典中的经典）是中国网络反讽用语，实际含义是'又来这套老掉牙的东西'。日语字面翻译会变成真正的赞美，完全错失反讽意图"
+  },
+  {
+    "id": 176,
+    "category": "slang",
+    "input_text": "チルい音楽を聴きながら作業する",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'チルい'（源自英语chill）是日本年轻人形容放松/舒缓氛围的新造形容词。中文'chill'已开始借用但'チルい'的形容词化（加い结尾）是日语独有的造词方式"
+  },
+  {
+    "id": 177,
+    "category": "slang",
+    "input_text": "这个点子很有灵魂",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'有灵魂'在中国网络中指某事物有独特的精髓/神韵。日语'魂がある'偏向热血/热情的含义，与中文'有灵魂'的创意/独特含义不同"
+  },
+  {
+    "id": 178,
+    "category": "slang",
+    "input_text": "ディスられた気分",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ディスる'（源自英语disrespect）是日语中嘲讽/贬低他人的动词。中文'diss'已借用但日语已完全将其动词化（ディスる/ディスられる）"
+  },
+  {
+    "id": 179,
+    "category": "slang",
+    "input_text": "给大家整个活，整乐了就完事了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'整个活'+'乐了就完事了'的组合传达一种娱乐至上的态度。日语'盛り上げる'（活跃气氛）太正式，缺少这种随性和反权威的基调"
+  },
+  {
+    "id": 180,
+    "category": "slang",
+    "input_text": "推し活に全力を注いでいる",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'推し活'（为喜欢的偶像/角色投入时间和金钱的活动）是日本独特的饭圈动词名词化。中文'追星'含义接近但'推し活'强调活动本身而非追的行为"
+  },
+  {
+    "id": 181,
+    "category": "slang",
+    "input_text": "他简直就是恋爱脑",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'恋爱脑'指一谈恋爱就丧失理智的人。日语'恋愛脳'可以直译但在日本文化中缺少中文那种对女性的特定批判/调侃意味"
+  },
+  {
+    "id": 182,
+    "category": "slang",
+    "input_text": "ワクワクが止まらない",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ワクワク'是日语特有的兴奋/期待拟态词。中文'激动到不行'可意译但日语拟态词（オノマトペ）的声音感受性在中文中无对等体系"
+  },
+  {
+    "id": 183,
+    "category": "slang",
+    "input_text": "我狠狠共情了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'狠狠共情'用暴力感副词修饰温柔动词，制造冲突感表达强烈认同。日语'めっちゃ共感'可意译但'狠狠'那种矛盾修辞的美学无法传达"
+  },
+  {
+    "id": 184,
+    "category": "slang",
+    "input_text": "バズった動画を見た？",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'バズる'（buzz的动词化）指内容在社交媒体上爆红。中文'火了'或'出圈了'功能对应但'バズる'强调传播的蜂鸣声般的扩散感"
+  },
+  {
+    "id": 185,
+    "category": "slang",
+    "input_text": "这不纯纯的韭菜吗",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'韭菜'指被反复割取利益的消费者/投资者（韭菜割了还长）。日语'カモ'（肥鸭/冤大头）近似但缺少韭菜反复再生被再割的隐喻深度"
+  },
+  {
+    "id": 186,
+    "category": "slang",
+    "input_text": "あの人はガラスのハートだから",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ガラスのハート'（玻璃心）在日本指极度脆弱敏感的人。中文'玻璃心'含义相同且可能是从日语借入的，但使用语境和频率有差异"
+  },
+  {
+    "id": 187,
+    "category": "slang",
+    "input_text": "CPU我呢？这人说话满嘴跑火车",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'CPU'在中国网络中被赋予'蒙骗/处理（你）'的新义（取处理器加工数据的比喻）。'跑火车'指说大话。日语中这两个网络语都不存在"
+  },
+  {
+    "id": 188,
+    "category": "slang",
+    "input_text": "ほっこりする話だね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ほっこり'是日语特有的温暖感受词，指看到/听到某事后内心温暖舒适。中文'暖心'或'治愈'接近但'ほっこり'那种身体性的温暖感觉无法精确传达"
+  },
+  {
+    "id": 189,
+    "category": "slang",
+    "input_text": "完了，我DNA动了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'DNA动了'指某个事物唤醒了深藏记忆中的情感/经历。源自基因记忆的比喻。日语中没有用DNA来表达怀旧/记忆唤醒的网络用法"
+  },
+  {
+    "id": 190,
+    "category": "slang",
+    "input_text": "今日は自分にご褒美",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'自分にご褒美'（给自己奖励）是日本消费文化中的重要概念，为自己花钱的正当化表达。中文'犒劳自己'对应但日本将其仪式化的程度更高"
+  },
+  {
+    "id": 191,
+    "category": "slang",
+    "input_text": "这不妥妥的天花板吗",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'天花板'在中国网络中指某领域的最高水平。日语'天井'虽字面对应但通常只用于股市等具体场景，不像中文泛用于任何领域的赞美"
+  },
+  {
+    "id": 192,
+    "category": "slang",
+    "input_text": "ガチ恋勢は大変だ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'ガチ恋勢'指真的爱上偶像/VTuber的粉丝群体。中文'真爱粉'接近但日本偶像文化中'ガチ恋'有更明确的文化定位和规则（禁止恋爱等）"
+  },
+  {
+    "id": 193,
+    "category": "slang",
+    "input_text": "这也太内卷了，连小学生都开始上补习班了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'内卷'（involution）是中国社会核心热词，指无意义的过度竞争。日本有'受験戦争'但'内卷'的含义超越教育涵盖整个社会的焦虑"
+  },
+  {
+    "id": 194,
+    "category": "slang",
+    "input_text": "親ガチャに失敗した",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'親ガチャ'（父母扭蛋）比喻出生家庭像抽扭蛋一样随机，'失敗'指抽到了不好的家庭。中文'投胎是门技术活'功能接近但扭蛋比喻是日本独有的"
+  },
+  {
+    "id": 195,
+    "category": "slang",
+    "input_text": "这种行为属于是刻在DNA里的了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'刻在DNA里'指某种行为/记忆极其深刻，已成为本能反应。日语中没有这种基因/DNA的网络比喻传统，需要完整解释才能传达"
+  },
+  {
+    "id": 196,
+    "category": "slang",
+    "input_text": "限界オタクの日常",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'限界オタク'指因过度追星/宅而接近崩溃极限的御宅族。中文'极限追星'可意译但'限界'那种在崩溃边缘却仍在坚持的自嘲美学是日本御宅文化独有的"
+  },
+  {
+    "id": 197,
+    "category": "slang",
+    "input_text": "他这人就是嘴硬心软",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'嘴硬心软'是中国对人性格的经典四字描述。日语'口は悪いけど優しい'可意译但四字结构的精炼感和文化共识感无法传达"
+  },
+  {
+    "id": 198,
+    "category": "slang",
+    "input_text": "オワコンだと思ったら復活した",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'オワコン'（终わったコンテンツ的缩写，已过气的内容）是日本网络对事物生命周期的评判标签。中文'过气了'对应但'オワコン'的缩写标签文化带有更强的审判感"
+  },
+  {
+    "id": 199,
+    "category": "slang",
+    "input_text": "你这么卷，是想把我们都卷到沟里去吗",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'卷到沟里'是'内卷'的升级表达，加入了'掉沟里'的具体画面感。日语中需要完整解释内卷概念+落入沟渠的比喻，信息密度损失极大"
+  },
+  {
+    "id": 200,
+    "category": "slang",
+    "input_text": "あの人の行動は理解に苦しむ、いい意味で",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'理解に苦しむ、いい意味で'（难以理解，但是好的意思）是日本年轻人先否定再反转的修辞手法。中文'离谱到佩服'的逻辑接近但日本'いい意味で'已成为固定补充句式"
+  }
+]

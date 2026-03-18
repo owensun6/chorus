@@ -1,0 +1,4 @@
+_archive/
+.claude/
+node_modules/
+coverage/

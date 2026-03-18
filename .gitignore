@@ -1,0 +1,7 @@
+node_modules/
+coverage/
+.ecc_temp/
+*.log
+.DS_Store
+dist/
+.astro/

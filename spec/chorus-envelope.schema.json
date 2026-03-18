@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chorus-protocol.org/schemas/envelope/v0.1",
+  "title": "Chorus Envelope",
+  "description": "Chorus message envelope, carried as a DataPart in A2A Message.",
+  "type": "object",
+  "required": ["chorus_version", "original_semantic", "sender_culture"],
+  "additionalProperties": false,
+  "properties": {
+    "chorus_version": {
+      "type": "string",
+      "const": "0.1",
+      "description": "Protocol version. Phase 0 fixed to '0.1'."
+    },
+    "original_semantic": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Sender Agent's extracted original semantic intent (natural language)."
+    },
+    "sender_culture": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Z][a-z]{3})?(-[A-Z]{2}|-[0-9]{3})?$",
+      "description": "Sender user's cultural background identifier (BCP47)."
+    },
+    "intent_type": {
+      "type": "string",
+      "enum": [
+        "greeting",
+        "request",
+        "proposal",
+        "rejection",
+        "chitchat",
+        "apology",
+        "gratitude",
+        "information"
+      ],
+      "description": "Auxiliary intent label."
+    },
+    "formality": {
+      "type": "string",
+      "enum": ["formal", "semi-formal", "casual"],
+      "description": "Formality level."
+    },
+    "emotional_tone": {
+      "type": "string",
+      "enum": ["polite", "neutral", "enthusiastic", "cautious", "apologetic"],
+      "description": "Emotional tone."
+    },
+    "relationship_level": {
+      "type": "string",
+      "enum": ["new_acquaintance", "colleague", "close_friend"],
+      "description": "Relationship closeness (reserved for future use in Phase 0)."
+    }
+  }
+}

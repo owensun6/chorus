@@ -1,25 +1,10 @@
 // Author: be-api-router
 import { Hono } from "hono";
-import { ZodError } from "zod";
 import type OpenAI from "openai";
-import { parseEnvelope } from "./envelope";
+import { findChorusDataPart } from "./envelope";
 import { adaptMessage } from "./llm";
-import { CHORUS_MEDIA_TYPE } from "../shared/types";
-import type { A2AMessage, ChorusEnvelope, DataPart } from "../shared/types";
-
-// --- Response Helpers ---
-
-const successResponse = (data: unknown) => ({
-  success: true as const,
-  data,
-  metadata: { timestamp: new Date().toISOString() },
-});
-
-const errorResponse = (code: string, message: string) => ({
-  success: false as const,
-  error: { code, message },
-  metadata: { timestamp: new Date().toISOString() },
-});
+import { successResponse, errorResponse } from "../shared/response";
+import type { A2AMessage } from "../shared/types";
 
 // --- Receiver Config ---
 
@@ -30,15 +15,7 @@ interface ReceiverConfig {
   readonly onMessage: (from: string, original: string, adapted: string) => void;
 }
 
-// --- Internal Helpers ---
-
-const findRawChorusDataPart = (message: A2AMessage): DataPart | null => {
-  const found = message.parts.find(
-    (p): p is DataPart =>
-      "data" in p && p.mediaType === CHORUS_MEDIA_TYPE,
-  );
-  return found ?? null;
-};
+// --- Internal Helper ---
 
 const extractOriginalText = (message: A2AMessage): string => {
   const textPart = message.parts.find(
@@ -46,25 +23,6 @@ const extractOriginalText = (message: A2AMessage): string => {
       "text" in p && p.mediaType === "text/plain",
   );
   return textPart?.text ?? "";
-};
-
-type ParseResult =
-  | { readonly ok: true; readonly envelope: ChorusEnvelope }
-  | { readonly ok: false; readonly errorMessage: string };
-
-const tryParseEnvelope = (data: unknown): ParseResult => {
-  try {
-    const envelope = parseEnvelope(data);
-    return { ok: true, envelope };
-  } catch (err: unknown) {
-    if (err instanceof ZodError) {
-      const fieldErrors = err.issues
-        .map((i) => `${i.path.join(".")}: ${i.message}`)
-        .join("; ");
-      return { ok: false, errorMessage: fieldErrors };
-    }
-    return { ok: false, errorMessage: "invalid envelope data" };
-  }
 };
 
 // --- Public API ---
@@ -86,20 +44,19 @@ const createReceiver = (config: ReceiverConfig) => {
 
     const { sender_agent_id, message } = body;
 
-    // Step 1: Find raw Chorus DataPart by mediaType
-    const dataPart = findRawChorusDataPart(message);
-    if (dataPart === null) {
+    // Step 1-2: Find and validate Chorus DataPart
+    const result = findChorusDataPart(message);
+
+    if (result.status === "not_found") {
       return c.json(
         errorResponse("ERR_INVALID_ENVELOPE", "no Chorus DataPart found"),
         400,
       );
     }
 
-    // Step 2: Validate envelope via parseEnvelope (catches ZodError)
-    const parsed = tryParseEnvelope(dataPart.data);
-    if (!parsed.ok) {
+    if (result.status === "invalid") {
       return c.json(
-        errorResponse("ERR_INVALID_ENVELOPE", parsed.errorMessage),
+        errorResponse("ERR_INVALID_ENVELOPE", result.error),
         400,
       );
     }
@@ -111,7 +68,7 @@ const createReceiver = (config: ReceiverConfig) => {
     try {
       const adaptedText = await adaptMessage(
         llmClient,
-        parsed.envelope,
+        result.envelope,
         originalText,
         receiverCulture,
       );

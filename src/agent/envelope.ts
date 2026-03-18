@@ -57,23 +57,34 @@ const createChorusMessage = (
   extensions: [CHORUS_EXTENSION_URI],
 });
 
+type FindEnvelopeResult =
+  | { readonly status: "found"; readonly envelope: ChorusEnvelope }
+  | { readonly status: "not_found" }
+  | { readonly status: "invalid"; readonly error: string };
+
 /**
  * Scans an A2AMessage for a DataPart whose mediaType matches CHORUS_MEDIA_TYPE.
- * If found, validates the data against ChorusEnvelopeSchema.
- * Returns the parsed envelope on success, or null when absent / invalid.
+ * Returns a discriminated result distinguishing: found+valid, not found, found+invalid.
  */
-const findChorusDataPart = (message: A2AMessage): ChorusEnvelope | null => {
+const findChorusDataPart = (message: A2AMessage): FindEnvelopeResult => {
   const chorusPart = message.parts.find(
     (p): p is DataPart =>
       "data" in p && p.mediaType === CHORUS_MEDIA_TYPE,
   );
 
   if (chorusPart === undefined) {
-    return null;
+    return { status: "not_found" };
   }
 
   const result = ChorusEnvelopeSchema.safeParse(chorusPart.data);
-  return result.success ? result.data : null;
+  if (result.success) {
+    return { status: "found", envelope: result.data };
+  }
+
+  const fieldErrors = result.error.issues
+    .map((i) => `${i.path.join(".")}: ${i.message}`)
+    .join("; ");
+  return { status: "invalid", error: fieldErrors };
 };
 
 /**
@@ -84,4 +95,4 @@ const parseEnvelope = (data: unknown): ChorusEnvelope =>
   ChorusEnvelopeSchema.parse(data);
 
 export { createEnvelope, createChorusMessage, findChorusDataPart, parseEnvelope };
-export type { EnvelopeExtras };
+export type { EnvelopeExtras, FindEnvelopeResult };

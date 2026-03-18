@@ -190,15 +190,15 @@ if (require.main === module) {
       });
 
       // Find first compatible agent for convenience
-      let defaultTarget = "";
+      const target = { id: "" };
       discoverCompatibleAgents(config.routerUrl, {
         chorus_version: "0.2",
         user_culture: config.culture,
         supported_languages: [...config.languages],
       }).then((agents) => {
         if (agents.length > 0) {
-          defaultTarget = agents[0].agent_id;
-          console.log(`Default target: ${defaultTarget}`);
+          target.id = agents[0].agent_id;
+          console.log(`Default target: ${target.id}`);
         }
       });
 
@@ -210,12 +210,12 @@ if (require.main === module) {
             rl.close();
             process.exit(0);
           }
-          if (trimmed === "" || defaultTarget === "") {
+          if (trimmed === "" || target.id === "") {
             prompt();
             return;
           }
           try {
-            await handle.sendMessage(defaultTarget, trimmed);
+            await handle.sendMessage(target.id, trimmed);
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
             console.error(`Error: ${msg}`);

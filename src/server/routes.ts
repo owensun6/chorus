@@ -2,18 +2,7 @@
 import { Hono } from "hono";
 import { AgentRegistry } from "./registry";
 import { RegisterAgentBodySchema, MessagePayloadBodySchema } from "./validation";
-
-const successResponse = (data: unknown) => ({
-  success: true as const,
-  data,
-  metadata: { timestamp: new Date().toISOString() },
-});
-
-const errorResponse = (code: string, message: string) => ({
-  success: false as const,
-  error: { code, message },
-  metadata: { timestamp: new Date().toISOString() },
-});
+import { successResponse, errorResponse } from "../shared/response";
 
 const createApp = (registry: AgentRegistry): Hono => {
   const app = new Hono();

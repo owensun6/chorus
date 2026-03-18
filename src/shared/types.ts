@@ -95,44 +95,14 @@ const A2AMessageSchema = z.object({
 
 type A2AMessage = z.infer<typeof A2AMessageSchema>;
 
-// --- Routing Server Types ---
+// --- Routing Server Types (plain interfaces — no runtime schema needed) ---
 
-const AgentRegistrationSchema = z.object({
-  agent_id: z.string().min(1),
-  endpoint: z.string().url(),
-  agent_card: ChorusAgentCardSchema,
-  registered_at: z.string().datetime(),
-});
-
-type AgentRegistration = z.infer<typeof AgentRegistrationSchema>;
-
-const MessagePayloadSchema = z.object({
-  sender_agent_id: z.string().min(1),
-  target_agent_id: z.string().min(1),
-  message: A2AMessageSchema,
-});
-
-type MessagePayload = z.infer<typeof MessagePayloadSchema>;
-
-// --- Standard API Response ---
-
-const ApiSuccessSchema = z.object({
-  success: z.literal(true),
-  data: z.unknown(),
-  metadata: z.object({ timestamp: z.string() }),
-});
-
-const ApiErrorSchema = z.object({
-  success: z.literal(false),
-  error: z.object({
-    code: z.string(),
-    message: z.string(),
-  }),
-  metadata: z.object({ timestamp: z.string() }),
-});
-
-type ApiSuccess = z.infer<typeof ApiSuccessSchema>;
-type ApiError = z.infer<typeof ApiErrorSchema>;
+interface AgentRegistration {
+  readonly agent_id: string;
+  readonly endpoint: string;
+  readonly agent_card: ChorusAgentCard;
+  readonly registered_at: string;
+}
 
 export {
   BCP47_REGEX,
@@ -148,10 +118,6 @@ export {
   DataPartSchema,
   PartSchema,
   A2AMessageSchema,
-  AgentRegistrationSchema,
-  MessagePayloadSchema,
-  ApiSuccessSchema,
-  ApiErrorSchema,
 };
 
 export type {
@@ -162,7 +128,4 @@ export type {
   Part,
   A2AMessage,
   AgentRegistration,
-  MessagePayload,
-  ApiSuccess,
-  ApiError,
 };

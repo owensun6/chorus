@@ -112,10 +112,13 @@ describe("envelope pure functions", () => {
 
       const result = findChorusDataPart(message);
 
-      expect(result).toEqual(envelope);
+      expect(result.status).toBe("found");
+      if (result.status === "found") {
+        expect(result.envelope).toEqual(envelope);
+      }
     });
 
-    it("returns null when no Chorus DataPart exists", () => {
+    it("returns not_found when no Chorus DataPart exists", () => {
       const message: A2AMessage = {
         role: "ROLE_USER",
         parts: [{ text: "Plain message", mediaType: "text/plain" }],
@@ -123,10 +126,10 @@ describe("envelope pure functions", () => {
 
       const result = findChorusDataPart(message);
 
-      expect(result).toBeNull();
+      expect(result.status).toBe("not_found");
     });
 
-    it("returns null when DataPart has wrong mediaType", () => {
+    it("returns not_found when DataPart has wrong mediaType", () => {
       const message: A2AMessage = {
         role: "ROLE_USER",
         parts: [
@@ -137,10 +140,10 @@ describe("envelope pure functions", () => {
 
       const result = findChorusDataPart(message);
 
-      expect(result).toBeNull();
+      expect(result.status).toBe("not_found");
     });
 
-    it("returns null when DataPart data fails schema validation", () => {
+    it("returns invalid when DataPart data fails schema validation", () => {
       const message: A2AMessage = {
         role: "ROLE_USER",
         parts: [
@@ -153,7 +156,10 @@ describe("envelope pure functions", () => {
 
       const result = findChorusDataPart(message);
 
-      expect(result).toBeNull();
+      expect(result.status).toBe("invalid");
+      if (result.status === "invalid") {
+        expect(result.error).toBeDefined();
+      }
     });
   });
 

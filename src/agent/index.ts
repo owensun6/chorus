@@ -1,9 +1,10 @@
 // Author: be-domain-modeler
 import { serve } from "@hono/node-server";
-import { createLLMClient, extractSemantic } from "./llm";
+import { createLLMClient, extractSemantic, extractSemanticStream } from "./llm";
 import { createReceiver } from "./receiver";
 import { createEnvelope, createChorusMessage } from "./envelope";
 import { discoverCompatibleAgents } from "./discovery";
+import { ConversationHistory } from "./history";
 import type { ChorusEnvelope } from "../shared/types";
 
 // --- Types ---
@@ -59,6 +60,29 @@ const validateEnv = (): { readonly apiKey: string } => {
   return { apiKey };
 };
 
+// --- SSE Response Parser ---
+
+const parseSSEChunks = (raw: string): Array<{ event: string; data: string }> => {
+  const events: Array<{ event: string; data: string }> = [];
+  const lines = raw.split("\n");
+  let currentEvent = "";
+  let currentData = "";
+
+  for (const line of lines) {
+    if (line.startsWith("event: ")) {
+      currentEvent = line.slice(7);
+    } else if (line.startsWith("data: ")) {
+      currentData = line.slice(6);
+    } else if (line === "" && currentEvent !== "") {
+      events.push({ event: currentEvent, data: currentData });
+      currentEvent = "";
+      currentData = "";
+    }
+  }
+
+  return events;
+};
+
 // --- Agent Lifecycle ---
 
 const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
@@ -70,7 +94,10 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
   // Step b: create LLM client
   const llmClient = createLLMClient(apiKey);
 
-  // Step c: create receiver
+  // Step c: create conversation history
+  const history = new ConversationHistory();
+
+  // Step d: create receiver
   const { app } = createReceiver({
     port,
     llmClient,
@@ -79,15 +106,28 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
       console.log(`[${agentId}] Message from ${from}:`);
       console.log(`  Original: ${original}`);
       console.log(`  Adapted:  ${adapted}`);
+
+      history.addTurn(from, {
+        role: "received",
+        originalText: original,
+        adaptedText: adapted,
+        envelope: {
+          chorus_version: "0.3",
+          original_semantic: original,
+          sender_culture: "unknown",
+        },
+        timestamp: new Date().toISOString(),
+      });
     },
+    history,
   });
 
-  // Step d: start HTTP server
+  // Step e: start HTTP server
   const server = serve({ fetch: app.fetch, port });
 
   console.log(`[${agentId}] Receiver listening on port ${port}`);
 
-  // Step e: register with router
+  // Step f: register with router
   const registrationBody = {
     agent_id: agentId,
     endpoint: `http://localhost:${port}/receive`,
@@ -112,7 +152,7 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
 
   console.log(`[${agentId}] Registered with router at ${routerUrl}`);
 
-  // Step f: discover compatible agents
+  // Step g: discover compatible agents
   const compatible = await discoverCompatibleAgents(routerUrl, {
     chorus_version: "0.2",
     user_culture: culture,
@@ -124,10 +164,20 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
     compatible.map((a) => a.agent_id),
   );
 
-  // Step g: return handle
+  // Step h: return handle
 
   const sendMessage = async (targetId: string, text: string): Promise<void> => {
-    const semantics = await extractSemantic(llmClient, text, culture);
+    const semantics = await extractSemanticStream(
+      llmClient,
+      text,
+      culture,
+      (token: string) => {
+        process.stdout.write(token);
+      },
+    );
+
+    const conversationId = history.getConversationId(targetId);
+    const turnNumber = history.getNextTurnNumber(targetId);
 
     const envelope: ChorusEnvelope = createEnvelope(
       semantics.original_semantic,
@@ -137,6 +187,8 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
         intent_type: semantics.intent_type as ChorusEnvelope["intent_type"],
         formality: semantics.formality as ChorusEnvelope["formality"],
         emotional_tone: semantics.emotional_tone as ChorusEnvelope["emotional_tone"],
+        conversation_id: conversationId,
+        turn_number: turnNumber,
       },
     );
 
@@ -146,6 +198,7 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
       sender_agent_id: agentId,
       target_agent_id: targetId,
       message,
+      stream: true,
     };
 
     const response = await fetch(`${routerUrl}/messages`, {
@@ -154,8 +207,49 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
       body: JSON.stringify(payload),
     });
 
-    const result = await response.json();
-    console.log(`[${agentId}] Message sent to ${targetId}:`, result);
+    // Read SSE streaming response
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let fullAdaptedText = "";
+
+    if (reader) {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const rawText = decoder.decode(value);
+        const events = parseSSEChunks(rawText);
+
+        for (const evt of events) {
+          if (evt.event === "chunk") {
+            try {
+              const parsed = JSON.parse(evt.data) as { text: string };
+              process.stdout.write(parsed.text);
+              fullAdaptedText += parsed.text;
+            } catch {
+              // skip malformed chunk
+            }
+          } else if (evt.event === "done") {
+            try {
+              const parsed = JSON.parse(evt.data) as { full_text: string };
+              fullAdaptedText = parsed.full_text;
+            } catch {
+              // skip
+            }
+          }
+        }
+      }
+    }
+
+    // Save to history after successful send
+    history.addTurn(targetId, {
+      role: "sent",
+      originalText: text,
+      adaptedText: fullAdaptedText,
+      envelope,
+      timestamp: new Date().toISOString(),
+    });
+
+    console.log(`\n[${agentId}] Message sent to ${targetId}`);
   };
 
   const shutdown = async (): Promise<void> => {
@@ -239,5 +333,5 @@ if (require.main === module) {
     });
 }
 
-export { parseArgs, validateEnv, startAgent };
+export { parseArgs, validateEnv, startAgent, parseSSEChunks };
 export type { AgentConfig, AgentHandle };

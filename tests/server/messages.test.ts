@@ -200,3 +200,154 @@ describe("Server entry point (test_case_7)", () => {
     expect(app).toBeDefined();
   });
 });
+
+// ---------------------------------------------------------------------------
+// T-05: Streaming forwarding tests
+// ---------------------------------------------------------------------------
+
+const parseSSEEvents = (raw: string): Array<{ event: string; data: string }> => {
+  const events: Array<{ event: string; data: string }> = [];
+  const blocks = raw.split("\n\n").filter((b) => b.trim().length > 0);
+  for (const block of blocks) {
+    const lines = block.split("\n");
+    let event = "";
+    let data = "";
+    for (const line of lines) {
+      if (line.startsWith("event: ")) event = line.slice(7);
+      if (line.startsWith("data: ")) data = line.slice(6);
+    }
+    if (event || data) events.push({ event, data });
+  }
+  return events;
+};
+
+const makeMockSSEStream = (events: string): ReadableStream<Uint8Array> => {
+  const encoder = new TextEncoder();
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode(events));
+      controller.close();
+    },
+  });
+};
+
+describe("POST /messages (streaming — T-05)", () => {
+  let app: ReturnType<typeof createApp>;
+  let registry: AgentRegistry;
+  let fetchSpy: jest.SpiedFunction<typeof global.fetch>;
+
+  const streamMessage = {
+    ...validMessage,
+    stream: true,
+  };
+
+  beforeEach(() => {
+    registry = new AgentRegistry();
+    registry.register(SENDER_AGENT.id, SENDER_AGENT.endpoint, SENDER_AGENT.card);
+    registry.register(TARGET_AGENT.id, TARGET_AGENT.endpoint, TARGET_AGENT.card);
+    app = createApp(registry);
+    fetchSpy = jest.spyOn(global, "fetch");
+  });
+
+  afterEach(() => {
+    fetchSpy.mockRestore();
+  });
+
+  const postMessage = (body: unknown) =>
+    app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" },
+    });
+
+  it("test_case_1: stream=true pipes SSE from mock target agent", async () => {
+    const ssePayload =
+      `event: chunk\ndata: {"text":"Hello"}\n\n` +
+      `event: done\ndata: {"full_text":"Hello world"}\n\n`;
+
+    fetchSpy.mockResolvedValueOnce(
+      new Response(makeMockSSEStream(ssePayload), {
+        status: 200,
+        headers: { "Content-Type": "text/event-stream" },
+      }),
+    );
+
+    const res = await postMessage(streamMessage);
+
+    expect(res.headers.get("Content-Type")).toBe("text/event-stream");
+    expect(res.headers.get("Cache-Control")).toBe("no-cache");
+
+    const text = await res.text();
+    const events = parseSSEEvents(text);
+    expect(events.some((e) => e.event === "chunk")).toBe(true);
+    expect(events.some((e) => e.event === "done")).toBe(true);
+
+    // Verify fetch was called with Accept: text/event-stream
+    const [, opts] = fetchSpy.mock.calls[0];
+    expect(opts?.headers).toBeDefined();
+    const headers = opts?.headers as Record<string, string>;
+    expect(headers["Accept"]).toBe("text/event-stream");
+  });
+
+  it("test_case_2: stream=false returns JSON response (Phase 1 compat)", async () => {
+    const targetReply = { status: "ok" };
+    fetchSpy.mockResolvedValueOnce(
+      new Response(JSON.stringify(targetReply), { status: 200 }),
+    );
+
+    const res = await postMessage({ ...validMessage, stream: false });
+
+    expect(res.status).toBe(200);
+    const json: Json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.data.target_response).toEqual(targetReply);
+  });
+
+  it("test_case_3: stream=true with unreachable agent returns SSE error", async () => {
+    fetchSpy.mockRejectedValueOnce(new Error("ECONNREFUSED"));
+
+    const res = await postMessage(streamMessage);
+
+    expect(res.headers.get("Content-Type")).toBe("text/event-stream");
+    const text = await res.text();
+    const events = parseSSEEvents(text);
+
+    const errorEvents = events.filter((e) => e.event === "error");
+    expect(errorEvents.length).toBe(1);
+    const errorData = JSON.parse(errorEvents[0].data);
+    expect(errorData.code).toBe("ERR_AGENT_UNREACHABLE");
+  });
+
+  it("test_case_4: stream=true with agent 500 returns SSE error", async () => {
+    fetchSpy.mockResolvedValueOnce(
+      new Response("Internal Server Error", { status: 500 }),
+    );
+
+    const res = await postMessage(streamMessage);
+
+    expect(res.headers.get("Content-Type")).toBe("text/event-stream");
+    const text = await res.text();
+    const events = parseSSEEvents(text);
+
+    const errorEvents = events.filter((e) => e.event === "error");
+    expect(errorEvents.length).toBe(1);
+    const errorData = JSON.parse(errorEvents[0].data);
+    expect(errorData.code).toBe("ERR_AGENT_UNREACHABLE");
+  });
+
+  it("test_case_5: validation error returns 400 JSON regardless of stream flag", async () => {
+    const body = {
+      sender_agent_id: SENDER_AGENT.id,
+      // missing target_agent_id
+      stream: true,
+      message: validMessage.message,
+    };
+
+    const res = await postMessage(body);
+
+    expect(res.status).toBe(400);
+    const json: Json = await res.json();
+    expect(json.success).toBe(false);
+    expect(json.error.code).toBe("ERR_INVALID_BODY");
+  });
+});

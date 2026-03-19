@@ -202,4 +202,133 @@ describe("envelope pure functions", () => {
       expect(() => parseEnvelope(badCulture)).toThrow(ZodError);
     });
   });
+
+  // --- v0.3 envelope support ---
+
+  describe("createEnvelope v0.3 auto-detection", () => {
+    it("produces v0.3 when conversation_id and turn_number are provided", () => {
+      const env = createEnvelope("Hello", "en-US", undefined, {
+        conversation_id: "conv-abc-123",
+        turn_number: 1,
+      });
+
+      expect(env).toEqual({
+        chorus_version: "0.3",
+        original_semantic: "Hello",
+        sender_culture: "en-US",
+        conversation_id: "conv-abc-123",
+        turn_number: 1,
+      });
+    });
+
+    it("produces v0.3 when only conversation_id is provided", () => {
+      const env = createEnvelope("Hola", "es-ES", undefined, {
+        conversation_id: "conv-xyz",
+      });
+
+      expect(env.chorus_version).toBe("0.3");
+      expect(env.conversation_id).toBe("conv-xyz");
+      expect(env.turn_number).toBeUndefined();
+    });
+
+    it("produces v0.3 when only turn_number is provided", () => {
+      const env = createEnvelope("Bonjour", "fr-FR", undefined, {
+        turn_number: 5,
+      });
+
+      expect(env.chorus_version).toBe("0.3");
+      expect(env.turn_number).toBe(5);
+      expect(env.conversation_id).toBeUndefined();
+    });
+
+    it("produces v0.2 when no v0.3 fields are provided", () => {
+      const env = createEnvelope("Ciao", "it-IT", undefined, {
+        intent_type: "greeting",
+      });
+
+      expect(env.chorus_version).toBe("0.2");
+      expect(env.conversation_id).toBeUndefined();
+      expect(env.turn_number).toBeUndefined();
+    });
+
+    it("produces v0.3 with all extras combined", () => {
+      const env = createEnvelope("Hi", "en-US", "Team standup context", {
+        intent_type: "information",
+        formality: "semi-formal",
+        emotional_tone: "neutral",
+        conversation_id: "conv-full",
+        turn_number: 3,
+      });
+
+      expect(env).toEqual({
+        chorus_version: "0.3",
+        original_semantic: "Hi",
+        sender_culture: "en-US",
+        cultural_context: "Team standup context",
+        intent_type: "information",
+        formality: "semi-formal",
+        emotional_tone: "neutral",
+        conversation_id: "conv-full",
+        turn_number: 3,
+      });
+    });
+  });
+
+  describe("parseEnvelope v0.3", () => {
+    it("parses valid v0.3 data with conversation_id and turn_number", () => {
+      const data = {
+        chorus_version: "0.3",
+        original_semantic: "Test v0.3",
+        sender_culture: "ja-JP",
+        conversation_id: "conv-parse-test",
+        turn_number: 2,
+      };
+
+      const result = parseEnvelope(data);
+
+      expect(result).toEqual(data);
+    });
+
+    it("still parses valid v0.2 data (backward compat)", () => {
+      const data = {
+        chorus_version: "0.2",
+        original_semantic: "Legacy",
+        sender_culture: "de-DE",
+      };
+
+      const result = parseEnvelope(data);
+
+      expect(result).toEqual(data);
+    });
+  });
+
+  describe("findChorusDataPart v0.3", () => {
+    it("extracts v0.3 envelope from A2AMessage", () => {
+      const envelope: ChorusEnvelope = {
+        chorus_version: "0.3",
+        original_semantic: "Multi-turn",
+        sender_culture: "zh-CN",
+        conversation_id: "conv-find-test",
+        turn_number: 4,
+      };
+
+      const message: A2AMessage = {
+        role: "ROLE_USER",
+        parts: [
+          { text: "Multi-turn text", mediaType: "text/plain" },
+          { data: { ...envelope }, mediaType: CHORUS_MEDIA_TYPE },
+        ],
+        extensions: [CHORUS_EXTENSION_URI],
+      };
+
+      const result = findChorusDataPart(message);
+
+      expect(result.status).toBe("found");
+      if (result.status === "found") {
+        expect(result.envelope).toEqual(envelope);
+        expect(result.envelope.conversation_id).toBe("conv-find-test");
+        expect(result.envelope.turn_number).toBe(4);
+      }
+    });
+  });
 });

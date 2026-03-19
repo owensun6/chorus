@@ -1,6 +1,6 @@
 // Author: be-ai-integrator
 import OpenAI from "openai";
-import type { ChorusEnvelope } from "../shared/types";
+import type { ChorusEnvelope, ConversationTurn } from "../shared/types";
 
 // --- Types ---
 
@@ -135,5 +135,107 @@ const adaptMessage = async (
   }
 };
 
-export { createLLMClient, extractSemantic, adaptMessage };
+const extractSemanticStream = async (
+  client: OpenAI,
+  userInput: string,
+  senderCulture: string,
+  onToken?: (chunk: string) => void,
+  model: string = DEFAULT_MODEL,
+): Promise<ExtractResult> => {
+  const stream = await client.chat.completions.create({
+    model,
+    messages: [{ role: "user", content: buildSenderPrompt(userInput, senderCulture) }],
+    stream: true,
+  });
+
+  let accumulated = "";
+  for await (const chunk of stream) {
+    const delta = chunk.choices[0]?.delta?.content ?? "";
+    if (delta) {
+      if (onToken) {
+        onToken(delta);
+      }
+      accumulated += delta;
+    }
+  }
+
+  try {
+    const parsed = JSON.parse(accumulated) as Record<string, unknown>;
+
+    return {
+      original_semantic: String(parsed.original_semantic ?? ""),
+      cultural_context:
+        parsed.cultural_context === "" || parsed.cultural_context == null
+          ? undefined
+          : String(parsed.cultural_context),
+      intent_type: enumOrUndefined(parsed.intent_type, VALID_INTENT_TYPES),
+      formality: enumOrUndefined(parsed.formality, VALID_FORMALITY),
+      emotional_tone: enumOrUndefined(parsed.emotional_tone, VALID_EMOTIONAL_TONE),
+    };
+  } catch {
+    throw new Error("failed to parse LLM response");
+  }
+};
+
+const buildReceiverPromptWithHistory = (
+  envelope: ChorusEnvelope,
+  originalText: string,
+  receiverCulture: string,
+  history?: readonly ConversationTurn[],
+): string => {
+  const historyBlock =
+    history && history.length > 0
+      ? "对话历史:\n" +
+        history.map((t) => `[${t.role}] ${t.originalText} → ${t.adaptedText}`).join("\n") +
+        "\n---\n"
+      : "";
+
+  return historyBlock + buildReceiverPrompt(envelope, originalText, receiverCulture);
+};
+
+const adaptMessageStream = async (
+  client: OpenAI,
+  envelope: ChorusEnvelope,
+  originalText: string,
+  receiverCulture: string,
+  history?: readonly ConversationTurn[],
+  onChunk?: (text: string) => void,
+  model: string = DEFAULT_MODEL,
+): Promise<string> => {
+  try {
+    const prompt = buildReceiverPromptWithHistory(
+      envelope,
+      originalText,
+      receiverCulture,
+      history,
+    );
+
+    const stream = await client.chat.completions.create({
+      model,
+      messages: [{ role: "user", content: prompt }],
+      stream: true,
+    });
+
+    let accumulated = "";
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content ?? "";
+      if (delta) {
+        if (onChunk) {
+          onChunk(delta);
+        }
+        accumulated += delta;
+      }
+    }
+
+    return accumulated;
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes("timeout")) {
+      throw new Error(`LLM request timeout: ${message}`);
+    }
+    throw err;
+  }
+};
+
+export { createLLMClient, extractSemantic, adaptMessage, extractSemanticStream, adaptMessageStream };
 export type { ExtractResult };

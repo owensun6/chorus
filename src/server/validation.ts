@@ -17,6 +17,7 @@ const MessagePayloadBodySchema = z.object({
     role: z.string(),
     parts: z.array(z.unknown()).min(1),
   }).passthrough(),
+  stream: z.boolean().optional().default(false),
 });
 
 type MessagePayloadBody = z.infer<typeof MessagePayloadBodySchema>;

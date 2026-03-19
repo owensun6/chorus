@@ -83,7 +83,7 @@ const createApp = (registry: AgentRegistry): Hono => {
       return c.json(errorResponse("ERR_INVALID_BODY", message), 400);
     }
 
-    const { sender_agent_id, target_agent_id, message } = parsed.data;
+    const { sender_agent_id, target_agent_id, message, stream } = parsed.data;
 
     if (!registry.get(sender_agent_id)) {
       return c.json(
@@ -101,6 +101,10 @@ const createApp = (registry: AgentRegistry): Hono => {
     }
 
     const TIMEOUT_MS = 120_000;
+
+    if (stream) {
+      return handleStreamForward(c, target.endpoint, sender_agent_id, message, TIMEOUT_MS);
+    }
 
     try {
       const controller = new AbortController();
@@ -139,6 +143,82 @@ const createApp = (registry: AgentRegistry): Hono => {
   });
 
   return app;
+};
+
+// --- Streaming Forward Helper ---
+
+const buildSSEError = (code: string, message: string): string =>
+  `event: error\ndata: ${JSON.stringify({ code, message })}\n\n`;
+
+const handleStreamForward = async (
+  c: { body: (stream: ReadableStream | null) => Response },
+  endpoint: string,
+  senderAgentId: string,
+  message: unknown,
+  timeoutMs: number,
+): Promise<Response> => {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    const targetRes = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "text/event-stream",
+      },
+      body: JSON.stringify({ sender_agent_id: senderAgentId, message }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timer);
+
+    if (targetRes.status >= 500) {
+      const encoder = new TextEncoder();
+      const errStream = new ReadableStream({
+        start(ctrl) {
+          ctrl.enqueue(
+            encoder.encode(
+              buildSSEError("ERR_AGENT_UNREACHABLE", "Target agent returned a server error"),
+            ),
+          );
+          ctrl.close();
+        },
+      });
+      return new Response(errStream, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+        },
+      });
+    }
+
+    return new Response(targetRes.body, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+      },
+    });
+  } catch (err: unknown) {
+    const errMessage = err instanceof Error ? err.message : String(err);
+    const encoder = new TextEncoder();
+    const errStream = new ReadableStream({
+      start(ctrl) {
+        ctrl.enqueue(
+          encoder.encode(
+            buildSSEError("ERR_AGENT_UNREACHABLE", `Failed to reach target agent: ${errMessage}`),
+          ),
+        );
+        ctrl.close();
+      },
+    });
+    return new Response(errStream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+      },
+    });
+  }
 };
 
 export { createApp };

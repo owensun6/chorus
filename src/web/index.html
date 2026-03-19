@@ -1,0 +1,236 @@
+<!-- Author: fe-ui-builder -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chorus Protocol — Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .msg-meta { display: none; }
+    .msg-meta.open { display: block; }
+    .typing::after { content: '▍'; animation: blink .6s steps(2) infinite; }
+    @keyframes blink { 0% { opacity: 1; } 100% { opacity: 0; } }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 h-screen flex flex-col overflow-hidden">
+
+  <!-- Connection status bar -->
+  <header class="flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-800 shrink-0">
+    <h1 class="text-sm font-semibold tracking-wide">Chorus Protocol Demo</h1>
+    <span id="status" class="text-xs px-2 py-0.5 rounded-full bg-red-900 text-red-300">未连接</span>
+  </header>
+
+  <!-- Dual-panel chat -->
+  <main class="flex flex-1 flex-col md:flex-row overflow-hidden">
+    <!-- zh-CN panel -->
+    <section class="flex flex-col flex-1 border-b md:border-b-0 md:border-r border-gray-800">
+      <div class="px-4 py-2 bg-gray-900/60 text-center text-sm font-medium shrink-0">🇨🇳 Agent zh-CN</div>
+      <div id="msgs-zh" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
+      <form data-agent="agent-zh-cn" data-target="agent-ja" class="send-form flex gap-2 px-4 py-3 bg-gray-900/40 shrink-0">
+        <input type="text" placeholder="输入消息…" class="flex-1 rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-sm focus:outline-none focus:border-blue-500" required>
+        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-medium transition-colors">发送</button>
+        <span class="send-error hidden text-xs text-red-400 self-center"></span>
+      </form>
+    </section>
+
+    <!-- ja panel -->
+    <section class="flex flex-col flex-1">
+      <div class="px-4 py-2 bg-gray-900/60 text-center text-sm font-medium shrink-0">🇯🇵 Agent ja</div>
+      <div id="msgs-ja" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
+      <form data-agent="agent-ja" data-target="agent-zh-cn" class="send-form flex gap-2 px-4 py-3 bg-gray-900/40 shrink-0">
+        <input type="text" placeholder="メッセージを入力…" class="flex-1 rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-sm focus:outline-none focus:border-blue-500" required>
+        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-medium transition-colors">送信</button>
+        <span class="send-error hidden text-xs text-red-400 self-center"></span>
+      </form>
+    </section>
+  </main>
+
+<script>
+"use strict";
+const AGENTS = { "agent-zh-cn": "msgs-zh", "agent-ja": "msgs-ja" };
+const META_KEYS = [
+  ["original_semantic", "原始语义"],
+  ["cultural_context", "文化语境"],
+  ["intent_type", "意图类型"],
+  ["formality", "正式度"],
+  ["emotional_tone", "情感色调"],
+  ["conversation_id", "对话 ID"],
+  ["turn_number", "轮次"]
+];
+
+function getPanel(agentId) {
+  return document.getElementById(AGENTS[agentId] || "msgs-zh");
+}
+
+function scrollToBottom(el) {
+  el.scrollTop = el.scrollHeight;
+}
+
+function createBubble(panel, side, content, extra) {
+  const wrap = document.createElement("div");
+  const isRight = side === "right";
+  wrap.className = `flex ${isRight ? "justify-end" : "justify-start"}`;
+
+  const bubble = document.createElement("div");
+  bubble.className = `max-w-[80%] rounded-xl px-3 py-2 text-sm leading-relaxed ${
+    isRight ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-200"
+  }`;
+
+  const textEl = document.createElement("span");
+  textEl.textContent = content;
+  bubble.appendChild(textEl);
+
+  if (extra) {
+    bubble.appendChild(buildMetaToggle(extra));
+  }
+  wrap.appendChild(bubble);
+  panel.appendChild(wrap);
+  scrollToBottom(panel);
+  return textEl;
+}
+
+function buildMetaToggle(envelope) {
+  const container = document.createElement("div");
+  container.className = "mt-2 border-t border-white/20 pt-1";
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "text-xs opacity-70 hover:opacity-100 transition-opacity";
+  btn.textContent = "▶ 元数据";
+
+  const detail = document.createElement("div");
+  detail.className = "msg-meta mt-1 text-xs space-y-0.5 opacity-80";
+
+  META_KEYS.forEach(([key, label]) => {
+    const row = document.createElement("div");
+    const val = envelope[key] ?? "（无）";
+    row.textContent = `${label}: ${val}`;
+    detail.appendChild(row);
+  });
+
+  btn.addEventListener("click", () => {
+    const open = detail.classList.toggle("open");
+    btn.textContent = `${open ? "▼" : "▶"} 元数据`;
+  });
+
+  container.appendChild(btn);
+  container.appendChild(detail);
+  return container;
+}
+
+// Pending adaptation placeholders keyed by agentId
+const pending = {};
+
+function handleSSE(eventType, data) {
+  if (eventType === "message_sent") {
+    const panel = getPanel(data.from);
+    createBubble(panel, "right", data.text, data.envelope);
+    return;
+  }
+
+  if (eventType === "adaptation_start") {
+    const panel = getPanel(data.agent_id);
+    const textEl = createBubble(panel, "left", "适配中...");
+    textEl.classList.add("typing");
+    pending[data.agent_id] = { textEl, chunks: "" };
+    return;
+  }
+
+  if (eventType === "adaptation_chunk") {
+    const entry = pending[data.agent_id];
+    if (!entry) return;
+    entry.chunks += data.text;
+    entry.textEl.textContent = entry.chunks;
+    scrollToBottom(getPanel(data.agent_id));
+    return;
+  }
+
+  if (eventType === "adaptation_done") {
+    const entry = pending[data.agent_id];
+    const panel = getPanel(data.agent_id);
+    if (entry) {
+      entry.textEl.classList.remove("typing");
+      entry.textEl.textContent = data.text;
+      const bubble = entry.textEl.parentElement;
+      bubble.appendChild(buildMetaToggle(data.envelope || {}));
+      scrollToBottom(panel);
+      delete pending[data.agent_id];
+    } else {
+      createBubble(panel, "left", data.text, data.envelope);
+    }
+    return;
+  }
+
+  if (eventType === "adaptation_error") {
+    const entry = pending[data.agent_id];
+    const panel = getPanel(data.agent_id);
+    if (entry) {
+      entry.textEl.classList.remove("typing");
+      entry.textEl.textContent = `⚠ ${data.message || data.code || "适配失败"}`;
+      entry.textEl.parentElement.classList.replace("bg-gray-800", "bg-red-900/60");
+      delete pending[data.agent_id];
+    } else {
+      const el = createBubble(panel, "left", `⚠ ${data.message || data.code || "适配失败"}`);
+      el.parentElement.classList.replace("bg-gray-800", "bg-red-900/60");
+    }
+    scrollToBottom(panel);
+  }
+}
+
+// SSE Connection
+const statusEl = document.getElementById("status");
+
+function connectSSE() {
+  const es = new EventSource("/events");
+
+  es.addEventListener("open", () => {
+    statusEl.textContent = "已连接";
+    statusEl.className = "text-xs px-2 py-0.5 rounded-full bg-green-900 text-green-300";
+  });
+
+  ["message_sent", "adaptation_start", "adaptation_chunk", "adaptation_done", "adaptation_error"].forEach(type => {
+    es.addEventListener(type, (e) => {
+      try { handleSSE(type, JSON.parse(e.data)); } catch (_) { /* malformed event */ }
+    });
+  });
+
+  es.addEventListener("error", () => {
+    statusEl.textContent = "未连接";
+    statusEl.className = "text-xs px-2 py-0.5 rounded-full bg-red-900 text-red-300";
+  });
+}
+
+connectSSE();
+
+// Send forms
+document.querySelectorAll(".send-form").forEach(form => {
+  const input = form.querySelector("input");
+  const errEl = form.querySelector(".send-error");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+
+    errEl.classList.add("hidden");
+    const fromId = form.dataset.agent;
+    const toId = form.dataset.target;
+
+    try {
+      const res = await fetch("/api/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ from_agent_id: fromId, to_agent_id: toId, text })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      input.value = "";
+    } catch (err) {
+      errEl.textContent = `发送失败: ${err.message}`;
+      errEl.classList.remove("hidden");
+    }
+  });
+});
+</script>
+</body>
+</html>

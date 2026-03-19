@@ -18,3 +18,22 @@
 - 心跳删除：localhost demo 不需要分布式心跳，改为 Agent 退出时显式 DELETE 注销
 - 延迟指标：8s E2E → 5s 单跳（有分解依据）
 - Phase 1 目标受众：内部验证（demo first）
+
+### 2026-03-19 12:00
+
+**操作**: Phase 1 完整流水线 (Stage 1→7) + Phase 2 完整流水线 + 3 轮优化
+**结果**:
+- Phase 1: 8 Tasks TDD 完成，195 tests，92.5% coverage，merged to main
+- Phase 1 E2E: ja→zh-CN "つまらないものですが"→"一点心意，不成敬意，请您收下" 验证通过
+- Phase 2: Streaming + Web Demo UI + 多轮对话，8 Tasks，255 tests，merged to main
+- 模型切换: qwen3.5-plus→qwen3-coder-next (80x 提速，30s→1.4s)
+- FP 审计 3 轮: 死代码清除 + llm.ts 重复消除 + index.ts 拆分 + demo 假广播修复
+- 架构简化: JSON 提取→纯文本双调用（零格式失败，消除 ja→zh 方向 100% 失败率）
+- Agent 人格: 透明翻译管道→文化朋友传话模式（一行提示词改变，体验质变）
+
+**决策**:
+- 不定义 Agent 人格参数——LLM 自带人格，不需要额外配置
+- 不要求 LLM 输出 JSON——纯文本调用，100% 可靠
+- intent_type/formality/emotional_tone 删除——从未参与适配过程，只是展示元数据
+- coding.dashscope.aliyuncs.com/v1 + qwen3-coder-next 是当前最优 LLM 配置
+- 8 模型横评结论: qwen3-coder-next (1.4s) > kimi-k2.5 (2.1s) > 其余全部被 thinking 拖慢

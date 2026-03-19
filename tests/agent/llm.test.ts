@@ -8,19 +8,28 @@ import {
   adaptMessageStream,
 } from "../../src/agent/llm";
 
-// --- Mock OpenAI client factory ---
+// --- Mock OpenAI client factory (all functions now use stream:true internally) ---
 
-const buildMockClient = (responseContent: string) => ({
+const buildMockClient = (responseContent: string) =>
+  buildStreamMockClientFromChunks([responseContent]);
+
+const buildTimeoutClient = () => buildStreamTimeoutClientFactory();
+
+const buildStreamMockClientFromChunks = (chunks: readonly string[]) => ({
   chat: {
     completions: {
       create: jest.fn().mockResolvedValue({
-        choices: [{ message: { content: responseContent } }],
+        [Symbol.asyncIterator]: async function* () {
+          for (const text of chunks) {
+            yield { choices: [{ delta: { content: text } }] };
+          }
+        },
       }),
     },
   },
 });
 
-const buildTimeoutClient = () => ({
+const buildStreamTimeoutClientFactory = () => ({
   chat: {
     completions: {
       create: jest.fn().mockRejectedValue(new Error("LLM request timeout")),
@@ -180,29 +189,10 @@ describe("adaptMessage", () => {
   });
 });
 
-// --- Streaming mock helpers ---
+// --- Streaming tests reuse the same mock helpers above ---
 
-const buildStreamMockClient = (chunks: readonly string[]) => ({
-  chat: {
-    completions: {
-      create: jest.fn().mockResolvedValue({
-        [Symbol.asyncIterator]: async function* () {
-          for (const text of chunks) {
-            yield { choices: [{ delta: { content: text } }] };
-          }
-        },
-      }),
-    },
-  },
-});
-
-const buildStreamTimeoutClient = () => ({
-  chat: {
-    completions: {
-      create: jest.fn().mockRejectedValue(new Error("connection timeout")),
-    },
-  },
-});
+const buildStreamMockClient = buildStreamMockClientFromChunks;
+const buildStreamTimeoutClient = buildStreamTimeoutClientFactory;
 
 // --- extractSemanticStream ---
 

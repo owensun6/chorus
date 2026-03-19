@@ -13,11 +13,13 @@ jest.mock("../../src/agent/llm", () => {
   const actual = jest.requireActual("../../src/agent/llm");
   return {
     ...actual,
+    adaptMessage: jest.fn(),
     adaptMessageStream: jest.fn(),
   };
 });
 
-import { adaptMessageStream } from "../../src/agent/llm";
+import { adaptMessage, adaptMessageStream } from "../../src/agent/llm";
+const mockAdaptMessage = adaptMessage as jest.MockedFunction<typeof adaptMessage>;
 const mockAdaptMessageStream = adaptMessageStream as jest.MockedFunction<typeof adaptMessageStream>;
 
 // ---------------------------------------------------------------------------
@@ -71,8 +73,13 @@ const validRequestBody = {
 // ---------------------------------------------------------------------------
 
 describe("POST /receive", () => {
+  beforeEach(() => {
+    mockAdaptMessage.mockReset();
+  });
+
   it("returns 200 and calls onMessage for valid message with Chorus DataPart", async () => {
     const adapted = "Hey, shall we catch up tomorrow?";
+    mockAdaptMessage.mockResolvedValue(adapted);
     const llmClient = makeLLMClient(adapted);
     const onMessage = jest.fn();
 
@@ -175,6 +182,7 @@ describe("POST /receive", () => {
   });
 
   it("returns 500 ERR_ADAPTATION_FAILED when LLM adaptation fails", async () => {
+    mockAdaptMessage.mockRejectedValue(new Error("model overloaded"));
     const llmClient = makeFailingLLMClient("model overloaded");
     const onMessage = jest.fn();
 
@@ -275,6 +283,7 @@ describe("POST /receive (streaming — T-04)", () => {
 
   it("test_case_2: non-streaming response without Accept header returns JSON (Phase 1 compat)", async () => {
     const adapted = "Adapted non-streaming text";
+    mockAdaptMessage.mockResolvedValue(adapted);
     const llmClient = makeLLMClient(adapted);
     const onMessage = jest.fn();
 

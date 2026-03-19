@@ -40,12 +40,20 @@ const buildReceiverPrompt = (
   envelope: ChorusEnvelope,
   originalText: string,
   receiverCulture: string,
+  history?: readonly ConversationTurn[],
 ): string => {
   const contextNote =
     envelope.cultural_context ??
     "（无文化背景说明，请仅根据 sender_culture 标签推断）";
 
-  return `你是一个跨文化沟通助手，代表用户与来自不同文化背景的对方进行对话。
+  const historyBlock =
+    history && history.length > 0
+      ? "对话历史:\n" +
+        history.map((t) => `[${t.role}] ${t.originalText} → ${t.adaptedText}`).join("\n") +
+        "\n---\n"
+      : "";
+
+  return `${historyBlock}你是一个跨文化沟通助手，代表用户与来自不同文化背景的对方进行对话。
 核心原则：传达意图，而非逐字翻译。适配对方文化的表达习惯。
 你收到的消息来自 ${envelope.sender_culture} 文化背景的发送者。
 原始语义意图: ${envelope.original_semantic}
@@ -54,13 +62,7 @@ const buildReceiverPrompt = (
 请用 ${receiverCulture} 文化最自然的方式表达这段消息。只输出适配文本。`;
 };
 
-// --- Public API ---
-
-const createLLMClient = (apiKey: string, baseUrl?: string): OpenAI =>
-  new OpenAI({
-    apiKey,
-    baseURL: baseUrl ?? DEFAULT_BASE_URL,
-  });
+// --- Enum Validation ---
 
 const VALID_INTENT_TYPES = new Set([
   "greeting", "request", "proposal", "rejection",
@@ -76,64 +78,7 @@ const enumOrUndefined = (value: unknown, valid: Set<string>): string | undefined
   return s !== undefined && valid.has(s) ? s : undefined;
 };
 
-const extractSemantic = async (
-  client: OpenAI,
-  userInput: string,
-  senderCulture: string,
-  model: string = DEFAULT_MODEL,
-): Promise<ExtractResult> => {
-  const response = await client.chat.completions.create({
-    model,
-    messages: [{ role: "user", content: buildSenderPrompt(userInput, senderCulture) }],
-  });
-
-  const raw = response.choices[0]?.message?.content ?? "";
-
-  try {
-    const parsed = JSON.parse(raw) as Record<string, unknown>;
-
-    return {
-      original_semantic: String(parsed.original_semantic ?? ""),
-      cultural_context:
-        parsed.cultural_context === "" || parsed.cultural_context == null
-          ? undefined
-          : String(parsed.cultural_context),
-      intent_type: enumOrUndefined(parsed.intent_type, VALID_INTENT_TYPES),
-      formality: enumOrUndefined(parsed.formality, VALID_FORMALITY),
-      emotional_tone: enumOrUndefined(parsed.emotional_tone, VALID_EMOTIONAL_TONE),
-    };
-  } catch {
-    throw new Error("failed to parse LLM response");
-  }
-};
-
-const adaptMessage = async (
-  client: OpenAI,
-  envelope: ChorusEnvelope,
-  originalText: string,
-  receiverCulture: string,
-  model: string = DEFAULT_MODEL,
-): Promise<string> => {
-  try {
-    const response = await client.chat.completions.create({
-      model,
-      messages: [
-        {
-          role: "user",
-          content: buildReceiverPrompt(envelope, originalText, receiverCulture),
-        },
-      ],
-    });
-
-    return response.choices[0]?.message?.content ?? "";
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    if (message.includes("timeout")) {
-      throw new Error(`LLM request timeout: ${message}`);
-    }
-    throw err;
-  }
-};
+// --- Core Functions (streaming is canonical, non-streaming wraps) ---
 
 const extractSemanticStream = async (
   client: OpenAI,
@@ -152,16 +97,13 @@ const extractSemanticStream = async (
   for await (const chunk of stream) {
     const delta = chunk.choices[0]?.delta?.content ?? "";
     if (delta) {
-      if (onToken) {
-        onToken(delta);
-      }
+      if (onToken) onToken(delta);
       accumulated += delta;
     }
   }
 
   try {
     const parsed = JSON.parse(accumulated) as Record<string, unknown>;
-
     return {
       original_semantic: String(parsed.original_semantic ?? ""),
       cultural_context:
@@ -177,22 +119,6 @@ const extractSemanticStream = async (
   }
 };
 
-const buildReceiverPromptWithHistory = (
-  envelope: ChorusEnvelope,
-  originalText: string,
-  receiverCulture: string,
-  history?: readonly ConversationTurn[],
-): string => {
-  const historyBlock =
-    history && history.length > 0
-      ? "对话历史:\n" +
-        history.map((t) => `[${t.role}] ${t.originalText} → ${t.adaptedText}`).join("\n") +
-        "\n---\n"
-      : "";
-
-  return historyBlock + buildReceiverPrompt(envelope, originalText, receiverCulture);
-};
-
 const adaptMessageStream = async (
   client: OpenAI,
   envelope: ChorusEnvelope,
@@ -203,12 +129,7 @@ const adaptMessageStream = async (
   model: string = DEFAULT_MODEL,
 ): Promise<string> => {
   try {
-    const prompt = buildReceiverPromptWithHistory(
-      envelope,
-      originalText,
-      receiverCulture,
-      history,
-    );
+    const prompt = buildReceiverPrompt(envelope, originalText, receiverCulture, history);
 
     const stream = await client.chat.completions.create({
       model,
@@ -220,9 +141,7 @@ const adaptMessageStream = async (
     for await (const chunk of stream) {
       const delta = chunk.choices[0]?.delta?.content ?? "";
       if (delta) {
-        if (onChunk) {
-          onChunk(delta);
-        }
+        if (onChunk) onChunk(delta);
         accumulated += delta;
       }
     }
@@ -236,6 +155,30 @@ const adaptMessageStream = async (
     throw err;
   }
 };
+
+// Non-streaming: thin wrappers around streaming (no callbacks = no overhead difference)
+const extractSemantic = (
+  client: OpenAI,
+  userInput: string,
+  senderCulture: string,
+  model: string = DEFAULT_MODEL,
+): Promise<ExtractResult> =>
+  extractSemanticStream(client, userInput, senderCulture, undefined, model);
+
+const adaptMessage = (
+  client: OpenAI,
+  envelope: ChorusEnvelope,
+  originalText: string,
+  receiverCulture: string,
+  model: string = DEFAULT_MODEL,
+): Promise<string> =>
+  adaptMessageStream(client, envelope, originalText, receiverCulture, undefined, undefined, model);
+
+const createLLMClient = (apiKey: string, baseUrl?: string): OpenAI =>
+  new OpenAI({
+    apiKey,
+    baseURL: baseUrl ?? DEFAULT_BASE_URL,
+  });
 
 export { createLLMClient, extractSemantic, adaptMessage, extractSemanticStream, adaptMessageStream };
 export type { ExtractResult };

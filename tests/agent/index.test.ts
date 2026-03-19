@@ -28,7 +28,8 @@ jest.mock("@hono/node-server", () => ({
 }));
 
 // Import after mocks are wired
-import { parseArgs, validateEnv, startAgent, parseSSEChunks } from "../../src/agent/index";
+import { parseArgs, validateEnv, startAgent } from "../../src/agent/index";
+import { parseSSEChunks } from "../../src/shared/sse";
 
 // ---------------------------------------------------------------------------
 // Helpers

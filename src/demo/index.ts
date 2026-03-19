@@ -107,13 +107,12 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
       });
 
       try {
-        await handle.sendMessage(to, text);
+        const result = await handle.sendMessage(to, text);
 
-        // Broadcast adaptation_done
         broadcast("adaptation_done", {
           agent_id: to,
-          text: "(see agent console for adapted text)",
-          envelope: {},
+          text: result.adaptedText,
+          envelope: result.envelope,
         });
       } catch (err: unknown) {
         const errMessage = err instanceof Error ? err.message : String(err);

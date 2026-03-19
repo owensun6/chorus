@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import type OpenAI from "openai";
 import { findChorusDataPart } from "./envelope";
 import { adaptMessage, adaptMessageStream } from "./llm";
+import { formatSSE } from "../shared/sse";
 import { successResponse, errorResponse } from "../shared/response";
 import type { A2AMessage, ChorusEnvelope } from "../shared/types";
 import type { ConversationHistory } from "./history";
@@ -134,20 +135,17 @@ const handleStreaming = (
         receiverCulture,
         historyTurns,
         (chunk: string) => {
-          const sseChunk = `event: chunk\ndata: ${JSON.stringify({ text: chunk })}\n\n`;
-          controller.enqueue(encoder.encode(sseChunk));
+          controller.enqueue(encoder.encode(formatSSE("chunk", { text: chunk })));
         },
       )
         .then((fullText) => {
-          const sseDone = `event: done\ndata: ${JSON.stringify({ full_text: fullText, envelope })}\n\n`;
-          controller.enqueue(encoder.encode(sseDone));
+          controller.enqueue(encoder.encode(formatSSE("done", { full_text: fullText, envelope })));
           onMessage(senderAgentId, originalText, fullText);
           controller.close();
         })
         .catch((err: unknown) => {
           const errMessage = err instanceof Error ? err.message : String(err);
-          const sseError = `event: error\ndata: ${JSON.stringify({ code: "ERR_ADAPTATION_FAILED", message: errMessage })}\n\n`;
-          controller.enqueue(encoder.encode(sseError));
+          controller.enqueue(encoder.encode(formatSSE("error", { code: "ERR_ADAPTATION_FAILED", message: errMessage })));
           controller.close();
         });
     },

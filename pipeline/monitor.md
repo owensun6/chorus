@@ -75,7 +75,10 @@ FP-2 原子性: Phase 0 选择了 spike 模式而非正式 TDD，因为目的是
 |------|---------|------|-----------|--------------|
 | Gate 0 | Stage 0: PM 需求解构 | ✅ 已通过 | phase2/0_requirements/PRD.md, FEATURE_LIST.md, BDD_Scenarios.md | Commander 2026-03-19 签字 |
 | Gate 0.5 | Stage 0.5: 低保真原型 | ⏭️ SKIP | 单页 demo UI，Lead 内联处理 | |
-| Gate 1 | Stage 1: 系统架构设计 | 🟡 进行中 | | |
+| Gate 1 | Stage 1: 系统架构设计 | ✅ 已通过 | System_Design.md, INTERFACE.md, Data_Models.md | Commander 2026-03-19 签字 |
+| Stage 1.5 | 原型修订 | ⏭️ SKIP | 无 UI 冲突 | |
+| Stage 2 | 头脑风暴 | ⏭️ SKIP | 技术路径已锁定 | |
+| Gate 2 | Stage 3: DAG 兵力分配 | 🟡 进行中 | | |
 
 ## Phase 1 Task 级追踪
 

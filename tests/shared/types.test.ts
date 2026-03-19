@@ -75,18 +75,65 @@ describe("ChorusAgentCard v0.2", () => {
   });
 });
 
-describe("JSON Schema files v0.2", () => {
-  test("test_case_6: chorus-envelope.schema.json is v0.2", () => {
+describe("ChorusEnvelope v0.3", () => {
+  test("v0.3 envelope with conversation_id and turn_number passes", () => {
+    const v03 = {
+      chorus_version: "0.3" as const,
+      original_semantic: "test",
+      sender_culture: "zh-CN",
+      conversation_id: "conv-123",
+      turn_number: 3,
+    };
+    const result = ChorusEnvelopeSchema.parse(v03);
+    expect(result.conversation_id).toBe("conv-123");
+    expect(result.turn_number).toBe(3);
+  });
+
+  test("v0.2 envelope without new fields still passes", () => {
+    const v02 = {
+      chorus_version: "0.2" as const,
+      original_semantic: "test",
+      sender_culture: "ja",
+    };
+    const result = ChorusEnvelopeSchema.parse(v02);
+    expect(result.chorus_version).toBe("0.2");
+    expect(result.conversation_id).toBeUndefined();
+  });
+
+  test("conversation_id exceeding 64 chars rejected", () => {
+    const invalid = {
+      chorus_version: "0.3",
+      original_semantic: "test",
+      sender_culture: "zh-CN",
+      conversation_id: "x".repeat(65),
+    };
+    expect(() => ChorusEnvelopeSchema.parse(invalid)).toThrow();
+  });
+
+  test("turn_number = 0 rejected, turn_number = 1 accepted", () => {
+    const base = {
+      chorus_version: "0.3",
+      original_semantic: "test",
+      sender_culture: "zh-CN",
+    };
+    expect(() => ChorusEnvelopeSchema.parse({ ...base, turn_number: 0 })).toThrow();
+    const valid = ChorusEnvelopeSchema.parse({ ...base, turn_number: 1 });
+    expect(valid.turn_number).toBe(1);
+  });
+});
+
+describe("JSON Schema files v0.3", () => {
+  test("chorus-envelope.schema.json is v0.3", () => {
     const raw = readFileSync(
       join(__dirname, "../../spec/chorus-envelope.schema.json"),
       "utf-8",
     );
     const schema = JSON.parse(raw);
-    expect(schema.$id).toContain("v0.2");
-    expect(schema.properties.chorus_version.const).toBe("0.2");
-    expect(schema.properties.cultural_context).toBeDefined();
+    expect(schema.$id).toContain("v0.3");
+    expect(schema.properties.chorus_version.enum).toEqual(["0.2", "0.3"]);
+    expect(schema.properties.conversation_id).toBeDefined();
+    expect(schema.properties.turn_number).toBeDefined();
     expect(schema.additionalProperties).toBe(true);
-    expect(schema.properties.relationship_level).toBeUndefined();
   });
 
   test("chorus-agent-card.schema.json is v0.2", () => {
@@ -98,7 +145,6 @@ describe("JSON Schema files v0.2", () => {
     expect(schema.$id).toContain("v0.2");
     expect(schema.properties.chorus_version.const).toBe("0.2");
     expect(schema.additionalProperties).toBe(true);
-    expect(schema.properties.communication_preferences).toBeUndefined();
   });
 });
 

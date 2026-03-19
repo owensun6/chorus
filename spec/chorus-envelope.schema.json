@@ -1,15 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://chorus-protocol.org/schemas/envelope/v0.2",
+  "$id": "https://chorus-protocol.org/schemas/envelope/v0.3",
   "title": "Chorus Envelope",
-  "description": "Chorus message envelope v0.2, carried as a DataPart in A2A Message.",
+  "description": "Chorus message envelope v0.3, carried as a DataPart in A2A Message.",
   "type": "object",
   "required": ["chorus_version", "original_semantic", "sender_culture"],
   "additionalProperties": true,
   "properties": {
     "chorus_version": {
       "type": "string",
-      "const": "0.2",
+      "enum": ["0.2", "0.3"],
       "description": "Protocol version."
     },
     "original_semantic": {
@@ -31,14 +31,8 @@
     "intent_type": {
       "type": "string",
       "enum": [
-        "greeting",
-        "request",
-        "proposal",
-        "rejection",
-        "chitchat",
-        "apology",
-        "gratitude",
-        "information"
+        "greeting", "request", "proposal", "rejection",
+        "chitchat", "apology", "gratitude", "information"
       ],
       "description": "Auxiliary intent label."
     },
@@ -51,6 +45,16 @@
       "type": "string",
       "enum": ["polite", "neutral", "enthusiastic", "cautious", "apologetic"],
       "description": "Emotional tone."
+    },
+    "conversation_id": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "Conversation identifier for multi-turn tracking."
+    },
+    "turn_number": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Turn number within the conversation."
     }
   }
 }

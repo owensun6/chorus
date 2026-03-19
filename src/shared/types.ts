@@ -37,11 +37,11 @@ const EmotionalTone = z.enum([
   "apologetic",
 ]);
 
-// --- ChorusEnvelope v0.2 ---
+// --- ChorusEnvelope v0.2/v0.3 ---
 
 const ChorusEnvelopeSchema = z
   .object({
-    chorus_version: z.literal("0.2"),
+    chorus_version: z.enum(["0.2", "0.3"]),
     original_semantic: z
       .string()
       .min(1, "original_semantic must not be empty"),
@@ -50,10 +50,27 @@ const ChorusEnvelopeSchema = z
     intent_type: IntentType.optional(),
     formality: Formality.optional(),
     emotional_tone: EmotionalTone.optional(),
+    conversation_id: z.string().max(64).optional(),
+    turn_number: z.number().int().min(1).optional(),
   })
   .passthrough();
 
 type ChorusEnvelope = z.infer<typeof ChorusEnvelopeSchema>;
+
+// --- Conversation Types ---
+
+interface ConversationTurn {
+  readonly role: "sent" | "received";
+  readonly originalText: string;
+  readonly adaptedText: string;
+  readonly envelope: ChorusEnvelope;
+  readonly timestamp: string;
+}
+
+// --- Streaming Callback Types ---
+
+type OnTokenCallback = (chunk: string) => void;
+type OnChunkCallback = (text: string) => void;
 
 // --- ChorusAgentCardExtension v0.2 ---
 
@@ -128,4 +145,7 @@ export type {
   Part,
   A2AMessage,
   AgentRegistration,
+  ConversationTurn,
+  OnTokenCallback,
+  OnChunkCallback,
 };

@@ -64,4 +64,20 @@ FP-2 原子性: Phase 0 选择了 spike 模式而非正式 TDD，因为目的是
 | Gate 1 | Stage 1: 系统架构设计 | ✅ 已通过 | System_Design.md, INTERFACE.md, Data_Models.md, ADR-P1-001, Arch-Consultant-audit.md (PASS) | Commander 2026-03-18 签字。FP 审计后删除 ADR-P1-002 + communication_preferences + 3 条废假设 |
 | Stage 2 | 头脑风暴 | ✅ 完成 | 2026-03-18-phase1-implementation-design.md | 路径 2 Modular Layered 确认。Hono + openai 包 + A2A 兼容 JSON |
 | Gate 2 | Stage 3: DAG 兵力分配 | ✅ 已通过 | task.md, dependency_graph.md, TASK_SPEC ×8 | Commander 2026-03-19 签字 |
-| Gate 3 | Stage 6: 全维验收 | ⬜ 未开始 | | |
+| Stage 4 | Worktree 隔离 | ✅ 完成 | ../chorus-phase1 (feature/phase1-chorus-protocol) | |
+| Stage 5 | 开发执行 | ✅ 完成 | 195 tests, 92.5% coverage | 8/8 Tasks GREEN |
+| Stage 6 | QA 审查 + FP 审计 | ✅ 完成 | BCP47 校验修复 + 死代码清除 + API 设计修复 | tsc 零错误 |
+| Stage 7 | 收尾 | ✅ 完成 | merged to main, worktree cleaned | 2026-03-19 |
+
+## Phase 1 Task 级追踪
+
+| T-ID | Assignee | Blocker | Worker | Simplify | QA | 审计报告 |
+|------|----------|---------|--------|----------|----|---------|
+| T-01 | be-domain-modeler | None | [x] | [✓] | [ ] | |
+| T-02 | be-domain-modeler | T-01 | [x] | [✓] | [ ] | |
+| T-03 | be-domain-modeler | T-01 | [x] | [✓] | [ ] | |
+| T-04 | be-ai-integrator | T-01 | [x] | [✓] | [ ] | |
+| T-05 | be-api-router | T-01 | [x] | [✓] | [ ] | |
+| T-06 | be-api-router | T-05 | [x] | [✓] | [ ] | |
+| T-07 | be-api-router | T-02,T-04 | [x] | [✓] | [ ] | |
+| T-08 | be-domain-modeler | T-02,T-03,T-04,T-07 | [x] | [✓] | [ ] | |

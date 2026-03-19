@@ -69,6 +69,12 @@ FP-2 原子性: Phase 0 选择了 spike 模式而非正式 TDD，因为目的是
 | Stage 6 | QA 审查 + FP 审计 | ✅ 完成 | BCP47 校验修复 + 死代码清除 + API 设计修复 | tsc 零错误 |
 | Stage 7 | 收尾 | ✅ 完成 | merged to main, worktree cleaned | 2026-03-19 |
 
+## Phase 2 看板
+
+| Gate | 阶段名称 | 状态 | 产出物链路 | 风险与重审日志 |
+|------|---------|------|-----------|--------------|
+| Gate 0 | Stage 0: PM 需求解构 | 🟡 待审批 | phase2/0_requirements/PRD.md, FEATURE_LIST.md, BDD_Scenarios.md | 6 个假设待确认 |
+
 ## Phase 1 Task 级追踪
 
 | T-ID | Assignee | Blocker | Worker | Simplify | QA | 审计报告 |

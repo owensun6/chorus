@@ -73,7 +73,9 @@ FP-2 原子性: Phase 0 选择了 spike 模式而非正式 TDD，因为目的是
 
 | Gate | 阶段名称 | 状态 | 产出物链路 | 风险与重审日志 |
 |------|---------|------|-----------|--------------|
-| Gate 0 | Stage 0: PM 需求解构 | 🟡 待审批 | phase2/0_requirements/PRD.md, FEATURE_LIST.md, BDD_Scenarios.md | 6 个假设待确认 |
+| Gate 0 | Stage 0: PM 需求解构 | ✅ 已通过 | phase2/0_requirements/PRD.md, FEATURE_LIST.md, BDD_Scenarios.md | Commander 2026-03-19 签字 |
+| Gate 0.5 | Stage 0.5: 低保真原型 | ⏭️ SKIP | 单页 demo UI，Lead 内联处理 | |
+| Gate 1 | Stage 1: 系统架构设计 | 🟡 进行中 | | |
 
 ## Phase 1 Task 级追踪
 

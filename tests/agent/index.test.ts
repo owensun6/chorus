@@ -317,9 +317,6 @@ describe("sendMessage (via AgentHandle)", () => {
     mockExtractSemanticStream.mockResolvedValueOnce({
       original_semantic: "I want to meet",
       cultural_context: "Direct meeting request in Chinese culture",
-      intent_type: "request",
-      formality: "formal",
-      emotional_tone: "polite",
     });
 
     const sseBody = "event: chunk\ndata: {\"text\":\"Meeting\"}\n\nevent: done\ndata: {\"full_text\":\"Meeting request\"}\n\n";
@@ -364,9 +361,6 @@ describe("sendMessage (via AgentHandle)", () => {
     // First message
     mockExtractSemanticStream.mockResolvedValueOnce({
       original_semantic: "hello",
-      intent_type: "greeting",
-      formality: "casual",
-      emotional_tone: "polite",
     });
 
     const sseBody1 = "event: done\ndata: {\"full_text\":\"hi\"}\n\n";
@@ -383,9 +377,6 @@ describe("sendMessage (via AgentHandle)", () => {
     // Second message to same target
     mockExtractSemanticStream.mockResolvedValueOnce({
       original_semantic: "how are you",
-      intent_type: "chitchat",
-      formality: "casual",
-      emotional_tone: "polite",
     });
 
     const sseBody2 = "event: done\ndata: {\"full_text\":\"fine\"}\n\n";
@@ -405,9 +396,6 @@ describe("sendMessage (via AgentHandle)", () => {
 
     mockExtractSemanticStream.mockResolvedValueOnce({
       original_semantic: "test semantic",
-      intent_type: "information",
-      formality: "formal",
-      emotional_tone: "neutral",
     });
 
     const sseBody = "event: done\ndata: {\"full_text\":\"adapted test\"}\n\n";
@@ -451,9 +439,6 @@ describe("sendMessage (via AgentHandle)", () => {
 
     mockExtractSemanticStream.mockResolvedValueOnce({
       original_semantic: "hello",
-      intent_type: "greeting",
-      formality: "casual",
-      emotional_tone: "polite",
     });
 
     const sseBody =

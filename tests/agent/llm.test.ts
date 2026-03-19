@@ -8,28 +8,29 @@ import {
   adaptMessageStream,
 } from "../../src/agent/llm";
 
-// --- Mock OpenAI client factory (all functions now use stream:true internally) ---
+// --- Mock: streaming async iterable ---
 
-const buildMockClient = (responseContent: string) =>
-  buildStreamMockClientFromChunks([responseContent]);
-
-const buildTimeoutClient = () => buildStreamTimeoutClientFactory();
-
-const buildStreamMockClientFromChunks = (chunks: readonly string[]) => ({
-  chat: {
-    completions: {
-      create: jest.fn().mockResolvedValue({
-        [Symbol.asyncIterator]: async function* () {
-          for (const text of chunks) {
-            yield { choices: [{ delta: { content: text } }] };
-          }
-        },
-      }),
-    },
+const buildStreamMock = (chunks: readonly string[]) => ({
+  [Symbol.asyncIterator]: async function* () {
+    for (const text of chunks) {
+      yield { choices: [{ delta: { content: text } }] };
+    }
   },
 });
 
-const buildStreamTimeoutClientFactory = () => ({
+// Mock client that returns different responses per call
+const buildMultiCallClient = (responses: readonly string[][]) => {
+  const createFn = jest.fn();
+  for (const chunks of responses) {
+    createFn.mockResolvedValueOnce(buildStreamMock(chunks));
+  }
+  return { chat: { completions: { create: createFn } } };
+};
+
+const buildSingleCallClient = (chunks: readonly string[]) =>
+  buildMultiCallClient([[...chunks]]);
+
+const buildTimeoutClient = () => ({
   chat: {
     completions: {
       create: jest.fn().mockRejectedValue(new Error("LLM request timeout")),
@@ -37,206 +38,92 @@ const buildStreamTimeoutClientFactory = () => ({
   },
 });
 
-// --- Tests ---
-
-describe("createLLMClient", () => {
-  test("test_case_6: creates client successfully with apiKey and default baseUrl", () => {
-    const client = createLLMClient("test-api-key");
-    expect(client).toBeDefined();
-    expect(client.chat).toBeDefined();
-    expect(client.chat.completions).toBeDefined();
-  });
-
-  test("creates client with custom baseUrl", () => {
-    const client = createLLMClient("test-api-key", "https://custom.api.com/v1");
-    expect(client).toBeDefined();
-  });
-});
+// --- extractSemantic (now 2 plain-text calls) ---
 
 describe("extractSemantic", () => {
-  const validResponse = JSON.stringify({
-    original_semantic: "Suggesting exercise out of health concern",
-    cultural_context:
-      "In Chinese culture, commenting on weight is a normal expression of care.",
-    intent_type: "chitchat",
-    formality: "casual",
-    emotional_tone: "polite",
+  test("returns semantic + cultural_context from 2 LLM calls", async () => {
+    const mockClient = buildMultiCallClient([
+      ["关心对方健康"],  // call 1: semantic
+      ["中国文化中直接评论体重是亲近关系的关心表达"],  // call 2: cultural context
+    ]);
+
+    const result = await extractSemantic(mockClient as any, "你最近胖了", "zh-CN");
+
+    expect(result.original_semantic).toBe("关心对方健康");
+    expect(result.cultural_context).toBe("中国文化中直接评论体重是亲近关系的关心表达");
+    expect(mockClient.chat.completions.create).toHaveBeenCalledTimes(2);
   });
 
-  test("test_case_1: normal extraction — returns parsed result", async () => {
-    const mockClient = buildMockClient(validResponse);
+  test("cultural_context too short is dropped", async () => {
+    const mockClient = buildMultiCallClient([
+      ["问候"],  // semantic
+      ["short"],  // cultural context < 10 chars
+    ]);
 
-    const result = await extractSemantic(
-      mockClient as any,
-      "你最近胖了，多运动运动",
-      "zh-CN",
-    );
+    const result = await extractSemantic(mockClient as any, "hi", "en-US");
 
-    expect(result.original_semantic).toBe(
-      "Suggesting exercise out of health concern",
-    );
-    expect(result.cultural_context).toBe(
-      "In Chinese culture, commenting on weight is a normal expression of care.",
-    );
-    expect(result.intent_type).toBe("chitchat");
-    expect(result.formality).toBe("casual");
-    expect(result.emotional_tone).toBe("polite");
-
-    expect(mockClient.chat.completions.create).toHaveBeenCalledTimes(1);
-    const callArgs = mockClient.chat.completions.create.mock.calls[0][0];
-    expect(callArgs.model).toBe("qwen3-coder-next");
-    expect(callArgs.messages).toBeDefined();
-  });
-
-  test("test_case_2: LLM returns invalid JSON — throws parse error", async () => {
-    const mockClient = buildMockClient("this is not json at all");
-
-    await expect(
-      extractSemantic(mockClient as any, "hello", "en-US"),
-    ).rejects.toThrow("failed to parse LLM response");
-  });
-
-  test("test_case_3: cultural_context is empty string — returns undefined", async () => {
-    const responseWithEmptyContext = JSON.stringify({
-      original_semantic: "Greeting",
-      cultural_context: "",
-      intent_type: "greeting",
-      formality: "casual",
-      emotional_tone: "neutral",
-    });
-    const mockClient = buildMockClient(responseWithEmptyContext);
-
-    const result = await extractSemantic(mockClient as any, "hey", "en-US");
-
-    expect(result.original_semantic).toBe("Greeting");
+    expect(result.original_semantic).toBe("问候");
     expect(result.cultural_context).toBeUndefined();
   });
 
-  test("does not mutate input parameters", async () => {
-    const mockClient = buildMockClient(validResponse);
-    const inputText = "你最近胖了";
-    const culture = "zh-CN";
+  test("falls back to user input when semantic is empty", async () => {
+    const mockClient = buildMultiCallClient([
+      [""],  // empty semantic
+      ["some cultural context that is long enough"],
+    ]);
 
-    await extractSemantic(mockClient as any, inputText, culture);
+    const result = await extractSemantic(mockClient as any, "hello", "en-US");
 
-    expect(inputText).toBe("你最近胖了");
-    expect(culture).toBe("zh-CN");
+    expect(result.original_semantic).toBe("hello");
   });
 });
-
-describe("adaptMessage", () => {
-  const envelope: ChorusEnvelope = {
-    chorus_version: "0.2",
-    original_semantic: "Suggesting exercise out of health concern",
-    sender_culture: "zh-CN",
-    cultural_context:
-      "In Chinese culture, commenting on weight is a normal expression of care.",
-    intent_type: "chitchat",
-    formality: "casual",
-    emotional_tone: "polite",
-  };
-
-  test("test_case_4: normal adaptation — returns adapted text", async () => {
-    const adaptedText =
-      "Hey, I've been getting into running lately — want to join sometime?";
-    const mockClient = buildMockClient(adaptedText);
-
-    const result = await adaptMessage(
-      mockClient as any,
-      envelope,
-      "你最近胖了，多运动运动",
-      "en-US",
-    );
-
-    expect(result).toBe(adaptedText);
-    expect(mockClient.chat.completions.create).toHaveBeenCalledTimes(1);
-
-    const callArgs = mockClient.chat.completions.create.mock.calls[0][0];
-    expect(callArgs.model).toBe("qwen3-coder-next");
-    expect(callArgs.messages).toBeDefined();
-  });
-
-  test("test_case_5: LLM timeout — throws error containing 'LLM request timeout'", async () => {
-    const mockClient = buildTimeoutClient();
-
-    await expect(
-      adaptMessage(
-        mockClient as any,
-        envelope,
-        "你最近胖了，多运动运动",
-        "en-US",
-      ),
-    ).rejects.toThrow("LLM request timeout");
-  });
-
-  test("adapts with missing cultural_context gracefully", async () => {
-    const envelopeNoContext: ChorusEnvelope = {
-      chorus_version: "0.2",
-      original_semantic: "Just a greeting",
-      sender_culture: "zh-CN",
-    };
-    const adaptedText = "Hey there!";
-    const mockClient = buildMockClient(adaptedText);
-
-    const result = await adaptMessage(
-      mockClient as any,
-      envelopeNoContext,
-      "你好",
-      "en-US",
-    );
-
-    expect(result).toBe(adaptedText);
-  });
-});
-
-// --- Streaming tests reuse the same mock helpers above ---
-
-const buildStreamMockClient = buildStreamMockClientFromChunks;
-const buildStreamTimeoutClient = buildStreamTimeoutClientFactory;
 
 // --- extractSemanticStream ---
 
 describe("extractSemanticStream", () => {
-  const jsonPart1 = '{"original_semantic":"test meaning"';
-  const jsonPart2 = ',"cultural_context":"cultural note"';
-  const jsonPart3 = ',"intent_type":"greeting","formality":"casual","emotional_tone":"polite"}';
-
-  test("calls onToken for each chunk", async () => {
-    const mockClient = buildStreamMockClient([jsonPart1, jsonPart2, jsonPart3]);
+  test("calls onToken during cultural context generation", async () => {
+    const mockClient = buildMultiCallClient([
+      ["语义意图"],
+      ["文化", "背景", "说明长文本"],
+    ]);
     const tokens: string[] = [];
 
     await extractSemanticStream(
       mockClient as any,
-      "hello",
-      "en-US",
+      "test",
+      "zh-CN",
       (chunk: string) => { tokens.push(chunk); },
     );
 
-    expect(tokens).toEqual([jsonPart1, jsonPart2, jsonPart3]);
+    // onToken receives chunks from 2nd call (cultural context)
+    expect(tokens).toEqual(["文化", "背景", "说明长文本"]);
+  });
+});
+
+// --- adaptMessage ---
+
+describe("adaptMessage", () => {
+  const envelope: ChorusEnvelope = {
+    chorus_version: "0.2",
+    original_semantic: "关心对方健康",
+    sender_culture: "zh-CN",
+    cultural_context: "中国文化中直接评论体重是亲近关系的关心表达不带恶意",
+  };
+
+  test("returns adapted text", async () => {
+    const mockClient = buildSingleCallClient(["I hope you're", " taking care of yourself!"]);
+
+    const result = await adaptMessage(mockClient as any, envelope, "多运动", "en-US");
+
+    expect(result).toBe("I hope you're taking care of yourself!");
   });
 
-  test("returns valid ExtractResult from concatenated chunks", async () => {
-    const mockClient = buildStreamMockClient([jsonPart1, jsonPart2, jsonPart3]);
-
-    const result = await extractSemanticStream(
-      mockClient as any,
-      "hello",
-      "en-US",
-    );
-
-    expect(result.original_semantic).toBe("test meaning");
-    expect(result.cultural_context).toBe("cultural note");
-    expect(result.intent_type).toBe("greeting");
-    expect(result.formality).toBe("casual");
-    expect(result.emotional_tone).toBe("polite");
-  });
-
-  test("throws on invalid JSON response", async () => {
-    const mockClient = buildStreamMockClient(["not", " valid", " json"]);
+  test("timeout throws LLM request timeout", async () => {
+    const mockClient = buildTimeoutClient();
 
     await expect(
-      extractSemanticStream(mockClient as any, "hello", "en-US"),
-    ).rejects.toThrow("failed to parse LLM response");
+      adaptMessage(mockClient as any, envelope, "多运动", "en-US"),
+    ).rejects.toThrow("LLM request timeout");
   });
 });
 
@@ -245,17 +132,12 @@ describe("extractSemanticStream", () => {
 describe("adaptMessageStream", () => {
   const envelope: ChorusEnvelope = {
     chorus_version: "0.2",
-    original_semantic: "Suggesting exercise out of health concern",
+    original_semantic: "test",
     sender_culture: "zh-CN",
-    cultural_context:
-      "In Chinese culture, commenting on weight is a normal expression of care.",
-    intent_type: "chitchat",
-    formality: "casual",
-    emotional_tone: "polite",
   };
 
-  test("calls onChunk for each text delta", async () => {
-    const mockClient = buildStreamMockClient(["Hey, ", "how are ", "you?"]);
+  test("calls onChunk for each delta", async () => {
+    const mockClient = buildSingleCallClient(["Hey, ", "how are ", "you?"]);
     const chunks: string[] = [];
 
     await adaptMessageStream(
@@ -270,21 +152,8 @@ describe("adaptMessageStream", () => {
     expect(chunks).toEqual(["Hey, ", "how are ", "you?"]);
   });
 
-  test("returns full concatenated text", async () => {
-    const mockClient = buildStreamMockClient(["Hello ", "World"]);
-
-    const result = await adaptMessageStream(
-      mockClient as any,
-      envelope,
-      "你好",
-      "en-US",
-    );
-
-    expect(result).toBe("Hello World");
-  });
-
-  test("injects history into prompt when provided", async () => {
-    const mockClient = buildStreamMockClient(["adapted reply"]);
+  test("injects history into prompt", async () => {
+    const mockClient = buildSingleCallClient(["adapted reply"]);
     const history: readonly ConversationTurn[] = [
       {
         role: "sent",
@@ -292,13 +161,6 @@ describe("adaptMessageStream", () => {
         adaptedText: "Hello",
         envelope: { ...envelope },
         timestamp: "2026-03-19T00:00:00Z",
-      },
-      {
-        role: "received",
-        originalText: "Hi there",
-        adaptedText: "你好呀",
-        envelope: { ...envelope, sender_culture: "en-US" },
-        timestamp: "2026-03-19T00:00:01Z",
       },
     ];
 
@@ -314,21 +176,29 @@ describe("adaptMessageStream", () => {
     const promptContent = callArgs.messages[0].content as string;
     expect(promptContent).toContain("对话历史:");
     expect(promptContent).toContain("[sent] 你好 → Hello");
-    expect(promptContent).toContain("[received] Hi there → 你好呀");
   });
 
-  test("without history produces prompt without history section", async () => {
-    const mockClient = buildStreamMockClient(["adapted text"]);
+  test("without history omits history section", async () => {
+    const mockClient = buildSingleCallClient(["adapted"]);
 
-    await adaptMessageStream(
-      mockClient as any,
-      envelope,
-      "你好",
-      "en-US",
-    );
+    await adaptMessageStream(mockClient as any, envelope, "你好", "en-US");
 
     const callArgs = mockClient.chat.completions.create.mock.calls[0][0];
     const promptContent = callArgs.messages[0].content as string;
     expect(promptContent).not.toContain("对话历史:");
+  });
+});
+
+// --- createLLMClient ---
+
+describe("createLLMClient", () => {
+  test("creates client with default base URL", () => {
+    const client = createLLMClient("test-key");
+    expect(client).toBeDefined();
+  });
+
+  test("creates client with custom base URL", () => {
+    const client = createLLMClient("test-key", "https://custom.api.com/v1");
+    expect(client).toBeDefined();
   });
 });

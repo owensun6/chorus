@@ -76,9 +76,6 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
     const turnNumber = history.getNextTurnNumber(targetId);
 
     const envelope: ChorusEnvelope = createEnvelope(semantics.original_semantic, culture, semantics.cultural_context, {
-      intent_type: semantics.intent_type as ChorusEnvelope["intent_type"],
-      formality: semantics.formality as ChorusEnvelope["formality"],
-      emotional_tone: semantics.emotional_tone as ChorusEnvelope["emotional_tone"],
       conversation_id: conversationId,
       turn_number: turnNumber,
     });

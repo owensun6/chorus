@@ -3,8 +3,9 @@ import { Hono } from "hono";
 import type OpenAI from "openai";
 import { findChorusDataPart } from "./envelope";
 import { adaptMessage, adaptMessageStream } from "./llm";
-import { formatSSE } from "../shared/sse";
+import { formatSSE, SSE_ENCODER } from "../shared/sse";
 import { successResponse, errorResponse } from "../shared/response";
+import { extractErrorMessage } from "../shared/log";
 import type { A2AMessage, ChorusEnvelope } from "../shared/types";
 import type { ConversationHistory } from "./history";
 
@@ -16,6 +17,7 @@ interface ReceiverConfig {
   readonly receiverCulture: string;
   readonly onMessage: (from: string, original: string, adapted: string) => void;
   readonly history?: ConversationHistory;
+  readonly personality?: string;
 }
 
 // --- Internal Helper ---
@@ -31,14 +33,12 @@ const extractOriginalText = (message: A2AMessage): string => {
 // --- Public API ---
 
 const createReceiver = (config: ReceiverConfig) => {
-  const { llmClient, receiverCulture, onMessage, history } = config;
+  const { llmClient, receiverCulture, onMessage, history, personality } = config;
   const app = new Hono();
 
   app.post("/receive", async (c) => {
-    let body: { sender_agent_id: string; message: A2AMessage };
-    try {
-      body = await c.req.json();
-    } catch {
+    const body = await c.req.json().catch(() => null) as { sender_agent_id: string; message: A2AMessage } | null;
+    if (body === null) {
       return c.json(
         errorResponse("ERR_VALIDATION", "Invalid JSON body"),
         400,
@@ -81,6 +81,7 @@ const createReceiver = (config: ReceiverConfig) => {
         sender_agent_id,
         onMessage,
         history,
+        personality,
       );
     }
 
@@ -91,15 +92,15 @@ const createReceiver = (config: ReceiverConfig) => {
         result.envelope,
         originalText,
         receiverCulture,
+        personality,
       );
 
       onMessage(sender_agent_id, originalText, adaptedText);
 
       return c.json(successResponse({ processed: true }), 200);
     } catch (err: unknown) {
-      const errMessage = err instanceof Error ? err.message : String(err);
       return c.json(
-        errorResponse("ERR_ADAPTATION_FAILED", errMessage),
+        errorResponse("ERR_ADAPTATION_FAILED", extractErrorMessage(err)),
         500,
       );
     }
@@ -119,12 +120,11 @@ const handleStreaming = (
   senderAgentId: string,
   onMessage: (from: string, original: string, adapted: string) => void,
   history?: ConversationHistory,
+  senderPersonality?: string,
 ): Response => {
   const historyTurns = history
     ? history.getTurns(senderAgentId)
     : undefined;
-
-  const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
     start(controller) {
@@ -134,18 +134,18 @@ const handleStreaming = (
         originalText,
         receiverCulture,
         historyTurns,
+        senderPersonality,
         (chunk: string) => {
-          controller.enqueue(encoder.encode(formatSSE("chunk", { text: chunk })));
+          controller.enqueue(SSE_ENCODER.encode(formatSSE("chunk", { text: chunk })));
         },
       )
         .then((fullText) => {
-          controller.enqueue(encoder.encode(formatSSE("done", { full_text: fullText, envelope })));
+          controller.enqueue(SSE_ENCODER.encode(formatSSE("done", { full_text: fullText, envelope })));
           onMessage(senderAgentId, originalText, fullText);
           controller.close();
         })
         .catch((err: unknown) => {
-          const errMessage = err instanceof Error ? err.message : String(err);
-          controller.enqueue(encoder.encode(formatSSE("error", { code: "ERR_ADAPTATION_FAILED", message: errMessage })));
+          controller.enqueue(SSE_ENCODER.encode(formatSSE("error", { code: "ERR_ADAPTATION_FAILED", message: extractErrorMessage(err) })));
           controller.close();
         });
     },

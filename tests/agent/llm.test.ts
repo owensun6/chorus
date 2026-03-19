@@ -146,6 +146,7 @@ describe("adaptMessageStream", () => {
       "你好",
       "en-US",
       undefined,
+      undefined,
       (text: string) => { chunks.push(text); },
     );
 

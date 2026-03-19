@@ -7,6 +7,7 @@ import { discoverCompatibleAgents } from "./discovery";
 import { ConversationHistory } from "./history";
 import { parseSSEChunks } from "../shared/sse";
 import { parseArgs, validateEnv } from "./config";
+import { log, logError, extractErrorMessage } from "../shared/log";
 import type { AgentConfig, AgentHandle, SendResult } from "./config";
 import type { ChorusEnvelope } from "../shared/types";
 
@@ -23,10 +24,11 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
     port,
     llmClient,
     receiverCulture: culture,
+    personality: config.personality,
     onMessage: (from: string, original: string, adapted: string) => {
-      console.log(`[${agentId}] Message from ${from}:`);
-      console.log(`  Original: ${original}`);
-      console.log(`  Adapted:  ${adapted}`);
+      log(agentId, `Message from ${from}:`);
+      log(agentId, `  Original: ${original}`);
+      log(agentId, `  Adapted:  ${adapted}`);
       history.addTurn(from, {
         role: "received",
         originalText: original,
@@ -39,7 +41,7 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
   });
 
   const server = serve({ fetch: app.fetch, port });
-  console.log(`[${agentId}] Receiver listening on port ${port}`);
+  log(agentId, `Receiver listening on port ${port}`);
 
   const registrationBody = {
     agent_id: agentId,
@@ -56,14 +58,14 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
   if (!regResponse.ok) {
     throw new Error(`Failed to register with router at ${routerUrl}: ${regResponse.status}`);
   }
-  console.log(`[${agentId}] Registered with router at ${routerUrl}`);
+  log(agentId, `Registered with router at ${routerUrl}`);
 
   const compatible = await discoverCompatibleAgents(routerUrl, {
     chorus_version: "0.2",
     user_culture: culture,
     supported_languages: [...languages],
   });
-  console.log(`[${agentId}] Discovered ${compatible.length} compatible agent(s):`, compatible.map((a) => a.agent_id));
+  log(agentId, `Discovered ${compatible.length} compatible agent(s): ${compatible.map((a) => a.agent_id).join(", ")}`);
 
   // --- Send Message ---
 
@@ -122,23 +124,23 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
       timestamp: new Date().toISOString(),
     });
 
-    console.log(`\n[${agentId}] Message sent to ${targetId}`);
+    log(agentId, `\nMessage sent to ${targetId}`);
     return { adaptedText: fullAdaptedText, envelope };
   };
 
   // --- Shutdown ---
 
   const shutdown = async (): Promise<void> => {
-    console.log(`[${agentId}] Shutting down...`);
+    log(agentId, "Shutting down...");
     try {
       await fetch(`${routerUrl}/agents/${agentId}`, { method: "DELETE" });
-      console.log(`[${agentId}] Deregistered from router`);
+      log(agentId, "Deregistered from router");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error(`[${agentId}] Failed to deregister: ${msg}`);
+      const msg = extractErrorMessage(err);
+      logError(agentId, `Failed to deregister: ${msg}`);
     }
     server.close();
-    console.log(`[${agentId}] Server closed`);
+    log(agentId, "Server closed");
   };
 
   return { shutdown, sendMessage };
@@ -162,7 +164,7 @@ if (require.main === module) {
       }).then((agents) => {
         if (agents.length > 0) {
           target.id = agents[0].agent_id;
-          console.log(`Default target: ${target.id}`);
+          log("cli", `Default target: ${target.id}`);
         }
       });
 
@@ -172,17 +174,17 @@ if (require.main === module) {
           if (trimmed === "exit") { await handle.shutdown(); rl.close(); process.exit(0); }
           if (trimmed === "" || target.id === "") { prompt(); return; }
           try { await handle.sendMessage(target.id, trimmed); } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : String(err);
-            console.error(`Error: ${msg}`);
+            const msg = extractErrorMessage(err);
+            logError("cli", msg);
           }
           prompt();
         });
       };
       prompt();
 
-      process.on("SIGINT", async () => { console.log("\nReceived SIGINT"); await handle.shutdown(); rl.close(); process.exit(0); });
+      process.on("SIGINT", async () => { log("cli", "Received SIGINT"); await handle.shutdown(); rl.close(); process.exit(0); });
     })
-    .catch((err) => { console.error("Failed to start agent:", err); process.exit(1); });
+    .catch((err) => { logError("cli", `Failed to start agent: ${err}`); process.exit(1); });
 }
 
 export { parseArgs, validateEnv, startAgent };

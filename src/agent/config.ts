@@ -6,6 +6,7 @@ interface AgentConfig {
   readonly routerUrl: string;
   readonly agentId: string;
   readonly languages: readonly string[];
+  readonly personality?: string;
 }
 
 interface SendResult {
@@ -34,8 +35,9 @@ const parseArgs = (args: readonly string[]): AgentConfig => {
   const agentId = flagValue("--agent-id") ?? `agent-${culture}-${port}`;
   const languagesRaw = flagValue("--languages");
   const languages = languagesRaw ? languagesRaw.split(",") : [culture];
+  const personality = flagValue("--personality");
 
-  return { culture, port, routerUrl, agentId, languages };
+  return { culture, port, routerUrl, agentId, languages, personality };
 };
 
 const validateEnv = (): { readonly apiKey: string } => {

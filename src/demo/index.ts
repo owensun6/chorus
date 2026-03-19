@@ -5,6 +5,7 @@ import { AgentRegistry } from "../server/registry";
 import { startAgent } from "../agent/index";
 import { createWebServer } from "./web";
 import { execFile } from "child_process";
+import { log, logError, extractErrorMessage } from "../shared/log";
 import type { AgentHandle } from "../agent/index";
 
 // --- Types ---
@@ -51,7 +52,7 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
   const registry = new AgentRegistry();
   const routerApp = createApp(registry);
   const routerServer = serve({ fetch: routerApp.fetch, port: routerPort });
-  console.log(`[demo] Router started on :${routerPort}`);
+  log("demo", `Router started on :${routerPort}`);
 
   // Step 2: Start agents
   const agentHandles: AgentHandle[] = [];
@@ -62,9 +63,10 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
     routerUrl,
     agentId: "agent-zh-cn",
     languages: ["zh-CN", "ja"],
+    personality: "热情直爽的北京大哥，说话接地气，爱用口语化表达",
   });
   agentHandles.push(zhHandle);
-  console.log(`[demo] Agent zh-CN started on :${agentZhPort}`);
+  log("demo", `Agent zh-CN started on :${agentZhPort}`);
 
   const jaHandle = await startAgent({
     culture: "ja",
@@ -72,9 +74,10 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
     routerUrl,
     agentId: "agent-ja",
     languages: ["ja", "zh-CN"],
+    personality: "礼貌细腻的东京白领，注重措辞得体，表达含蓄委婉",
   });
   agentHandles.push(jaHandle);
-  console.log(`[demo] Agent ja started on :${agentJaPort}`);
+  log("demo", `Agent ja started on :${agentJaPort}`);
 
   // Step 3: Build agent map for sendMessage delegation
   const agentMap = new Map<string, AgentHandle>([
@@ -115,7 +118,7 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
           envelope: result.envelope,
         });
       } catch (err: unknown) {
-        const errMessage = err instanceof Error ? err.message : String(err);
+        const errMessage = extractErrorMessage(err);
         broadcast("adaptation_error", {
           agent_id: to,
           code: "ERR_ADAPTATION_FAILED",
@@ -129,29 +132,29 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
 
   // Step 5: Start web server
   const webServer = serve({ fetch: webApp.fetch, port: webPort });
-  console.log(`[demo] Web server started on :${webPort}`);
+  log("demo", `Web server started on :${webPort}`);
 
   // Step 6: Open browser (safe: no user input in URL, only numeric port)
   const url = `http://localhost:${webPort}`;
-  console.log(`[demo] Opening browser: ${url}`);
+  log("demo", `Opening browser: ${url}`);
   execFile("open", [url]);
 
   // Step 7: Return shutdown handle
   const shutdown = async (): Promise<void> => {
-    console.log("[demo] Shutting down...");
+    log("demo", "Shutting down...");
 
     for (const handle of agentHandles) {
       try {
         await handle.shutdown();
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : String(err);
-        console.error(`[demo] Agent shutdown error: ${msg}`);
+        const msg = extractErrorMessage(err);
+        logError("demo", `Agent shutdown error: ${msg}`);
       }
     }
 
     webServer.close();
     routerServer.close();
-    console.log("[demo] All servers closed");
+    log("demo", "All servers closed");
   };
 
   return { shutdown };
@@ -165,13 +168,13 @@ if (require.main === module) {
   startDemo(webPort)
     .then((handle) => {
       process.on("SIGINT", async () => {
-        console.log("\n[demo] Received SIGINT");
+        log("demo", "Received SIGINT");
         await handle.shutdown();
         process.exit(0);
       });
     })
     .catch((err) => {
-      console.error("[demo] Failed to start:", err);
+      logError("demo", `Failed to start: ${err}`);
       process.exit(1);
     });
 }

@@ -236,7 +236,7 @@ describe("POST /receive (streaming — T-04)", () => {
   it("test_case_1: streaming response with Accept: text/event-stream contains chunk + done events", async () => {
     const fullText = "Adapted streaming text";
     mockAdaptMessageStream.mockImplementation(
-      async (_client, _env, _orig, _culture, _hist, onChunk) => {
+      async (_client, _env, _orig, _culture, _hist, _personality, onChunk) => {
         if (onChunk) {
           onChunk("Adapted ");
           onChunk("streaming ");
@@ -354,7 +354,7 @@ describe("POST /receive (streaming — T-04)", () => {
     });
 
     mockAdaptMessageStream.mockImplementation(
-      async (_client, _env, _orig, _culture, _hist, onChunk) => {
+      async (_client, _env, _orig, _culture, _hist, _personality, onChunk) => {
         if (onChunk) onChunk("ok");
         return "ok";
       },

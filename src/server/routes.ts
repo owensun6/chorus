@@ -2,17 +2,16 @@
 import { Hono } from "hono";
 import { AgentRegistry } from "./registry";
 import { RegisterAgentBodySchema, MessagePayloadBodySchema } from "./validation";
-import { successResponse, errorResponse } from "../shared/response";
+import { successResponse, errorResponse, formatZodErrors } from "../shared/response";
 import { singleSSEStream } from "../shared/sse";
+import { extractErrorMessage } from "../shared/log";
 
 const createApp = (registry: AgentRegistry): Hono => {
   const app = new Hono();
 
   app.post("/agents", async (c) => {
-    let body: unknown;
-    try {
-      body = await c.req.json();
-    } catch {
+    const body = await c.req.json().catch(() => null);
+    if (body === null) {
       return c.json(
         errorResponse("ERR_VALIDATION", "Invalid JSON body"),
         400
@@ -21,9 +20,7 @@ const createApp = (registry: AgentRegistry): Hono => {
 
     const parsed = RegisterAgentBodySchema.safeParse(body);
     if (!parsed.success) {
-      const message = parsed.error.issues
-        .map((i) => `${i.path.join(".")}: ${i.message}`)
-        .join("; ");
+      const message = formatZodErrors(parsed.error.issues);
       return c.json(errorResponse("ERR_VALIDATION", message), 400);
     }
 
@@ -66,10 +63,8 @@ const createApp = (registry: AgentRegistry): Hono => {
   });
 
   app.post("/messages", async (c) => {
-    let body: unknown;
-    try {
-      body = await c.req.json();
-    } catch {
+    const body = await c.req.json().catch(() => null);
+    if (body === null) {
       return c.json(
         errorResponse("ERR_INVALID_BODY", "Invalid JSON body"),
         400
@@ -78,9 +73,7 @@ const createApp = (registry: AgentRegistry): Hono => {
 
     const parsed = MessagePayloadBodySchema.safeParse(body);
     if (!parsed.success) {
-      const message = parsed.error.issues
-        .map((i) => `${i.path.join(".")}: ${i.message}`)
-        .join("; ");
+      const message = formatZodErrors(parsed.error.issues);
       return c.json(errorResponse("ERR_INVALID_BODY", message), 400);
     }
 
@@ -182,7 +175,7 @@ const handleStreamForward = async (
 
     return new Response(targetRes.body, { headers: SSE_HEADERS });
   } catch (err: unknown) {
-    const errMessage = err instanceof Error ? err.message : String(err);
+    const errMessage = extractErrorMessage(err);
     return sseErrorResponse("ERR_AGENT_UNREACHABLE", `Failed to reach target agent: ${errMessage}`);
   }
 };

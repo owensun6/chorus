@@ -29,15 +29,15 @@ const parseSSEChunks = (raw: string): readonly SSEEvent[] => {
   return events;
 };
 
-const singleSSEStream = (event: string, data: unknown): ReadableStream => {
-  const encoder = new TextEncoder();
-  return new ReadableStream({
+const SSE_ENCODER = new TextEncoder();
+
+const singleSSEStream = (event: string, data: unknown): ReadableStream =>
+  new ReadableStream({
     start(controller) {
-      controller.enqueue(encoder.encode(formatSSE(event, data)));
+      controller.enqueue(SSE_ENCODER.encode(formatSSE(event, data)));
       controller.close();
     },
   });
-};
 
-export { formatSSE, parseSSEChunks, singleSSEStream };
+export { formatSSE, parseSSEChunks, singleSSEStream, SSE_ENCODER };
 export type { SSEEvent };

@@ -28,6 +28,7 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.11",
     "hono": "^4.12.8",
     "openai": "^6.32.0",
     "typescript": "^5.9.3",

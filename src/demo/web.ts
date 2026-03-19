@@ -4,7 +4,8 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { z } from "zod";
 import { randomUUID } from "crypto";
-import { successResponse, errorResponse } from "../shared/response";
+import { successResponse, errorResponse, formatZodErrors } from "../shared/response";
+import { extractErrorMessage } from "../shared/log";
 
 // --- Types ---
 
@@ -106,10 +107,8 @@ const createWebServer = (config: WebServerConfig): WebServerResult => {
 
   // POST /api/send — send message via agent
   app.post("/api/send", async (c) => {
-    let body: unknown;
-    try {
-      body = await c.req.json();
-    } catch {
+    const body = await c.req.json().catch(() => null);
+    if (body === null) {
       return c.json(
         errorResponse("ERR_VALIDATION", "Invalid JSON body"),
         400,
@@ -118,9 +117,7 @@ const createWebServer = (config: WebServerConfig): WebServerResult => {
 
     const parsed = SendBodySchema.safeParse(body);
     if (!parsed.success) {
-      const message = parsed.error.issues
-        .map((i) => `${i.path.join(".")}: ${i.message}`)
-        .join("; ");
+      const message = formatZodErrors(parsed.error.issues);
       return c.json(errorResponse("ERR_VALIDATION", message), 400);
     }
 
@@ -141,7 +138,7 @@ const createWebServer = (config: WebServerConfig): WebServerResult => {
         202,
       );
     } catch (err: unknown) {
-      const errMessage = err instanceof Error ? err.message : String(err);
+      const errMessage = extractErrorMessage(err);
       return c.json(
         errorResponse("ERR_SEND_FAILED", errMessage),
         500,

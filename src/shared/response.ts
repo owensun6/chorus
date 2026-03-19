@@ -12,4 +12,7 @@ const errorResponse = (code: string, message: string) => ({
   metadata: { timestamp: new Date().toISOString() },
 });
 
-export { successResponse, errorResponse };
+const formatZodErrors = (issues: readonly { path: readonly PropertyKey[]; message: string }[]): string =>
+  issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
+
+export { successResponse, errorResponse, formatZodErrors };

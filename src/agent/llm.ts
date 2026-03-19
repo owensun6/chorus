@@ -17,7 +17,7 @@ interface ExtractResult {
 const DEFAULT_BASE_URL =
   "https://coding.dashscope.aliyuncs.com/v1" as const;
 
-const DEFAULT_MODEL = "qwen3.5-plus" as const;
+const DEFAULT_MODEL = "qwen3-coder-next" as const;
 
 // --- Prompt Templates ---
 

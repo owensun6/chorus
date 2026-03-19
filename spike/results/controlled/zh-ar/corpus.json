@@ -1,0 +1,322 @@
+[
+  {
+    "id": 1,
+    "category": "taboo",
+    "input_text": "用左手递东西给你",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "中文文化中左右手无特殊意义。阿拉伯伊斯兰文化中左手被视为不洁净，用左手传递物品或进食是严重不尊重"
+  },
+  {
+    "id": 2,
+    "category": "taboo",
+    "input_text": "我们一起吃猪肉吧",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "猪肉是中文食文化常见食物。但伊斯兰教中猪肉为禁忌食物（haram），直接邀请穆斯林食用是严重冒犯"
+  },
+  {
+    "id": 3,
+    "category": "taboo",
+    "input_text": "竖起大拇指表示很好",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "中文文化中竖拇指表赞同。但在某些阿拉伯地区这个手势被视为冒犯和贬低的信号"
+  },
+  {
+    "id": 4,
+    "category": "taboo",
+    "input_text": "这个数字4很幸运",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "中文文化中4谐音'死'为禁忌数字。阿拉伯文化中4无负面含义，这种避讳显得莫名其妙"
+  },
+  {
+    "id": 5,
+    "category": "taboo",
+    "input_text": "你的宗教信仰看起来很迷信",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "相对世俗的中文环境允许直率批评信仰。但在虔诚穆斯林社区，质疑伊斯兰教是严重冒犯"
+  },
+  {
+    "id": 6,
+    "category": "taboo",
+    "input_text": "你看起来需要减肥",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "中文文化允许相对直率的身体评价。阿拉伯文化中这对女性特别冒犯，涉及身体的不尊重评论"
+  },
+  {
+    "id": 7,
+    "category": "taboo",
+    "input_text": "同性恋是很正常的生活方式",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "现代中文社会对LGBTQ+议题有一定开放讨论空间。许多阿拉伯国家中同性恋在法律和宗教上被严格禁止"
+  },
+  {
+    "id": 8,
+    "category": "taboo",
+    "input_text": "我不相信来世和复活",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "中文无神论相对可被接受。但在虔诚伊斯兰信徒中否定来世是对核心教义的否定，严重冒犯"
+  },
+  {
+    "id": 9,
+    "category": "taboo",
+    "input_text": "那个女人很漂亮，我想约她",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "中文文化中这是相对直接但可接受的表达。保守阿拉伯家族文化中未经允许评论陌生女性外表不尊重"
+  },
+  {
+    "id": 10,
+    "category": "taboo",
+    "input_text": "你们应该放弃那些过时传统",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "中文文化中批评传统相对常见。重视传统和宗教的阿拉伯社会中这被视为傲慢的文化冒犯"
+  },
+  {
+    "id": 11,
+    "category": "taboo",
+    "input_text": "إن الله عظيم جداً، ولكن يجب أن نشكك في كل شيء",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "伊斯兰文化中频繁提及真主是日常交流的一部分。中文无神论传统中频繁宗教言论显得过度虔诚和陌生"
+  },
+  {
+    "id": 12,
+    "category": "taboo",
+    "input_text": "الحمد لله على كل شيء",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'感赞真主'是阿拉伯日常语言常见表达。中文世俗环境中频繁宗教表述被认为过度虔诚"
+  },
+  {
+    "id": 13,
+    "category": "taboo",
+    "input_text": "يجب على النساء أن يرتدين الحجاب",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "传统伊斯兰社会中着装规范是宗教文化规范。现代中文社会中强制着装要求被视为对女性自由的限制"
+  },
+  {
+    "id": 14,
+    "category": "taboo",
+    "input_text": "هذا غير حلال",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'这不合法（根据伊斯兰法）'在穆斯林社区是重要道德判断。中文文化中用宗教法律标准判断行为有效性显得不当"
+  },
+  {
+    "id": 15,
+    "category": "taboo",
+    "input_text": "يا إلهي، ما أجمل هذه المرأة!",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'我的真主，这女人多漂亮'在阿拉伯常见但在中文中这样直率评论他人外表被认为不尊重和肤浅"
+  },
+  {
+    "id": 16,
+    "category": "taboo",
+    "input_text": "أنا مسلم ملتزم جداً",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'我是非常虔诚的穆斯林'在中文社会中可能被误解为极端主义暗示，引发不必要误会"
+  },
+  {
+    "id": 17,
+    "category": "taboo",
+    "input_text": "كيف تجرؤ على السخرية من الإسلام؟",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'你敢嘲笑伊斯兰教？'这种措辞显得过度激进。中文文化通常对宗教批评有更高容忍度"
+  },
+  {
+    "id": 18,
+    "category": "taboo",
+    "input_text": "لا تصافحي يدي لأنك امرأة",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'因为你是女性所以我不和你握手'在伊斯兰文化中基于宗教原因。中文文化中这被视为性别歧视和不尊重"
+  },
+  {
+    "id": 19,
+    "category": "taboo",
+    "input_text": "الجنة والنار حقيقية جداً",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'天堂和地狱非常真实'是伊斯兰基本教义。中文世俗社会中绝对超自然声明显得不理性"
+  },
+  {
+    "id": 20,
+    "category": "taboo",
+    "input_text": "المسيحيون كفار",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'基督徒是非信徒'虽在某些伊斯兰论述中出现。中文多元社会中将其他宗教信徒称非信徒被视为不容忍"
+  },
+  {
+    "id": 21,
+    "category": "slang",
+    "input_text": "这件事情真的很扯",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "'扯'在中文俚语中表示荒谬、不合理。直译为阿拉伯语'拉扯'只有字面意思，无法表达荒谬含义"
+  },
+  {
+    "id": 22,
+    "category": "slang",
+    "input_text": "你这是在装什么呢",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "'装'在中文俚语中表示假装、欺骗。直译为阿拉伯语可能只被理解为'穿衣'，完全丧失讽刺含义"
+  },
+  {
+    "id": 23,
+    "category": "slang",
+    "input_text": "你在这儿瞎搅和什么呢",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "'瞎搅和'表示乱干事、添麻烦。直译丢失贬低和不赞成的感情色彩"
+  },
+  {
+    "id": 24,
+    "category": "slang",
+    "input_text": "这个想法有点儿二",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "'二'在中文俚语中表示愚蠢。直译为阿拉伯语只是数字，无法表达嘲笑含义"
+  },
+  {
+    "id": 25,
+    "category": "slang",
+    "input_text": "你别在这儿磨蹭了",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "'磨蹭'表示拖延、浪费时间。直译可能被理解为物理摩擦，失去时间催促的含义"
+  },
+  {
+    "id": 26,
+    "category": "slang",
+    "input_text": "这事儿跟我没八竿子打不着的关系",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "'八竿子打不着'是中文俚语表示距离遥远、完全无关。直译为'八根竿子'完全无法传达'毫无关系'的含义"
+  },
+  {
+    "id": 27,
+    "category": "slang",
+    "input_text": "你这是在跟我搞笑呢",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "'搞笑'表示开玩笑或不认真。直译可能被理解为'让我发笑'的字面意思"
+  },
+  {
+    "id": 28,
+    "category": "slang",
+    "input_text": "这个人真的很轴",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "'轴'是中文网络俚语表示固执、不灵活。直译为阿拉伯语只是几何术语，无法表达性格特征"
+  },
+  {
+    "id": 29,
+    "category": "slang",
+    "input_text": "他老是喜欢装大尾巴狼",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "'装大尾巴狼'是中文习语表示装作了不起。直译为'大尾巴狼'的字面描述，无法表达虚伪和自大"
+  },
+  {
+    "id": 30,
+    "category": "slang",
+    "input_text": "你这是在打我的脸",
+    "source_culture": "zh-CN",
+    "target_culture": "ar",
+    "context": "'打脸'在中文俚语中表示让人丢脸、尴尬。直译为物理打击完全无法表达社交尴尬的含义"
+  },
+  {
+    "id": 31,
+    "category": "slang",
+    "input_text": "إن شاء الله",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'如果真主愿意'在阿拉伯文化中常用表示'希望如此'或表达对未来的不确定。直译显得过度宗教化，失去日常使用的自然感"
+  },
+  {
+    "id": 32,
+    "category": "slang",
+    "input_text": "لا حول ولا قوة إلا بالله",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'除真主外无力无能'是阿拉伯表达无力感、接受命运的说法。直译显得生硬，无法传达文化认可的宿命论"
+  },
+  {
+    "id": 33,
+    "category": "slang",
+    "input_text": "يا سلام",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'哦，和平啊'字面上很奇怪，但在阿拉伯中是对令人惊艳事物的感叹。直译无法捕捉这种习语的感受"
+  },
+  {
+    "id": 34,
+    "category": "slang",
+    "input_text": "أنت مجنون",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'你疯了'在阿拉伯俚语中可是开玩笑或亲昵表达。中文直译显得过于刺耳和冒犯"
+  },
+  {
+    "id": 35,
+    "category": "slang",
+    "input_text": "تمام التمام",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'完全完全'字面上重复，但在阿拉伯中表示'完美无缺'。直译为中文显得冗余，无法传达肯定的强度"
+  },
+  {
+    "id": 36,
+    "category": "slang",
+    "input_text": "يا جماعة",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'哦，各位'或'嘿，伙计们'是阿拉伯中呼唤听众的方式。直译为中文显得不自然，无法建立预期的亲近感"
+  },
+  {
+    "id": 37,
+    "category": "slang",
+    "input_text": "ما شاء الله",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'真主所愿'在阿拉伯中用来表达对好事的欣赏或祝贺。直译为中文失去文化语境，显得过度陌生"
+  },
+  {
+    "id": 38,
+    "category": "slang",
+    "input_text": "روح نام",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'去睡觉'在某些阿拉伯方言中可是亲密的嘲弄。直译为中文只是字面命令，无法表达亲昵的嘲笑"
+  },
+  {
+    "id": 39,
+    "category": "slang",
+    "input_text": "بالهوينة",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'用舒适的方式'在阿拉伯中表示放松、不急。直译为中文的描述方式太生硬和冗长"
+  },
+  {
+    "id": 40,
+    "category": "slang",
+    "input_text": "تمشية",
+    "source_culture": "ar",
+    "target_culture": "zh-CN",
+    "context": "'一种行走方式'但在口语中表示'一场经历'或'一段关系'。直译无法传达这种引申义，容易造成严重误解"
+  }
+]

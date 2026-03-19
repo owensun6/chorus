@@ -1,0 +1,322 @@
+[
+  {
+    "id": 1,
+    "category": "taboo",
+    "input_text": "太りましたね",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "日语中直接评论体重变化是日常社交，但英美文化视此为对身体的冒犯和不尊重。特别是对女性，会被理解为身体羞辱。"
+  },
+  {
+    "id": 2,
+    "category": "taboo",
+    "input_text": "お子さんはまだですか？",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "日本职场和社交中询问是否有孩子很正常，但美国认为这是侵犯隐私，可能涉及家庭计划和生育能力的敏感话题。"
+  },
+  {
+    "id": 3,
+    "category": "taboo",
+    "input_text": "女性らしくない服ですね",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "日本常见评论服装的性别特征，但在英美文化中被视为性别刻板印象和对个人选择的批评。"
+  },
+  {
+    "id": 4,
+    "category": "taboo",
+    "input_text": "歳はいくつですか？",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "日本社交中直接询问年龄是常见寒暄，但美国人认为这是失礼的，特别是对女性，暗示对年龄的评判。"
+  },
+  {
+    "id": 5,
+    "category": "taboo",
+    "input_text": "独身ですか？",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "日本会直接询问婚姻状况，美国视为个人隐私，不应该在职场或初识时提出。"
+  },
+  {
+    "id": 6,
+    "category": "taboo",
+    "input_text": "可愛いですね",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "日语中对女性使用'可愛い'是常见的正面评价，但英美文化中频繁用'cute'形容女性成人会被视为性别歧视或贬低。"
+  },
+  {
+    "id": 7,
+    "category": "taboo",
+    "input_text": "お酒が飲めないなんて、大丈夫ですか？",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "日本职场饮酒文化中不喝酒会引起关切，但在美国施压某人喝酒违反同意原则，且可能涉及宗教或健康禁忌。"
+  },
+  {
+    "id": 8,
+    "category": "taboo",
+    "input_text": "痩せましたね。何かあったんですか？",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "日本人评论他人变瘦往往出于关心，但美国人会认为这是对外表的评论，可能暗示健康问题或饮食失调。"
+  },
+  {
+    "id": 9,
+    "category": "taboo",
+    "input_text": "容姿が良いですね",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "日本中对陌生人或同事评论外表可以是礼貌，英美职场中这会被视为不适当、造成骚扰或不安全感。"
+  },
+  {
+    "id": 10,
+    "category": "taboo",
+    "input_text": "女のくせに車を運転するんですか？",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "日语中'女のくせに'（女人竟然）虽然目的可能无害，但完全触犯英美的性别平等价值观，会被视为性别歧视。"
+  },
+  {
+    "id": 11,
+    "category": "taboo",
+    "input_text": "I disagree with that approach",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "美国鼓励直接表达异议，但日本职场文化中对上级直接说'我不同意'被视为不尊重权威和破坏和谐。"
+  },
+  {
+    "id": 12,
+    "category": "taboo",
+    "input_text": "I don't think that's a good idea",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "英美文化倡导建设性批评，但日本人会认为这样直接质疑是在公开挑战领导的权威。"
+  },
+  {
+    "id": 13,
+    "category": "taboo",
+    "input_text": "You're wrong about that",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "直接说某人错了在美国被视为诚实，在日本会造成当事人失去面子，伤害人际关系。"
+  },
+  {
+    "id": 14,
+    "category": "taboo",
+    "input_text": "Why do you think that will work?",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "英美人会通过提问来启发思考，日本人会理解为质疑决策的合理性，在职场中被视为抗拒。"
+  },
+  {
+    "id": 15,
+    "category": "taboo",
+    "input_text": "Can I ask you something personal?",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "美国人通过建立个人联系来增进关系，但日本人在职场初期警惕个人话题，会认为是越界。"
+  },
+  {
+    "id": 16,
+    "category": "taboo",
+    "input_text": "What's your salary?",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "美国倡导薪酬透明，日本视薪酬为隐私，直接询问被认为是严重的失礼。"
+  },
+  {
+    "id": 17,
+    "category": "taboo",
+    "input_text": "Let me point out where you made a mistake",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "英美文化中指出错误帮助改进，日本则会给犯错者造成难堪，特别是在他人面前。"
+  },
+  {
+    "id": 18,
+    "category": "taboo",
+    "input_text": "I'm going to do it my way",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "个人主义在美国被鼓励，日本强调团队和谐，强调个人方式会被视为不配合。"
+  },
+  {
+    "id": 19,
+    "category": "taboo",
+    "input_text": "I'm not comfortable with that decision",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "美国人表达边界和不适，日本人则习惯自我抑制，直接表达舒适度被认为是不成熟或自我中心。"
+  },
+  {
+    "id": 20,
+    "category": "taboo",
+    "input_text": "That doesn't make sense to me",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "质疑逻辑在美国是理性讨论，在日本会被理解为质疑上级的判断力和能力。"
+  },
+  {
+    "id": 21,
+    "category": "slang",
+    "input_text": "木に竹を接ぐ",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "字面意思是'在树上嫁接竹子'，实际意思是将不相容的东西硬生生结合。直译会完全失去含义。"
+  },
+  {
+    "id": 22,
+    "category": "slang",
+    "input_text": "猫の手も借りたい",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "字面是'想借猫的爪子'，实际表示非常忙碌，需要任何帮助。直译英文听者会困惑。"
+  },
+  {
+    "id": 23,
+    "category": "slang",
+    "input_text": "馬の耳に念仏",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "字面'在马耳边念诵佛经'，实际表示对听不进去的人说话。直译为动物术语，失去含义。"
+  },
+  {
+    "id": 24,
+    "category": "slang",
+    "input_text": "頭が固い",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "字面'头硬'，实际表示人固执、思想不灵活。若逐字翻译成'hard-headed'虽接近但习语感完全不同。"
+  },
+  {
+    "id": 25,
+    "category": "slang",
+    "input_text": "腰が引ける",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "字面'腰向后拉'，实际表示失去勇气或退缩。英文'back down'或'lose nerve'无法捕捉身体姿态的隐喻。"
+  },
+  {
+    "id": 26,
+    "category": "slang",
+    "input_text": "鼻が高い",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "字面'鼻高'，实际表示骄傲或自豪。'high nose'在英文中没有这种习语含义。"
+  },
+  {
+    "id": 27,
+    "category": "slang",
+    "input_text": "猫をかぶる",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "字面'穿上猫'，实际表示伪装无辜或假装乖巧。'wear a cat'在英文中毫无意义。"
+  },
+  {
+    "id": 28,
+    "category": "slang",
+    "input_text": "手がける",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "字面'手接触'，实际表示着手从事或承担。直译的'hand takes'不是自然的英文表达。"
+  },
+  {
+    "id": 29,
+    "category": "slang",
+    "input_text": "口が堅い",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "字面'嘴硬'，实际表示能保守秘密。英文'tight-lipped'或'close-mouthed'含义相似但文化语境不同。"
+  },
+  {
+    "id": 30,
+    "category": "slang",
+    "input_text": "目玉焼き",
+    "source_culture": "ja",
+    "target_culture": "en-US",
+    "context": "字面'眼球炸'，实际只是指太阳蛋（煎蛋）。这个习语来源于蛋的外观，外国人第一次听会感到离奇。"
+  },
+  {
+    "id": 31,
+    "category": "slang",
+    "input_text": "It's raining cats and dogs",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "表示下大雨，但字面提及动物会让日本人困惑，直译无法传达'大雨'的含义。"
+  },
+  {
+    "id": 32,
+    "category": "slang",
+    "input_text": "Break a leg",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "实际祝愿好运，但字面'断腿'令日本人震惊，违反表面的字义，需文化背景才能理解。"
+  },
+  {
+    "id": 33,
+    "category": "slang",
+    "input_text": "Piece of cake",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "表示容易，但直译成'蛋糕一块'无法传达'简单'的含义，会令日本人思维混乱。"
+  },
+  {
+    "id": 34,
+    "category": "slang",
+    "input_text": "Under the weather",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "表示身体不适，但与天气无关，直译'在天气下'毫无意义，日本人无法从字面猜测。"
+  },
+  {
+    "id": 35,
+    "category": "slang",
+    "input_text": "Barking up the wrong tree",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "表示寻找错误的方向，但动物意象在日本习语中不通用，直译为'狗叫错树'失去原意。"
+  },
+  {
+    "id": 36,
+    "category": "slang",
+    "input_text": "Better half",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "指配偶，但'更好的一半'暗示自己不完整，日本人会按字面理解为贬低自己。"
+  },
+  {
+    "id": 37,
+    "category": "slang",
+    "input_text": "Burning bridges",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "表示破坏关系，但'燃烧桥梁'的意象在日本文化中不存在，直译显得奇怪。"
+  },
+  {
+    "id": 38,
+    "category": "slang",
+    "input_text": "Caught red-handed",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "表示当场被抓住，但'红手'暗示没有相关的日本文化参考，直译为'红手抓住'毫无逻辑。"
+  },
+  {
+    "id": 39,
+    "category": "slang",
+    "input_text": "Hit the hay",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "表示去睡觉，但'打干草'的意象来自农业文化，日本人无法理解为何睡觉涉及干草。"
+  },
+  {
+    "id": 40,
+    "category": "slang",
+    "input_text": "Ball is in your court",
+    "source_culture": "en-US",
+    "target_culture": "ja",
+    "context": "表示轮到你采取行动，但网球术语'球在你的球场'需要体育背景知识，日本人可能不理解转喻。"
+  }
+]

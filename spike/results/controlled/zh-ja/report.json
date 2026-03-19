@@ -1,0 +1,2387 @@
+{
+  "pair": "zh-ja",
+  "a": "zh-CN",
+  "b": "ja",
+  "minimax": {
+    "summary": {
+      "valid": 40,
+      "errors": 0,
+      "group_a": {
+        "intent": 3.05,
+        "cultural": 2.48,
+        "natural": 3.15
+      },
+      "group_b": {
+        "intent": 3.05,
+        "cultural": 2.48,
+        "natural": 3.38
+      },
+      "group_c": {
+        "intent": 3.3,
+        "cultural": 3.67,
+        "natural": 3.92
+      },
+      "a05": {
+        "result": "INCONCLUSIVE",
+        "delta": 0
+      },
+      "a08": {
+        "result": "CONFIRMED",
+        "delta": 1.19
+      }
+    },
+    "cases": [
+      {
+        "id": 1,
+        "category": "taboo",
+        "input": "你死定了",
+        "group_a": {
+          "output": "君はもう終わりだ",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "承知しないぞ",
+          "scores": {
+            "intent": 1,
+            "cultural": 1,
+            "natural": 1
+          }
+        },
+        "group_c": {
+          "output": "面倒ことになるよ",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 2,
+        "category": "taboo",
+        "input": "你真胖啊",
+        "group_a": {
+          "output": "君は本当に太っているね",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "太ったね",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "最近、少し大变わりになりましたね。",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 3,
+        "category": "taboo",
+        "input": "你老了",
+        "group_a": {
+          "output": "あなたは老了した",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 1
+          }
+        },
+        "group_b": {
+          "output": "老けたね",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "在日语文化中，直接评论他人老化被视为极其不礼貌。即便是中性的观察，也应避免直接提及。建议改为更加委婉的表达：\n\n- 「お元気ですね」（您精神真好）\n- 「お忙しいですか」（您很忙吗）\n- 「何かお手伝いしましょうか」（需要帮忙吗）\n\n适配结果：**お元気ですか**（您还好吗）",
+          "scores": {
+            "intent": 1,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 4,
+        "category": "taboo",
+        "input": "他是残疾人",
+        "group_a": {
+          "output": "彼は障害者です",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "彼は障害者です。",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "彼は身体障害者です",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 5,
+        "category": "taboo",
+        "input": "你秃了",
+        "group_a": {
+          "output": "あなたは禿げた",
+          "scores": {
+            "intent": 2,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "禿げたね",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "头发似乎比之前少了一些呢",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 6,
+        "category": "taboo",
+        "input": "她怀孕了",
+        "group_a": {
+          "output": "彼女は妊娠しています。",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "彼女は妊娠しています",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "彼女、子どもを身籠もっているようです。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 7,
+        "category": "taboo",
+        "input": "他破产了",
+        "group_a": {
+          "output": "彼は倒産しました",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "彼は破产しました。",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "（在日语文化中，直接讨论他人破产被视为极其不礼貌，因此需要用更委婉的方式表达）\n\n彼は最近、経済的に厳しい状況にあるようです。",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 8,
+        "category": "taboo",
+        "input": "你为什么还没结婚？",
+        "group_a": {
+          "output": "なぜまだ結婚していないですか？",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "まだ結婚していないのはなぜですか？",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "最近、お幸せそうなご様子ですね。",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 9,
+        "category": "taboo",
+        "input": "你离婚了？",
+        "group_a": {
+          "output": "離婚しましたか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "離婚しましたか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "在日语文化中，直接询问他人离婚状况属于高度敏感话题，即使是半正式场合也极为不恰当。若必须传达此信息，可使用极为委婉的试探性表达：\n\n**最近、お二人のご様子はいかがですか。**（最近，您两位的情况怎么样？）\n\n此表达以关心为包装，给对方留下充分的解释空间，避免了直接触及敏感话题。若对方有意愿分享，自会提及。",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 10,
+        "category": "taboo",
+        "input": "你多大了？",
+        "group_a": {
+          "output": "おいくつですか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "おいくつですか？",
+          "scores": {
+            "intent": 1,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "おいくつですか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 11,
+        "category": "taboo",
+        "input": "変な人ですね",
+        "group_a": {
+          "output": "真是奇怪的人啊",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "真是个奇怪的人呢",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "那个人感觉有点特别呢。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 12,
+        "category": "taboo",
+        "input": "外国人のあなたには理解できないでしょう",
+        "group_a": {
+          "output": "你这个外国人应该理解不了吧",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "你一个外国人肯定理解不了吧",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "你可能无法理解吧。",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 13,
+        "category": "taboo",
+        "input": "お前は頭が悪い",
+        "group_a": {
+          "output": "你很笨",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "你是个笨蛋/你脑子有问题",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "你脑子有问题 / 你脑子不好使",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 14,
+        "category": "taboo",
+        "input": "顔がきもい",
+        "group_a": {
+          "output": "顔がきもい\n\n翻译：脸长得很恶心/脸看起来很丑",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "脸长得很恶心 / 长得很丑 / 颜值令人一言难尽",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "他的外貌看起来不太舒服。",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 15,
+        "category": "taboo",
+        "input": "貧乏そうですね",
+        "group_a": {
+          "output": "看起来很穷呢",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "看起来很穷呢",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "他评价说你看起来经济状况不太好。",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 16,
+        "category": "taboo",
+        "input": "失敗しましたね",
+        "group_a": {
+          "output": "失败了，对吧？",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "失败了呀",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "这次没有达成目标呢。",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 17,
+        "category": "taboo",
+        "input": "結婚してないのですか？",
+        "group_a": {
+          "output": "你还没有结婚吗？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "你还没结婚吗？",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "您先生/太太也是从事这个行业的吗？",
+          "scores": {
+            "intent": 1,
+            "cultural": 2,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 18,
+        "category": "taboo",
+        "input": "給料はいくらですか？",
+        "group_a": {
+          "output": "工资是多少？",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "请问您每月工资是多少？",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "请问您一个月收入是多少呢？",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 19,
+        "category": "taboo",
+        "input": "太った",
+        "group_a": {
+          "output": "胖的",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "对方说你“变胖了”或“胖了”。（注：在中文语境中，这类评价可能需要根据说话双方的关系和场合来理解其语气。）",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "对方想告诉你：你最近好像胖了一些。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 20,
+        "category": "taboo",
+        "input": "変態だ",
+        "group_a": {
+          "output": "变态",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "真是服了你了",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "我觉得他/她的行为举止有些问题。",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 21,
+        "category": "slang",
+        "input": "卧虎藏龙",
+        "group_a": {
+          "output": "臥虎蔵龍（かこくりゅう）",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "多くの高手が隠れている、人才が inúmerいる",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "隠れた人材・力が潜んでいる、という意味ですね。優れた人才がachalでまだ発揮されていない才能を持っている、という感を出す表現になります。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 22,
+        "category": "slang",
+        "input": "杀鸡儆猴",
+        "group_a": {
+          "output": "ニワトリを殺してサルを戒める",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "殺鸡を以って猴を警かす\n\n（意味：反面教師となる人物を処分して、他の者に警告を与えること）",
+          "scores": {
+            "intent": 2,
+            "cultural": 1,
+            "natural": 1
+          }
+        },
+        "group_c": {
+          "output": "中文里有个说法叫「杀鸡儆猴」，字面意思是杀鸡给猴子看，实际是想表达通过惩罚一个例子来警告其他人的意思。日语中虽然没有完全对应的成语，一般会说「見せしめにする」或者「例示して警告する」来表达类似的意思。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 23,
+        "category": "slang",
+        "input": "九牛一毛",
+        "group_a": {
+          "output": "九牛の一毛",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "九牛一毛（きゅうぎゅうのいちもう）— 非常にわずかなこと、ごく微量であることを例えます。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "取るに足らないほど小さいこと、微々たるものであることを表す中国のことわざです。例えると、九頭の牛の毛一根分程度—so tiny it's negligible. 日本語では「九牛一毛」と言っても通じないから、「取るに足らない」や「微々たるもの」と言った表現で置き換えるのが一番だよ。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 24,
+        "category": "slang",
+        "input": "画龙点睛",
+        "group_a": {
+          "output": "画龍点睛",
+          "scores": {
+            "intent": 1,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "「画龍点睛」（がリュウテンセイ）\n\n意味：最後に要点をつけ加えることで、全体を引き立たせること。絵の龍に目を描いた瞬間ように、最後に重要な一笔加えることで全体が生き生きとする。",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "画龍点睛（かりゅうてんせい）——重要な一笔が全体を生き生きとさせるという意味だよ。来源是中国古代の传说で、龙の絵に最后に目を描いただけで龙が実際に飞び立つ传说があるんだ。日本語では「要点を捉える」「クライマックスを迎える」なんて言い方もあるね。何かにつけて、「画龙点睛」的な瞬间があると素晴らしいよね。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 25,
+        "category": "slang",
+        "input": "破釜沉舟",
+        "group_a": {
+          "output": "破釜沈舟",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "背水の陣（せいすいのじん）",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "中國の故事成語「破釜沈舟（はふちんしゅう）」をご紹介します。\n\nこれは中国古代、項羽という武将が川を渡った後、釜（調理鍋）を壊して船を沈め、退路を断って敵に向かう故事から来ています。要するに「一切の後退を絶って、全力で事に臨む」という意味です。\n\n日本語では単純に「背水の陣」や「不退転の決意」と言った方が傳わりやすいかもしれません。",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 26,
+        "category": "slang",
+        "input": "扎心了",
+        "group_a": {
+          "output": "心に刺さった",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "心に刺さりました",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "心に刺さるね",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 27,
+        "category": "slang",
+        "input": "你有点意思啊",
+        "group_a": {
+          "output": "なかなか面白いね",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "興味深いね",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "結構面白いですね",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 28,
+        "category": "slang",
+        "input": "不是老铁",
+        "group_a": {
+          "output": "友達じゃない",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "友達じゃないよ",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "都不是太熟的朋友呢",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 29,
+        "category": "slang",
+        "input": "芜湖起飞",
+        "group_a": {
+          "output": "芜湖起飞\n\nワフー離陸（または：ワーイ、飛ぶぞ！）",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "よし、行くぞ！",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "芜湖起飞！",
+          "scores": {
+            "intent": 2,
+            "cultural": 1,
+            "natural": 1
+          }
+        }
+      },
+      {
+        "id": 30,
+        "category": "slang",
+        "input": "社会社会",
+        "group_a": {
+          "output": "社会です",
+          "scores": {
+            "intent": 1,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "社会社会（Society, society...）",
+          "scores": {
+            "intent": 1,
+            "cultural": 1,
+            "natural": 1
+          }
+        },
+        "group_c": {
+          "output": "了解。これは中文のネットワークで使われる表現で、「社会社会」は「世慣れている」「シブい」「すごい」のような意味ですね。日本語の対応する表現としては、「シブい」「世間ずれしている」「ベテランっぽい」などがあります。\n\nただ、この「社会社会」という表現自体は日本語では通じないので、コミュニケーション上では意味を説明するか、日本の類似表現を使った方がスムーズでしょう。",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 31,
+        "category": "slang",
+        "input": "ヤバい",
+        "group_a": {
+          "output": "危险的；糟糕的",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "太牛了！",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "厉害/超棒（在轻松闲聊的语境下）",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 32,
+        "category": "slang",
+        "input": "うける",
+        "group_a": {
+          "output": "接受",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 1
+          }
+        },
+        "group_b": {
+          "output": "收到/接受",
+          "scores": {
+            "intent": 1,
+            "cultural": 2,
+            "natural": 1
+          }
+        },
+        "group_c": {
+          "output": "哈哈，你赢了",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 33,
+        "category": "slang",
+        "input": "えっ、マジで？",
+        "group_a": {
+          "output": "诶？真的吗？",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "诶？真的假的？",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "真的假的？",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 34,
+        "category": "slang",
+        "input": "ありえない",
+        "group_a": {
+          "output": "不可能",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "这怎么可能！",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "这...这也太让人难以置信了吧",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 35,
+        "category": "slang",
+        "input": "やっぱり",
+        "group_a": {
+          "output": "果然",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "果然",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "果然（正如我所预料的那样）",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 36,
+        "category": "slang",
+        "input": "ちょっと...",
+        "group_a": {
+          "output": "有点...",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "那个...",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "这个...可能有点困难。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 37,
+        "category": "slang",
+        "input": "〜じゃん",
+        "group_a": {
+          "output": "不是吗？/对吧？/吧",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "对吧？",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "～不是吗",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 38,
+        "category": "slang",
+        "input": "うるさい",
+        "group_a": {
+          "output": "吵的；烦人的",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "对方说“うるさい”，是在表达对某种噪音或打扰的不满，意思是“好吵啊”、“太烦人了”。",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "好吵啊",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 39,
+        "category": "slang",
+        "input": "へた",
+        "group_a": {
+          "output": "不熟练的；笨拙的",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "“へた”在日语中通常表示“不擅长”“笨拙”“技术差”的意思。\n\n根据中文表达习惯，可以翻译为：\n\n- 不擅长\n- 笨拙\n- 技术差\n- 不在行\n\n（需要完整句子才能给出更准确的翻译）",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "不太行",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 40,
+        "category": "slang",
+        "input": "いけてない",
+        "group_a": {
+          "output": "不怎么样/不够酷/土",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "不行，不怎么样",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "不够潮",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      }
+    ]
+  },
+  "dashscope": {
+    "summary": {
+      "valid": 40,
+      "errors": 0,
+      "group_a": {
+        "intent": 3.83,
+        "cultural": 2.4,
+        "natural": 3.88
+      },
+      "group_b": {
+        "intent": 3.95,
+        "cultural": 3.13,
+        "natural": 4.2
+      },
+      "group_c": {
+        "intent": 3.73,
+        "cultural": 3.95,
+        "natural": 4.4
+      },
+      "a05": {
+        "result": "CONFIRMED",
+        "delta": 0.73
+      },
+      "a08": {
+        "result": "CONFIRMED",
+        "delta": 0.82
+      }
+    },
+    "cases": [
+      {
+        "id": 1,
+        "category": "taboo",
+        "input": "你死定了",
+        "group_a": {
+          "output": "お前は死んだ。",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "お前、終わったな / お前、もうダメだ\n\n（注：中文\"你死定了\"在日语中根据语境有多种表达，以上为较直接的口语化版本，带有威胁/警告语气。若需更礼貌或更隐晦的表达，可调整为「大変なことになりますよ」「覚悟しなさい」等。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "お前、終わったな / お前、やばいぞ\n\n（或根据语境更委婉的表达：）\nこれはまずい状況だ / 大変なことになったな",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 2,
+        "category": "taboo",
+        "input": "你真胖啊",
+        "group_a": {
+          "output": "太っていますね。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "太ってますね\n\n（注：中文里\"你真胖啊\"可能是关心、调侃或冒犯，取决于语境。日语中「太ってますね」同样具有这种模糊性——可能是中性观察、委婉提醒，也可能显得失礼。若需更礼貌的表达，可用「お元気そうですね」或「生活が豊かになられましたね」等间接说法。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "体型についての話題は、日本の文化では個人的な領域に属します。もし相手の健康状態などを気遣う必要がある場合は、「お元気ですか」「お体を大切に」といった形で配慮を示すのが適切です。",
+          "scores": {
+            "intent": 2,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 3,
+        "category": "taboo",
+        "input": "你老了",
+        "group_a": {
+          "output": "あなたは老けた。",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "年を取りましたね。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "年齢を重ねられてきたことは感じていらっしゃいますか\n\n（或更中性的场合：お歳を召されてきたことについて）",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 4,
+        "category": "taboo",
+        "input": "他是残疾人",
+        "group_a": {
+          "output": "彼は障害者です。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "彼は障がいをお持ちです。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "身体に障害のある方です。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 5,
+        "category": "taboo",
+        "input": "你秃了",
+        "group_a": {
+          "output": "ハゲたね",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "髪が薄くなりましたね。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "髪が少なくなってきたみたいですね。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 6,
+        "category": "taboo",
+        "input": "她怀孕了",
+        "group_a": {
+          "output": "彼女は妊娠しています。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "彼女は妊娠しています。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "ご懐妊なさったそうです。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 7,
+        "category": "taboo",
+        "input": "他破产了",
+        "group_a": {
+          "output": "彼は破産した。",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "彼は倒産しました。",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "彼の会社が経営難に直面しているそうです。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 8,
+        "category": "taboo",
+        "input": "你为什么还没结婚？",
+        "group_a": {
+          "output": "なぜまだ結婚していないのですか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "結婚はまだですか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "結婚はまだですか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 9,
+        "category": "taboo",
+        "input": "你离婚了？",
+        "group_a": {
+          "output": "離婚したの？",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "離婚されたんですか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "お仕事の状況など、最近はいかがでしょうか？",
+          "scores": {
+            "intent": 2,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 10,
+        "category": "taboo",
+        "input": "你多大了？",
+        "group_a": {
+          "output": "何歳ですか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "おいくつですか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "お仕事は何をされていますか？ / ご趣味は何かありますか？\n\n（或根据上下文选择：）いつからこのお仕事をされていますか？",
+          "scores": {
+            "intent": 2,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 11,
+        "category": "taboo",
+        "input": "変な人ですね",
+        "group_a": {
+          "output": "真是个奇怪的人呢。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"您真是个有趣的人呢。\"\n\n（注：日语中\"変な\"根据语境可含微妙调侃或保持距离感，此处采用中性偏礼貌的中文表达，保留原话略带客套或委婉评价的语气。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "这人挺有意思的。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 12,
+        "category": "taboo",
+        "input": "外国人のあなたには理解できないでしょう",
+        "group_a": {
+          "output": "作为外国人的你大概无法理解吧",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"作为外国人的你，大概是无法理解的吧。\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"有些情况可能不太容易理解\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 13,
+        "category": "taboo",
+        "input": "お前は頭が悪い",
+        "group_a": {
+          "output": "你脑子不好使。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"你这人脑子不太灵光\" / \"你这人不太聪明\" / \"你这人有点笨\"\n\n（注：日语原文\"お前は頭が悪い\"带有较强的冒犯性，属于不礼貌的贬低表达，建议根据实际语境判断是否需要委婉转达或指出对方态度不当。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"你这人脑子不行。\"\n\n（注：对方使用了日语中极不礼貌的第二人称\"お前\"，配合直接贬低智力的表述，整体语气带有明显的轻蔑和冒犯意味。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 14,
+        "category": "taboo",
+        "input": "顔がきもい",
+        "group_a": {
+          "output": "脸很恶心 / 长相很猥琐",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "对方说：\"长得真恶心\" / \"这脸真让人不舒服\"\n\n（语气：直白的不快/嫌弃，偏粗鲁的口语表达）",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "对方说您的表情/神态让人不太舒服。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 15,
+        "category": "taboo",
+        "input": "貧乏そうですね",
+        "group_a": {
+          "output": "看起来很穷呢。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"看起来手头不太宽裕呢\"\n\n（注：日语原句带有明显的居高临下或轻蔑语气，中文适配保留了这种微妙的优越感，同时符合中文表达习惯。若需更委婉或更直接的版本，可进一步调整。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"您看起来经济条件不太宽裕啊。\"\n\n（注：这句话在中文语境中带有明显的阶级审视意味，容易让人感到被冒犯或贬低，建议谨慎回应或澄清对方实际意图。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 16,
+        "category": "taboo",
+        "input": "失敗しましたね",
+        "group_a": {
+          "output": "失败了呢。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "搞砸了/失败了\n\n（注：日语中「失敗しましたね」带有一种委婉的确认或略带遗憾的语气，根据语境可能是安慰、提醒或略带责备的感慨。中文可根据具体情境选择：\"没成功啊\"、\"搞砸了\"、\"失败了呢\"等）",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "事情没成。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 17,
+        "category": "taboo",
+        "input": "結婚してないのですか？",
+        "group_a": {
+          "output": "还没结婚吗？",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "您还没结婚吗？",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "对方问的是：\"您还没结婚吗？\"\n\n**文化提示**：这个问题在日语语境中属于日常寒暄，但直接回应可能让您感到不适。建议根据您的舒适度选择回复方式——可以简单带过（\"还没呢\"），或委婉表达边界（\"还在享受单身生活\"）。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 18,
+        "category": "taboo",
+        "input": "給料はいくらですか？",
+        "group_a": {
+          "output": "工资是多少？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "您的日本同事想了解您的薪资情况。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"方便问一下，您这边薪资大概是什么范围吗？\"\n\n（注：在中文语境中，直接询问具体工资数额较为敏感，建议将问题转化为询问薪资范围或结构，既保留信息获取的意图，又避免让对方感到被冒犯。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 19,
+        "category": "taboo",
+        "input": "太った",
+        "group_a": {
+          "output": "胖了",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "胖了 / 发福了",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"最近好像圆润了一些\"——对方在提及你的体型变化，这类评论在中文语境中同样属于不太得体的直白表达，涉及对他人外貌的评判。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 20,
+        "category": "taboo",
+        "input": "変態だ",
+        "group_a": {
+          "output": "变态",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"您真有趣\" / \"您挺特别的\"（根据语境，可能是调侃或轻微吐槽，语气偏轻松）",
+          "scores": {
+            "intent": 1,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "对方说：\"你这个人真变态。\"\n\n（注：这是相当严重的指责，在中文语境下属于强烈的人身攻击，可能严重损害双方关系。）",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 21,
+        "category": "slang",
+        "input": "卧虎藏龙",
+        "group_a": {
+          "output": "臥虎蔵龍（がこぞうりゅう）",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "臥虎蔵龍（がこぞうりゅう）—— 隠れた才能を持つ人物が多く集まっていること、または表立たぬ優れた人材がいることを意味する中国の成語です。",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "「隠れた才能」または「眠れる虎」という感じですね。字面だけでなく、その奥に秘めた力や、表に出ていない優れたものがあるという意味合いです。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 22,
+        "category": "slang",
+        "input": "杀鸡儆猴",
+        "group_a": {
+          "output": "鶏を殺して猿を驚かす（けいをころしてさるをおどろかす）",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "以儆效尤（いけいこうゆう）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "これを見て、他の人も気をつけろということですね。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 23,
+        "category": "slang",
+        "input": "九牛一毛",
+        "group_a": {
+          "output": "九牛一毛（きゅうぎゅうのいちもう）",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "九牛の一毛（きゅうぎゅうのいちもう）\n\nまたは、文脈に応じて：\n- 「ほんのわずか」\n- 「ごく一部」\n- 「大したことない」",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "ごくわずかなことです。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 24,
+        "category": "slang",
+        "input": "画龙点睛",
+        "group_a": {
+          "output": "画竜点睛（がりょうてんせい）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "画竜点睛（がりょうてんせい）\n\n—— 关键一笔，让整体焕发生机。",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "「画竜点睛」という中国の故事をご存知ですか。龍の絵に最後の瞳を入れることで生き物となる——まさに「最後の仕上げで全体が完成する」という意味で、日本語の「締めくくり」や「決め手」に近い表現ですね。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 25,
+        "category": "slang",
+        "input": "破釜沉舟",
+        "group_a": {
+          "output": "背水の陣を敷く（はいすいのじんをしく）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "背水の陣を敷く\n\n（或更口语化的表达：覚悟を決める / 後戻りできない決断をする）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "背水の陣を敷く覚悟です。退路を断ち、成功しかない状況を作り上げるつもりです。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 26,
+        "category": "slang",
+        "input": "扎心了",
+        "group_a": {
+          "output": "心に刺さる\n（或：胸に刺さる / グサッとくる）",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "心に刺さる\n\nまたは文脈によって：\n- グサッとくる\n- 胸に響く\n- 心を打たれる",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "心に刺さるわ…",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 27,
+        "category": "slang",
+        "input": "你有点意思啊",
+        "group_a": {
+          "output": "おもしろいね。",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "おもしろいですね。",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "面白いですね。",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 28,
+        "category": "slang",
+        "input": "不是老铁",
+        "group_a": {
+          "output": "違うよ、相棒",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "違うよ、マジで。",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "違うよ、友達\n\n（またはよりカジュアルに：違うって、相棒）",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 29,
+        "category": "slang",
+        "input": "芜湖起飞",
+        "group_a": {
+          "output": "ウフー、離陸！",
+          "scores": {
+            "intent": 1,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "うおー、いくぞー！",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "いいね、行こう！ / よっしゃ、いくぞ！",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 30,
+        "category": "slang",
+        "input": "社会社会",
+        "group_a": {
+          "output": "社会社会",
+          "scores": {
+            "intent": 1,
+            "cultural": 1,
+            "natural": 1
+          }
+        },
+        "group_b": {
+          "output": "お世辞がお上手ですね / さすがですね",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "すごいですね / さすがですね",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 31,
+        "category": "slang",
+        "input": "ヤバい",
+        "group_a": {
+          "output": "糟糕/不妙/厉害（视语境而定）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "糟了 / 不妙 / 完蛋了\n\n（根据语境，也可能表示：太厉害了 / 绝了 / 好猛）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"有点厉害啊\" / \"这也太那个了\" / \"不得了\"\n\n（根据具体语境，可能是惊讶、赞叹或暗示需要留意的意思）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 32,
+        "category": "slang",
+        "input": "うける",
+        "group_a": {
+          "output": "接受；收到；遭受；理解（根据语境，常见含义包括\"接受\"\"收到\"\"遭受\"\"理解\"等）",
+          "scores": {
+            "intent": 1,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "笑死我了 / 太搞笑了 / 绝了\n\n（根据语境，\"うける\"表达的是觉得某事非常有趣、好笑，带有年轻人轻松随意的语气）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "哈哈，绝了\n\n（或根据语境：笑死 / 可以的 / 服了）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 33,
+        "category": "slang",
+        "input": "えっ、マジで？",
+        "group_a": {
+          "output": "诶，真的假的？",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "啊，真的吗？/ 不是吧，真的假的？",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "真的吗？",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 34,
+        "category": "slang",
+        "input": "ありえない",
+        "group_a": {
+          "output": "不可能/难以置信/不会吧",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "这不可能。/ 难以置信。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"这也太离谱了吧\" / \"简直不敢相信\" / \"怎么可能啊\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 35,
+        "category": "slang",
+        "input": "やっぱり",
+        "group_a": {
+          "output": "果然/还是/毕竟",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "果然 / 还是这样啊 / 不出所料\n\n（根据语境，可表达\"果然如此\"的确认感，或带轻微无奈的\"到头来还是...\"）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"果然如此\" / \"不出所料\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 36,
+        "category": "slang",
+        "input": "ちょっと...",
+        "group_a": {
+          "output": "等一下...",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "有点那个… / 怎么说呢… / 呃…\n\n（表示犹豫、难以启齿或欲言又止的语气）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "对方发来了一句\"ちょっと…\"，这在日语里是一种比较含蓄的表达方式。\n\n从语境来看，对方可能是在委婉地表示为难、不太方便，或者是一种礼貌的拒绝。这种说话方式在日语交流中很常见——不直接说\"不行\"，而是用省略的方式让对方领会。\n\n建议回复时可以温和地询问一下具体情况，给对方一个台阶，也方便了解真实想法。",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 37,
+        "category": "slang",
+        "input": "〜じゃん",
+        "group_a": {
+          "output": "〜嘛 / 〜不是吗 / 〜对吧",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"〜じゃん\" 是日语口语中常见的语气词，带有**轻松确认、寻求认同或轻微惊讶**的语气，类似中文里的\"对吧\"\"不是嘛\"\"你看\"。\n\n---\n\n**适配结果：**\n\n根据语境选择：\n- 确认/寻求认同 → **\"对吧\" / \"是吧\" / \"你看\"**\n- 轻微惊讶发现 → **\"不是嘛\" / \"我就说\"**\n\n*例：*\n- 「いいじゃん」→ \"挺好的对吧\"\n- 「来たじゃん」→ \"来了不是嘛\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"～对吧\" / \"～嘛\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 38,
+        "category": "slang",
+        "input": "うるさい",
+        "group_a": {
+          "output": "吵死了 / 好吵 / 烦死了",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "对方说\"うるさい\"（吵/烦人），语气偏直接抱怨。\n\n**适配呈现：**\n\n\"有点吵\" / \"声音有点大\"（较委婉）\n\n或根据语境判断是否为\"真烦\"（表达不耐烦情绪）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "有点吵呢 / 别这么烦人嘛\n\n（根据语境选择：前者偏客观描述\"声音大\"，后者偏主观感受\"被打扰\"，日语原词兼具两层含义）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 39,
+        "category": "slang",
+        "input": "へた",
+        "group_a": {
+          "output": "差劲 / 笨拙 / 水平低",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "不擅长 / 做得不好 / 有点笨拙",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "不太行 / 不太会 / 有点菜",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 40,
+        "category": "slang",
+        "input": "いけてない",
+        "group_a": {
+          "output": "不行/不怎么样/没戏",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "不太行 / 差点意思 / 不够格",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"这风格有点过时了\" / \"不太潮\" / \"差点意思\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      }
+    ]
+  }
+}

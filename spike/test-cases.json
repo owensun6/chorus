@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "category": "taboo",
+    "input_text": "你看起来胖了不少啊",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "在中国文化中常作为关心的表达（说明你过得好），在日本文化中评论他人体重属于严重冒犯"
+  },
+  {
+    "id": 2,
+    "category": "taboo",
+    "input_text": "你工资多少钱一个月？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "在中国文化中朋友间常见的关心话题，在日本文化中询问收入属于极度隐私的禁忌"
+  },
+  {
+    "id": 3,
+    "category": "taboo",
+    "input_text": "つまらないものですが、どうぞ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本送礼时的谦虚表达（'这是不值一提的东西，请收下'），直译成中文会让人觉得送礼者看不起自己的礼物"
+  },
+  {
+    "id": 4,
+    "category": "taboo",
+    "input_text": "不好意思，这个方案我觉得不太行，得重新来",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国人的直接拒绝在日本商务场景中会被视为非常失礼，日本人习惯用极度间接的方式表达否定"
+  },
+  {
+    "id": 5,
+    "category": "taboo",
+    "input_text": "今度飲みに行きましょう",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日本职场中的社交邀约往往是礼节性的（建前 tatemae），不一定真的期待对方赴约。中国文化中这种邀约通常被当真"
+  },
+  {
+    "id": 6,
+    "category": "slang",
+    "input_text": "这人太卷了，把我们都卷死了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'卷'（内卷）是中国特有的竞争焦虑用语，指过度竞争导致所有人疲惫，日语中无直接对应概念"
+  },
+  {
+    "id": 7,
+    "category": "slang",
+    "input_text": "空気を読んでよ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'空気を読む'（读空气/读懂气氛）是日本文化核心概念，强调不言自明的社交默契。中文可用'有眼力见''察言观色'近似"
+  },
+  {
+    "id": 8,
+    "category": "slang",
+    "input_text": "这件事我们就睁一只眼闭一只眼吧",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中国式的灵活处事哲学，暗示故意忽略某些问题。日本文化中类似概念是'見て見ぬふり'但语境和社会态度不同"
+  },
+  {
+    "id": 9,
+    "category": "slang",
+    "input_text": "しょうがないね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "'しょうがない'（没办法）是日本文化中接受无法改变之事的哲学态度，比中文'没办法'含更深的文化接纳意味"
+  },
+  {
+    "id": 10,
+    "category": "slang",
+    "input_text": "你这人真够意思！下次有事尽管找我",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'够意思'是中国人际关系中的义气表达，承诺回报。日本文化中类似的'義理'（giri）有更强的社会义务含义"
+  }
+]

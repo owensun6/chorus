@@ -1,0 +1,22 @@
+{
+  "delay_ms": 3000,
+  "cases_per_pair": 40,
+  "dialogue_rounds": 8,
+  "language_pairs": [
+    { "id": "zh-ja", "a": "zh-CN", "b": "ja", "a_name": "中文", "b_name": "日语", "persona_a": "Alice，上海产品经理，30岁，热情直爽", "persona_b": "Bob，东京软件工程师，32岁，礼貌内敛", "scene": "初次商务社交" },
+    { "id": "zh-ko", "a": "zh-CN", "b": "ko", "a_name": "中文", "b_name": "韩语", "persona_a": "小明，北京大学生，22岁，开朗幽默", "persona_b": "지수(Jisoo)，首尔设计师，25岁，时尚热情", "scene": "网友初次聊天，聊流行文化" },
+    { "id": "zh-en", "a": "zh-CN", "b": "en-US", "a_name": "中文", "b_name": "英语", "persona_a": "李华，深圳创业者，35岁，务实高效", "persona_b": "Sarah，硅谷PM，33岁，开放直接", "scene": "跨国项目合作初次沟通" },
+    { "id": "ja-en", "a": "ja", "b": "en-US", "a_name": "日语", "b_name": "英语", "persona_a": "田中，大阪销售经理，28岁，外向但注重礼仪", "persona_b": "Mike，纽约律师，30岁，自信健谈", "scene": "商务宴请后的非正式交流" },
+    { "id": "zh-ar", "a": "zh-CN", "b": "ar", "a_name": "中文", "b_name": "阿拉伯语", "persona_a": "王芳，广州外贸商，40岁，精明务实", "persona_b": "Ahmed，迪拜商人，45岁，重视关系与信仰", "scene": "贸易谈判中的关系建立" },
+    { "id": "zh-fr", "a": "zh-CN", "b": "fr", "a_name": "中文", "b_name": "法语", "persona_a": "陈磊，上海厨师，29岁，对美食充满热情", "persona_b": "Marie，巴黎美食博主，27岁，注重品味与仪式感", "scene": "聊各自国家的饮食文化" },
+    { "id": "zh-de", "a": "zh-CN", "b": "de", "a_name": "中文", "b_name": "德语", "persona_a": "张伟，杭州工程师，31岁，内向务实", "persona_b": "Hans，慕尼黑工程师，34岁，严谨高效", "scene": "技术社区线上交流" },
+    { "id": "zh-es", "a": "zh-CN", "b": "es", "a_name": "中文", "b_name": "西班牙语", "persona_a": "刘洋，成都教师，28岁，温和有耐心", "persona_b": "Carlos，马德里记者，30岁，热情奔放", "scene": "语言交换伙伴首次对话" },
+    { "id": "zh-pt", "a": "zh-CN", "b": "pt-BR", "a_name": "中文", "b_name": "葡萄牙语(巴西)", "persona_a": "赵敏，北京自由职业者，26岁，随性开朗", "persona_b": "Lucas，圣保罗音乐人，28岁，热情外向", "scene": "社交平台上聊音乐和生活" },
+    { "id": "zh-ru", "a": "zh-CN", "b": "ru", "a_name": "中文", "b_name": "俄语", "persona_a": "孙涛，哈尔滨商人，38岁，豪爽大方", "persona_b": "Dmitri，莫斯科教授，42岁，知识渊博略显严肃", "scene": "老朋友久别重逢叙旧" },
+    { "id": "zh-hi", "a": "zh-CN", "b": "hi", "a_name": "中文", "b_name": "印地语", "persona_a": "周莉，深圳HR经理，33岁，细心周到", "persona_b": "Priya，班加罗尔IT主管，35岁，聪明注重家庭", "scene": "跨国公司同事初次远程认识" },
+    { "id": "ja-ko", "a": "ja", "b": "ko", "a_name": "日语", "b_name": "韩语", "persona_a": "佐藤，京都大学生，21岁，安静内向喜欢动漫", "persona_b": "민준(Minjun)，釜山大学生，22岁，活泼好胜", "scene": "游戏社区认识的网友" },
+    { "id": "ja-fr", "a": "ja", "b": "fr", "a_name": "日语", "b_name": "法语", "persona_a": "鈴木，名古屋花道师范，45岁，优雅含蓄", "persona_b": "Pierre，里昂画廊主，50岁，浪漫艺术气质", "scene": "艺术交流活动后的私下对话" },
+    { "id": "en-ar", "a": "en-US", "b": "ar", "a_name": "英语", "b_name": "阿拉伯语", "persona_a": "David，芝加哥NGO工作者，36岁，理想主义", "persona_b": "Fatima，开罗大学讲师，32岁，独立知性", "scene": "国际会议后的非正式交流" },
+    { "id": "ko-en", "a": "ko", "b": "en-US", "a_name": "韩语", "b_name": "英语", "persona_a": "수진(Sujin)，首尔时尚编辑，29岁，潮流敏锐", "persona_b": "Emma，洛杉矶内容创作者，27岁，直率有趣", "scene": "K-pop粉丝社群认识" }
+  ]
+}

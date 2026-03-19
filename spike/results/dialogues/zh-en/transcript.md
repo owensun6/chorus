@@ -1,0 +1,166 @@
+<!-- Author: Lead -->
+# Dialogue: 中文 ↔ 英语
+
+**李华，深圳创业者，35岁，务实高效** (via MiniMax) ↔ **Sarah，硅谷PM，33岁，开放直接** (via Dashscope)
+**场景**: 跨国项目合作初次沟通
+
+---
+
+### 🅰️ 李华 (Round 0)
+
+**原文**: 你好！我是李华。跨国项目合作初次沟通。很高兴认识你！
+
+**信封**: `{"original_semantic":"初次见面问候","sender_culture":"zh-CN","intent_type":"greeting","emotional_tone":"enthusiastic"}`
+
+---
+
+### 🅱️ Sarah (Round 1)
+
+**原文**: 你好李华！我是Sarah，硅谷的产品经理。直接说正事吧——你们那边目前项目进度到哪一步了？我想先对齐一下时间线和关键里程碑，免得后面节奏对不上。
+
+**对方看到**: Hi there! Nice to meet you too. I'm Sarah, PM based in Silicon Valley. Looking forward to working with you on this cross-border project.
+
+**信封**: `{"original_semantic":"接受问候并快速切入工作议题，建立高效协作基调","sender_culture":"en-US","intent_type":"task_alignment","emotional_tone":"direct_professional"}`
+
+---
+
+### 🅰️ 李华 (Round 1)
+
+**原文**: Hi Sarah, good to connect. Here's our current status - we've finished the MVP development and are now in the testing phase. Key milestones: user acceptance testing starts next week, final delivery targeted for end of February. What's your timeline looking like on your end?
+
+**对方看到**: Translation: Confirming greeting and responding with project progress, providing key milestone information.
+
+**信封**: `{"original_semantic":"确认问候并回复项目进度，提供关键里程碑信息","sender_culture":"zh-CN","intent_type":"task_alignment","emotional_tone":"direct_professional"}`
+
+---
+
+### 🅱️ Sarah (Round 2)
+
+**原文**: Hey! Good to hear from you. We're actually running a bit tight on our end — our integration sprint is scheduled for mid-February, so your end-of-February delivery works, but it's cutting it close. Can you confirm if there's any buffer built into that date? Also, who's your main point of contact for technical blockers during UAT?
+
+**对方看到**: 嗨Sarah，很高兴联系上。我们目前进度——MVP开发已完成，现处于测试阶段。关键里程碑：用户验收测试下周启动，最终交付目标2月底。你们那边时间线如何？
+
+**信封**: `{"original_semantic":"确认收到进度，表达时间线紧张但可行，请求确认缓冲空间并询问UAT技术对接人","sender_culture":"en-US","intent_type":"task_alignment","emotional_tone":"direct_professional"}`
+
+---
+
+### 🅰️ 李华 (Round 2)
+
+**原文**: Hi Sarah, understood on the timeline pressure. Our end-of-February delivery is firm, and I've built in a 3-5 day buffer to account for any final testing issues — so you're looking at latest mid-March for final sign-off. For UAT technical blockers, our tech lead Zhang Wei will be the main point of contact. He's handled cross-border UAT before and can respond quickly. Should we set up a quick sync next week to align on the UAT process?
+
+**对方看到**: 确认收到你们的进度反馈。理解2月中旬集成的紧张时间线——我们2月底的交付虽然紧凑，但完全可行。关于缓冲期：我们可以在最终交付预留3-5天的缓冲，以防最终测试出现小问题。UAT阶段的技术对接人我推荐我们的技术负责人张伟，他在跨境项目UAT方面经验丰富，有任何技术障碍可以直接联系他。
+
+**信封**: `{"original_semantic":"确认时间线承诺，提供缓冲期并指定UAT技术对接人张伟，建议下周同步会议","sender_culture":"zh-CN","intent_type":"task_alignment","emotional_tone":"direct_professional"}`
+
+---
+
+### 🅱️ Sarah (Round 3)
+
+**原文**: Hey, thanks for the buffer — that helps a lot with our exec reporting. Zhang Wei sounds solid, I'll have our QA lead reach out to him directly to swap contact info. Next week works for me — how's Tuesday morning your time? I'll send a cal invite. One thing: can you share what "quickly" means for Zhang Wei's response time? We sometimes hit timezone friction with P0 bugs.
+
+**对方看到**: 对方确认2月底交付节点不变，预留3-5天缓冲期，最终签字不晚于3月中旬。指定技术负责人张伟对接UAT，建议下周开会同步流程。
+
+**信封**: `{"original_semantic":"确认缓冲期价值，安排QA与张伟对接，提议周二会议，询问具体响应时效以规避时区风险","sender_culture":"en-US","intent_type":"task_alignment","emotional_tone":"direct_professional"}`
+
+---
+
+### 🅰️ 李华 (Round 3)
+
+**原文**: Hi Sarah, Tuesday morning works perfectly for me — please send the calendar invite. On the response time, here's what I can commit: for P0 critical bugs, Zhang Wei will respond within 2 hours during Shenzhen working hours (9 AM–6 PM CST). For P1 issues, within 4 hours. I know timezone overlap can be tricky, so we're also setting up a shared Slack channel for urgent escalations that works 24/7. This should eliminate the friction you're concerned about. Looking forward to the meeting.
+
+**对方看到**: 好的，缓冲期对执行报告帮助很大。张伟听起来很可靠，我会让QA负责人直接联系他交换联系方式。下周我OK——你那边周二上午怎么样？我会发日历邀请。还有一点：你能告诉我张伟的"快速"响应时间具体是指多久吗？我们有时会因为时区问题在P0 bug上遇到摩擦。
+
+**信封**: `{"original_semantic":"确认周二上午会议，承诺P0 bug 2小时内响应、P1 bug 4小时内响应，提出24/7紧急Slack频道以解决时区摩擦问题","sender_culture":"zh-CN","intent_type":"task_alignment","emotional_tone":"solution_oriented"}`
+
+---
+
+### 🅱️ Sarah (Round 4)
+
+**原文**: Hey, appreciate the specifics — that level of detail is exactly what I need. Two quick things to lock this down: First, what's the fallback if a P0 hits outside Shenzhen hours? I need to know if I'm waking someone up or if there's a handoff protocol. Second, can you share the Slack channel name so I can loop in my on-call engineer before Tuesday? The 24/7 escalation piece is smart — let's stress-test it in the first week so we don't find gaps when something's actually on fire. Tuesday 9 AM PST / Wednesday 1 AM your time, right? Sending the invite now.
+
+**对方看到**: 周二上午没问题，请发日历邀请。响应时间我这边确认：P0关键bug，张伟会在深圳工作时间（北京时间早9点-晚6点）2小时内响应；P1问题4小时内。时区重叠确实头疼，所以我们还建了个24/7的共享Slack紧急升级频道，应该能打消你的顾虑。期待会议。
+
+**信封**: `{"original_semantic":"确认收到承诺细节，追问P0非工作时间的fallback机制，索要Slack频道信息以便提前同步，提议首周实战测试24/7通道，确认会议时间并发送邀请","sender_culture":"en-US","intent_type":"risk_mitigation","emotional_tone":"collaborative_but_pressing"}`
+
+---
+
+### 🅰️ 李华 (Round 4)
+
+**原文**: Got it. For P0 outside Shenzhen hours, we have a dedicated on-call rotation — anyone between 6 PM and 9 AM gets a direct wake-up call from the duty phone. That's their job, you won't be bothering anyone. Slack channel is #proj-escalation-ops, you're already added. Fully agree on the first-week stress test — let's run the simulation right after Wednesday's call and test the full 24/7 escalation path within the first week. Time confirmed, invite received.
+
+**对方看到**: 好的，收到。P0非工作时间我有明确方案：深圳时间下午6点后（北京时间18:00）到次日早上9点之间的P0，会通过值班手机直接唤醒值班工程师，我们有轮值表每48小时一轮。你不需要担心把人从床上拉起来——值班人员知道这是他们职责。Slack频道是 **#proj-escalation-ops** ，我已经把你加进去了，现在能看到。首周实战测试我完全同意，周三凌晨1点的会后我们就开始模拟演练，24/7通道的压力测试定在第一周内完成。时间确认无误，邀请收下了。
+
+**信封**: `{"original_semantic":"确认P0非工作时间fallback机制（轮值手机唤醒），提供Slack频道#proj-escalation-ops，同意首周实战测试计划，确认周三凌晨1点会议时间","sender_culture":"zh-CN","intent_type":"risk_mitigation","emotional_tone":"collaborative_and_efficient"}`
+
+---
+
+### 🅱️ Sarah (Round 5)
+
+**原文**: Perfect, thanks for the clarity on the on-call rotation — that removes my main concern about timezone friction. Quick follow-up: for the Wednesday stress test, do you want me to trigger a mock P0 from my end during your daytime, or should we script both sides? Also, who's the escalation lead on your side for week one — same person or rotating? Want to make sure we're not both waiting for the other to make the first move.
+
+**对方看到**: 收到。P0在深圳非工作时间（晚6点至早9点）有专人轮值，会直接电话唤醒，这是他们的职责，不必担心打扰。Slack频道#proj-escalation-ops已添加你。完全同意首周压力测试——周三通话后立即跑模拟，第一周完成全链路24/7演练。时间确认，邀请已收。
+
+**信封**: `{"original_semantic":"确认轮值机制解除顾虑，询问周三压力测试的具体执行方式（单方触发或双方脚本），确认首周升级负责人是否固定，避免执行层面的双向等待","sender_culture":"en-US","intent_type":"operational_clarification","emotional_tone":"pragmatic_and_aligned"}`
+
+---
+
+### 🅰️ 李华 (Round 5)
+
+**原文**: Great questions. For the stress test, I'd prefer single-side trigger — it better simulates a real P0 where one side wakes up and the other responds. I'll handle the trigger from my end during your night, you just monitor and escalate. For week one's escalation lead, let's keep it fixed: David (my tech lead) will be the primary contact. Rotating starts week two. This removes the "both waiting" risk you mentioned. Sound good?
+
+**对方看到**: 明白了，轮值机制的澄清消除了我对时区摩擦的主要顾虑。快速跟进一下：周三的压力测试，你希望我在你白天时从我这端触发一个模拟P0，还是我们两边都写脚本？还有，你们首周的升级负责人是固定一个人还是轮换？不想让我们双方都在等对方先行动。
+
+**信封**: `{"original_semantic":"压力测试建议单方触发以模拟真实场景，首周升级负责人固定为技术负责人David，第二周开始轮换，明确执行流程避免双向等待","sender_culture":"zh-CN","intent_type":"operational_clarification","emotional_tone":"pragmatic_and_aligned"}`
+
+---
+
+### 🅱️ Sarah (Round 6)
+
+**原文**: Works for me. Single-side trigger keeps it realistic, and fixing David for week one gives us a clean baseline. I'll make sure my on-call knows to escalate straight to him during your night hours. Let's sync on the rotation schedule early next week so we're ready to switch smoothly.
+
+**对方看到**: 对方确认压力测试方案：单方触发（他们夜间发起，我们监控升级），首周固定David为升级负责人，第二周开始轮换。询问是否同意。
+
+**信封**: `{"original_semantic":"确认接受方案，首周固定David为升级联系人，己方值班人员将直接对接，提议下周初同步轮换安排","sender_culture":"en-US","intent_type":"operational_agreement","emotional_tone":"pragmatic_and_aligned"}`
+
+---
+
+### 🅰️ 李华 (Round 6)
+
+**原文**: 收到，确认方案。第一周固定David做升级联系人，这个安排合理。我会提前跟他沟通好，确保他了解你方夜间值班的转接流程。下周初我们安排时间同步轮换计划，具体时间你定。
+
+**对方看到**: 好的，明白。单边触发机制确实更切合实际，David第一周作为固定升级联系人也能帮我们建立清晰的基准。我会确保我方值班人员在你方夜间时段直接转接给他。下周初我们同步轮换安排，确保切换顺畅。
+
+**信封**: `{"original_semantic":"确认方案，第一周David固定为升级联系人，我会提前与他沟通对接流程，下周初同步轮换安排","sender_culture":"zh-CN","intent_type":"operational_agreement","emotional_tone":"pragmatic_and_aligned"}`
+
+---
+
+### 🅱️ Sarah (Round 7)
+
+**原文**: 收到，确认方案。第一周固定David做升级联系人，这个安排合理。我会提前跟他沟通好，确保他了解你方夜间值班的转接流程。下周初我们安排时间同步轮换计划，具体时间你定。
+
+**对方看到**: Got it, confirmed. Week 1 with David as escalation contact works. I'll brief him on your night shift handoff protocol. Let's sync on the rotation schedule early next week—just send over what time works for you.
+
+**信封**: `{"original_semantic":"确认方案，第一周David固定为升级联系人，我会提前与他沟通对接流程，下周初同步轮换安排","sender_culture":"zh-CN","intent_type":"operational_agreement","emotional_tone":"pragmatic_and_aligned"}`
+
+---
+
+### 🅰️ 李华 (Round 7)
+
+**原文**: 收到，确认方案。David这边没问题，我也会让我们团队提前把夜间值班的完整流程和注意事项整理给他。下周初同步轮换计划，周三上午10点（北京时间）方便吗？如果可以我发会议邀请给你。
+
+**对方看到**: Got it, confirmed. That works for us. Regarding the rotation sync next week, how about Wednesday morning? Let me know if that works on your end.
+
+**信封**: `{"original_semantic":"确认方案合理，提出具体会议时间周三上午10点北京时区，等待对方确认后发送会议邀请","sender_culture":"zh-CN","intent_type":"operational_agreement","emotional_tone":"pragmatic_and_aligned"}`
+
+---
+
+### 🅱️ Sarah (Round 8)
+
+**原文**: Works for me, Wednesday 10am Beijing time is locked in. I'll flag it for my team lead in Shanghai too so she's looped in. Quick check—will this cover just the handoff details or are we also walking through the escalation matrix? Want to make sure we have the right people on the call.
+
+**对方看到**: Got it, confirming the plan. David's side is all set, and I'll have my team prep the full night shift protocol and notes for him. We'll sync on the rotation schedule early next week. Does Wednesday 10am Beijing time work for you? If yes, I'll send the calendar invite.
+
+**信封**: `{"original_semantic":"确认时间可行，询问会议具体议程范围以确保参会人员合适","sender_culture":"en-US","intent_type":"operational_clarification","emotional_tone":"collaborative_and_proactive"}`
+
+---
+

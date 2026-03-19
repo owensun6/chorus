@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chorus Experiment Dashboard</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', sans-serif; background: #0a0a0a; color: #e0e0e0; }
+
+.header {
+  padding: 24px 32px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-bottom: 1px solid #333;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.header h1 { font-size: 1.6em; background: linear-gradient(135deg, #ff6b6b, #ffd700, #4ecdc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.header .meta { color: #888; font-size: 0.85em; }
+#startBtn {
+  padding: 10px 28px; background: #ff6b6b; color: #fff; border: none; border-radius: 8px;
+  font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+#startBtn:hover { background: #ff5252; transform: scale(1.02); }
+#startBtn:disabled { background: #555; cursor: not-allowed; transform: none; }
+
+.progress-bar { height: 4px; background: #222; }
+.progress-bar .fill { height: 100%; background: linear-gradient(90deg, #ff6b6b, #ffd700, #4ecdc4); transition: width 0.3s; width: 0%; }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px 32px; }
+.stat-card { background: #141414; border: 1px solid #2a2a2a; border-radius: 10px; padding: 16px; text-align: center; }
+.stat-card .label { color: #888; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; }
+.stat-card .value { font-size: 2em; font-weight: 700; margin-top: 4px; }
+.stat-card .sub { color: #666; font-size: 0.75em; margin-top: 2px; }
+
+.providers { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 60vh; }
+.provider-col { border-right: 1px solid #222; }
+.provider-col:last-child { border-right: none; }
+.provider-header { padding: 12px 24px; font-weight: 600; font-size: 1.1em; position: sticky; top: 0; z-index: 10; }
+.provider-header.minimax { background: #1a1a2e; border-bottom: 2px solid #ff6b6b; color: #ff6b6b; }
+.provider-header.dashscope { background: #1a2e1a; border-bottom: 2px solid #4ecdc4; color: #4ecdc4; }
+
+.score-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 24px; background: #111; }
+.score-group { text-align: center; padding: 8px; border-radius: 6px; }
+.score-group.ga { background: #1a1a1a; }
+.score-group.gb { background: #1a1a2e; }
+.score-group.gc { background: #1a2e1a; }
+.score-group .name { font-size: 0.7em; color: #888; text-transform: uppercase; }
+.score-group .score { font-size: 1.4em; font-weight: 700; margin: 2px 0; }
+.score-group .dim { font-size: 0.65em; color: #666; }
+
+.hypothesis { display: flex; gap: 12px; padding: 8px 24px; background: #0d0d0d; }
+.hyp-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; }
+.hyp-badge.confirmed { background: #1a3a1a; color: #4ecdc4; border: 1px solid #4ecdc444; }
+.hyp-badge.inconclusive { background: #3a3a1a; color: #ffd700; border: 1px solid #ffd70044; }
+.hyp-badge.pending { background: #1a1a1a; color: #666; border: 1px solid #333; }
+
+.cases-list { padding: 0 16px 16px; max-height: 60vh; overflow-y: auto; }
+.case-row { background: #141414; border: 1px solid #222; border-radius: 8px; margin: 8px 0; padding: 12px; font-size: 0.85em; }
+.case-row.error-row { border-color: #ff4444; }
+.case-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.case-id { color: #888; font-size: 0.8em; }
+.case-cat { padding: 2px 8px; border-radius: 4px; font-size: 0.7em; font-weight: 600; }
+.case-cat.taboo { background: #ff6b6b22; color: #ff6b6b; }
+.case-cat.slang { background: #4ecdc422; color: #4ecdc4; }
+.case-input { color: #ccc; margin-bottom: 8px; font-style: italic; }
+.case-groups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.case-group { background: #0d0d0d; border-radius: 4px; padding: 8px; }
+.case-group .glabel { font-size: 0.7em; color: #666; margin-bottom: 4px; }
+.case-group .output { font-size: 0.8em; color: #bbb; margin-bottom: 4px; line-height: 1.4; max-height: 60px; overflow: hidden; }
+.case-group .scores { font-size: 0.75em; }
+.case-group .scores span { margin-right: 6px; }
+.s-high { color: #4ecdc4; }
+.s-mid { color: #ffd700; }
+.s-low { color: #ff6b6b; }
+
+.log { padding: 8px 24px; font-size: 0.75em; color: #555; max-height: 100px; overflow-y: auto; background: #0a0a0a; }
+.log div { padding: 2px 0; }
+.log .err { color: #ff6b6b; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Chorus Experiment Dashboard</h1>
+    <div class="meta">Phase 0 Hypothesis Validation — MiniMax vs Dashscope</div>
+  </div>
+  <span id="startBtn" style="padding:10px 28px;background:#555;color:#fff;border-radius:8px;font-size:1em;font-weight:600;">Auto-starting...</span>
+</div>
+<div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+
+<div class="stats">
+  <div class="stat-card"><div class="label">Progress</div><div class="value" id="statProgress">0/0</div><div class="sub" id="statPhase">Ready</div></div>
+  <div class="stat-card"><div class="label">Errors</div><div class="value" id="statErrors">0</div><div class="sub">across both providers</div></div>
+  <div class="stat-card"><div class="label">A-05 (Prompt)</div><div class="value" id="statA05">—</div><div class="sub">B - A cultural score</div></div>
+  <div class="stat-card"><div class="label">A-08 (Structure)</div><div class="value" id="statA08">—</div><div class="sub">C - B cultural score</div></div>
+</div>
+
+<div class="providers">
+  <div class="provider-col">
+    <div class="provider-header minimax">MiniMax M2.5</div>
+    <div class="score-summary">
+      <div class="score-group ga"><div class="name">A 机械翻译</div><div class="score" id="mm-ga">—</div><div class="dim">cultural</div></div>
+      <div class="score-group gb"><div class="name">B 极简+提示</div><div class="score" id="mm-gb">—</div><div class="dim">cultural</div></div>
+      <div class="score-group gc"><div class="name">C 完整+提示</div><div class="score" id="mm-gc">—</div><div class="dim">cultural</div></div>
+    </div>
+    <div class="hypothesis">
+      <span class="hyp-badge pending" id="mm-a05">A-05: pending</span>
+      <span class="hyp-badge pending" id="mm-a08">A-08: pending</span>
+    </div>
+    <div class="cases-list" id="minimax-cases"></div>
+  </div>
+  <div class="provider-col">
+    <div class="provider-header dashscope">Dashscope Kimi-K2.5</div>
+    <div class="score-summary">
+      <div class="score-group ga"><div class="name">A 机械翻译</div><div class="score" id="ds-ga">—</div><div class="dim">cultural</div></div>
+      <div class="score-group gb"><div class="name">B 极简+提示</div><div class="score" id="ds-gb">—</div><div class="dim">cultural</div></div>
+      <div class="score-group gc"><div class="name">C 完整+提示</div><div class="score" id="ds-gc">—</div><div class="dim">cultural</div></div>
+    </div>
+    <div class="hypothesis">
+      <span class="hyp-badge pending" id="ds-a05">A-05: pending</span>
+      <span class="hyp-badge pending" id="ds-a08">A-08: pending</span>
+    </div>
+    <div class="cases-list" id="dashscope-cases"></div>
+  </div>
+</div>
+
+<div class="log" id="log"></div>
+
+<script>
+let total = 0, completed = { minimax: 0, dashscope: 0 }, errors = 0;
+const results = { minimax: [], dashscope: [] };
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.textContent; }
+function scoreClass(s) { return s >= 4 ? 's-high' : s >= 3 ? 's-mid' : 's-low'; }
+
+function startExperiment() {
+  document.getElementById('startBtn').textContent = 'Running...';
+  document.getElementById('statPhase').textContent = 'Connecting...';
+  const es = new EventSource('/events');
+
+  es.addEventListener('init', (e) => {
+    const d = JSON.parse(e.data);
+    total = d.total;
+    document.getElementById('statProgress').textContent = '0/' + (total * 2);
+    document.getElementById('statPhase').textContent = 'Running';
+    addLog('Experiment started: ' + total + ' cases x 2 providers');
+  });
+
+  es.addEventListener('status', (e) => {
+    const d = JSON.parse(e.data);
+    document.getElementById('statPhase').textContent = '#' + d.id + ' ' + d.provider + ' ' + d.phase;
+  });
+
+  es.addEventListener('result', (e) => {
+    const d = JSON.parse(e.data);
+    results[d.provider].push(d);
+    completed[d.provider]++;
+    updateProgress();
+    addCaseRow(d.provider, d);
+    updateSummary(d.provider);
+  });
+
+  es.addEventListener('error', (e) => {
+    const d = JSON.parse(e.data);
+    errors++;
+    completed[d.provider]++;
+    document.getElementById('statErrors').textContent = errors;
+    updateProgress();
+    addLog('ERROR: #' + d.id + ' ' + d.provider + ': ' + d.error, true);
+  });
+
+  es.addEventListener('complete', (e) => {
+    document.getElementById('statPhase').textContent = 'Complete!';
+    document.getElementById('startBtn').textContent = 'Done';
+    document.getElementById('progressFill').style.width = '100%';
+    addLog('Experiment complete. Report saved.');
+    es.close();
+  });
+
+  es.addEventListener('fatal', (e) => {
+    const d = JSON.parse(e.data);
+    document.getElementById('statPhase').textContent = 'FATAL ERROR';
+    addLog('FATAL: ' + d.error, true);
+    es.close();
+  });
+}
+
+// Auto-start on page load
+window.addEventListener('load', startExperiment);
+
+function updateProgress() {
+  const done = completed.minimax + completed.dashscope;
+  document.getElementById('statProgress').textContent = done + '/' + (total * 2);
+  document.getElementById('progressFill').style.width = ((done / (total * 2)) * 100) + '%';
+}
+
+function addCaseRow(provider, d) {
+  const container = document.getElementById(provider === 'minimax' ? 'minimax-cases' : 'dashscope-cases');
+  const row = document.createElement('div');
+  row.className = 'case-row';
+
+  const header = document.createElement('div');
+  header.className = 'case-header';
+  const idSpan = document.createElement('span');
+  idSpan.className = 'case-id';
+  idSpan.textContent = '#' + d.id;
+  const catSpan = document.createElement('span');
+  catSpan.className = 'case-cat ' + d.category;
+  catSpan.textContent = d.category;
+  header.appendChild(idSpan);
+  header.appendChild(catSpan);
+
+  const inputDiv = document.createElement('div');
+  inputDiv.className = 'case-input';
+  inputDiv.textContent = d.input.length > 50 ? d.input.slice(0, 50) + '...' : d.input;
+
+  const groupsDiv = document.createElement('div');
+  groupsDiv.className = 'case-groups';
+
+  const groups = [
+    { label: 'A 机械翻译', data: d.group_a },
+    { label: 'B 极简+提示', data: d.group_b },
+    { label: 'C 完整+提示', data: d.group_c }
+  ];
+
+  for (const g of groups) {
+    const gDiv = document.createElement('div');
+    gDiv.className = 'case-group';
+
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'glabel';
+    labelDiv.textContent = g.label;
+
+    const outputDiv = document.createElement('div');
+    outputDiv.className = 'output';
+    outputDiv.textContent = g.data.output;
+
+    const scoresDiv = document.createElement('div');
+    scoresDiv.className = 'scores';
+    const dims = [
+      { prefix: '文', val: g.data.scores.cultural },
+      { prefix: '意', val: g.data.scores.intent },
+      { prefix: '自', val: g.data.scores.natural }
+    ];
+    for (const dim of dims) {
+      const s = document.createElement('span');
+      s.className = scoreClass(dim.val);
+      s.textContent = dim.prefix + dim.val;
+      scoresDiv.appendChild(s);
+    }
+
+    gDiv.appendChild(labelDiv);
+    gDiv.appendChild(outputDiv);
+    gDiv.appendChild(scoresDiv);
+    groupsDiv.appendChild(gDiv);
+  }
+
+  row.appendChild(header);
+  row.appendChild(inputDiv);
+  row.appendChild(groupsDiv);
+  container.prepend(row);
+}
+
+function updateSummary(provider) {
+  const r = results[provider].filter(function(x) { return !x.error; });
+  if (r.length === 0) return;
+  const avg = function(g, d) {
+    const v = r.map(function(x) { return x[g] && x[g].scores ? x[g].scores[d] : 0; }).filter(function(x) { return x > 0; });
+    return v.length ? (v.reduce(function(a,b){ return a+b; }, 0) / v.length).toFixed(1) : '—';
+  };
+
+  const prefix = provider === 'minimax' ? 'mm' : 'ds';
+  document.getElementById(prefix + '-ga').textContent = avg('group_a', 'cultural');
+  document.getElementById(prefix + '-gb').textContent = avg('group_b', 'cultural');
+  document.getElementById(prefix + '-gc').textContent = avg('group_c', 'cultural');
+
+  const ga = parseFloat(avg('group_a', 'cultural'));
+  const gb = parseFloat(avg('group_b', 'cultural'));
+  const gc = parseFloat(avg('group_c', 'cultural'));
+  const dBA = (gb - ga).toFixed(1);
+  const dCB = (gc - gb).toFixed(1);
+
+  const a05El = document.getElementById(prefix + '-a05');
+  const a08El = document.getElementById(prefix + '-a08');
+  a05El.textContent = 'A-05: ' + (dBA > 0.5 ? 'CONFIRMED' : dBA > 0 ? 'WEAK' : 'FAIL') + ' (' + (dBA > 0 ? '+' : '') + dBA + ')';
+  a05El.className = 'hyp-badge ' + (dBA > 0.5 ? 'confirmed' : 'inconclusive');
+  a08El.textContent = 'A-08: ' + (dCB > 0.3 ? 'CONFIRMED' : dCB > 0 ? 'WEAK' : 'FAIL') + ' (' + (dCB > 0 ? '+' : '') + dCB + ')';
+  a08El.className = 'hyp-badge ' + (dCB > 0.3 ? 'confirmed' : 'inconclusive');
+
+  const allR = results.minimax.concat(results.dashscope).filter(function(x) { return !x.error; });
+  if (allR.length > 0) {
+    const gAvg = function(g, d) {
+      const v = allR.map(function(x) { return x[g] && x[g].scores ? x[g].scores[d] : 0; }).filter(function(x) { return x > 0; });
+      return v.length ? (v.reduce(function(a,b){ return a+b; }, 0) / v.length) : 0;
+    };
+    const gGA = gAvg('group_a', 'cultural'), gGB = gAvg('group_b', 'cultural'), gGC = gAvg('group_c', 'cultural');
+    document.getElementById('statA05').textContent = (gGB - gGA).toFixed(1);
+    document.getElementById('statA08').textContent = (gGC - gGB).toFixed(1);
+  }
+}
+
+function addLog(msg, isErr) {
+  const el = document.getElementById('log');
+  const d = document.createElement('div');
+  if (isErr) d.className = 'err';
+  d.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  el.prepend(d);
+}
+</script>
+</body>
+</html>

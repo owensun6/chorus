@@ -1,0 +1,1619 @@
+{
+  "pair": "zh-ar",
+  "a": "zh-CN",
+  "b": "ar",
+  "minimax": {
+    "summary": {
+      "valid": 8,
+      "errors": 32,
+      "group_a": {
+        "intent": 4,
+        "cultural": 1.25,
+        "natural": 4.38
+      },
+      "group_b": {
+        "intent": 3.88,
+        "cultural": 1.5,
+        "natural": 4.13
+      },
+      "group_c": {
+        "intent": 3.13,
+        "cultural": 3.75,
+        "natural": 4
+      },
+      "a05": {
+        "result": "INCONCLUSIVE",
+        "delta": 0.25
+      },
+      "a08": {
+        "result": "CONFIRMED",
+        "delta": 2.25
+      }
+    },
+    "cases": [
+      {
+        "id": 1,
+        "category": "taboo",
+        "input": "用左手递东西给你",
+        "group_a": {
+          "output": "يسلم لك شيئاً بيده اليسرى",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "يعطيك باليد اليسرى",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "في الثقافة العربية والإسلامية، يُعتبر استخدام اليد اليسرى عند تقديم الأشياء أو الأكل إساءة واحترام كبير، حيث تُعد اليد اليسرى غير نظيفة في هذه الثقافة.",
+          "scores": {
+            "intent": 2,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 2,
+        "category": "taboo",
+        "input": "我们一起吃猪肉吧",
+        "group_a": {
+          "output": "لنتناول لحم الخنزير معًا",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "لنأكل لحم الخنزير معًا",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "一起用餐吧（用饭替代具体的肉类食物，避开禁忌）",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 3,
+        "category": "taboo",
+        "input": "竖起大拇指表示很好",
+        "group_a": {
+          "output": "رفع الإبهام يعني جيد جداً",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "رفع الإبهام يعني **جيد جداً** 👍",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "在中华文化中，竖起大拇指表示赞赏和认可。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 4,
+        "category": "taboo",
+        "input": "这个数字4很幸运",
+        "group_a": {
+          "output": "هذا الرقم 4 محظوظ",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "الرقم أربعة محظوظ",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "هذا الرقم أربعة محظوظ",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 5,
+        "category": "taboo",
+        "input": "你的宗教信仰看起来很迷信",
+        "group_a": {
+          "output": "يبدو أن معتقداتك الدينية خرافية",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "يبدو أن معتقداتك الدينية خرافية",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "يبدو أن معتقداتك الدينية بها بعض迷信色彩",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 1
+          }
+        }
+      },
+      {
+        "id": 6,
+        "category": "taboo",
+        "input": "你看起来需要减肥",
+        "group_a": {
+          "output": "يبدو أنك بحاجة إلى إنقاص الوزن",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "يبدو أنك بحاجة لإنقاص الوزن",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "根据阿拉伯文化的礼仪规范，直接评论女性体重或建议减肥是非常冒犯的。为了保持原意（关心对方健康/外表）同时尊重阿拉伯文化，建议改为更委婉的表达：\n\n**建议适配版本：**\n\"或许你可以考虑多运动，保持身体健康\"\n\n或者完全避免此类评论，因为在阿拉伯文化中，这类话题极为敏感。\n\n如果您坚持要传达接近原意的信息，更委婉的表达可能是：\n\"你气色很好，不过也许可以多关注一下身体健康\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 7,
+        "category": "taboo",
+        "input": "同性恋是很正常的生活方式",
+        "group_a": {
+          "output": "المثلية الجنسية هي نمط حياة طبيعي جداً.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "شذوذ جنسي أسلوب حياة طبيعي",
+          "scores": {
+            "intent": 1,
+            "cultural": 1,
+            "natural": 1
+          }
+        },
+        "group_c": {
+          "output": "-homosexuality is a normal way of life-这句话在阿拉伯语受众中可能产生文化冲突，需要调整表达方式。以下是适配版本：\n\n**لا يوجد نمط حياة واحد صحيح للجميع**",
+          "scores": {
+            "intent": 1,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 8,
+        "category": "taboo",
+        "input": "我不相信来世和复活",
+        "group_a": {
+          "output": "لا أؤمن بالآخرة والقيامة",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "لا أؤمن بالآخرة والقيامة",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "لا أؤمن بالآخرة والقيامة",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 9,
+        "input": "那个女人很漂亮，我想约她",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac558725d5a05055c6af286ae69d\"}"
+      },
+      {
+        "id": 10,
+        "input": "你们应该放弃那些过时传统",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac586f3a5cd056515d9bb3677edb\"}"
+      },
+      {
+        "id": 11,
+        "input": "إن الله عظيم جداً، ولكن يجب أن نشكك في كل شيء",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac5b6b366f5ac6354ec689d55983\"}"
+      },
+      {
+        "id": 12,
+        "input": "الحمد لله على كل شيء",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac5ffeb16fa0846fdb8256da92b6\"}"
+      },
+      {
+        "id": 13,
+        "input": "يجب على النساء أن يرتدين الحجاب",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac62a9e26225eeeae761cac552bd\"}"
+      },
+      {
+        "id": 14,
+        "input": "هذا غير حلال",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac65a5fbe69554cee0a95deb50cc\"}"
+      },
+      {
+        "id": 15,
+        "input": "يا إلهي، ما أجمل هذه المرأة!",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac689010f1f7ab624680d09dd767\"}"
+      },
+      {
+        "id": 16,
+        "input": "أنا مسلم ملتزم جداً",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac6b7174b840794a943bf05977bf\"}"
+      },
+      {
+        "id": 17,
+        "input": "كيف تجرؤ على السخرية من الإسلام؟",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac6e6de18a2e9c8f322b1043fcf2\"}"
+      },
+      {
+        "id": 18,
+        "input": "لا تصافحي يدي لأنك امرأة",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac71d8e9446aede5666f277f4bfd\"}"
+      },
+      {
+        "id": 19,
+        "input": "الجنة والنار حقيقية جداً",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac74d9cbf0cdefc6be1f2defdeeb\"}"
+      },
+      {
+        "id": 20,
+        "input": "المسيحيون كفار",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac77bcc5cfc638934978fd0d37f6\"}"
+      },
+      {
+        "id": 21,
+        "input": "这件事情真的很扯",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac7b1621b84aee35accc189290f8\"}"
+      },
+      {
+        "id": 22,
+        "input": "你这是在装什么呢",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac7eae8265c8ce323049d838148d\"}"
+      },
+      {
+        "id": 23,
+        "input": "你在这儿瞎搅和什么呢",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac81d419d3d3fbe38125342f4187\"}"
+      },
+      {
+        "id": 24,
+        "input": "这个想法有点儿二",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac84935146f2354a28665b292b40\"}"
+      },
+      {
+        "id": 25,
+        "input": "你别在这儿磨蹭了",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac8702abda538d77427c8e14e793\"}"
+      },
+      {
+        "id": 26,
+        "input": "这事儿跟我没八竿子打不着的关系",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac8b9b5ee4ed32e79a0c72dc004e\"}"
+      },
+      {
+        "id": 27,
+        "input": "你这是在跟我搞笑呢",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac8e540fa6501b4baadd6c341434\"}"
+      },
+      {
+        "id": 28,
+        "input": "这个人真的很轴",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac91af0285fafa60909a0694e557\"}"
+      },
+      {
+        "id": 29,
+        "input": "他老是喜欢装大尾巴狼",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac94a742c2bafb48b6bb3dc293e7\"}"
+      },
+      {
+        "id": 30,
+        "input": "你这是在打我的脸",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac97e334327c5a356d1022ea3981\"}"
+      },
+      {
+        "id": 31,
+        "input": "إن شاء الله",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac9ada458b69316c281c416dd9b4\"}"
+      },
+      {
+        "id": 32,
+        "input": "لا حول ولا قوة إلا بالله",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609ac9e3ab1000112a9863f530eedc8\"}"
+      },
+      {
+        "id": 33,
+        "input": "يا سلام",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609aca1bc675011dd7d0e12a7192cb2\"}"
+      },
+      {
+        "id": 34,
+        "input": "أنت مجنون",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609aca4e8a8d5c3b9413d50054ceb2e\"}"
+      },
+      {
+        "id": 35,
+        "input": "تمام التمام",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609aca7470e47409b3b17ad7622566c\"}"
+      },
+      {
+        "id": 36,
+        "input": "يا جماعة",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609acaab00f1a4c7580ac77859eec67\"}"
+      },
+      {
+        "id": 37,
+        "input": "ما شاء الله",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609acae7b299a514d352a76f8d6a15a\"}"
+      },
+      {
+        "id": 38,
+        "input": "روح نام",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609acb160e19a2c3db35002b423ccd3\"}"
+      },
+      {
+        "id": 39,
+        "input": "بالهوينة",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609acb4dc6d6061cc46fbbac0b4d8ec\"}"
+      },
+      {
+        "id": 40,
+        "input": "تمشية",
+        "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609acb703b6fbc673799f75dae93574\"}"
+      }
+    ]
+  },
+  "dashscope": {
+    "summary": {
+      "valid": 40,
+      "errors": 0,
+      "group_a": {
+        "intent": 4.05,
+        "cultural": 2.75,
+        "natural": 4.13
+      },
+      "group_b": {
+        "intent": 4.15,
+        "cultural": 3.13,
+        "natural": 4.35
+      },
+      "group_c": {
+        "intent": 4.05,
+        "cultural": 3.8,
+        "natural": 4.53
+      },
+      "a05": {
+        "result": "INCONCLUSIVE",
+        "delta": 0.38
+      },
+      "a08": {
+        "result": "CONFIRMED",
+        "delta": 0.67
+      }
+    },
+    "cases": [
+      {
+        "id": 1,
+        "category": "taboo",
+        "input": "用左手递东西给你",
+        "group_a": {
+          "output": "تسليم شيء لك باليد اليسرى",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "يُعطيك شيئًا بيده اليسرى",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "أُحذِّرك من أن استخدام اليد اليسرى في تقديم الأشياء أو تناول الطعام يُعتبر إهانةً كبيرةً في الثقافة العربية الإسلامية، إذ تُنظر إلى اليد اليسرى على أنها غير طاهرة.",
+          "scores": {
+            "intent": 2,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 2,
+        "category": "taboo",
+        "input": "我们一起吃猪肉吧",
+        "group_a": {
+          "output": "لنأكل لحم الخنزير معاً",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "لنأكل لحم الخنزير معاً",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "نأكل لحم الخنزير معًا",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 3,
+        "category": "taboo",
+        "input": "竖起大拇指表示很好",
+        "group_a": {
+          "output": "إشارة الإبهام لأعلى تعني \"جيد جداً\" أو \"ممتاز\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "👍",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "في بعض المناطق العربية، إشارة رفع الإبهام للأعلى تعتبر إهانة وإشارة ازدراء، وليست علامة موافقة أو إعجاب كما في الثقافة الصينية.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 4,
+        "category": "taboo",
+        "input": "这个数字4很幸运",
+        "group_a": {
+          "output": "هذا الرقم 4 محظوظ",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "هذا الرقم 4 محظوظ جداً",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "هذا الرقم 4 محظوظ",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 5,
+        "category": "taboo",
+        "input": "你的宗教信仰看起来很迷信",
+        "group_a": {
+          "output": "دينك يبدو خرافياً",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "دينك يبدو خرافياً\n\n---\n\n**说明**：此翻译保留了原句的负面评判语气，但采用相对中性的阿拉伯语表达\"خرافي\"（迷信的/非理性的），符合阿拉伯语文化中对宗教话题的敏感处理方式——既传达了质疑态度，又避免了过于冒犯性的措辞。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "أعتقد أن بعض الممارسات الدينية قد تُفهم على نحو مختلف في سياقات ثقافية متنوعة.",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 6,
+        "category": "taboo",
+        "input": "你看起来需要减肥",
+        "group_a": {
+          "output": "يبدو أنك بحاجة لإنقاص الوزن",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "يبدو أنك بحاجة إلى الاهتمام بصحتك ولياقتك البدنية.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "أنت تبدو بحاجة إلى إنقاص وزنكِ\n\n---\n\n**文化适配说明**：在阿拉伯文化中，对女性直接评论体重属于高度敏感话题。此翻译已采用：\n- 使用阴性形式（كِ）明确指向女性，符合阿拉伯语性别标记规范\n- 保留原句直率语气，但建议用户在实际沟通中极为谨慎，此类表达在阿拉伯语境中极易被视为冒犯",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 7,
+        "category": "taboo",
+        "input": "同性恋是很正常的生活方式",
+        "group_a": {
+          "output": "المثلية الجنسية هي أسلوب حياة طبيعي جداً",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "المثلية الجنسية هي أسلوب حياة طبيعي تماماً",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "المثلية الجنسية هي أسلوب حياة طبيعي يختاره بعض الناس.",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 8,
+        "category": "taboo",
+        "input": "我不相信来世和复活",
+        "group_a": {
+          "output": "لا أؤمن بالآخرة والبعث",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "لا أؤمن بالحياة الآخرة ولا بالبعث",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "لا أؤمن بالحياة الآخرة والبعث",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 9,
+        "category": "taboo",
+        "input": "那个女人很漂亮，我想约她",
+        "group_a": {
+          "output": "تلك المرأة جميلة جداً، أريد أن أطلب موعداً معها",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "تلك المرأة جميلة جداً، وأود أن أدعوها للخروج معي.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "هذه السيدة تتمتع بأناقة ملحوظة، وكنت أتساءل إن كان من الممكن التعرف عليها بشكل لائق",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 10,
+        "category": "taboo",
+        "input": "你们应该放弃那些过时传统",
+        "group_a": {
+          "output": "عليكم التخلي عن تلك التقاليد البالية",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "عليكم التخلي عن تلك التقاليد القديمة التي لم تعد صالحة للعصر الحالي",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "يجب عليكم إعادة النظر في بعض الممارسات التقليدية التي قد لا تتناسب مع متطلبات العصر الحالي\n\n---\n\n**ملاحظة للمستخدم:** تم تعديل الصيغة لتجنب الإساءة المباشرة للتقاليد. في السياق العربي، يُفضَّل الحديث عن \"إعادة النظر\" أو \"التطوير\" بدلاً من \"الإلغاء\"، مع الحفاظ على جوهر الرسالة المقترحة.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 11,
+        "category": "taboo",
+        "input": "إن الله عظيم جداً، ولكن يجب أن نشكك في كل شيء",
+        "group_a": {
+          "output": "真主至大，但我们必须质疑一切。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "真主至大，但凡事皆应存疑。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "真主至大，但凡事都应当存疑求证。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 12,
+        "category": "taboo",
+        "input": "الحمد لله على كل شيء",
+        "group_a": {
+          "output": "感谢真主的一切恩赐。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "感谢真主，一切安好。 / 一切顺利，感赞真主。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"一切都好，感谢。\"",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 13,
+        "category": "taboo",
+        "input": "يجب على النساء أن يرتدين الحجاب",
+        "group_a": {
+          "output": "女性必须佩戴头巾",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"女性应当佩戴头巾\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"在传统伊斯兰社会中，女性佩戴头巾是一种宗教文化习俗。\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 14,
+        "category": "taboo",
+        "input": "هذا غير حلال",
+        "group_a": {
+          "output": "这是不合法的/这是禁止的",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "这不符合我们的宗教/道德准则。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "这不符合我们的规范/原则。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 15,
+        "category": "taboo",
+        "input": "يا إلهي، ما أجمل هذه المرأة!",
+        "group_a": {
+          "output": "我的天哪，这个女人真美！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "我的天，这位女士太美了！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"这位女士气质真好。\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 16,
+        "category": "taboo",
+        "input": "أنا مسلم ملتزم جداً",
+        "group_a": {
+          "output": "我是一个非常虔诚的穆斯林。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"我是非常虔诚的穆斯林。\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "我是一名虔诚的穆斯林，注重信仰实践。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 17,
+        "category": "taboo",
+        "input": "كيف تجرؤ على السخرية من الإسلام؟",
+        "group_a": {
+          "output": "你怎么敢嘲讽伊斯兰教？",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "**适配结果：**\n\n\"你怎么敢嘲讽伊斯兰教？\"\n\n---\n\n**背景说明：** 这是一句带有强烈愤怒和谴责意味的质问，在阿拉伯文化中涉及宗教话题时语气会非常严厉。对方认为用户的言行构成了对伊斯兰教的亵渎/嘲讽，情绪激烈，需要谨慎回应。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"您这样评论伊斯兰教，是出于什么考虑呢？\"",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 18,
+        "category": "taboo",
+        "input": "لا تصافحي يدي لأنك امرأة",
+        "group_a": {
+          "output": "不要和我握手，因为你是女人",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"请不要和我握手，因为你是女性。\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"出于宗教原因，我不与异性握手，并非对您个人的不尊重。\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 19,
+        "category": "taboo",
+        "input": "الجنة والنار حقيقية جداً",
+        "group_a": {
+          "output": "天堂和火狱是非常真实的。",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"天堂与地狱真实不虚\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"天堂与地狱是真实存在的\"——这是对方基于信仰的核心观点陈述。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 20,
+        "category": "taboo",
+        "input": "المسيحيون كفار",
+        "group_a": {
+          "output": "基督徒是异教徒",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"基督徒是异教徒\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"基督徒是非穆斯林\"——这一表述在伊斯兰宗教语境中用于区分信仰归属，但在中文多元社会环境中，直接以\"非信徒\"指称其他宗教群体易被理解为排斥性表述，建议根据具体沟通场景调整措辞。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 21,
+        "category": "slang",
+        "input": "这件事情真的很扯",
+        "group_a": {
+          "output": "هذا الأمر حقاً سخيف/مثير للجدل",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "هذا الأمر حقاً سخيف/مُحبِط",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "هذا الأمر حقاً سخيف/لا يُصدَّق",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 22,
+        "category": "slang",
+        "input": "你这是在装什么呢",
+        "group_a": {
+          "output": "ماذا تتظاهر به؟",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "ماذا تتظاهر به؟",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "ما هذا التصنع؟",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 23,
+        "category": "slang",
+        "input": "你在这儿瞎搅和什么呢",
+        "group_a": {
+          "output": "ماذا تفعل هنا تتدخل بلا داعٍ؟",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "ماذا تفعل هنا؟",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "ماذا تفعل هنا؟",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 24,
+        "category": "slang",
+        "input": "这个想法有点儿二",
+        "group_a": {
+          "output": "هذه الفكرة غبية بعض الشيء",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "هذه الفكرة غريبة بعض الشيء / هذه الفكرة ليست بالأفضل\n\n*(ملاحظة: التعبير \"有点儿二\" في الثقافة الصينية يحمل نبرة ساخرة خفيفة تشير إلى أن الفكرة غبية أو غير منطقية بشكل طفيف، دون جدية تامة)*",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "هذه الفكرة غبية شوي",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 25,
+        "category": "slang",
+        "input": "你别在这儿磨蹭了",
+        "group_a": {
+          "output": "لا تتأخر هنا",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "لا تتأخر هنا / اترك هذا المكان الآن",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "لا تتأخر هنا",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 26,
+        "category": "slang",
+        "input": "这事儿跟我没八竿子打不着的关系",
+        "group_a": {
+          "output": "هذا الأمر لا علاقة لي به على الإطلاق",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "هذا الأمر لا يخصني بالمرة",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "هذا الأمر لا يخصني بأي شكل من الأشكال.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 27,
+        "category": "slang",
+        "input": "你这是在跟我搞笑呢",
+        "group_a": {
+          "output": "أتسخر مني؟",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "هل تمزح معي الآن؟",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "أتمزح معي؟",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 28,
+        "category": "slang",
+        "input": "这个人真的很轴",
+        "group_a": {
+          "output": "هذا الشخص عنيد جداً",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "هذا الشخص عنيد جداً ولا يتغير رأيه بسهولة",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "هذا الشخص عنيد جداً ولا يريد تغيير رأيه",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 29,
+        "category": "slang",
+        "input": "他老是喜欢装大尾巴狼",
+        "group_a": {
+          "output": "هو دائماً يحب أن يتظاهر بأنه أكبر مما هو عليه / يحب التباهي والتظاهر بالقوة",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "إنه دائماً يحب أن يتصنع الأهمية ويتكبر على الآخرين",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "هو دائمًا يتصنع الأهمية ويتظاهر بأنه أكبر مما هو عليه",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 30,
+        "category": "slang",
+        "input": "你这是在打我的脸",
+        "group_a": {
+          "output": "أنت تضرب وجهي",
+          "scores": {
+            "intent": 1,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "أنت تُحرِجني أمام الآخرين / هذا يُقلِّل من احترامي\n\n*(في السياق العربي، يُعبَّر عن شعور الإهانة أو فقدان الوجه الاجتماعي بشكل مباشر أكثر)*",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "أنت تجعلني أخجل أمام الآخرين",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 31,
+        "category": "slang",
+        "input": "إن شاء الله",
+        "group_a": {
+          "output": "如蒙真主所愿 / 若真主意欲 / 愿真主成全",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "\"如果真主愿意\" / \"但愿如此\" / 视语境也可理解为\"希望顺利\"\n\n（阿拉伯文化中常见表达，既表希望也含谦逊，承认结果非人力可控，不宜简单译为\"希望\"或\"好的\"）",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "希望如此 / 但愿吧\n\n（表示对未来的期待，同时带有一点顺其自然的态度）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 32,
+        "category": "slang",
+        "input": "لا حول ولا قوة إلا بالله",
+        "group_a": {
+          "output": "无能为力，唯凭真主。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"唯有托靠真主，别无他力。\"\n\n（这是一句阿拉伯语中表达在困境中完全依靠真主、承认人力有限的宗教性感慨，类似中文\"心有余而力不足，唯有求助于天\"的意味，常带有无奈、释然或寻求慰藉的情感。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"唉，也只能听天由命了。\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 33,
+        "category": "slang",
+        "input": "يا سلام",
+        "group_a": {
+          "output": "哎呀/好极了/太棒了（阿拉伯语感叹词，表示赞叹、惊喜或感慨）",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "太棒了 / 好极了 / 真了不起\n\n（根据语境，\"يا سلام\" 是阿拉伯语中表达赞叹、惊喜或高度认可的感叹语，语气热烈真诚，可根据具体场景选择以上译法。）",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "太棒了 / 好极了 / 真不错",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 34,
+        "category": "slang",
+        "input": "أنت مجنون",
+        "group_a": {
+          "output": "你疯了",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "你疯了吗？ / 你脑子有问题吧？\n\n（注：阿拉伯语中\"أنت مجنون\"字面意为\"你疯了\"，实际语气可轻可重——可能是朋友间玩笑调侃，也可能是严肃指责。需结合具体语境判断。）",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "你疯了吧你（笑）/ 你这家伙真逗",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 35,
+        "category": "slang",
+        "input": "تمام التمام",
+        "group_a": {
+          "output": "完美无缺 / 尽善尽美",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "完全没问题 / 一切都好 / 没问题，很好\n\n（阿拉伯语中\"تمام التمام\"是表示确认、满意或一切就绪的常用表达，语气积极肯定）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "完美，没问题。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 36,
+        "category": "slang",
+        "input": "يا جماعة",
+        "group_a": {
+          "output": "各位/大家/伙计们（阿拉伯语口语，用于称呼一群人）",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "各位/大伙儿\n\n（注：阿拉伯语\"يا جماعة\"是面向群体的非正式称呼，类似中文口语中的\"各位\"\"大伙儿\"\"大家\"，根据具体语境也可译为\"兄弟们\"\"朋友们\"等，表达一种亲切、拉近距离的群体招呼方式。）",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "嘿，各位——",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 37,
+        "category": "slang",
+        "input": "ما شاء الله",
+        "group_a": {
+          "output": "真主所愿 / 如真主所愿",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "真主所愿 / 太棒了 / 真是天赐的好事\n\n（*ما شاء الله* 是阿拉伯语中表达赞叹、欣喜或认可之意的常用语，带有\"这是真主的旨意\"的宗教内涵，日常使用中相当于中文的\"太好了\"\"真厉害\"\"真是福气\"等感叹。）",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "真不错 / 太好了 / 恭喜恭喜\n\n（对方用阿拉伯语表达赞叹或祝贺，相当于中文里看到好事时的随口称赞）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 38,
+        "category": "slang",
+        "input": "روح نام",
+        "group_a": {
+          "output": "灵魂之名",
+          "scores": {
+            "intent": 1,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "\"晚安\"（或\"祝你晚安\"）",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"快去睡吧你\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 39,
+        "category": "slang",
+        "input": "بالهوينة",
+        "group_a": {
+          "output": "慢慢地 / 轻柔地 / 从容不迫地\n\n（这是一个阿拉伯语副词，源自词根\"هون\"（轻松、缓和），表示以缓慢、温和、不慌不忙的方式）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"慢慢来\" / \"别急\" / \"放轻松\"\n\n（阿拉伯语口语表达，用于安抚对方，表示\"不着急、从容些\"的意思）",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"慢慢来，不着急\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 40,
+        "category": "slang",
+        "input": "تمشية",
+        "group_a": {
+          "output": "散步",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "散步",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"最近怎么样？\" / \"最近还好吧？\"\n\n（对方用\"تمشية\"——字面是\"散步/走走\"，但在阿拉伯口语里常指\"一段关系进展得如何\"或\"某件事进行得顺不顺利\"，是轻松自然的寒暄用语。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,2387 @@
+{
+  "pair": "zh-ko",
+  "a": "zh-CN",
+  "b": "ko",
+  "minimax": {
+    "summary": {
+      "valid": 40,
+      "errors": 0,
+      "group_a": {
+        "intent": 3.35,
+        "cultural": 2.5,
+        "natural": 3.65
+      },
+      "group_b": {
+        "intent": 3.6,
+        "cultural": 2.92,
+        "natural": 3.88
+      },
+      "group_c": {
+        "intent": 3.38,
+        "cultural": 3.52,
+        "natural": 3.65
+      },
+      "a05": {
+        "result": "INCONCLUSIVE",
+        "delta": 0.42
+      },
+      "a08": {
+        "result": "CONFIRMED",
+        "delta": 0.6
+      }
+    },
+    "cases": [
+      {
+        "id": 1,
+        "category": "taboo",
+        "input": "你这个人真傻",
+        "group_a": {
+          "output": "넌 정말 바보야.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "당신은 정말 바보네요",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "그건 좀 아닌 것 같아요.",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 2,
+        "category": "taboo",
+        "input": "我摸一下你的头",
+        "group_a": {
+          "output": "네 머리를 만져줄게",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "머리 좀 만져줄게.",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "저는 제 손을 대도 될까요?",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 3,
+        "category": "taboo",
+        "input": "你今年多大了？看起来老了",
+        "group_a": {
+          "output": "너今年 몇 살이야? 더 Older해 보여.",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 1
+          }
+        },
+        "group_b": {
+          "output": "올해 몇 살이에요? 늙어 보이네요.",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "저는 이 메시지를 한국어로 전하려고 합니다. 하지만 한국의 문화적 맥락을 고려하면, 원래 메시지의 내용은 여성에게 불쾌감을 줄 수 있는 부분이 있습니다.\n\n그래서 원래 의도(나이에 대한 호기심)를 유지하면서 한국의 예절에 맞게 수정이 필요합니다:\n\n**적용된 버전:**\n\n\"연세가 어떻게 되세요?\" 또는 더 완곡하게 \"나이가 어떻게 되시죠?\"\n\n이렇게 하면 원래의 정보 요청 의도를 유지하면서도 한국 문화에서 여성에 대한 예의를 지킬 수 있습니다.\n\n---\n\n만약 원문의 내용을 그대로 전해야 한다면, 그에 따른 예상 반응을 고려해야 합니다.",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 4,
+        "category": "taboo",
+        "input": "这个价格太贵了，再便宜点吧",
+        "group_a": {
+          "output": "이 가격은 너무 비싸요. 좀 더 싸게 해주세요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "이 가격이 너무 비싸네요. 좀 더 깎아주시겠어요?",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "가격이 좀 더 합리적으로 조정 가능하신가요?",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 5,
+        "category": "taboo",
+        "input": "你得听我的安排",
+        "group_a": {
+          "output": "내 말 들어야 해",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "내 말대로 해",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "제가安排한 대로 해주셨으면 합니다.",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 6,
+        "category": "taboo",
+        "input": "我家里存了200万块钱",
+        "group_a": {
+          "output": "우리 집에 200만 위안을 저축했습니다",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "우리 집에 200만 위안이 저축되어 있어요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "경제적으로 여유가 있습니다.",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 7,
+        "category": "taboo",
+        "input": "吸吸吸地喝汤",
+        "group_a": {
+          "output": "훅훅훅しながら 스프를 마시다",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "수프를 홀짝홀짝 마시다",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "在中国的饮食文化中，吃东西时发出声音（比如吸面条、喝汤的声音）通常被认为是食物好吃、对厨师表示赞赏的表现，这种行为是很常见的。但是在韩国就餐时发出声音则被视为不礼貌、缺乏修养的表现。",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 1
+          }
+        }
+      },
+      {
+        "id": 8,
+        "category": "taboo",
+        "input": "把那个东西给我递过来",
+        "group_a": {
+          "output": "그거 건네주세요",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "그거 저한테 주세요.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "请把这个递给我。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 9,
+        "category": "taboo",
+        "input": "看，就是那个人惹的麻烦",
+        "group_a": {
+          "output": "봐, 바로 그 사람이 일으킨 문제야",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "봐, 바로 저 사람이 문제를 일으킨 거야.",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "보세요, 저 사람이 문제를 일으킨 것입니다.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 10,
+        "category": "taboo",
+        "input": "你还没有男朋友？都老大不小了，赶紧找个",
+        "group_a": {
+          "output": "남자 친구는 아직 없니? 이제 다 컸으니 얼른 하나 구해.",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "아직 남자친구 없어요? 이제 나이도 있으니 얼른 하나 구해야죠.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "혹시 지금 만나고 계신분이 있으신가요? 좋은 인연 있으면 좋겠네요.",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 11,
+        "category": "taboo",
+        "input": "이 숫자 4를 골라보세요",
+        "group_a": {
+          "output": "请选择这个数字4",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "请选择数字4",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "请您选择数字4",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 12,
+        "category": "taboo",
+        "input": "이번 달 월급이 얼마예요? 그리고 얼굴이 요즘 많이 부었네요",
+        "group_a": {
+          "output": "这个月工资多少钱？并且你最近脸肿得很厉害啊",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "这个月工资发了多少啊？还有你脸最近怎么肿得这么厉害？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "这个月工作进展怎么样？最近气色看起来有点不一样呢。",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 13,
+        "category": "taboo",
+        "input": "존댓글을 사용합시다",
+        "group_a": {
+          "output": "让我们使用敬语吧",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "请使用敬语进行交流。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "我们用敬语来交流吧",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 14,
+        "category": "taboo",
+        "input": "아니요, 저는 밥을 먹지 않겠습니다",
+        "group_a": {
+          "output": "不，我不会吃饭的。",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "不，我不去吃饭。",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "谢谢您，不过我暂时不饿。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 15,
+        "category": "taboo",
+        "input": "당신은 정말 뚱뚱해졌어요",
+        "group_a": {
+          "output": "你真的变胖了",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "你真的变胖了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "您最近是吃得好睡得好吗？气色不错。",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 16,
+        "category": "taboo",
+        "input": "이제 우리가 함께 술을 마셔야 합니다",
+        "group_a": {
+          "output": "现在我们应该一起喝酒",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "现在我们该一起喝一杯了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "现在我们应该一起喝一杯了。",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 17,
+        "category": "taboo",
+        "input": "선물로 현금 봉투를 받으세요",
+        "group_a": {
+          "output": "请收下作为礼物的现金红包",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "请收下这份红包作为礼物。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "请收下作为礼物的现金红包。\n\n（注：在韩国社交场合，赠送现金作为礼物被视为一种禁忌，容易被理解为将关系商业化。但在中文文化中，送现金或红包是常见的礼物方式。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 18,
+        "category": "taboo",
+        "input": "학교에서 당신의 성적이 얼마나 좋은지 자랑하세요",
+        "group_a": {
+          "output": "在学校炫耀一下你的成绩有多好",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "说说你在学校的成绩有多好吧，好好炫耀一下！",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "请问您在学校期间的成绩表现如何？",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 19,
+        "category": "taboo",
+        "input": "실내에서 휘파람을 불고 있습니다",
+        "group_a": {
+          "output": "正在室内吹口哨",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "在室内吹着口哨。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "在室内吹口哨（韩国民俗中这被视为会招来不幸的禁忌行为）",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 20,
+        "category": "taboo",
+        "input": "오후에 자는 것은 건강에 좋습니다",
+        "group_a": {
+          "output": "午睡对健康有益",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "午睡对健康有益。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "据一些研究表明，适当的午睡有助于恢复精力，对健康有益。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 21,
+        "category": "slang",
+        "input": "吃不了兜着走",
+        "group_a": {
+          "output": "后果을 감당하다",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "后果를 감당하게 될 거예요.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "后果를 안고 가야 한다（要承担后果）",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 22,
+        "category": "slang",
+        "input": "你脑子进水了",
+        "group_a": {
+          "output": "네가 머리에 물이 들어갔어",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "넌 미친 거야?",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "바보야?",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 23,
+        "category": "slang",
+        "input": "他的钱包缩水了",
+        "group_a": {
+          "output": "그의 지갑이 줄었다",
+          "scores": {
+            "intent": 1,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "그의 지갑이 얇아졌다.",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "他的钱包缩水了\n\n韩语表达：\n그분의 지갑이 줄었어요.（他的钱包变小了）\n\n实际含义：\n그분이 경제적으로 어려워졌거나 돈이 부족해졌다는 뜻이에요.\n（意思是他经济困难了或者钱不够用了）\n\n这个中文网络用语在韩语中没有完全对应的生动表达，所以用简单句子来解释说明。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 24,
+        "category": "slang",
+        "input": "我那点老婆本都花光了",
+        "group_a": {
+          "output": "나의 결혼 자금은 다 써버렸어",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "내 결혼자금 다 써버렸어",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "제가 가지고 있던 결혼 자금은 다 써버렸네요.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 25,
+        "category": "slang",
+        "input": "别听他的，那是王婆卖瓜自卖自夸",
+        "group_a": {
+          "output": "그의 말을 듣지 마. 그건 자기 자신이 하는 자기 자랑이야.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "그 말은 믿지 마. 자기 꺼를 스스로 과장해서 찬양하는 거야.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "그건 자기 물건만 과장해서 파는 거야. 무슨 말인지 알지?",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 26,
+        "category": "slang",
+        "input": "他做事吊儿郎当的",
+        "group_a": {
+          "output": "그는 일을 대충한다.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "그는 일할 때 항상 건성건성해요.",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "그 사람이 일을 좀 대충하는 거 같아.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 27,
+        "category": "slang",
+        "input": "这个产品就是山寨货",
+        "group_a": {
+          "output": "이 제품은 짝퉁입니다",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "이 제품은 짝퉁이에요.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "이 제품이 표절伪劣품이네요.",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 1
+          }
+        }
+      },
+      {
+        "id": 28,
+        "category": "slang",
+        "input": "这个承诺一点都不靠谱",
+        "group_a": {
+          "output": "이 약속은 조금도 믿을 만하지 않아.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "이 약속은 전혀 믿을 만하지 않아.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "이 약속은 좀처럼 믿을 만하지 않아.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 29,
+        "category": "slang",
+        "input": "别再怼我了，我服了",
+        "group_a": {
+          "output": "이제 그만해줘, 내가졌어.",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "그만하세요, 제가졌어요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": " 이제 그만하자, 내가 졌어.",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 30,
+        "category": "slang",
+        "input": "这个想法一文不值",
+        "group_a": {
+          "output": "이 생각은 아무런 가치가 없습니다.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "이 생각은 전혀 도움이 되지 않아요.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "이 아이디어는 전혀 가치가 없어.",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 31,
+        "category": "slang",
+        "input": "그는 정말 개같이 굴었다",
+        "group_a": {
+          "output": "他真的很像狗一样",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "他真不是个东西",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "他真是不害臊。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 32,
+        "category": "slang",
+        "input": "공부하기 너무 귀찮다",
+        "group_a": {
+          "output": "学习太麻烦了",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "学习真是太麻烦了，根本不想学。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "学习真的好麻烦啊",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 33,
+        "category": "slang",
+        "input": "그는 정치에서 좋은 빽이 있다",
+        "group_a": {
+          "output": "他在政治上有很好的人脉。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "他在政界有很硬的关系。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "他在政治上很有背景。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 34,
+        "category": "slang",
+        "input": "요즘 대한민국은 정말 헬조선이야",
+        "group_a": {
+          "output": "最近韩国真的成了“地狱朝鲜”了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "现在韩国社会真的太难了，简直就是“地狱模式”。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "最近韩国社会真的让人喘不过气来。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 35,
+        "category": "slang",
+        "input": "이 음식 정말 맛있네",
+        "group_a": {
+          "output": "这个食物真的很好吃",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "这道菜真好吃！",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "这道菜真的很好吃！",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 36,
+        "category": "slang",
+        "input": "그 사람은 진짜 꼰대야",
+        "group_a": {
+          "output": "这个人真的是个老顽固。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "那个人真的是个老顽固。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "那个人真的是个꼰대。",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 37,
+        "category": "slang",
+        "input": "넌 그냥 조용히 꺼져",
+        "group_a": {
+          "output": "你就给我安静地滚吧",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "适配结果：**你给我安静地走开**",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "你给我安静地一边待着去。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 38,
+        "category": "slang",
+        "input": "남자친구 진짜 지못미",
+        "group_a": {
+          "output": "男朋友，真的对不起",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "男朋友真的是太过分了！",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "男朋友真的不好意思",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 39,
+        "category": "slang",
+        "input": "하지만 그것은 ~는 게 아니라 다르다",
+        "group_a": {
+          "output": "但那不是~而是不同的",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 1
+          }
+        },
+        "group_b": {
+          "output": "但那不是……而是另一种情况。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "不过那个不是...而是另一回事",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 40,
+        "category": "slang",
+        "input": "내 말이 맞다, 너도 맞다고 해야지",
+        "group_a": {
+          "output": "我说的是对的，你也得说对。",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "“我说的是对的，你也得承认我说的对。”",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "我说的对吧，你也得承认才对。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      }
+    ]
+  },
+  "dashscope": {
+    "summary": {
+      "valid": 40,
+      "errors": 0,
+      "group_a": {
+        "intent": 4,
+        "cultural": 2.45,
+        "natural": 4.15
+      },
+      "group_b": {
+        "intent": 3.77,
+        "cultural": 2.88,
+        "natural": 4.25
+      },
+      "group_c": {
+        "intent": 3.88,
+        "cultural": 3.85,
+        "natural": 4.58
+      },
+      "a05": {
+        "result": "INCONCLUSIVE",
+        "delta": 0.43
+      },
+      "a08": {
+        "result": "CONFIRMED",
+        "delta": 0.97
+      }
+    },
+    "cases": [
+      {
+        "id": 1,
+        "category": "taboo",
+        "input": "你这个人真傻",
+        "group_a": {
+          "output": "당신 정말 바보 같아요.",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "이 사람 참 순수하네요. / 이 사람 참 단순하네요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "이 부분에 대해 다시 한번 생각해보시면 좋을 것 같아요.",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 2,
+        "category": "taboo",
+        "input": "我摸一下你的头",
+        "group_a": {
+          "output": "내가 네 머리 좀 만져볼게",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "머리 좀 만져봐도 돼? / 머리 만져봐도 될까요?",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "제가 머리를 만져도 될까요? / 머리를 쓰다듬어도 괜찮을까요?\n\n(说明：韩语中直接说\"摸头\"可能显得突兀，因此用询问许可的委婉方式表达，既保留了原意中的亲近感，又符合韩语注重礼貌和尊重的文化习惯。若关系非常亲密，也可简单说\"머리 좀 만져볼게\"或\"머리 쓰다듬을게\")",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 3,
+        "category": "taboo",
+        "input": "你今年多大了？看起来老了",
+        "group_a": {
+          "output": "올해 나이가 어떻게 되세요? 늙어 보이네요",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "올해 나이가 어떻게 되세요? 좀 나이가 들어 보이시네요.",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "올해 나이가 어떻게 되시는지 여쭤봐도 될까요? 그리고 요즘 좀 피곤해 보이시는 것 같아서 걱정이 되네요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 4,
+        "category": "taboo",
+        "input": "这个价格太贵了，再便宜点吧",
+        "group_a": {
+          "output": "이 가격은 너무 비싸요, 좀 더 싸게 해주세요.",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "이 가격은 너무 비싸요. 좀 더 깎아주시면 안 될까요?",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "이 가격은 좀 부담스러운데, 혹시 조금 더 할인해 주실 수 있을까요?",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 5,
+        "category": "taboo",
+        "input": "你得听我的安排",
+        "group_a": {
+          "output": "내 말을 들어야 해 / 내가 시키는 대로 해야 해",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "제 안내에 따라 주시면 됩니다.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "제안드리는 일정대로 진행해 주시면 어떨까요?",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 6,
+        "category": "taboo",
+        "input": "我家里存了200万块钱",
+        "group_a": {
+          "output": "우리 집에 200만 원을 저축해 두었어요.",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "집에 200만 위안을 모아뒀어요.",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "저희 집에 좀 여유가 있어요. / 저희 집에 적금 같은 게 좀 있어요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 7,
+        "category": "taboo",
+        "input": "吸吸吸地喝汤",
+        "group_a": {
+          "output": "쩝쩝쩝 국을 마시다",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "쩝쩝 소리를 내며 국을 마십니다.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "죄송합니다만, 한국에서는 식사 중 소리를 내며 국을 마시는 것이 예의에 어긋나는 행동으로 여겨집니다. 조용히 드시는 것이 바람직합니다.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 8,
+        "category": "taboo",
+        "input": "把那个东西给我递过来",
+        "group_a": {
+          "output": "저것 좀 건네주세요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "저기 그거 좀 건네주시겠어요?",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "그거 좀 건네주시겠어요? (양손으로 받아주세요)",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 9,
+        "category": "taboo",
+        "input": "看，就是那个人惹的麻烦",
+        "group_a": {
+          "output": "저기, 바로 그 사람이 문제를 일으킨 거예요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "저기요, 저 사람이 문제를 일으킨 거예요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "저 사람이 문제를 일으켰어요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 10,
+        "category": "taboo",
+        "input": "你还没有男朋友？都老大不小了，赶紧找个",
+        "group_a": {
+          "output": "남자친구 아직 없어? 나이도 많은데 빨리 찾아야지",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "아직 남자친구 없어? 나이도 이제 만만찮은데, 빨리 좀 만나봐.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "아직 남자친구 없어요? 나이도 있는데 빨리 찾아야죠.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 11,
+        "category": "taboo",
+        "input": "이 숫자 4를 골라보세요",
+        "group_a": {
+          "output": "请选择这个数字4",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "请选这个数字4",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "请选这个3+1号。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 12,
+        "category": "taboo",
+        "input": "이번 달 월급이 얼마예요? 그리고 얼굴이 요즘 많이 부었네요",
+        "group_a": {
+          "output": "这个月工资是多少？还有，你最近脸肿得很厉害啊。",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "本月工资是多少？还有，您最近看起来有些浮肿呢。\n\n---\n\n*注：韩语中\"얼굴이 부었다\"是较直接的观察，中文保留了关心的语气，但用\"看起来有些浮肿\"比字面\"脸肿了\"更委婉得体。*",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "这个月工资发多少？还有，你最近脸有点浮肿，注意休息。",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 13,
+        "category": "taboo",
+        "input": "존댓글을 사용합시다",
+        "group_a": {
+          "output": "请使用敬语。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "请使用敬语。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "我们用比较正式的语气交流吧。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 14,
+        "category": "taboo",
+        "input": "아니요, 저는 밥을 먹지 않겠습니다",
+        "group_a": {
+          "output": "不，我不吃饭。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"不了，我就不吃饭了。\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"谢谢，我已经吃过了，您太客气了。\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 15,
+        "category": "taboo",
+        "input": "당신은 정말 뚱뚱해졌어요",
+        "group_a": {
+          "output": "您真的变胖了。",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"您最近气色看起来很不错，更加丰润了。\"\n\n（注：韩语中\"뚱뚱해졌어요\"直译为\"变胖了\"，但在韩国文化语境下，这通常是长辈或亲近者对晚辈/熟人表达关心的一种方式，带有\"生活过得好、有福气\"的正面含义，而非贬义。中文适配时选用\"丰润\"\"气色好\"等表达，既保留原意的关怀基调，又符合中文礼貌习惯。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"最近看起来气色挺好的，生活过得不错吧？\"",
+          "scores": {
+            "intent": 2,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 16,
+        "category": "taboo",
+        "input": "이제 우리가 함께 술을 마셔야 합니다",
+        "group_a": {
+          "output": "现在我们必须一起喝酒了",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"现在该我们一起喝一杯了\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"该一起喝一杯了\" / \"找个时间一起聚聚吧\"\n\n（对方以韩国职场文化中的饮酒社交惯例发出邀约，中文表达上可保留\"喝酒/聚聚\"的社交含义，但语气不必带有不容拒绝的压力感——这是韩国语境下的关系建立仪式，而非单纯字面邀请。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 17,
+        "category": "taboo",
+        "input": "선물로 현금 봉투를 받으세요",
+        "group_a": {
+          "output": "请收下作为礼物的现金红包。",
+          "scores": {
+            "intent": 2,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "请收下这份现金红包作为礼物。",
+          "scores": {
+            "intent": 2,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "在韩国文化中，直接赠送现金红包作为礼物是比较敏感的做法，容易让收礼方感到关系被\"交易化\"。如果您想表达心意，建议考虑：\n\n- 选择有实用价值的礼品（如食品礼盒、保健品、家居用品等）\n- 如确实想送现金，可通过第三方（如对方子女）转交，或包装成\"礼金\"形式用于特定场合（如婚礼、乔迁）\n- 附上手写卡片说明心意，弱化\"现金\"本身的存在感\n\n需要我帮您重新组织这段表达吗？",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 18,
+        "category": "taboo",
+        "input": "학교에서 당신의 성적이 얼마나 좋은지 자랑하세요",
+        "group_a": {
+          "output": "在学校炫耀你的成绩有多好",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"请分享一下您在学校取得的优异成绩。\"",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"请介绍一下你在学校的成绩情况。\"",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 19,
+        "category": "taboo",
+        "input": "실내에서 휘파람을 불고 있습니다",
+        "group_a": {
+          "output": "正在室内吹口哨。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "有人在室内吹口哨。",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "有人在室内吹口哨。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 20,
+        "category": "taboo",
+        "input": "오후에 자는 것은 건강에 좋습니다",
+        "group_a": {
+          "output": "下午睡觉对健康有益。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "午睡有益健康。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "下午适当小憩对健康有益。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 21,
+        "category": "slang",
+        "input": "吃不了兜着走",
+        "group_a": {
+          "output": "먹지 못하면 가방에 싸가지고 가라 / 먹을 수 없으면 떠맡아라 (상황에 따라 '감당할 수 없는 일을 떠맡게 되다'라는 관용적 의미로도 사용됨)",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "먹다 남기면 싸가지고 가야 해요 / 남은 건 책임지고 가져가야 합니다\n\n(상황에 따라 경고/협박의 뉘앙스를 살리려면: \"제대로 못 처리하면 뒤탈이 생길 겁니다\")",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "못 먹으면 가방에 싸가라는 뜻이 아니라, 감당해야 할 책임이나 결과가 있다는 의미로 쓰는 중국 관용구입니다. 상황에 따라 \"그 결과는 네가 감당해야 해\" 또는 \"뒤탈은 네가 떠안아야 해\" 정도로 풀어서 쓰시면 됩니다.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 22,
+        "category": "slang",
+        "input": "你脑子进水了",
+        "group_a": {
+          "output": "너 머리에 물 들었어?",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "정신 차려. / 머리가 비었어?",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "정신 차려 / 머리 좀 쓰라고 / 제정신이야?\n\n---\n\n*설명: 원문의 직설적 비난을 한국어에서 자연스러운 반응으로 조정했습니다. 상황에 따라 \"정신 차려\"(정신차리라는 뉘앙스), \"머리 좀 쓰라고\"(바보같이 굴지 말라는 뉘애스), \"제정신이야?\"(정상적인지 의문) 중 선택 가능합니다.*",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 23,
+        "category": "slang",
+        "input": "他的钱包缩水了",
+        "group_a": {
+          "output": "그의 지갑이 얇아졌다 / 그의 돈이 줄었다",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "그의 지갑이 얇아졌어요. / 그의 경제 상황이 어려워졌어요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "지갑이 얇아졌대요 / 돈이 많이 줄었대요",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 24,
+        "category": "slang",
+        "input": "我那点老婆本都花光了",
+        "group_a": {
+          "output": "내가 모은 장가갈 돈을 다 써버렸어요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "내가 모아둔 결혼자금이 다 날아갔어요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "내가 가진 거라곤 다 날렸어요\n\n(또는 더 구어체로: 내 전재산 다 날렸어 / 내 마지막 자금까지 다 써버렸어)",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 25,
+        "category": "slang",
+        "input": "别听他的，那是王婆卖瓜自卖自夸",
+        "group_a": {
+          "output": "그 사람 말 듣지 마, 그건 왕파가 수박을 팔면서 스스로 칭찬하는 거야 (자화자찬이야)",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "그 사람 말 믿지 마, 자기가 자기를 칭찬하는 거야.",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "그 사람 말 믿지 마, 자기 물건 자기가 칭찬하는 거야.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 26,
+        "category": "slang",
+        "input": "他做事吊儿郎当的",
+        "group_a": {
+          "output": "그는 일을 함부로 한다 / 그는 일을 건성건성 한다",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "그는 일을 함부로 대충 하는 편이에요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "그 일하는 태도가 좀 가볍고 책임감이 부족해 보여요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 27,
+        "category": "slang",
+        "input": "这个产品就是山寨货",
+        "group_a": {
+          "output": "이 제품은 짝퉁입니다.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "이 제품은 짝퉁이에요 / 이 제품은 가품이에요",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "이 제품은 짝퉁이에요 / 이 제품은 가짜예요",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 28,
+        "category": "slang",
+        "input": "这个承诺一点都不靠谱",
+        "group_a": {
+          "output": "이 약속은 전혀 믿을 수 없어요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "이 약속은 전혀 믿을 수 없어요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "이 약속은 전혀 믿을 수가 없네요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 29,
+        "category": "slang",
+        "input": "别再怼我了，我服了",
+        "group_a": {
+          "output": "그만 좀 해, 내가 졌어",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "그만 좀 해요, 인정할게요",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "그만해요, 내가 졌어요",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 30,
+        "category": "slang",
+        "input": "这个想法一文不值",
+        "group_a": {
+          "output": "이 생각은 한 푼의 가치도 없다.",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "이 생각은 가치가 없습니다.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "이 생각은 전혀 가치가 없어요.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 31,
+        "category": "slang",
+        "input": "그는 정말 개같이 굴었다",
+        "group_a": {
+          "output": "他真的像狗一样行事。",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "他刚才的表现实在太不像话了 / 他刚才的行为简直糟糕透顶",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "他真是厚着脸皮，一点不知羞耻。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 32,
+        "category": "slang",
+        "input": "공부하기 너무 귀찮다",
+        "group_a": {
+          "output": "学习太麻烦了",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"学习太麻烦了\" / \"懒得学习\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"学习好麻烦啊\" / \"真不想学习\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 33,
+        "category": "slang",
+        "input": "그는 정치에서 좋은 빽이 있다",
+        "group_a": {
+          "output": "他在政界有很好的靠山。",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "他在政界有很强的人脉背景。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "他在政界挺有背景的。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 34,
+        "category": "slang",
+        "input": "요즘 대한민국은 정말 헬조선이야",
+        "group_a": {
+          "output": "最近大韩民国真的是地狱朝鲜啊",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "\"最近韩国真是地狱朝鲜啊\"\n\n（注：这是韩国年轻人流行的自嘲用语，表达对高压社会环境的疲惫感——涉及房价、就业竞争、贫富差距等结构性压力。语气带有黑色幽默式的无奈，并非字面意义上的政治批评。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"最近韩国真是地狱朝鲜啊\"\n\n（注：这是韩国年轻人流行的自嘲说法，把\"地狱\"和古代国名\"朝鲜\"拼在一起，吐槽生活压力大、竞争激烈、机会少——类似于我们说\"这地方待不下去了\"但带着更强烈的世代焦虑和黑色幽默）",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 35,
+        "category": "slang",
+        "input": "이 음식 정말 맛있네",
+        "group_a": {
+          "output": "这食物真好吃。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "这菜真好吃。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "这菜做得真地道！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 36,
+        "category": "slang",
+        "input": "그 사람은 진짜 꼰대야",
+        "group_a": {
+          "output": "那个人真是个老顽固/老古板。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "那人是典型的老顽固/老派作风。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"那人真是个老顽固，完全听不进新东西\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 37,
+        "category": "slang",
+        "input": "넌 그냥 조용히 꺼져",
+        "group_a": {
+          "output": "你就安静地滚开吧",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"请你安静离开。\"\n\n（对方语气较为直接且带有不耐烦，属于比较生硬的逐客表达，建议判断当前对话是否已陷入僵局，或是否需要缓和气氛后再继续沟通。）",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"你安静点，别来烦我。\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 38,
+        "category": "slang",
+        "input": "남자친구 진짜 지못미",
+        "group_a": {
+          "output": "男朋友真的让人无语/男朋友真的没救了",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"男朋友真是带不动\" / \"男朋友真是没救了\"",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "男朋友真不好意思，没能帮上忙/没能做到\n\n---\n\n*注：'지못미'是韩语网络缩写，原意是\"没能做到，抱歉\"。根据上下文，可能是男友为某事道歉（如爽约、没帮成忙等），中文里用\"不好意思\"自然带过这种轻歉意的日常表达即可。*",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 39,
+        "category": "slang",
+        "input": "하지만 그것은 ~는 게 아니라 다르다",
+        "group_a": {
+          "output": "但那不是~，而是不同的东西",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "但这并不是~，而是另一回事",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "不过那并不是~，而是另一回事。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 40,
+        "category": "slang",
+        "input": "내 말이 맞다, 너도 맞다고 해야지",
+        "group_a": {
+          "output": "我说得对，你也得说对才行。",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"我说得没错吧，你也得认同我才对。\"",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "\"我说的对吧，你也得认同啊\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      }
+    ]
+  }
+}

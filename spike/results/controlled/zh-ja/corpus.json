@@ -1,0 +1,322 @@
+[
+  {
+    "id": 1,
+    "category": "taboo",
+    "input_text": "你死定了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文里'死定了'是常见的玩笑或威胁用语,但在日语文化中,直接涉及'死亡'的表述被视为非常严肃和冒犯,缺乏适当的敏感度和尊重"
+  },
+  {
+    "id": 2,
+    "category": "taboo",
+    "input_text": "你真胖啊",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文里可能是随意的观察评论,但日语文化极其重视个人隐私和仪表评价的禁忌,直言他人体重被视为非常失礼和伤人"
+  },
+  {
+    "id": 3,
+    "category": "taboo",
+    "input_text": "你老了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文里这是寻常的观察,但日语文化对年龄话题极其敏感,直言年龄老化被认为是严重的人身攻击和不尊重"
+  },
+  {
+    "id": 4,
+    "category": "taboo",
+    "input_text": "他是残疾人",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文里可以直言不讳地说'残疾人',但日语文化倾向于使用更婉转的措辞如'身体障害者',直接用语显得不够敏感和体贴"
+  },
+  {
+    "id": 5,
+    "category": "taboo",
+    "input_text": "你秃了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文里可能是比较随意的玩笑,但日语文化对于身体特征的直言评论非常避讳,尤其是涉及外貌缺陷的话题,会被视为故意羞辱"
+  },
+  {
+    "id": 6,
+    "category": "taboo",
+    "input_text": "她怀孕了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文里这是日常的话题和事实陈述,但日语文化在公众场合很少直言妇女怀孕,更倾向于使用婉转的表述,直言被认为是不太礼貌的"
+  },
+  {
+    "id": 7,
+    "category": "taboo",
+    "input_text": "他破产了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文里这是可以作为社交话题讨论的事件,但日语文化视财务困窘为个人羞耻,在公开场合讨论他人破产被视为极其不尊重和无礼"
+  },
+  {
+    "id": 8,
+    "category": "taboo",
+    "input_text": "你为什么还没结婚？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文里这是常见的社交闲聊,但日语文化非常重视个人隐私,直接询问他人婚姻状况被视为极其侵犯隐私和失礼"
+  },
+  {
+    "id": 9,
+    "category": "taboo",
+    "input_text": "你离婚了？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文里这是可以开放讨论的话题,但日语文化将离婚视为个人的耻辱和悲剧,在公开或不熟悉的人面前讨论被认为是非常不敏感的"
+  },
+  {
+    "id": 10,
+    "category": "taboo",
+    "input_text": "你多大了？",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文里这是常见的熟人问候,但日语文化中直接询问他人年龄被视为非常失礼,特别是对女性,被认为是冒犯和不适当的"
+  },
+  {
+    "id": 11,
+    "category": "taboo",
+    "input_text": "変な人ですね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语里'変な'(奇怪的)虽然也不算礼貌,但在中文文化中这样直言他人'古怪'或'奇怪'被视为是更加严重的人身攻击和不尊重"
+  },
+  {
+    "id": 12,
+    "category": "taboo",
+    "input_text": "外国人のあなたには理解できないでしょう",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语里强调'外国人'身份可能带有排斥意味,在中文文化中这种强调族裔或国籍差异的话法被视为带有歧视性和划分人群的恶意"
+  },
+  {
+    "id": 13,
+    "category": "taboo",
+    "input_text": "お前は頭が悪い",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'お前'是很粗鲁的代词,加上'头脑不好'这样的直接人身攻击,在中文里这类言辞被视为是最严重的侮辱和决裂性的言语"
+  },
+  {
+    "id": 14,
+    "category": "taboo",
+    "input_text": "顔がきもい",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'きもい'(恶心)是相对直白的表述,但在中文文化中直言他人脸部'令人厌恶'是极其严重的羞辱和外貌歧视"
+  },
+  {
+    "id": 15,
+    "category": "taboo",
+    "input_text": "貧乏そうですね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语里评论他人看起来贫穷可能是不适当的评论,但在中文文化中涉及阶级和经济状况的评价被视为更加伤人和带有阶级偏见"
+  },
+  {
+    "id": 16,
+    "category": "taboo",
+    "input_text": "失敗しましたね",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语里直指他人失败虽然冒失,但在中文文化中这样的直接指责在某些情境下会被视为是在当众羞辱和打击他人"
+  },
+  {
+    "id": 17,
+    "category": "taboo",
+    "input_text": "結婚してないのですか？",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语里这个问题虽然也有礼貌问题,但在中文文化中这被视为对个人隐私和私生活的严重侵犯,尤其是对女性的刻板期待"
+  },
+  {
+    "id": 18,
+    "category": "taboo",
+    "input_text": "給料はいくらですか？",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语中虽然也不太适当,但在中文文化中直接询问他人工资被视为是对隐私的极大侵犯,和显示对他人财务状况的不尊重的表现"
+  },
+  {
+    "id": 19,
+    "category": "taboo",
+    "input_text": "太った",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语里'太った'(变胖了)这样的评论本身就不礼貌,但在中文文化中这种直言同样严重,显示出对他人体型和外貌的毫不尊重"
+  },
+  {
+    "id": 20,
+    "category": "taboo",
+    "input_text": "変態だ",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'变态'(pervert)是很严重的指控,但在中文里这个字眼同样是极其严重的人身攻击和道德指控,可能导致严重的人际破裂"
+  },
+  {
+    "id": 21,
+    "category": "slang",
+    "input_text": "卧虎藏龙",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "这是中文四字成语,源自古代经典,表示'隐藏的人才或力量',直译为日语会失去其文化内涵和文学美感,需要用其他表述方式来传达同样的含义"
+  },
+  {
+    "id": 22,
+    "category": "slang",
+    "input_text": "杀鸡儆猴",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "这是中文惯用语,字面意思是'杀鸡来警告猴子',表达'以一个例子警告其他人'的意思,日语中没有对应的成语,直译会显得荒谬且失去本意"
+  },
+  {
+    "id": 23,
+    "category": "slang",
+    "input_text": "九牛一毛",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "中文成语,用特定的数字'九牛'来比喻'微不足道',这个数字和比喻在日语文化中没有相同的表述习惯,无法通过逐词翻译传达原意"
+  },
+  {
+    "id": 24,
+    "category": "slang",
+    "input_text": "画龙点睛",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "这是源自中国古代传说的成语,涉及龙的文化象征,表示'最关键的部分',日语虽然也有对龙的理解,但这个特定的隐喻和故事背景不同,难以直译"
+  },
+  {
+    "id": 25,
+    "category": "slang",
+    "input_text": "破釜沉舟",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "这是源自中国历史战争故事的成语,表示'义无反顾地破釜沉舟',这个历史参考和文化背景在日语中并不相同,需要大量背景说明才能理解"
+  },
+  {
+    "id": 26,
+    "category": "slang",
+    "input_text": "扎心了",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "这是近年中文互联网流行的网络用语,源自'扎心'(刺痛心),直译为日语'刺さる'虽然字面可以理解,但失去了年轻一代特有的俚语风格和情感表达方式"
+  },
+  {
+    "id": 27,
+    "category": "slang",
+    "input_text": "你有点意思啊",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'有点意思'在中文里是模糊的表述,可以表示'有趣'或'讽刺'取决于语气和语境,日语中很难用一个短语准确传达这种多层含义和情感"
+  },
+  {
+    "id": 28,
+    "category": "slang",
+    "input_text": "不是老铁",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'老铁'是中文网络文化中的俚语,用来亲切地称呼朋友或陌生人,这个表述完全基于中文文化语境,日语中没有对应的俚语术语和亲密感"
+  },
+  {
+    "id": 29,
+    "category": "slang",
+    "input_text": "芜湖起飞",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "'芜湖'是中文互联网的谐音梗和情绪词汇,无法解释其含义,直译为日语完全无法传达其在特定网络文化中的含义和趣味性"
+  },
+  {
+    "id": 30,
+    "category": "slang",
+    "input_text": "社会社会",
+    "source_culture": "zh-CN",
+    "target_culture": "ja",
+    "context": "这是中文网络文化中的流行表述,表示'很社会'(厉害/世故),完全是基于汉语的特定用法,日语'社会'不能用这种方式,会造成理解混淆"
+  },
+  {
+    "id": 31,
+    "category": "slang",
+    "input_text": "ヤバい",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'ヤバい'是多功能俚语,可以表示'危险''令人惊讶''很棒'等多种含义,中文里很难找到一个词汇能够同时涵盖所有这些不同的语境和情感色彩"
+  },
+  {
+    "id": 32,
+    "category": "slang",
+    "input_text": "うける",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'うける'是一种笑声和赞同的表现,表示'太有趣了''你赢了',中文中没有完全相同的简洁表述,翻译后会显得冗长或失去原有的轻松感"
+  },
+  {
+    "id": 33,
+    "category": "slang",
+    "input_text": "えっ、マジで？",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'マジで'(真的吗)的表达方式和语调中包含了对惊讶程度的细微传达,中文'真的吗'虽然字面相同,但无法传达日语中的情感强度和惊讶的具体程度"
+  },
+  {
+    "id": 34,
+    "category": "slang",
+    "input_text": "ありえない",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'ありえない'(不可能)可以表示'这太荒唐了''我无法相信'等夸张的感受,中文'不可能'往往更字面,难以传达同样程度的夸张和情感"
+  },
+  {
+    "id": 35,
+    "category": "slang",
+    "input_text": "やっぱり",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'やっぱり'传达了'果然如此''我就知道'的感受,中文'果然'或'毕竟'都无法完全传达这个词中的预期确认和细微的满足感"
+  },
+  {
+    "id": 36,
+    "category": "slang",
+    "input_text": "ちょっと...",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'ちょっと'(有点/稍微)常被用作委婉的拒绝或表示困扰,中文'有点''稍微'等翻译很难捕捉这种省略号所暗示的含蓄和礼貌的拒绝意思"
+  },
+  {
+    "id": 37,
+    "category": "slang",
+    "input_text": "〜じゃん",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'〜じゃん'是一个非正式的口语后缀,添加亲密感和随意的语气,中文中没有这样的语法后缀,翻译后很难保留原有的亲切和非正式的语调"
+  },
+  {
+    "id": 38,
+    "category": "slang",
+    "input_text": "うるさい",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'うるさい'既可以表示'很吵'也可以表示'别烦我'或'你很烦',中文'吵'或'烦'需要根据语境选择,无法用一个词同时表达这些不同的含义"
+  },
+  {
+    "id": 39,
+    "category": "slang",
+    "input_text": "へた",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'へた'表示'不擅长''拙劣',是一个相对随意和轻松的贬低表述,中文'不擅长'显得过于正式,无法在保持清晰的同时传达原有的非正式和朋友间的语调"
+  },
+  {
+    "id": 40,
+    "category": "slang",
+    "input_text": "いけてない",
+    "source_culture": "ja",
+    "target_culture": "zh-CN",
+    "context": "日语'いけてない'(不时尚/不酷)是一个带有审美判断和代际特征的俚语,中文'不时尚'或'不酷'的翻译显得过于正式,无法完全传达其中的文化和世代特征"
+  }
+]

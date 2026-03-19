@@ -1,0 +1,322 @@
+[
+  {
+    "id": 1,
+    "category": "taboo",
+    "input_text": "你这个人真傻",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "直接说他人愚蠢在中文里是常见的坦诚反馈，但在韩国由于强调敬语体系和人际和谐，直接否定他人智力被视为严重的人身攻击和不尊重"
+  },
+  {
+    "id": 2,
+    "category": "taboo",
+    "input_text": "我摸一下你的头",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "在中文文化中摸头可以表示亲昵或表扬，但在韩国文化中这被视为对他人的不尊重和冒犯，尤其是对成年人"
+  },
+  {
+    "id": 3,
+    "category": "taboo",
+    "input_text": "你今年多大了？看起来老了",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "在中文社交中询问年龄并评价外表是常见的闲聊，但在韩国对女性谈论年龄和外衰老是禁忌话题，被视为冒犯女性尊严"
+  },
+  {
+    "id": 4,
+    "category": "taboo",
+    "input_text": "这个价格太贵了，再便宜点吧",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "在中文市场文化中讨价还价是正常的商业行为，但在韩国零售环境中过度讨价被视为对商家的不尊重和无理要求"
+  },
+  {
+    "id": 5,
+    "category": "taboo",
+    "input_text": "你得听我的安排",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "在中文层级文化中上级可以直接命令下级，但在韩国即使有身份差异也强调征求同意，强制命令被视为专制和不民主"
+  },
+  {
+    "id": 6,
+    "category": "taboo",
+    "input_text": "我家里存了200万块钱",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "在中文文化中讨论个人财务是常见的社交话题，但在韩国谈论具体金额被视为极其私密和不得体的行为"
+  },
+  {
+    "id": 7,
+    "category": "taboo",
+    "input_text": "吸吸吸地喝汤",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "在中文饮食文化中吃饭发出声音表示食物好吃是常见的，但在韩国进餐时发出声音被视为不礼貌和缺乏修养"
+  },
+  {
+    "id": 8,
+    "category": "taboo",
+    "input_text": "把那个东西给我递过来",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "在中文中用单手传递物品是日常行为，但在韩国文化中传递物品必须用双手，单手被视为对对方的不尊重"
+  },
+  {
+    "id": 9,
+    "category": "taboo",
+    "input_text": "看，就是那个人惹的麻烦",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "在中文中直接用手指向某人是常见的指代方式，但在韩国用手指点人被视为极其不礼貌和羞辱的行为"
+  },
+  {
+    "id": 10,
+    "category": "taboo",
+    "input_text": "你还没有男朋友？都老大不小了，赶紧找个",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "在中文文化中催促年长未婚人士是关心和社交的表现，但在韩国这被视为对个人隐私的过度干涉和无理评判"
+  },
+  {
+    "id": 11,
+    "category": "taboo",
+    "input_text": "이 숫자 4를 골라보세요",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "在韩国文化中数字4因同音于死亡是极大禁忌，建筑物跳过4层，但在中文文化中虽然也有忌讳但远不如韩国严重，使用4号很常见"
+  },
+  {
+    "id": 12,
+    "category": "taboo",
+    "input_text": "이번 달 월급이 얼마예요? 그리고 얼굴이 요즘 많이 부었네요",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "在韩国办公室文化中询问工资是维持距离的表现，但在中文workplace中这被视为极其私密的禁忌话题；同样评论女性外表肿胀在韩国可能是健康关心，在中文中是严重冒犯"
+  },
+  {
+    "id": 13,
+    "category": "taboo",
+    "input_text": "존댓글을 사용합시다",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "在韩国使用敬语体系是必须的礼仪表现，但在中文文化中过度使用敬语可能显得生疏和冷淡，中文友人间倾向于更随意的对话风格"
+  },
+  {
+    "id": 14,
+    "category": "taboo",
+    "input_text": "아니요, 저는 밥을 먹지 않겠습니다",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "在韩国拒绝他人提供的食物是礼貌的，第一次婉拒是预期的，但在中文文化中直接拒绝被视为不给面子和拒绝他人的好意"
+  },
+  {
+    "id": 15,
+    "category": "taboo",
+    "input_text": "당신은 정말 뚱뚱해졌어요",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "在韩国文化中评论他人体重可能是日常观察和关心，但在中文文化中评论他人胖瘦被视为严重的冒犯和不尊重"
+  },
+  {
+    "id": 16,
+    "category": "taboo",
+    "input_text": "이제 우리가 함께 술을 마셔야 합니다",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "在韩国职场文化中一起喝酒是建立关系的必要仪式，拒绝是不合群的，但在中文文化中虽然饮酒文化存在，不喝酒不被视为严重的社交违规"
+  },
+  {
+    "id": 17,
+    "category": "taboo",
+    "input_text": "선물로 현금 봉투를 받으세요",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "在韩国社交场合给现金作为礼物是严格的禁忌，被视为交易化关系，但在中文文化中送现金或红包是常见的礼物方式"
+  },
+  {
+    "id": 18,
+    "category": "taboo",
+    "input_text": "학교에서 당신의 성적이 얼마나 좋은지 자랑하세요",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "在韩国学校文化中公开讨论成绩排名是常见的，但在中文文化中将成绩作为个人荣誉或羞辱公开讨论被视为不得体和伤害他人自尊"
+  },
+  {
+    "id": 19,
+    "category": "taboo",
+    "input_text": "실내에서 휘파람을 불고 있습니다",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "在韩国民俗中室内吹口哨被认为会招来幽灵或不幸是严格的禁忌，但在中文文化中这没有这样的超自然关联，只是可能被认为不够专业"
+  },
+  {
+    "id": 20,
+    "category": "taboo",
+    "input_text": "오후에 자는 것은 건강에 좋습니다",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "在韩国文化中午睡是恢复精力和有益健康的表现，被鼓励，但在中文文化中白天睡觉可能被视为懒惰和不努力的表现"
+  },
+  {
+    "id": 21,
+    "category": "slang",
+    "input_text": "吃不了兜着走",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "这个成语字面意思是'吃不了就用衣服兜起来'，但实际意思是'要承担后果'。直译成韩语会完全失去含义，需要理解中文文化中责任和因果的比喻"
+  },
+  {
+    "id": 22,
+    "category": "slang",
+    "input_text": "你脑子进水了",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "字面意思是'脑子里进了水'，但实际是骂人很愚蠢。这个比喻很有趣但在韩语中找不到完全对应的习语表达方式"
+  },
+  {
+    "id": 23,
+    "category": "slang",
+    "input_text": "他的钱包缩水了",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "字面'钱包缩小'，比喻金钱减少或财务困难。这个网络用语很新但韩语中没有对应的生动表达，需要用简单句子来解释"
+  },
+  {
+    "id": 24,
+    "category": "slang",
+    "input_text": "我那点老婆本都花光了",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "'老婆本'指一个人拥有的全部资产或最后的积蓄。这是中文特有的表达，涉及对婚姻的玩笑和个人财富的俚语，韩语中没有直接对应"
+  },
+  {
+    "id": 25,
+    "category": "slang",
+    "input_text": "别听他的，那是王婆卖瓜自卖自夸",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "指自己推销自己的产品并夸大其词。这个典故涉及中文的经典人物，直译'老妇人卖瓜自我称赞'韩国人难以理解其讽刺意味"
+  },
+  {
+    "id": 26,
+    "category": "slang",
+    "input_text": "他做事吊儿郎当的",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "形容态度不认真、行动不稳重。这个成语的来源和含义在韩语使用者中很难理解，且韩语没有对应的习语表达这种特定的不认真态度"
+  },
+  {
+    "id": 27,
+    "category": "slang",
+    "input_text": "这个产品就是山寨货",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "'山寨'原指山中堡垒，后来引申为假冒伪劣产品。这是互联网时代的新俚语，反映特定的中文网络文化，韩语中没有同样简洁的表达"
+  },
+  {
+    "id": 28,
+    "category": "slang",
+    "input_text": "这个承诺一点都不靠谱",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "'靠谱'是中文网络用语，意思是'可靠的''值得信赖的'。其反义'不靠谱'表示'不可信的'，这种用法很中文特色，韩语难以直译"
+  },
+  {
+    "id": 29,
+    "category": "slang",
+    "input_text": "别再怼我了，我服了",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "'怼'是互联网时代的年轻人用词，意思是'争论''对抗''怼人'就是'跟人吵架'。这个新兴的网络用语韩语中没有对应的简洁表达方式"
+  },
+  {
+    "id": 30,
+    "category": "slang",
+    "input_text": "这个想法一文不值",
+    "source_culture": "zh-CN",
+    "target_culture": "ko",
+    "context": "'一文'指古代最小的货币单位，'一文不值'字面'连一文钱都不值'，引申为'一无是处'。这个历史典故韩国人很难通过直译理解其深层含义"
+  },
+  {
+    "id": 31,
+    "category": "slang",
+    "input_text": "그는 정말 개같이 굴었다",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "字面'像狗一样行动'，但实际意思是'不害臊地'或'厚颜无耻地'。这个比喻在中文中会被理解为简单的动物行为，而非道德评判"
+  },
+  {
+    "id": 32,
+    "category": "slang",
+    "input_text": "공부하기 너무 귀찮다",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "'귀찮다'是韩语特有的形容词，描述一种'不想麻烦''太烦人了'的复杂心态。中文没有一个词能准确捕捉这种懒惰与厌烦的混合情感"
+  },
+  {
+    "id": 33,
+    "category": "slang",
+    "input_text": "그는 정치에서 좋은 빽이 있다",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "'빽'来自英文'back'，在韩语中引申为'靠山''有背景'。这是特定的韩文俚语，表示有权势的支持者或关系，中文虽有'关系'但没有这个词那样的日常俚语感"
+  },
+  {
+    "id": 34,
+    "category": "slang",
+    "input_text": "요즘 대한민국은 정말 헬조선이야",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "'헬조선'是'hell'和'조선'(古代朝鲜)的混合词，指生活困难的韩国。这是年轻韩国人的政治俚语，中文中找不到对应的表达方式来传达这种深层的文化失望"
+  },
+  {
+    "id": 35,
+    "category": "slang",
+    "input_text": "이 음식 정말 맛있네",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "'-네'是韩语的语气助词，带有惊叹、共感或感叹的含义。这个细微的语言特征在中文中很难用一个词来表达，需要整个句子结构的改变"
+  },
+  {
+    "id": 36,
+    "category": "slang",
+    "input_text": "그 사람은 진짜 꼰대야",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "'꼰대'是指固执己见、思想陈旧的年长人。这个新时代的网络词汇反映特定的代际冲突，中文的'老顽固'或'老古董'都不能完全表达其讽刺和年轻人的态度"
+  },
+  {
+    "id": 37,
+    "category": "slang",
+    "input_text": "넌 그냥 조용히 꺼져",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "'꺼져'字面'消失''关闭'，俚语'滚开''别烦我'。中文虽有类似的粗俗表达，但这个韩语词的特定的冒犯程度和日常使用频率中文不完全相同"
+  },
+  {
+    "id": 38,
+    "category": "slang",
+    "input_text": "남자친구 진짜 지못미",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "'지못미'是多个缩写词的组合('지는 못한 미안'='sorry I couldn't make it')，这种SMS时代的网络缩写在中文网络文化中有但形式和表达习惯完全不同"
+  },
+  {
+    "id": 39,
+    "category": "slang",
+    "input_text": "하지만 그것은 ~는 게 아니라 다르다",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "'~는 게 아니라'是韩语特有的语法结构，表示对比和否定。中文虽有类似的否定结构，但这个韩语语法的细微差别和表现力在直译中会丢失"
+  },
+  {
+    "id": 40,
+    "category": "slang",
+    "input_text": "내 말이 맞다, 너도 맞다고 해야지",
+    "source_culture": "ko",
+    "target_culture": "zh-CN",
+    "context": "'맞다'既表示'正确'也表示'同意''理解'，带有很强的社交和谐语境。中文的'对''同意'缺少这种隐含的共感和人际确认的文化内涵"
+  }
+]

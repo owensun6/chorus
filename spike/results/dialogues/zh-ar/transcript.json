@@ -1,0 +1,66 @@
+[
+  {
+    "round": 0,
+    "speaker": "A",
+    "text": "你好！我是王芳。贸易谈判中的关系建立。很高兴认识你！",
+    "envelope": {
+      "original_semantic": "初次见面问候",
+      "sender_culture": "zh-CN",
+      "intent_type": "greeting",
+      "emotional_tone": "enthusiastic"
+    }
+  },
+  {
+    "round": 1,
+    "speaker": "B",
+    "text": "你好！我是Ahmed。感谢真主的安排让我们相识。在我们开始谈生意之前，我想先了解你——你的家人好吗？旅途还顺利吗？对我来说，信任比合同更重要。",
+    "adapted": "你好，王芳女士。我是Ahmed。感谢真主让我们相遇，愿这次会面为我们带来共同的繁荣。请坐，先喝杯茶，生意的事我们可以慢慢谈。",
+    "envelope": {
+      "original_semantic": "回应问候并建立个人连接，强调关系优先于交易",
+      "sender_culture": "ar",
+      "intent_type": "relationship_building",
+      "emotional_tone": "warm_respectful"
+    },
+    "raw": "[适配]\n你好，王芳女士。我是Ahmed。感谢真主让我们相遇，愿这次会面为我们带来共同的繁荣。请坐，先喝杯茶，生意的事我们可以慢慢谈。\n\n[回复]\n你好！我是Ahmed。感谢真主的安排让我们相识。在我们开始谈生意之前，我想先了解你——你的家人好吗？旅途还顺利吗？对我来说，信任比合同更重要。\n\n[信封]\n{\"original_semantic\":\"回应问候并建立个人连接，强调关系优先于交易\",\"sender_culture\":\"ar\",\"intent_type\":\"relationship_building\",\"emotional_tone\":\"warm_respectful\"}"
+  },
+  {
+    "round": 1,
+    "speaker": "?",
+    "error": "MiniMax 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"usage limit exceeded (2056)\"},\"request_id\":\"0609b0b9859a78b40cd958809d775952\"}"
+  },
+  {
+    "round": 2,
+    "speaker": "?",
+    "error": "Cannot read properties of undefined (reading 'slice')"
+  },
+  {
+    "round": 3,
+    "speaker": "?",
+    "error": "Cannot read properties of undefined (reading 'slice')"
+  },
+  {
+    "round": 4,
+    "speaker": "?",
+    "error": "Cannot read properties of undefined (reading 'slice')"
+  },
+  {
+    "round": 5,
+    "speaker": "?",
+    "error": "Cannot read properties of undefined (reading 'slice')"
+  },
+  {
+    "round": 6,
+    "speaker": "?",
+    "error": "Cannot read properties of undefined (reading 'slice')"
+  },
+  {
+    "round": 7,
+    "speaker": "?",
+    "error": "Cannot read properties of undefined (reading 'slice')"
+  },
+  {
+    "round": 8,
+    "speaker": "?",
+    "error": "Cannot read properties of undefined (reading 'slice')"
+  }
+]

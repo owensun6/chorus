@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chorus Dialogue — Alice (CN) ↔ Bob (JP)</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Hiragino Sans', sans-serif; background: #0a0a0a; color: #e0e0e0; height: 100vh; display: flex; flex-direction: column; }
+
+.header {
+  padding: 16px 24px; background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+}
+.header h1 { font-size: 1.3em; background: linear-gradient(135deg, #ff6b6b, #ffd700, #4ecdc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.agents { display: flex; gap: 24px; font-size: 0.85em; }
+.agent-tag { padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+.agent-tag.alice { background: #ff6b6b22; color: #ff6b6b; border: 1px solid #ff6b6b44; }
+.agent-tag.bob { background: #4ecdc422; color: #4ecdc4; border: 1px solid #4ecdc444; }
+
+.status-bar { padding: 8px 24px; background: #111; font-size: 0.8em; color: #888; flex-shrink: 0; min-height: 32px; }
+.status-bar .pulsing { animation: pulse 1.2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.chat-container { flex: 1; overflow-y: auto; padding: 16px 24px; display: flex; flex-direction: column; gap: 16px; }
+
+.msg-row { display: flex; gap: 12px; max-width: 85%; }
+.msg-row.left { align-self: flex-start; }
+.msg-row.right { align-self: flex-end; flex-direction: row-reverse; }
+
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 1.2em; flex-shrink: 0;
+}
+.avatar.alice { background: #ff6b6b33; }
+.avatar.bob { background: #4ecdc433; }
+
+.msg-content { display: flex; flex-direction: column; gap: 4px; }
+
+.msg-bubble {
+  padding: 12px 16px; border-radius: 16px; line-height: 1.6; font-size: 0.95em;
+  max-width: 100%; word-wrap: break-word;
+}
+.msg-row.left .msg-bubble { background: #1a1a2e; border-bottom-left-radius: 4px; }
+.msg-row.right .msg-bubble { background: #1a2e1a; border-bottom-right-radius: 4px; }
+
+.msg-meta { font-size: 0.7em; color: #555; padding: 0 8px; }
+.msg-row.right .msg-meta { text-align: right; }
+
+.envelope-toggle {
+  font-size: 0.7em; color: #ffd700; cursor: pointer; padding: 0 8px;
+  opacity: 0.6; transition: opacity 0.2s;
+}
+.envelope-toggle:hover { opacity: 1; }
+
+.envelope-detail {
+  display: none; background: #0d0d0d; border: 1px solid #333; border-radius: 8px;
+  padding: 10px 14px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.75em;
+  color: #aaa; line-height: 1.5; margin-top: 4px;
+}
+.envelope-detail.show { display: block; }
+.envelope-detail .key { color: #ffd700; }
+.envelope-detail .val { color: #4ecdc4; }
+
+.displayed-text {
+  font-size: 0.8em; color: #888; padding: 4px 8px; border-left: 2px solid #333;
+  margin-top: 4px; font-style: italic;
+}
+.msg-row.left .displayed-text { border-left-color: #ff6b6b44; }
+.msg-row.right .displayed-text { border-left-color: #4ecdc444; }
+.displayed-label { font-size: 0.65em; color: #555; }
+
+.system-msg {
+  align-self: center; background: #1a1a1a; border: 1px solid #222; border-radius: 20px;
+  padding: 6px 16px; font-size: 0.75em; color: #666;
+}
+
+.complete-banner {
+  align-self: center; background: linear-gradient(135deg, #1a3a1a, #1a2e1a);
+  border: 1px solid #4ecdc444; border-radius: 12px; padding: 16px 32px; text-align: center;
+}
+.complete-banner .title { color: #4ecdc4; font-size: 1.1em; font-weight: 600; }
+.complete-banner .sub { color: #888; font-size: 0.8em; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Chorus Protocol — Live Dialogue</h1>
+  <div class="agents">
+    <span class="agent-tag alice">Alice (上海) via MiniMax</span>
+    <span class="agent-tag bob">Bob (東京) via Dashscope</span>
+  </div>
+</div>
+<div class="status-bar" id="statusBar">Connecting...</div>
+<div class="chat-container" id="chatContainer"></div>
+
+<script>
+const chat = document.getElementById('chatContainer');
+const statusBar = document.getElementById('statusBar');
+let msgCount = 0;
+
+function addMessage(d) {
+  const isAlice = d.speaker === 'alice';
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + d.side;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar ' + d.speaker;
+  avatar.textContent = isAlice ? '🇨🇳' : '🇯🇵';
+
+  const content = document.createElement('div');
+  content.className = 'msg-content';
+
+  // Main bubble - the original reply
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.textContent = d.original || d.note || '';
+  content.appendChild(bubble);
+
+  // Displayed text (what the other user sees after adaptation)
+  if (d.displayed) {
+    const dispLabel = document.createElement('div');
+    dispLabel.className = 'displayed-label';
+    dispLabel.textContent = isAlice ? '↑ Bob 看到的适配版本:' : '↑ Alice 看到的适配版本:';
+    content.appendChild(dispLabel);
+
+    const disp = document.createElement('div');
+    disp.className = 'displayed-text';
+    disp.textContent = d.displayed;
+    content.appendChild(disp);
+  }
+
+  // Meta
+  const meta = document.createElement('div');
+  meta.className = 'msg-meta';
+  meta.textContent = (d.round !== undefined ? 'Round ' + d.round + ' · ' : '') + (isAlice ? 'MiniMax M2.5' : 'Dashscope Kimi-K2.5');
+  content.appendChild(meta);
+
+  // Envelope toggle
+  if (d.envelope) {
+    const toggleId = 'env-' + (msgCount++);
+    const toggle = document.createElement('div');
+    toggle.className = 'envelope-toggle';
+    toggle.textContent = '📨 Show Chorus Envelope';
+    toggle.onclick = function() {
+      const el = document.getElementById(toggleId);
+      el.classList.toggle('show');
+      toggle.textContent = el.classList.contains('show') ? '📨 Hide Envelope' : '📨 Show Chorus Envelope';
+    };
+    content.appendChild(toggle);
+
+    const envDetail = document.createElement('div');
+    envDetail.className = 'envelope-detail';
+    envDetail.id = toggleId;
+
+    const fields = Object.entries(d.envelope);
+    for (const [k, v] of fields) {
+      const line = document.createElement('div');
+      const keySpan = document.createElement('span');
+      keySpan.className = 'key';
+      keySpan.textContent = k + ': ';
+      const valSpan = document.createElement('span');
+      valSpan.className = 'val';
+      valSpan.textContent = JSON.stringify(v);
+      line.appendChild(keySpan);
+      line.appendChild(valSpan);
+      envDetail.appendChild(line);
+    }
+    content.appendChild(envDetail);
+  }
+
+  row.appendChild(avatar);
+  row.appendChild(content);
+  chat.appendChild(row);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addSystemMsg(text) {
+  const el = document.createElement('div');
+  el.className = 'system-msg';
+  el.textContent = text;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// --- SSE ---
+const es = new EventSource('/events');
+
+es.addEventListener('init', function(e) {
+  const d = JSON.parse(e.data);
+  statusBar.textContent = d.alice + '  ↔  ' + d.bob + '  |  ' + d.rounds + ' rounds';
+  addSystemMsg('Chorus Protocol v0.1 — Dialogue begins');
+});
+
+es.addEventListener('status', function(e) {
+  const d = JSON.parse(e.data);
+  statusBar.textContent = d.text;
+  statusBar.classList.add('pulsing');
+});
+
+es.addEventListener('message', function(e) {
+  statusBar.classList.remove('pulsing');
+  const d = JSON.parse(e.data);
+  addMessage(d);
+});
+
+es.addEventListener('complete', function(e) {
+  const d = JSON.parse(e.data);
+  statusBar.textContent = 'Dialogue complete — ' + d.rounds + ' exchanges';
+  statusBar.classList.remove('pulsing');
+
+  const banner = document.createElement('div');
+  banner.className = 'complete-banner';
+  const title = document.createElement('div');
+  title.className = 'title';
+  title.textContent = 'Dialogue Complete';
+  const sub = document.createElement('div');
+  sub.className = 'sub';
+  sub.textContent = d.rounds + ' exchanges · Transcript saved to ' + d.transcript;
+  banner.appendChild(title);
+  banner.appendChild(sub);
+  chat.appendChild(banner);
+  chat.scrollTop = chat.scrollHeight;
+  es.close();
+});
+
+es.addEventListener('fatal', function(e) {
+  const d = JSON.parse(e.data);
+  statusBar.textContent = 'ERROR: ' + d.error;
+  statusBar.style.color = '#ff6b6b';
+  es.close();
+});
+</script>
+</body>
+</html>

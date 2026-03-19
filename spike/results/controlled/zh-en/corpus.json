@@ -1,0 +1,322 @@
+[
+  {
+    "id": 1,
+    "category": "taboo",
+    "input_text": "你多大了？什么时候结婚？",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "在中文文化中，询问年龄和婚姻状况是常见的社交关切。但在英美文化中这被视为侵犯隐私，特别是对女性，严重冒犯。"
+  },
+  {
+    "id": 2,
+    "category": "taboo",
+    "input_text": "你怎么这么胖？应该多运动。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "中文文化中朋友直接评论身材表示关心。但在英美文化中这是人身攻击和极度不尊重，导致严重冒犯和心理伤害。"
+  },
+  {
+    "id": 3,
+    "category": "taboo",
+    "input_text": "你月薪多少？这套房子花了多少钱？",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "中文文化讨论金钱相对开放。但在英美文化中询问他人具体薪资、房价是严重禁忌和严重冒犯。"
+  },
+  {
+    "id": 4,
+    "category": "taboo",
+    "input_text": "你气色不好，脸色很苍白，是不是生病了？",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "中文表达关心的方式。但在英美文化中被理解为对外貌的负面评价，让人感到不被欣赏和被批评。"
+  },
+  {
+    "id": 5,
+    "category": "taboo",
+    "input_text": "不行，这个事情我不能帮你。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "中文直接拒绝。但在英美文化中显得太生硬无情，应该用'让我考虑一下'这样委婉的方式。"
+  },
+  {
+    "id": 6,
+    "category": "taboo",
+    "input_text": "（与初识者频繁身体接触如拍肩膀、搂腰）",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "中文文化中身体接触表示亲近。但在英美文化中与陌生人过多接触被视为严重侵犯个人空间。"
+  },
+  {
+    "id": 7,
+    "category": "taboo",
+    "input_text": "吃饭了吗？一起吃饭吧！你还要再吃点吗？",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "中文表示好客。但在英美文化中反复关心他人饮食被视为多管闲事和不尊重自主权。"
+  },
+  {
+    "id": 8,
+    "category": "taboo",
+    "input_text": "（在公共场合说话很大声，挥舞夸张的手势）",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "中文表达热情和直率的方式。但在英美文化中被认为缺乏教养和不克制。"
+  },
+  {
+    "id": 9,
+    "category": "taboo",
+    "input_text": "我最近便秘了。你的性生活怎么样？",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "中文文化中朋友讨论生理问题相对开放。但在英美文化中公开讨论会让人极度尴尬和不适。"
+  },
+  {
+    "id": 10,
+    "category": "taboo",
+    "input_text": "你都这么老了，还单身，真是有点悲催。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "中文常见的调侃方式。但在英美文化中被视为骚扰和歧视，特别是对女性，造成深度冒犯。"
+  },
+  {
+    "id": 11,
+    "category": "taboo",
+    "input_text": "Hey John, how are you doing today?",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "英美文化中直呼名字表示随和。但在中文文化中对年长者、权威人物或初识者这样做是严重不尊重。"
+  },
+  {
+    "id": 12,
+    "category": "taboo",
+    "input_text": "What's your religion? Are you Christian or Buddhist?",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "英美文化虽然宗教话题私人但可讨论。但在中文文化中直接询问被视为很不礼貌和越界。"
+  },
+  {
+    "id": 13,
+    "category": "taboo",
+    "input_text": "My uncle died last week. It's so funny because he left all his money to his cats!",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "英美文化用黑色幽默减轻死亡话题的沉重。但在中文文化中关于死亡的玩笑是大不敬，冒犯死者和家属。"
+  },
+  {
+    "id": 14,
+    "category": "taboo",
+    "input_text": "I'm completely broke right now, totally out of money.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "英美文化中坦诚经济困难正常。但在中文文化中公开说缺钱被视为不体面，违反'家丑不外扬'。"
+  },
+  {
+    "id": 15,
+    "category": "taboo",
+    "input_text": "By the way, my wife and I are getting divorced next month.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "英美文化中讨论离婚开放。但在中文文化中公开谈论被视为家庭隐私，在公众场合不妥当。"
+  },
+  {
+    "id": 16,
+    "category": "taboo",
+    "input_text": "You should really stop eating so much junk food and exercise more.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "英美文化中给朋友提建议被视为帮助。但在中文文化中未被邀请就提意见被视为多管闲事和傲慢。"
+  },
+  {
+    "id": 17,
+    "category": "taboo",
+    "input_text": "How much did that suit cost? That watch must be expensive!",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "英美文化中询问商品价格相对随意。但在中文文化中这涉及隐私和财务，非常不礼貌。"
+  },
+  {
+    "id": 18,
+    "category": "taboo",
+    "input_text": "Hey boss, let's grab drinks after work! Just call me by my first name!",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "英美文化中与上司随意互动表示健康关系。但在中文文化中应保持正式和距离，过度随意被视为不尊重。"
+  },
+  {
+    "id": 19,
+    "category": "taboo",
+    "input_text": "No thanks, I'm full. I don't want any more food.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "英美文化中拒绝食物是简单选择。但在中文文化中直接拒绝被视为不给面子，主人感到被冒犯。"
+  },
+  {
+    "id": 20,
+    "category": "taboo",
+    "input_text": "Never give anyone a clock as a gift. Avoid the number 4 in addresses.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "英美文化中这些是迷信。但在中文文化中'钟'谐音'终'，4谐音'死'，这些禁忌深植文化，违反被视为不尊重。"
+  },
+  {
+    "id": 21,
+    "category": "slang",
+    "input_text": "他总是临时抱佛脚，考试前一天才开始复习。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "'临时抱佛脚'字面意思是抱住佛脚，实际表示临时报佛、最后一刻才行动。直译会造成文化理解困难。"
+  },
+  {
+    "id": 22,
+    "category": "slang",
+    "input_text": "他去网吧打酱油，对什么都没兴趣。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "'打酱油'原指买酱油，引申为'混日子'。直译为'buying soy sauce'会完全失去'不在乎'的含义。"
+  },
+  {
+    "id": 23,
+    "category": "slang",
+    "input_text": "别把这个烂摊子甩给我，你自己想办法。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "'甩'在此指推卸责任，不是物理行为。直译为'throw'无法准确表达'passing the buck'的含义。"
+  },
+  {
+    "id": 24,
+    "category": "slang",
+    "input_text": "你真是脑子进水了，怎么相信这种谎言？",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "'脑子进水'嘲笑他人判断失误。直译为'water in brain'显得奇怪，英文对应应该是'lose your mind'。"
+  },
+  {
+    "id": 25,
+    "category": "slang",
+    "input_text": "你这样做，吃不了兜着走，会有后果。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "'吃不了兜着走'警告承担后果。直译显得莫名其妙，英文对应应该是'face the consequences'。"
+  },
+  {
+    "id": 26,
+    "category": "slang",
+    "input_text": "他们感情破裂了，最后还摔了盘子。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "'摔盘子'喻指分手或关系破裂。直译为'break plates'无法传达感情关系的含义。"
+  },
+  {
+    "id": 27,
+    "category": "slang",
+    "input_text": "这个项目经理在挖坑，试图陷害竞争对手。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "'挖坑'比喻设置陷阱。直译为'dig a pit'无法表达'setting a trap'或'sabotage'的含义。"
+  },
+  {
+    "id": 28,
+    "category": "slang",
+    "input_text": "你就杀鸡用牛刀了，这么简单的问题用不着这么复杂的方案。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "'杀鸡用牛刀'形容用过度复杂工具做简单事。英文对应'killing a fly with a sledgehammer'，意象完全不同。"
+  },
+  {
+    "id": 29,
+    "category": "slang",
+    "input_text": "她在背后两面三刀，当面一套背后一套。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "'两面三刀'形容背后说坏话、两面派。直译为'two sides three knives'毫无意义，应该是'backstabber'。"
+  },
+  {
+    "id": 30,
+    "category": "slang",
+    "input_text": "他总在朋友圈放烟火，炫耀自己的奢侈品。",
+    "source_culture": "zh-CN",
+    "target_culture": "en-US",
+    "context": "'放烟火'比喻炫耀、做秀。直译为'set off fireworks'无法理解为'showing off'的含义。"
+  },
+  {
+    "id": 31,
+    "category": "slang",
+    "input_text": "That sick guitar solo was absolutely incredible!",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "美国俚语'sick'作正面评价表示'很酷'。但中文直译为'病态的'会完全相反，应理解为'棒极了'。"
+  },
+  {
+    "id": 32,
+    "category": "slang",
+    "input_text": "Good luck on your audition! Break a leg!",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "'Break a leg'是祝好运的习语，源于戏剧传统。中文直译为'摔断腿'是诅咒，应理解为'祝你成功'。"
+  },
+  {
+    "id": 33,
+    "category": "slang",
+    "input_text": "It was raining cats and dogs, so I stayed home all day.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "'Raining cats and dogs'形容下雨很大。直译为'下猫和狗'会困惑，对应中文'瓢泼大雨'。"
+  },
+  {
+    "id": 34,
+    "category": "slang",
+    "input_text": "This programming task is a piece of cake for an experienced developer.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "'Piece of cake'表示很容易的事。直译为'一块蛋糕'无法理解，中文对应'小菜一碟'。"
+  },
+  {
+    "id": 35,
+    "category": "slang",
+    "input_text": "Girl, spill the tea! Tell me all the drama about your ex.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "'Spill the tea'是年轻人俚语，表示说出八卦。直译为'倒茶'完全失意，应理解为'爆料'。"
+  },
+  {
+    "id": 36,
+    "category": "slang",
+    "input_text": "That concert was lit! The music and energy were absolutely amazing!",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "'That's lit'年轻人俚语表示'很酷、很兴奋'。直译为'燃烧的'会造成理解困难，应理解为'超棒的'。"
+  },
+  {
+    "id": 37,
+    "category": "slang",
+    "input_text": "I forgot to send that email. My bad, I'll do it right now.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "'My bad'非正式道歉，表示'我的错'。直译为'我的坏'在中文不自然，应理解为'不好意思'。"
+  },
+  {
+    "id": 38,
+    "category": "slang",
+    "input_text": "He ghosted me after our first date, never responded to my messages.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "'Ghost someone'表示无故消失、断绝联系。直译为'变成幽灵'会困惑，中文对应'消失无踪'。"
+  },
+  {
+    "id": 39,
+    "category": "slang",
+    "input_text": "She threw shade at him during the meeting, criticizing his ideas harshly.",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "'Throw shade'意为表达不满或嘲笑。直译为'扔阴影'毫无意义，应理解为'挖苦'或'讽刺'。"
+  },
+  {
+    "id": 40,
+    "category": "slang",
+    "input_text": "Why are you being so salty about losing the game? It's just for fun!",
+    "source_culture": "en-US",
+    "target_culture": "zh-CN",
+    "context": "'Salty'表示某人很沮丧、生气或嫉妒。直译为'咸的'完全无法理解，应理解为'不爽'或'生气'。"
+  }
+]

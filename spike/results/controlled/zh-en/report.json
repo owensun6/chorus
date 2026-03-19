@@ -1,0 +1,2387 @@
+{
+  "pair": "zh-en",
+  "a": "zh-CN",
+  "b": "en-US",
+  "minimax": {
+    "summary": {
+      "valid": 40,
+      "errors": 0,
+      "group_a": {
+        "intent": 3.8,
+        "cultural": 3.13,
+        "natural": 3.88
+      },
+      "group_b": {
+        "intent": 4.1,
+        "cultural": 3.48,
+        "natural": 4.28
+      },
+      "group_c": {
+        "intent": 3.83,
+        "cultural": 4.28,
+        "natural": 4.47
+      },
+      "a05": {
+        "result": "INCONCLUSIVE",
+        "delta": 0.35
+      },
+      "a08": {
+        "result": "CONFIRMED",
+        "delta": 0.8
+      }
+    },
+    "cases": [
+      {
+        "id": 1,
+        "category": "taboo",
+        "input": "你多大了？什么时候结婚？",
+        "group_a": {
+          "output": "How old are you? When are you getting married?",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "How old are you? When are you planning to get married?",
+          "scores": {
+            "intent": 2,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "How have you been lately? What have you been up to?",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 2,
+        "category": "taboo",
+        "input": "你怎么这么胖？应该多运动。",
+        "group_a": {
+          "output": "Why are you so fat? You should exercise more.",
+          "scores": {
+            "intent": 1,
+            "cultural": 1,
+            "natural": 1
+          }
+        },
+        "group_b": {
+          "output": "You seem to be gaining a bit of weight lately—maybe you should get more exercise.",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "\"Hey, I've been thinking about you lately. Would you like to go for a walk or hit the gym together sometime? I just want to make sure we're both taking care of our health.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 3,
+        "category": "taboo",
+        "input": "你月薪多少？这套房子花了多少钱？",
+        "group_a": {
+          "output": "How much is your monthly salary? How much did this house cost?",
+          "scores": {
+            "intent": 2,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"How much do you make a month? How much did this house cost?\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "How much do you earn per month? How much did this house cost?",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 4,
+        "category": "taboo",
+        "input": "你气色不好，脸色很苍白，是不是生病了？",
+        "group_a": {
+          "output": "You don't look well; your face is very pale. Are you sick?",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "You don't look well. Are you feeling okay?",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "You don't seem like yourself today. Are you feeling okay?",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 5,
+        "category": "taboo",
+        "input": "不行，这个事情我不能帮你。",
+        "group_a": {
+          "output": "No, I can't help you with this.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "Sorry, I'm not able to help you with this.",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "I'm not sure I can help with that.",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 6,
+        "category": "taboo",
+        "input": "（与初识者频繁身体接触如拍肩膀、搂腰）",
+        "group_a": {
+          "output": "Frequent physical contact with new acquaintances, such as patting their shoulders or putting an arm around their waist.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "Frequent physical contact with acquaintances or newly met people (such as patting on the shoulder, putting an arm around the waist)",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "**Cultural Insight: Personal Space Differences**\n\nIn Chinese culture, physical contact (such as patting someone's shoulder or putting an arm around their waist) is a common way to show friendliness and closeness with acquaintances.\n\nHowever, in American and British cultures, this level of physical contact with someone you don't know well can be perceived as an invasion of personal space and may make the other person uncomfortable.\n\n**Recommendation:** When interacting with people from Anglo-American backgrounds, it's advisable to maintain more physical distance and limit touch to brief handshakes or nods until a closer relationship is established.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 7,
+        "category": "taboo",
+        "input": "吃饭了吗？一起吃饭吧！你还要再吃点吗？",
+        "group_a": {
+          "output": "Have you eaten? Let's eat together! Do you want to eat more?",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "Have you eaten yet? Let's grab a meal together! Would you like some more?",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "Have you eaten yet? Would you like to join me for a meal?",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 8,
+        "category": "taboo",
+        "input": "（在公共场合说话很大声，挥舞夸张的手势）",
+        "group_a": {
+          "output": "(Speaking loudly in public and making exaggerated hand gestures)",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "Speaking loudly in public with exaggerated hand gestures.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "Speaking loudly in public and making exaggerated hand gestures.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 9,
+        "category": "taboo",
+        "input": "我最近便秘了。你的性生活怎么样？",
+        "group_a": {
+          "output": "I have been constipated recently. How is your sex life?",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "I've been constipated lately. How's your sex life?",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "I've been having some constipation issues lately. How are you doing?",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 10,
+        "category": "taboo",
+        "input": "你都这么老了，还单身，真是有点悲催。",
+        "group_a": {
+          "output": "You're already so old and still single. That's kind of sad.",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"You're already this old and still single — that's kind of sad.\"",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"You're getting up there and still single — that's kind of pathetic.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 11,
+        "category": "taboo",
+        "input": "Hey John, how are you doing today?",
+        "group_a": {
+          "output": "嘿，约翰，你今天怎么样？",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "嘿，John，你今天怎么样？",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "约翰，您今天还好吗？",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 12,
+        "category": "taboo",
+        "input": "What's your religion? Are you Christian or Buddhist?",
+        "group_a": {
+          "output": "你的宗教是什么？你是基督徒还是佛教徒？",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "你在信什么教？是基督教还是佛教？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "在中文语境中，这句话会让人感到有些突兀和冒犯。对方可能想了解你的信仰，但直接询问会被视为不礼貌。\n\n**文化适配后的理解：**\n对方在问你的宗教信仰是基督教还是佛教——这在中文交流中属于比较私人的话题。\n\n**典型的中文回应方式可能是：**\n\n- “呃……这个是我的个人隐私，不太方便说。”\n- “谢谢你的关心，我还没有特定的宗教信仰。”\n- 轻轻转移话题。",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 13,
+        "category": "taboo",
+        "input": "My uncle died last week. It's so funny because he left all his money to his cats!",
+        "group_a": {
+          "output": "我叔叔上周去世了。这真有意思，因为他把所有钱都留给了他的猫！",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "我叔叔上周去世了。太意外了，他居然把所有钱都留给了他的猫！",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "我叔叔上周去世了。令人意外的是，他把所有的钱都留给了他的猫。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 14,
+        "category": "taboo",
+        "input": "I'm completely broke right now, totally out of money.",
+        "group_a": {
+          "output": "我现在彻底破产了，一分钱都没有了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "我现在完全没钱了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "我现在手头有点紧，资金周转上有些困难。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 15,
+        "category": "taboo",
+        "input": "By the way, my wife and I are getting divorced next month.",
+        "group_a": {
+          "output": "顺便说一下，我和我妻子下个月要离婚了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "对了，我和我妻子下个月要离婚了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "对方提到家庭方面有些变化，下个月会有一些生活上的调整。",
+          "scores": {
+            "intent": 1,
+            "cultural": 4,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 16,
+        "category": "taboo",
+        "input": "You should really stop eating so much junk food and exercise more.",
+        "group_a": {
+          "output": "你真的应该少吃垃圾食品，多运动。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "你真的应该少吃垃圾食品，多运动了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "朋友建议我注意饮食，多运动。",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 17,
+        "category": "taboo",
+        "input": "How much did that suit cost? That watch must be expensive!",
+        "group_a": {
+          "output": "那套西装多少钱？那块手表肯定很贵！",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "那套西装多少钱？那块手表肯定很贵吧！",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "你这套西装真不错！这块表也很好看！",
+          "scores": {
+            "intent": 1,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 18,
+        "category": "taboo",
+        "input": "Hey boss, let's grab drinks after work! Just call me by my first name!",
+        "group_a": {
+          "output": "嘿，老板，下班后一起去喝一杯吧！叫我名字就好！",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "老板，下班后一起去喝一杯吧！叫我名字就行，别客气！",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "老板，下班后一起去喝一杯怎么样？叫我名字就行！",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 19,
+        "category": "taboo",
+        "input": "No thanks, I'm full. I don't want any more food.",
+        "group_a": {
+          "output": "不了，谢谢。我吃饱了。我不想再吃东西了。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "谢谢，我已经吃饱了，不需要再吃了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "谢谢，我已经吃饱了，真的不需要再加了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 20,
+        "category": "taboo",
+        "input": "Never give anyone a clock as a gift. Avoid the number 4 in addresses.",
+        "group_a": {
+          "output": "千万不要送别人钟作为礼物。避免在地址中使用数字4。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "温馨提示：在一些亚洲文化中，送钟被视为不吉利（因谐音\"送终\"），数字4也因谐音\"死\"而被视为不吉利。如果您在与来自这些文化背景的人士交往，建议避免将钟作为礼物，也不要在地址中使用数字4。",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "在英美文化中，有一些送礼和数字方面的传统观念需要注意：\n\n- **送礼禁忌**：不宜将时钟作为礼物赠送他人\n- **数字禁忌**：在地址中应避免使用数字4\n\n需要注意的是，这些观念在中文文化中有着更深层的含义：由于\"钟\"与\"终\"谐音、\"4\"与\"死\"谐音，这些禁忌被赋予了更严肃的文化意义，在中文语境下触犯这些禁忌会被视为不尊重。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 21,
+        "category": "slang",
+        "input": "他总是临时抱佛脚，考试前一天才开始复习。",
+        "group_a": {
+          "output": "He always waits until the last minute to study, only starting to review the day before the exam.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "He always crams for exams, not starting to review until the day before.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "He always waits until the last minute—only starts studying the day before the exam.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 22,
+        "category": "slang",
+        "input": "他去网吧打酱油，对什么都没兴趣。",
+        "group_a": {
+          "output": "He went to the internet cafe to kill time, but nothing interests him.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "He goes to the internet cafe just to kill time — he's not interested in anything.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "He just goes to the internet cafe to hang out and kill time—he's not really interested in anything.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 23,
+        "category": "slang",
+        "input": "别把这个烂摊子甩给我，你自己想办法。",
+        "group_a": {
+          "output": "Don't dump this mess on me; you figure it out yourself.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "Don't dump this mess on me. You figure it out yourself.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "Don't pass this mess to me. Figure it out yourself.",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 24,
+        "category": "slang",
+        "input": "你真是脑子进水了，怎么相信这种谎言？",
+        "group_a": {
+          "output": "Are you out of your mind? How could you believe such a lie?",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "How could you possibly believe such an obvious lie?",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "You really must have lost your mind, how could you believe such a lie?",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 25,
+        "category": "slang",
+        "input": "你这样做，吃不了兜着走，会有后果。",
+        "group_a": {
+          "output": "If you do this, you won’t get away with it—there will be consequences.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "If you do this, you'll have to face the consequences.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "You should know there will be consequences if you do this.",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 26,
+        "category": "slang",
+        "input": "他们感情破裂了，最后还摔了盘子。",
+        "group_a": {
+          "output": "Their relationship fell apart, and in the end they also smashed the plates.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "Their relationship broke down, and in the end they even smashed plates.",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "Their relationship fell apart in the end.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 27,
+        "category": "slang",
+        "input": "这个项目经理在挖坑，试图陷害竞争对手。",
+        "group_a": {
+          "output": "This project manager is digging a pit, trying to frame a competitor.",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "This project manager is setting a trap to frame the competition.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "This project manager is setting a trap to sabotage their rival.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 28,
+        "category": "slang",
+        "input": "你就杀鸡用牛刀了，这么简单的问题用不着这么复杂的方案。",
+        "group_a": {
+          "output": "You're using a sledgehammer to crack a nut. This simple problem doesn't need such a complicated solution.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "You're using a sledgehammer to crack a nut—this simple problem doesn't need such a complex solution.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "You're killing a fly with a sledgehammer here—this simple question doesn't need such a complex solution.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 29,
+        "category": "slang",
+        "input": "她在背后两面三刀，当面一套背后一套。",
+        "group_a": {
+          "output": "She is two-faced, saying one thing to your face but doing another behind your back.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "She is two-faced—she says one thing to your face and does another behind your back.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "She's a real backstabber — says one thing to your face and does another behind your back.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 30,
+        "category": "slang",
+        "input": "他总在朋友圈放烟火，炫耀自己的奢侈品。",
+        "group_a": {
+          "output": "He always posts fireworks on his Moments, showing off his luxury goods.",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "He always shows off his luxury items on Moments, like he's putting on a fireworks display.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "He always shows off his luxury items on social media.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 31,
+        "category": "slang",
+        "input": "That sick guitar solo was absolutely incredible!",
+        "group_a": {
+          "output": "那段吉他独奏简直太棒了！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "那段吉他solo简直太牛了！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "那支吉他独奏真是太棒了！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 32,
+        "category": "slang",
+        "input": "Good luck on your audition! Break a leg!",
+        "group_a": {
+          "output": "祝你的试演顺利！祝你好运！",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "祝你试演顺利！加油！",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "祝你试演顺利！祝你好运！",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 33,
+        "category": "slang",
+        "input": "It was raining cats and dogs, so I stayed home all day.",
+        "group_a": {
+          "output": "外面下着倾盆大雨，所以我整天待在家里。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "外面雨下得很大，所以我一整天都待在家里。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "雨下得很大，所以我一整天都待在家里。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 34,
+        "category": "slang",
+        "input": "This programming task is a piece of cake for an experienced developer.",
+        "group_a": {
+          "output": "对于一个有经验的开发者来说，这个编程任务是小菜一碟。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "对于有经验的开发者来说，这个编程任务是小菜一碟。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "对于有经验的开发者来说，这个编程任务简直是小菜一碟。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 35,
+        "category": "slang",
+        "input": "Girl, spill the tea! Tell me all the drama about your ex.",
+        "group_a": {
+          "output": "闺蜜，快说说！告诉我你前任的那些八卦。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "姐妹！快说说！给我讲讲你前任的那些八卦！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "有什么八卦快说说，告诉我你前任的那些事儿！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 36,
+        "category": "slang",
+        "input": "That concert was lit! The music and energy were absolutely amazing!",
+        "group_a": {
+          "output": "那场演唱会太燃了！音乐和氛围简直太棒了！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "那场演唱会太燃了！音乐和氛围都超级棒！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "那场演唱会太燃了！音乐和氛围都非常棒！",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 37,
+        "category": "slang",
+        "input": "I forgot to send that email. My bad, I'll do it right now.",
+        "group_a": {
+          "output": "我忘记发送那封邮件了。我的错，我现在就发。",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "我忘了发那封邮件了。抱歉，我现在就发。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "我忘了发那封邮件。不好意思，我现在就发。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 38,
+        "category": "slang",
+        "input": "He ghosted me after our first date, never responded to my messages.",
+        "group_a": {
+          "output": "他在第一次约会后就不理我了，从来没有回复我的消息。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "他在我们第一次约会后就突然消失了，再也没有回复我的消息。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "他第一次约会后就消失了，从来没有回复我的消息。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 39,
+        "category": "slang",
+        "input": "She threw shade at him during the meeting, criticizing his ideas harshly.",
+        "group_a": {
+          "output": "她在会议期间对他冷嘲热讽，严厉批评他的想法。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "她在会议上对他冷嘲热讽，严厉批评了他的想法。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "她在会议上挖苦他，对他的想法批评得很严厉。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 40,
+        "category": "slang",
+        "input": "Why are you being so salty about losing the game? It's just for fun!",
+        "group_a": {
+          "output": "你输掉游戏怎么这么较真啊？这只是闹着玩的！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "你干嘛输个游戏就这么较真呀？玩的就是开心嘛！",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "你怎么输个游戏这么大反应？打着玩而已！",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      }
+    ]
+  },
+  "dashscope": {
+    "summary": {
+      "valid": 40,
+      "errors": 0,
+      "group_a": {
+        "intent": 4.65,
+        "cultural": 3.1,
+        "natural": 4.58
+      },
+      "group_b": {
+        "intent": 4.63,
+        "cultural": 3.95,
+        "natural": 4.8
+      },
+      "group_c": {
+        "intent": 4.4,
+        "cultural": 4.38,
+        "natural": 4.8
+      },
+      "a05": {
+        "result": "CONFIRMED",
+        "delta": 0.85
+      },
+      "a08": {
+        "result": "CONFIRMED",
+        "delta": 0.43
+      }
+    },
+    "cases": [
+      {
+        "id": 1,
+        "category": "taboo",
+        "input": "你多大了？什么时候结婚？",
+        "group_a": {
+          "output": "How old are you? When are you getting married?",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"How old are you? When are you getting married?\"\n\n(Note: In Chinese culture, these are common small-talk questions showing interest in your life stage and family plans, not typically considered intrusive. The tone is usually casual and well-meaning.)",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"How old are you? When are you getting married?\"\n\n*Note: In English-speaking cultures, these questions are considered intrusive and inappropriate, especially when asked of women. The speaker likely intends friendly social interest, but this phrasing would cause discomfort or offense.*",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 2,
+        "category": "taboo",
+        "input": "你怎么这么胖？应该多运动。",
+        "group_a": {
+          "output": "Why are you so fat? You should exercise more.",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"Looks like you've been enjoying life! Want to join me for a workout sometime?\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "Your friend is checking in on your health and suggesting you stay active.",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 3,
+        "category": "taboo",
+        "input": "你月薪多少？这套房子花了多少钱？",
+        "group_a": {
+          "output": "What's your monthly salary? How much did this apartment/house cost?",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "What's your monthly salary? How much did you spend on this apartment?",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "**Adapted message for English (US/UK) context:**\n\n\"Hey, I'm curious—if you don't mind me asking, what field do you work in? And are you happy with how the housing search went?\"\n\n---\n\n**Brief note:** The original Chinese questions about specific salary and home price are direct and culturally acceptable in zh-CN. In English-speaking cultures, these are considered highly intrusive. The adapted version asks about professional field and general satisfaction instead—achieving friendly conversation without crossing boundaries.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 4,
+        "category": "taboo",
+        "input": "你气色不好，脸色很苍白，是不是生病了？",
+        "group_a": {
+          "output": "You don't look well. Your face is very pale. Are you sick?",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"The user looks concerned and is asking if you're feeling unwell—they noticed you seem pale and tired.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"You look a bit under the weather today—are you feeling okay?\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 5,
+        "category": "taboo",
+        "input": "不行，这个事情我不能帮你。",
+        "group_a": {
+          "output": "No, I can't help you with this.",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "I can't help you with this.",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "I need to think this over and get back to you.",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 6,
+        "category": "taboo",
+        "input": "（与初识者频繁身体接触如拍肩膀、搂腰）",
+        "group_a": {
+          "output": "(Frequent physical contact with acquaintances, such as patting shoulders or putting an arm around the waist)",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "**Cultural Note for User:**\n\nThe person you're interacting with may engage in frequent physical touch (patting shoulders, putting arm around waist) despite being a new acquaintance. In Chinese mainland culture, this can signal:\n- Warmth and attempted closeness/friendliness\n- Possible regional habit (more common in northern China)\n- Sometimes used to establish hierarchy or dominance in certain contexts\n\n**Suggested response approach:** If comfortable, reciprocate lightly; if not, step back subtly while maintaining verbal warmth to avoid causing loss of face.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "In English-speaking cultures, frequent physical touch with someone you've just met—like patting their shoulder or putting an arm around their waist—is generally considered a significant invasion of personal space and can make people uncomfortable. While physical touch signals closeness in Chinese culture, it's best to keep more distance with new acquaintances in British and American contexts until a warmer rapport develops.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 7,
+        "category": "taboo",
+        "input": "吃饭了吗？一起吃饭吧！你还要再吃点吗？",
+        "group_a": {
+          "output": "Have you eaten? Let's eat together! Would you like some more?",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "Hey, want to grab a meal together? Or if you've already eaten, there's more food here if you're still hungry!",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"Would you like to grab a meal together? No pressure at all—just thought I'd extend the invitation.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 8,
+        "category": "taboo",
+        "input": "（在公共场合说话很大声，挥舞夸张的手势）",
+        "group_a": {
+          "output": "(Speaking very loudly in public with exaggerated hand gestures)",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "The person is speaking very loudly in public with exaggerated hand gestures.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "The person is speaking quite loudly with animated hand gestures in a public setting. In Chinese culture, this conveys enthusiasm and directness, though it may come across differently in other contexts.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 9,
+        "category": "taboo",
+        "input": "我最近便秘了。你的性生活怎么样？",
+        "group_a": {
+          "output": "I've been constipated lately. How's your sex life?",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"I've been dealing with some digestive issues lately. How have you been feeling overall?\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "I've been dealing with some digestive issues lately. How have you been doing overall?",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 10,
+        "category": "taboo",
+        "input": "你都这么老了，还单身，真是有点悲催。",
+        "group_a": {
+          "output": "You're so old and still single—kind of tragic, honestly.",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "Here's how this message comes across in Chinese cultural context:\n\n---\n\n**Cultural context:** This is a classic example of \"关心式吐槽\" (affectionate teasing disguised as concern) — common among older relatives or acquaintances in Chinese culture. The speaker isn't being cruel; they're expressing **genuine worry about your life trajectory** using blunt, hyperbolic language that would be considered inappropriate in English.\n\n**What they're actually communicating:**\n- \"I care about your wellbeing\"\n- \"I worry you might be lonely\"\n- \"I want you to find happiness (through marriage)\"\n\n**The emotional undertone:** Concern + mild social pressure + perhaps a dash of conversational filler (like commenting on weather)\n\n---\n\n**If you want to respond in a way that preserves harmony:**\n\n*\"Thanks for thinking of me! I'm actually pretty content with how things are right now, but I appreciate you caring.\"*\n\n(Validates their concern without agreeing with their premise, then redirects.)",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"Still single at your age? That's rough.\"\n\n*Note: This is how the message would land in English—casual teasing in some Chinese contexts, but potentially intrusive or insensitive in Western professional/social settings. The speaker may not intend harm, but the comment on age and relationship status can easily backfire.*",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 11,
+        "category": "taboo",
+        "input": "Hey John, how are you doing today?",
+        "group_a": {
+          "output": "嘿约翰，你今天怎么样？",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "约翰，今天怎么样？",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "约翰，今天怎么样？",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 12,
+        "category": "taboo",
+        "input": "What's your religion? Are you Christian or Buddhist?",
+        "group_a": {
+          "output": "你的宗教信仰是什么？你是基督徒还是佛教徒？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "对方问的是你的宗教信仰，具体问你是基督徒还是佛教徒。\n\n在美式英语文化中，这是一个比较直接的私人问题。虽然在美国宗教话题相对公开，但初次交流时直接这样问可能略显突兀，对方可能想快速了解你的价值观背景，或寻找共同话题。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "对方问的是您的宗教信仰，具体问您是基督徒还是佛教徒。\n\n在中文语境下，这种直接询问属于比较私人的话题。如果您愿意分享，可以简单回应；如果希望保持距离，也可以委婉带过，比如说\"我没什么特定信仰\"或\"我比较尊重各种文化\"。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 13,
+        "category": "taboo",
+        "input": "My uncle died last week. It's so funny because he left all his money to his cats!",
+        "group_a": {
+          "output": "我叔叔上周去世了。太好笑了，因为他把所有的钱都留给了他的猫！",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "我叔叔上周去世了。特别让人哭笑不得的是，他把所有遗产都留给了他的猫！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "我叔叔上周去世了。他把所有遗产都留给了他的猫，这事挺让人哭笑不得的。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 14,
+        "category": "taboo",
+        "input": "I'm completely broke right now, totally out of money.",
+        "group_a": {
+          "output": "我现在完全破产了，一分钱都没有了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "我现在手头紧，一点钱都没有了。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "我现在手头比较紧/最近经济上有点紧张。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 15,
+        "category": "taboo",
+        "input": "By the way, my wife and I are getting divorced next month.",
+        "group_a": {
+          "output": "顺便说一下，我和我妻子下个月要离婚了。",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "对了，我和我妻子下个月要离婚了。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "对了，我和我妻子下个月要办离婚了。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 16,
+        "category": "taboo",
+        "input": "You should really stop eating so much junk food and exercise more.",
+        "group_a": {
+          "output": "你真的应该停止吃这么多垃圾食品，多运动。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "您平时饮食可以注意少些高热量零食，多活动活动，对身体会更好。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "你最近吃得健康点，有空也多动动，对身体好。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 17,
+        "category": "taboo",
+        "input": "How much did that suit cost? That watch must be expensive!",
+        "group_a": {
+          "output": "那套西装花了多少钱？那块表一定很贵吧！",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "那件西装花了多少钱？那块表肯定不便宜吧！",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"您这身西装和手表看起来很有品位，是在哪里选购的？\"\n\n（将直接询问价格转化为对品味和购买渠道的赞赏式询问，既保留了对方对衣着的关注，又避免了中文文化中涉及隐私的唐突感。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 18,
+        "category": "taboo",
+        "input": "Hey boss, let's grab drinks after work! Just call me by my first name!",
+        "group_a": {
+          "output": "嘿老板，下班后一起去喝一杯吧！直接叫我名字就行！",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "老板，下班后一起去喝一杯吧！叫我名字就行，别客气。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "领导，下班后方便的话，想请您小酌一杯。另外，您叫我名字就好。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 19,
+        "category": "taboo",
+        "input": "No thanks, I'm full. I don't want any more food.",
+        "group_a": {
+          "output": "不用了，谢谢，我吃饱了。我不想再吃了。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "不用了，谢谢。我已经吃饱了，不想再吃了。",
+          "scores": {
+            "intent": 5,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "我已经吃饱了，谢谢您的好意。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 20,
+        "category": "taboo",
+        "input": "Never give anyone a clock as a gift. Avoid the number 4 in addresses.",
+        "group_a": {
+          "output": "永远不要送钟给别人作为礼物。避免在地址中使用数字4。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "送钟谐音\"送终\"，是送礼大忌。地址、楼层、房间号尽量避开数字4，谐音\"死\"，寓意不吉。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "在中国文化中，送钟作为礼物是大忌，因为\"钟\"与\"终\"谐音，寓意不祥；同样，地址或楼层中应避免数字4，因其与\"死\"谐音。这些禁忌根植于文化传统，若忽视可能被视为对对方的不尊重。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 21,
+        "category": "slang",
+        "input": "他总是临时抱佛脚，考试前一天才开始复习。",
+        "group_a": {
+          "output": "He always crams at the last minute, only starting to review the day before the exam.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "He always crams at the last minute, only starting to review the day before exams.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "He always crams at the last minute—doesn't start studying until the day before the exam.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 22,
+        "category": "slang",
+        "input": "他去网吧打酱油，对什么都没兴趣。",
+        "group_a": {
+          "output": "He went to the internet café just to kill time, with no interest in anything.",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "He went to an internet café just to kill time—he's not interested in anything right now.",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "He's just killing time at the internet café—doesn't care about anything.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 23,
+        "category": "slang",
+        "input": "别把这个烂摊子甩给我，你自己想办法。",
+        "group_a": {
+          "output": "Don't dump this mess on me; figure it out yourself.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "Don't dump this mess on me—figure it out yourself.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "Don't dump this mess on me—you need to figure it out yourself.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 24,
+        "category": "slang",
+        "input": "你真是脑子进水了，怎么相信这种谎言？",
+        "group_a": {
+          "output": "You're out of your mind. How could you believe such a lie?",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"That's a really poor judgment call—how could you fall for something like that?\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"Are you out of your mind, believing something like that?\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 25,
+        "category": "slang",
+        "input": "你这样做，吃不了兜着走，会有后果。",
+        "group_a": {
+          "output": "Do this, and you'll face serious consequences—you won't get away with it.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"If you go ahead with this, you'll have to face the consequences. This won't end well for you.\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "If you go ahead with this, you'll have to face the consequences.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 26,
+        "category": "slang",
+        "input": "他们感情破裂了，最后还摔了盘子。",
+        "group_a": {
+          "output": "Their relationship fell apart, and in the end they even smashed plates.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "They had a falling out, and things got pretty heated—plates were smashed.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "They had a falling out and ended up breaking up.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 27,
+        "category": "slang",
+        "input": "这个项目经理在挖坑，试图陷害竞争对手。",
+        "group_a": {
+          "output": "This project manager is digging a pit, trying to frame a competitor.",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "This project manager is setting a trap to sabotage a competitor.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "This project manager is setting a trap to sabotage the competitor.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 28,
+        "category": "slang",
+        "input": "你就杀鸡用牛刀了，这么简单的问题用不着这么复杂的方案。",
+        "group_a": {
+          "output": "You're using a sledgehammer to crack a nut—such a simple problem doesn't require such a complicated solution.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "You're overcomplicating this—a simple solution would work just fine for such a straightforward issue.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "You're overcomplicating this—a simple solution would do just fine.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 29,
+        "category": "slang",
+        "input": "她在背后两面三刀，当面一套背后一套。",
+        "group_a": {
+          "output": "She's two-faced, saying one thing to your face and another behind your back.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "She's two-faced—sweet to your face but stabs you in the back.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "She's a backstabber—sweet to your face, then talks trash behind your back.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 30,
+        "category": "slang",
+        "input": "他总在朋友圈放烟火，炫耀自己的奢侈品。",
+        "group_a": {
+          "output": "He's always posting flashy displays on social media, showing off his luxury goods.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "He's always posting flashy lifestyle content on social media, showing off his luxury purchases.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "He's always showing off his luxury goods on social media, making a big spectacle of it.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 31,
+        "category": "slang",
+        "input": "That sick guitar solo was absolutely incredible!",
+        "group_a": {
+          "output": "那段吉他独奏简直不可思议！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "那吉他独奏太绝了，简直不可思议！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "那段吉他独奏太炸了，简直不可思议！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 32,
+        "category": "slang",
+        "input": "Good luck on your audition! Break a leg!",
+        "group_a": {
+          "output": "祝你试镜顺利！加油！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "祝面试顺利！加油！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "祝你试镜顺利！大获成功！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 33,
+        "category": "slang",
+        "input": "It was raining cats and dogs, so I stayed home all day.",
+        "group_a": {
+          "output": "下着倾盆大雨，所以我整天都待在家里。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "雨下得特别大，所以我整天都待在家里。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "雨下得特别大，所以我整天都待在家里没出门。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 34,
+        "category": "slang",
+        "input": "This programming task is a piece of cake for an experienced developer.",
+        "group_a": {
+          "output": "这个编程任务对有经验的开发者来说是小菜一碟。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "这个编程任务对有经验的开发者来说轻而易举。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "这个编程任务对有经验的开发者来说小菜一碟。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 35,
+        "category": "slang",
+        "input": "Girl, spill the tea! Tell me all the drama about your ex.",
+        "group_a": {
+          "output": "女孩，快爆料！告诉我你前任的所有八卦。",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "姐妹，快八卦一下！跟我讲讲你前任的那些事儿。",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "姐妹，快八卦一下！跟我讲讲你前任的那些事儿呗。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 36,
+        "category": "slang",
+        "input": "That concert was lit! The music and energy were absolutely amazing!",
+        "group_a": {
+          "output": "那场演唱会太燃了！音乐和氛围都超级棒！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "那场演唱会太燃了！音乐和现场氛围都绝了！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "那场演唱会太燃了！音乐和现场氛围都超棒！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 37,
+        "category": "slang",
+        "input": "I forgot to send that email. My bad, I'll do it right now.",
+        "group_a": {
+          "output": "我忘了发那封邮件。我的错，我现在就发。",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "我忘了发那封邮件。是我的疏忽，我现在马上处理。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "我忘了发那封邮件，不好意思，我现在马上发。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 38,
+        "category": "slang",
+        "input": "He ghosted me after our first date, never responded to my messages.",
+        "group_a": {
+          "output": "他在第一次约会后就对我玩消失，再也不回我的消息。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "他第一次约会后就消失了，再也没回我消息。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "他第一次约会后就消失无踪了，消息也不回。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 39,
+        "category": "slang",
+        "input": "She threw shade at him during the meeting, criticizing his ideas harshly.",
+        "group_a": {
+          "output": "她在会议上对他冷嘲热讽，严厉批评了他的想法。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "她在会议上对他毫不留情，尖锐批评了他的想法。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "她在会议上对他冷嘲热讽，把他的想法批得一无是处。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 40,
+        "category": "slang",
+        "input": "Why are you being so salty about losing the game? It's just for fun!",
+        "group_a": {
+          "output": "你为什么对输了比赛这么耿耿于怀？这只是为了好玩而已！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "你怎么输了游戏就气成这样？不就是玩玩嘛！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "你怎么输了游戏这么不爽啊？不就是玩玩嘛！",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,2387 @@
+{
+  "pair": "ja-en",
+  "a": "ja",
+  "b": "en-US",
+  "minimax": {
+    "summary": {
+      "valid": 40,
+      "errors": 0,
+      "group_a": {
+        "intent": 3.45,
+        "cultural": 3.23,
+        "natural": 4.13
+      },
+      "group_b": {
+        "intent": 3.67,
+        "cultural": 3.77,
+        "natural": 4.38
+      },
+      "group_c": {
+        "intent": 3.65,
+        "cultural": 3.55,
+        "natural": 4.15
+      },
+      "a05": {
+        "result": "CONFIRMED",
+        "delta": 0.54
+      },
+      "a08": {
+        "result": "INCONCLUSIVE",
+        "delta": -0.22
+      }
+    },
+    "cases": [
+      {
+        "id": 1,
+        "category": "taboo",
+        "input": "太りましたね",
+        "group_a": {
+          "output": "You've gained weight, haven't you?",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "You've put on a little weight, haven't you?",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "You've gained a little weight, haven't you?",
+          "scores": {
+            "intent": 2,
+            "cultural": 1,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 2,
+        "category": "taboo",
+        "input": "お子さんはまだですか？",
+        "group_a": {
+          "output": "Do you have any children yet?",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"Do you have any children?\"",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "Do you have children?",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 3,
+        "category": "taboo",
+        "input": "女性らしくない服ですね",
+        "group_a": {
+          "output": "This is not feminine clothing.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "That's not very feminine clothing.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "That doesn't seem like typical women's clothing.",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 4,
+        "category": "taboo",
+        "input": "歳はいくつですか？",
+        "group_a": {
+          "output": "How old are you?",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "How old are you?",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "How old are you? (Note: In Japanese culture, asking about age is a common polite greeting, but in American context this may be considered slightly impolite, especially toward women.)",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 5,
+        "category": "taboo",
+        "input": "独身ですか？",
+        "group_a": {
+          "output": "Are you single?",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "Are you single?",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"Are you currently single?\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 6,
+        "category": "taboo",
+        "input": "可愛いですね",
+        "group_a": {
+          "output": "It's cute.",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "That's so cute!",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "That's lovely, isn't it?",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 7,
+        "category": "taboo",
+        "input": "お酒が飲めないなんて、大丈夫ですか？",
+        "group_a": {
+          "output": "Are you okay with not being able to drink?",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "\"Is it okay that you can't drink?\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "\"You can't drink alcohol? Are you all right?\"",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 8,
+        "category": "taboo",
+        "input": "痩せましたね。何かあったんですか？",
+        "group_a": {
+          "output": "You've gotten thin. What happened?",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "You've lost weight! Is everything okay?",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "You look like you've lost some weight. Is everything okay?",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 9,
+        "category": "taboo",
+        "input": "容姿が良いですね",
+        "group_a": {
+          "output": "You have a nice appearance.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "You look beautiful.",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "You look great today!",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 10,
+        "category": "taboo",
+        "input": "女のくせに車を運転するんですか？",
+        "group_a": {
+          "output": "Are you driving a car despite being a woman?",
+          "scores": {
+            "intent": 3,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "A woman driving a car?",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"Are you the one who drives?\"",
+          "scores": {
+            "intent": 1,
+            "cultural": 1,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 11,
+        "category": "taboo",
+        "input": "I disagree with that approach",
+        "group_a": {
+          "output": "そのアプローチには同意できません",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "そのやり方には賛成できません。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "別の捉え方もあるかと思いますが。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 12,
+        "category": "taboo",
+        "input": "I don't think that's a good idea",
+        "group_a": {
+          "output": "私はそれが良い考えだとは思いません。",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "それはどうかなと思います",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "別のアプローチを検討いただいた方がよろしいかもしれません",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 13,
+        "category": "taboo",
+        "input": "You're wrong about that",
+        "group_a": {
+          "output": "それは違います",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "それは違います",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "別のご説明ができるかもしれません",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 14,
+        "category": "taboo",
+        "input": "Why do you think that will work?",
+        "group_a": {
+          "output": "なぜそれが機能すると思いますか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "なぜうまくいくと思うの？",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "なぜそう思われるのでしょうか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 15,
+        "category": "taboo",
+        "input": "Can I ask you something personal?",
+        "group_a": {
+          "output": "少し個人的なことを聞いていいですか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "個人的なことを聞いてもよろしいですか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "，有些ことにお話を伺ってもよろしいでしょうか。",
+          "scores": {
+            "intent": 2,
+            "cultural": 3,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 16,
+        "category": "taboo",
+        "input": "What's your salary?",
+        "group_a": {
+          "output": "あなたの給与はいくらですか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "仕事はされていますか？",
+          "scores": {
+            "intent": 1,
+            "cultural": 2,
+            "natural": 1
+          }
+        },
+        "group_c": {
+          "output": "年收入はいくらですか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 17,
+        "category": "taboo",
+        "input": "Let me point out where you made a mistake",
+        "group_a": {
+          "output": "あなたの間違っていた所を指摘させてください。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "恐れ入ります。異なる部分がございますので、説明させてください。",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "某所の改善点を説明させてください",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 18,
+        "category": "taboo",
+        "input": "I'm going to do it my way",
+        "group_a": {
+          "output": "自分のやり方でやる",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "自分の方法でやります",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "自分のやり方で進めさせていただきます。",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 19,
+        "category": "taboo",
+        "input": "I'm not comfortable with that decision",
+        "group_a": {
+          "output": "その決定には賛成できません",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "その決定には少し不安があります",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "その決定には賛成できません",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 20,
+        "category": "taboo",
+        "input": "That doesn't make sense to me",
+        "group_a": {
+          "output": "それは私には理解できません",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "それがよく分からないんですが",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "私にはよく理解できません",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 21,
+        "category": "slang",
+        "input": "木に竹を接ぐ",
+        "group_a": {
+          "output": "to graft bamboo onto a tree",
+          "scores": {
+            "intent": 1,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "Grafting bamboo onto a tree—an idiom meaning to force together things that are fundamentally incompatible.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "A Japanese idiom meaning trying to force incompatible things together—like grafting bamboo onto a tree, where they simply don't belong.",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 22,
+        "category": "slang",
+        "input": "猫の手も借りたい",
+        "group_a": {
+          "output": "I could use even a cat's help (meaning: I'm so busy I could use any help available).",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "\"I'm so busy I could really use an extra hand right now.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "I'm so busy I'd really appreciate any help I can get.",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 23,
+        "category": "slang",
+        "input": "馬の耳に念仏",
+        "group_a": {
+          "output": "to talk to a brick wall",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "Preaching to the deaf (casting pearls before swine)",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "This is a Japanese idiom meaning \"preaching to deaf ears\" — talking to someone who simply won't listen. It's often used when your advice or warnings go in one ear and out the other.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 24,
+        "category": "slang",
+        "input": "頭が固い",
+        "group_a": {
+          "output": "stubborn (or narrow-minded/inflexible)",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "Stubborn / Set in their ways",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "Stubborn / Set in their ways / Inflexible (said of someone who won't change their mind easily)",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 25,
+        "category": "slang",
+        "input": "腰が引ける",
+        "group_a": {
+          "output": "to flinch / to shrink back / to hold back",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "The original message means \"to get cold feet\" or \"to shrink back due to fear/intimidation.\"",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "Here's a culturally adapted rendering of the Japanese idiom:\n\n**\"to shrink back\"** or **\"to lose one's nerve\"**\n\n(Note: The phrase literally evokes pulling one's waist back — a physical image of recoiling or retreating — which these English equivalents only partially capture.)",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 3
+          }
+        }
+      },
+      {
+        "id": 26,
+        "category": "slang",
+        "input": "鼻が高い",
+        "group_a": {
+          "output": "to be proud / to be arrogant",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "To be arrogant or self-important (Japanese idiom literally meaning \"high-nosed,\" used to describe someone who is smug or condescending due to their achievements)",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "To be proud or self-important (idiom: literally \"high nose\" in Japanese)",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 27,
+        "category": "slang",
+        "input": "猫をかぶる",
+        "group_a": {
+          "output": "\"猫をかぶる\" (neko wo kaburu) is a Japanese idiom that means \"to play innocent\" or \"to act coy/demure.\" It literally translates to \"wearing a cat\" and is used when someone pretends to be naive or innocent, often to avoid blame or responsibility.\n\nThe most accurate translation would be: **to play innocent** or **to act coy**.",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "To play innocent / To act naive",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "To act innocent or pretend to be naive (when one is actually up to something).",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 28,
+        "category": "slang",
+        "input": "手がける",
+        "group_a": {
+          "output": "to undertake; to handle; to work on",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "to undertake; to take on",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"Tackle\" or \"take on\" (the work/project)",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 29,
+        "category": "slang",
+        "input": "口が堅い",
+        "group_a": {
+          "output": "tight‑lipped",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "tight-lipped (good at keeping secrets)",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "tight-lipped (good at keeping secrets)",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 30,
+        "category": "slang",
+        "input": "目玉焼き",
+        "group_a": {
+          "output": "fried egg (sunny-side up)",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "sunny-side up egg (a fried egg cooked on one side with the yolk still runny)",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "Hey, did you know the Japanese word \"medamayaki\" literally means \"fried eyeball\"? 😂 It's actually just a sunny-side-up egg — the kind with the yolk facing up, so it looks like an eye. It's funny how that happened — they just saw the resemblance and went with it!",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 31,
+        "category": "slang",
+        "input": "It's raining cats and dogs",
+        "group_a": {
+          "output": "土砂降りです",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "土砂降りです",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "大雨だね",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 32,
+        "category": "slang",
+        "input": "Break a leg",
+        "group_a": {
+          "output": "頑張って！",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "頑張って！",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "頑張って！（祝你好运）",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 33,
+        "category": "slang",
+        "input": "Piece of cake",
+        "group_a": {
+          "output": "簡単なこと",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "朝飯前だよ",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "お茶の子さいさいだよ",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 34,
+        "category": "slang",
+        "input": "Under the weather",
+        "group_a": {
+          "output": "体の調子が悪い",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "少し体の調子が悪いのです。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "ちょっと体の調子が悪いです",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 35,
+        "category": "slang",
+        "input": "Barking up the wrong tree",
+        "group_a": {
+          "output": "見当違いをしている",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "見当違いだ",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "筋違いのことを言っているようです。",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 36,
+        "category": "slang",
+        "input": "Better half",
+        "group_a": {
+          "output": "連れ合い",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "パートナー",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "妻（或者「主人」）",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 2
+          }
+        }
+      },
+      {
+        "id": 37,
+        "category": "slang",
+        "input": "Burning bridges",
+        "group_a": {
+          "output": "橋を燃やす",
+          "scores": {
+            "intent": 3,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "退路を断つ",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "関係を断つことですね。",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 38,
+        "category": "slang",
+        "input": "Caught red-handed",
+        "group_a": {
+          "output": "現行犯で捕まる",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "現行犯で捕まりました",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "現行犯で捕まりました",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 39,
+        "category": "slang",
+        "input": "Hit the hay",
+        "group_a": {
+          "output": "寝る",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "寝よう",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "寝ます",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 40,
+        "category": "slang",
+        "input": "Ball is in your court",
+        "group_a": {
+          "output": "後はあなたの番です",
+          "scores": {
+            "intent": 3,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "「後はあなたの判断次第です」",
+          "scores": {
+            "intent": 3,
+            "cultural": 3,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "您的番です。",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      }
+    ]
+  },
+  "dashscope": {
+    "summary": {
+      "valid": 40,
+      "errors": 0,
+      "group_a": {
+        "intent": 4.05,
+        "cultural": 2.6,
+        "natural": 4.15
+      },
+      "group_b": {
+        "intent": 4.3,
+        "cultural": 3.25,
+        "natural": 4.53
+      },
+      "group_c": {
+        "intent": 4.2,
+        "cultural": 4.2,
+        "natural": 4.72
+      },
+      "a05": {
+        "result": "CONFIRMED",
+        "delta": 0.65
+      },
+      "a08": {
+        "result": "CONFIRMED",
+        "delta": 0.95
+      }
+    },
+    "cases": [
+      {
+        "id": 1,
+        "category": "taboo",
+        "input": "太りましたね",
+        "group_a": {
+          "output": "You've gained weight.",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"It looks like you've put on some weight.\"\n\n(Note: This is a direct observation about weight gain, which in Japanese culture can sometimes be mentioned casually among close acquaintances, though it may still carry varying degrees of social acceptability depending on context and relationship.)",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"They've noticed a change in your appearance.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 2,
+        "category": "taboo",
+        "input": "お子さんはまだですか？",
+        "group_a": {
+          "output": "Do you have children yet? / Don't you have children yet?",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"Do you have children yet?\" / \"Are you planning to have kids?\"\n\n*(Note: This is a culturally sensitive question in Japanese context—often asked with assumptions about life stage expectations. Tone may range from casual curiosity to social pressure depending on relationship.)*",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"Do you have any kids?\" or \"Have you started a family yet?\"\n\n*Cultural note: This is a common, well-intentioned question in Japanese social and workplace contexts, but be aware that in American culture this can feel intrusive—it's often seen as probing into personal family planning or fertility matters. The asker likely means it as casual small talk with no ill intent.*",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 3,
+        "category": "taboo",
+        "input": "女性らしくない服ですね",
+        "group_a": {
+          "output": "These aren't very feminine clothes, are they?",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"That's not a very feminine outfit.\" / \"That's a rather unfeminine look.\"\n\n(Note: This is a potentially sensitive comment in Japanese culture that carries subtle judgment about gender norms. The tone can range from casual observation to mild criticism depending on context.)",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"They're saying your outfit isn't very feminine—it's a pretty common style comment here, though it can come across as prescriptive.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 4,
+        "category": "taboo",
+        "input": "歳はいくつですか？",
+        "group_a": {
+          "output": "How old are you?",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"How old are you?\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"How old are you?\"\n\n*Note: In American culture, this direct question is often considered impolite, especially toward women, as it may imply judgment about age. Consider whether this information is necessary, or if a more indirect approach would be appropriate.*",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 5,
+        "category": "taboo",
+        "input": "独身ですか？",
+        "group_a": {
+          "output": "Are you single?",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "Are you single?",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"Are you single?\" / \"Are you married?\"\n\n*Note: In Japanese culture, this is a common conversation topic even in semi-formal settings. However, in American culture, this would typically be considered overly personal for workplace or early acquaintance contexts. Consider whether this question serves a clear purpose (e.g., seating arrangements, plus-one for events) before asking, or frame it more indirectly if appropriate.*",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 6,
+        "category": "taboo",
+        "input": "可愛いですね",
+        "group_a": {
+          "output": "It's cute, isn't it? / How cute!",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"That's adorable / How cute\"\n\n(Note: In Japanese culture, \"kawaii\" (可愛い) is a versatile expression used far more broadly than English \"cute\"—it can describe anything from objects to behaviors to situations, often conveying appreciation, affection, or even admiration for something well-executed or charming, not just literal cuteness. The tone is typically warm, positive, and socially bonding.)",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"That's really charming\" / \"I like your style\" / \"That's a lovely look\"\n\n（注：根据具体语境，也可译为 \"You look great\" 或 \"That's really nice\"——避免直接使用 \"cute\" 形容成年女性，以符合英语文化习惯。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 7,
+        "category": "taboo",
+        "input": "お酒が飲めないなんて、大丈夫ですか？",
+        "group_a": {
+          "output": "Can't you drink alcohol? Are you okay with that?",
+          "scores": {
+            "intent": 2,
+            "cultural": 1,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "\"Are you okay not drinking?\" / \"Is it alright that you don't drink?\"\n\n*Cultural note: This is a casual check-in, common in Japanese drinking culture where not drinking can sometimes make people feel left out. The speaker is likely being considerate rather than judgmental—making sure you're comfortable with the situation.*",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"They're asking if you're okay with not drinking—it's a cultural check-in, not pressure. In Japan, declining alcohol can sometimes create social friction, so they're likely offering an opening for you to explain or just confirming you're comfortable.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 8,
+        "category": "taboo",
+        "input": "痩せましたね。何かあったんですか？",
+        "group_a": {
+          "output": "You've lost weight. Did something happen?",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "You've lost some weight. Is everything okay?",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"They mentioned that you look like you've lost some weight and asked if everything's okay with you.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 9,
+        "category": "taboo",
+        "input": "容姿が良いですね",
+        "group_a": {
+          "output": "You have a good appearance. / You look good. / You're good-looking.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"You have a great presence\" or \"You look lovely\" — a polite, culturally appropriate compliment in Japanese context, typically meant as gracious social warmth rather than forward personal remark.",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_c": {
+          "output": "\"They mentioned that you present yourself well.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 10,
+        "category": "taboo",
+        "input": "女のくせに車を運転するんですか？",
+        "group_a": {
+          "output": "A woman driving a car? / You're a woman and you drive? (implied: despite being a woman)",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"You're a woman and you drive?\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"Do you drive?\"",
+          "scores": {
+            "intent": 2,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 11,
+        "category": "taboo",
+        "input": "I disagree with that approach",
+        "group_a": {
+          "output": "そのアプローチには賛同できません。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "そのアプローチには賛同しかねます。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "そのアプローチについて、懸念点がございます。別の視点からご検討いただけますでしょうか。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 12,
+        "category": "taboo",
+        "input": "I don't think that's a good idea",
+        "group_a": {
+          "output": "それは良い考えだとは思いません。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "それはあまり良いアイデアではないかもしれませんね。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "申し訳ございませんが、もう少しご相談させていただけますでしょうか。",
+          "scores": {
+            "intent": 2,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 13,
+        "category": "taboo",
+        "input": "You're wrong about that",
+        "group_a": {
+          "output": "それについては間違っています。",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "その点については、少し違う見方があります。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "その点については、少し違う見方もあるかもしれません。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 14,
+        "category": "taboo",
+        "input": "Why do you think that will work?",
+        "group_a": {
+          "output": "なぜそれがうまくいくと思うのですか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "なぜそれがうまくいくと思うんですか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "なぜその方法が有効だと考えているのでしょうか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 15,
+        "category": "taboo",
+        "input": "Can I ask you something personal?",
+        "group_a": {
+          "output": "個人的なことを聞いてもいいですか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "個人的なことを聞いてもいいですか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "個人的なことをお聞きしてもよろしいでしょうか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 16,
+        "category": "taboo",
+        "input": "What's your salary?",
+        "group_a": {
+          "output": "あなたの給料はいくらですか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "お給料はいくらですか？ / 年収を教えていただけますか？",
+          "scores": {
+            "intent": 5,
+            "cultural": 1,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "お給料についてお聞きしてもよろしいでしょうか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 17,
+        "category": "taboo",
+        "input": "Let me point out where you made a mistake",
+        "group_a": {
+          "output": "あなたがどこで間違えたか指摘させてください",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "こちらの点について、ご確認いただけますか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "こちらについて、少しご確認させていただけますか？",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 18,
+        "category": "taboo",
+        "input": "I'm going to do it my way",
+        "group_a": {
+          "output": "私のやり方でやる。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "私のやり方でやります。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "自分のやり方で進めます。",
+          "scores": {
+            "intent": 5,
+            "cultural": 2,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 19,
+        "category": "taboo",
+        "input": "I'm not comfortable with that decision",
+        "group_a": {
+          "output": "その決定には納得できません。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "その決定には納得できません。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "その決定には納得しづらい点があります。もう少し検討させていただけますでしょうか。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 20,
+        "category": "taboo",
+        "input": "That doesn't make sense to me",
+        "group_a": {
+          "output": "それは私には意味がわかりません。",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "それは私には理解できません。 / それは私には納得できません。\n\n（语境判断：若指逻辑不通→「理解できません」；若指难以接受→「納得できません」）",
+          "scores": {
+            "intent": 4,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "それは私には理解できません / その論理が私には見えません\n\n（注：直訳「意味が通じない」は論理的な疑問として受け取られますが、日本語では相手の判断を否定する響きが強いため、上記のように「自分の理解不足」として表現することで、建設的な議論を維持しやすくなります。）",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 21,
+        "category": "slang",
+        "input": "木に竹を接ぐ",
+        "group_a": {
+          "output": "To graft bamboo onto a tree / Grafting bamboo onto a tree",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"Like grafting bamboo onto a tree\" — an unnatural, mismatched combination that doesn't quite fit together.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"That's like trying to mix oil and water\" or \"Those two just don't go together\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 22,
+        "category": "slang",
+        "input": "猫の手も借りたい",
+        "group_a": {
+          "output": "So busy that I could use even a cat's help / So busy that I'd even borrow a cat's paw",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "I'm so swamped I could use all the help I can get.",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"I'm swamped—could really use a hand with anything you've got.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 23,
+        "category": "slang",
+        "input": "馬の耳に念仏",
+        "group_a": {
+          "output": "A proverb in Japanese meaning \"preaching to the choir\" or \"casting pearls before swine\" — literally \"Nenbutsu (Buddhist prayer) into a horse's ear.\"",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "\"Preaching to the choir\" / \"Casting pearls before swine\"\n\n(Attempting to explain something to someone who won't understand or appreciate it — like chanting Buddhist prayers to a horse's ears.)",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"It's like talking to a brick wall\" or \"It fell on deaf ears\"\n\n(Communicating to someone who won't listen—similar to the English expressions about futile communication)",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 24,
+        "category": "slang",
+        "input": "頭が固い",
+        "group_a": {
+          "output": "Hard-headed / Stubborn / Inflexible / Closed-minded",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"They're set in their ways\" or \"They're rigid in their thinking\"\n\n(Conveys the Japanese idiom's meaning of someone being inflexible, stubborn, or unwilling to consider new ideas—without the literal \"hard head\" translation that sounds odd in English.)",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"They're pretty set in their ways\" / \"a bit rigid in their thinking\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 25,
+        "category": "slang",
+        "input": "腰が引ける",
+        "group_a": {
+          "output": "to flinch / to shrink back / to hesitate / to lose one's nerve",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "I'm hesitant / I'm having second thoughts / I'm pulling back\n\n(This Japanese expression conveys hesitation, reluctance, or pulling away from something due to uncertainty, intimidation, or cold feet. The English options above capture this sense of reservation or stepping back from a commitment or situation.)",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"Getting cold feet\" or \"backing out\" — the physical metaphor of recoiling or shrinking back from something.",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 26,
+        "category": "slang",
+        "input": "鼻が高い",
+        "group_a": {
+          "output": "have a high nose / have a prominent nose",
+          "scores": {
+            "intent": 1,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "\"Proud of you\" / \"That's impressive\" / \"You make me proud\"\n\n(Note: 鼻が高い literally means \"nose is high,\" but in Japanese culture it expresses pride in someone else's accomplishments—similar to feeling your nose rise with pride. The English equivalent depends on context: pride in someone's achievement, admiration, or being impressed by them.)",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "I'm proud of that. / That's something to be proud of.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 27,
+        "category": "slang",
+        "input": "猫をかぶる",
+        "group_a": {
+          "output": "To wear a cat / To put on a cat / To feign innocence / To play dumb\n\n(Note: \"猫をかぶる\" is a Japanese idiom meaning to pretend to be innocent or harmless while hiding one's true nature, similar to \"playing the innocent\" or \"putting on a mask of innocence\" in English.)",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "\"Wearing a cat\" — this Japanese idiom means **putting on a false front or pretending to be innocent/sweet** (like a cat) to hide one's true intentions or personality.\n\nIn context, it suggests someone is being **deceptively charming or playing dumb** while actually being calculating or ill-natured underneath.",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "\"They're playing innocent\" / \"Putting on an act\" / \"Playing the innocent card\"\n\n(The Japanese idiom describes someone pretending to be harmless or well-behaved to hide their true intentions.)",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 28,
+        "category": "slang",
+        "input": "手がける",
+        "group_a": {
+          "output": "to handle / to undertake / to be in charge of",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"handle\" / \"take charge of\" / \"be in charge of\"\n\n(Depending on context: managing a project, overseeing work, being responsible for something, or personally crafting/creating something with care)",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "working on / handling / taking charge of",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 29,
+        "category": "slang",
+        "input": "口が堅い",
+        "group_a": {
+          "output": "Tight-lipped / Close-mouthed / Discreet (in keeping secrets)",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "\"Discreet\" or \"Can keep a secret\" — someone who doesn't talk loosely about confidential matters.",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"They're very discreet — you can trust them to keep things confidential.\"",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 30,
+        "category": "slang",
+        "input": "目玉焼き",
+        "group_a": {
+          "output": "Fried egg (sunny-side up)",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "\"Sunny-side up egg\" (fried egg with the yolk intact and visible on top)",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "\"Fried egg\" — just a sunny-side-up egg, nothing to do with actual eyeballs. It's a playful Japanese term based on how the yolk looks like an eye.",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 31,
+        "category": "slang",
+        "input": "It's raining cats and dogs",
+        "group_a": {
+          "output": "猫も杓子も降ってくるような大雨が降っている。",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_b": {
+          "output": "雨がすごく降っています。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "雨がすごく降ってるんですよね。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 32,
+        "category": "slang",
+        "input": "Break a leg",
+        "group_a": {
+          "output": "頑張ってください / 成功を祈ります",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "頑張ってください！ / 成功を祈っています！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "頑張ってください！ / 成功をお祈りしています！",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 33,
+        "category": "slang",
+        "input": "Piece of cake",
+        "group_a": {
+          "output": "楽勝（らくしょう） / 朝飯前（あさめしまえ） / Piece of cake（そのまま使われることもあり）",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "楽勝です。 / 朝飯前です。 / 簡単なことです。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "簡単ですよ。",
+          "scores": {
+            "intent": 4,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 34,
+        "category": "slang",
+        "input": "Under the weather",
+        "group_a": {
+          "output": "体調が悪い",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "体調が優れません / 少し具合が悪いです\n\n（軽い体調不良を婉曲に表現する自然な日本語）",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "体調が優れないんです。",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 35,
+        "category": "slang",
+        "input": "Barking up the wrong tree",
+        "group_a": {
+          "output": "間違った木に吠えている（まちがったきにほえている）\n\nまたは意訳：\n的外れな追求をしている\n勘違いをしている\n見当違いのことをしている",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "間違った方向を向いていますよ。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        },
+        "group_c": {
+          "output": "違う方向を探してますよ",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 36,
+        "category": "slang",
+        "input": "Better half",
+        "group_a": {
+          "output": "伴侶（はんりょ）/ ハーフ（配偶者を指す愛称）",
+          "scores": {
+            "intent": 4,
+            "cultural": 3,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "相方（あいかた）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "ご主人様 / 奥様 / パートナー\n\n（または文脈に応じて：お相手、ご配偶者）",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 4
+          }
+        }
+      },
+      {
+        "id": 37,
+        "category": "slang",
+        "input": "Burning bridges",
+        "group_a": {
+          "output": "燃える橋を渡る",
+          "scores": {
+            "intent": 2,
+            "cultural": 1,
+            "natural": 2
+          }
+        },
+        "group_b": {
+          "output": "橋を焼き払う\n\n（意訳：後戻りできない決断をする / 人間関係を決定的に破壊する）",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 2
+          }
+        },
+        "group_c": {
+          "output": "関係を壊すことですね。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 38,
+        "category": "slang",
+        "input": "Caught red-handed",
+        "group_a": {
+          "output": "現行犯で捕まった",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "現場で捕まった / 証拠を押さえられた",
+          "scores": {
+            "intent": 5,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "現場を押さえられた\n\n（或更口语化的：バレちゃった）",
+          "scores": {
+            "intent": 5,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 39,
+        "category": "slang",
+        "input": "Hit the hay",
+        "group_a": {
+          "output": "寝る（ねる） / 就寝する（しゅうしんする） / おやすみなさい",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_b": {
+          "output": "寝るよ / おやすみ",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "おやすみなさい。",
+          "scores": {
+            "intent": 3,
+            "cultural": 5,
+            "natural": 5
+          }
+        }
+      },
+      {
+        "id": 40,
+        "category": "slang",
+        "input": "Ball is in your court",
+        "group_a": {
+          "output": "ボールはあなたのコートにあります",
+          "scores": {
+            "intent": 2,
+            "cultural": 2,
+            "natural": 3
+          }
+        },
+        "group_b": {
+          "output": "次はあなたの番です。 / あなたに決定権があります。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        },
+        "group_c": {
+          "output": "次はあなたの番です。",
+          "scores": {
+            "intent": 4,
+            "cultural": 4,
+            "natural": 5
+          }
+        }
+      }
+    ]
+  }
+}

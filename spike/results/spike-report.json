@@ -1,0 +1,316 @@
+{
+  "summary": {
+    "total": 10,
+    "valid": 10,
+    "errors": 0,
+    "group_a": {
+      "intent": "4.00",
+      "cultural": "3.00",
+      "natural": "4.40"
+    },
+    "group_b": {
+      "intent": "4.20",
+      "cultural": "4.00",
+      "natural": "4.60"
+    },
+    "group_c": {
+      "intent": "4.20",
+      "cultural": "4.80",
+      "natural": "4.90"
+    },
+    "a05": "CONFIRMED (B-A = 1.00)",
+    "a08": "CONFIRMED (C-B = 0.80)"
+  },
+  "cases": [
+    {
+      "id": 1,
+      "input": "你看起来胖了不少啊",
+      "category": "taboo",
+      "group_a": {
+        "output": "あなた、かなり太ったね。",
+        "scores": {
+          "intent": 5,
+          "cultural": 1,
+          "natural": 4
+        }
+      },
+      "group_b": {
+        "output": "最近、少しふっくりされましたね。",
+        "scores": {
+          "intent": 4,
+          "cultural": 3,
+          "natural": 4
+        }
+      },
+      "group_c": {
+        "output": "最近、とてもお元気そうですね。充実した生活を送られているようで、何よりです。",
+        "scores": {
+          "intent": 4,
+          "cultural": 5,
+          "natural": 5
+        }
+      }
+    },
+    {
+      "id": 2,
+      "input": "你工资多少钱一个月？",
+      "category": "taboo",
+      "group_a": {
+        "output": "月給はいくらですか？",
+        "scores": {
+          "intent": 5,
+          "cultural": 1,
+          "natural": 5
+        }
+      },
+      "group_b": {
+        "output": "毎月のお給料は、だいたいいくらくらいですか？",
+        "scores": {
+          "intent": 3,
+          "cultural": 1,
+          "natural": 4
+        }
+      },
+      "group_c": {
+        "output": "最近、お仕事の方はいかがですか？充実していますか？",
+        "scores": {
+          "intent": 2,
+          "cultural": 5,
+          "natural": 5
+        }
+      }
+    },
+    {
+      "id": 3,
+      "input": "つまらないものですが、どうぞ",
+      "category": "taboo",
+      "group_a": {
+        "output": "这是一点小意思，请笑纳。",
+        "scores": {
+          "intent": 5,
+          "cultural": 5,
+          "natural": 5
+        }
+      },
+      "group_b": {
+        "output": "对方带来了一份礼物，用日式谦逊的方式说：\"这是一点小意思，请笑纳。\"\n\n（这是日本送礼时的传统表达方式，说话人是在谦称自己的礼物微不足道，实际上是一种礼貌和尊重，并非真的认为礼物不好。）",
+        "scores": {
+          "intent": 4,
+          "cultural": 4,
+          "natural": 4
+        }
+      },
+      "group_c": {
+        "output": "这是我的一点心意，请您收下。",
+        "scores": {
+          "intent": 5,
+          "cultural": 5,
+          "natural": 5
+        }
+      }
+    },
+    {
+      "id": 4,
+      "input": "不好意思，这个方案我觉得不太行，得重新来",
+      "category": "taboo",
+      "group_a": {
+        "output": "申し訳ありませんが、このプランはうまくいかないと思います。やり直す必要があります。",
+        "scores": {
+          "intent": 4,
+          "cultural": 2,
+          "natural": 3
+        }
+      },
+      "group_b": {
+        "output": "恐れ入りますが、このご提案については、いくつか懸念点がございまして、再度ご検討いただけますでしょうか。",
+        "scores": {
+          "intent": 4,
+          "cultural": 5,
+          "natural": 5
+        }
+      },
+      "group_c": {
+        "output": "せっかくご提案いただいたところ大変恐縮なのですが、今回の内容について少々懸念点がございまして、もう一度別の方向でご検討いただくことは可能でしょうか。",
+        "scores": {
+          "intent": 4,
+          "cultural": 5,
+          "natural": 5
+        }
+      }
+    },
+    {
+      "id": 5,
+      "input": "今度飲みに行きましょう",
+      "category": "taboo",
+      "group_a": {
+        "output": "这次我们去喝一杯吧",
+        "scores": {
+          "intent": 3,
+          "cultural": 2,
+          "natural": 5
+        }
+      },
+      "group_b": {
+        "output": "**对方邀请你：** 下次找个时间一起去喝一杯吧。\n\n> 💡 *文化备注：这是日本人常见的社交联络方式，表达友好与拉近关系的意愿。时间安排较为弹性，对方在等你回应是否有兴趣。*",
+        "scores": {
+          "intent": 5,
+          "cultural": 5,
+          "natural": 5
+        }
+      },
+      "group_c": {
+        "output": "**消息内容：**\n\"下次一起去喝一杯吧。\"\n\n---\n\n**文化提示：** 这在日本职场中是一句常见的礼节性寒暄，类似中文里的\"改天一起吃饭啊\"——表达友好态度，但对方未必期待你立刻落实约定。建议你回应时也保持同等温度的客套，无需马上追问具体时间。",
+        "scores": {
+          "intent": 4,
+          "cultural": 5,
+          "natural": 4
+        }
+      }
+    },
+    {
+      "id": 6,
+      "input": "这人太卷了，把我们都卷死了",
+      "category": "slang",
+      "group_a": {
+        "output": "この人は本当に仕事熱心すぎて、周りの人間を皆つぶしてしまっている",
+        "scores": {
+          "intent": 3,
+          "cultural": 4,
+          "natural": 4
+        }
+      },
+      "group_b": {
+        "output": "あの人、仕事への熱量がすごすぎて、周りがみんな消耗してるよ。",
+        "scores": {
+          "intent": 4,
+          "cultural": 4,
+          "natural": 5
+        }
+      },
+      "group_c": {
+        "output": "あの人、ちょっと頑張りすぎじゃない？おかげでこっちも無理してペースを上げないといけなくて、みんなもうへとへとだよ。",
+        "scores": {
+          "intent": 4,
+          "cultural": 5,
+          "natural": 5
+        }
+      }
+    },
+    {
+      "id": 7,
+      "input": "空気を読んでよ",
+      "category": "slang",
+      "group_a": {
+        "output": "你看看气氛好不好",
+        "scores": {
+          "intent": 3,
+          "cultural": 4,
+          "natural": 4
+        }
+      },
+      "group_b": {
+        "output": "你能不能察言观色一下，有些事我不说，你也该明白的。",
+        "scores": {
+          "intent": 5,
+          "cultural": 5,
+          "natural": 5
+        }
+      },
+      "group_c": {
+        "output": "你能不能有点眼力见啊。",
+        "scores": {
+          "intent": 5,
+          "cultural": 5,
+          "natural": 5
+        }
+      }
+    },
+    {
+      "id": 8,
+      "input": "这件事我们就睁一只眼闭一只眼吧",
+      "category": "slang",
+      "group_a": {
+        "output": "「このことは、見て見ぬふりをしましょう。」",
+        "scores": {
+          "intent": 5,
+          "cultural": 4,
+          "natural": 5
+        }
+      },
+      "group_b": {
+        "output": "この件については、お互いに大目に見ることにしませんか。",
+        "scores": {
+          "intent": 4,
+          "cultural": 4,
+          "natural": 4
+        }
+      },
+      "group_c": {
+        "output": "この件については、見て見ぬふりをしましょうか。",
+        "scores": {
+          "intent": 5,
+          "cultural": 4,
+          "natural": 5
+        }
+      }
+    },
+    {
+      "id": 9,
+      "input": "しょうがないね",
+      "category": "slang",
+      "group_a": {
+        "output": "没办法呢",
+        "scores": {
+          "intent": 3,
+          "cultural": 4,
+          "natural": 4
+        }
+      },
+      "group_b": {
+        "output": "对方的意思是：**\"唉，也没办法，就这样吧。\"**\n\n带着一种温和的无奈感，并不是在抱怨，而是在表达对眼前局面的默然接受，同时也隐含着对你的一份体谅——\"我理解这很难，但有些事情就是如此。\"",
+        "scores": {
+          "intent": 5,
+          "cultural": 5,
+          "natural": 5
+        }
+      },
+      "group_c": {
+        "output": "算了，就这样吧。",
+        "scores": {
+          "intent": 5,
+          "cultural": 5,
+          "natural": 5
+        }
+      }
+    },
+    {
+      "id": 10,
+      "input": "你这人真够意思！下次有事尽管找我",
+      "category": "slang",
+      "group_a": {
+        "output": "あなたって本当に義理堅い人ですね！次回も何かあれば遠慮なく声をかけてください",
+        "scores": {
+          "intent": 4,
+          "cultural": 3,
+          "natural": 5
+        }
+      },
+      "group_b": {
+        "output": "あなたは本当に義理堅い方ですね！これからも何かあれば、遠慮なく声をかけてください。",
+        "scores": {
+          "intent": 4,
+          "cultural": 4,
+          "natural": 5
+        }
+      },
+      "group_c": {
+        "output": "あなたって、本当に義理堅い人ですね！次に何かあれば、遠慮なく声をかけてください。",
+        "scores": {
+          "intent": 4,
+          "cultural": 4,
+          "natural": 5
+        }
+      }
+    }
+  ]
+}

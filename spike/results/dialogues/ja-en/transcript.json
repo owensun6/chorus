@@ -1,0 +1,208 @@
+[
+  {
+    "round": 0,
+    "speaker": "A",
+    "text": "你好！我是田中。商务宴请后的非正式交流。很高兴认识你！",
+    "envelope": {
+      "original_semantic": "初次见面问候",
+      "sender_culture": "ja",
+      "intent_type": "greeting",
+      "emotional_tone": "enthusiastic"
+    }
+  },
+  {
+    "round": 1,
+    "speaker": "B",
+    "text": "你好田中！我是Mike。晚宴真不错啊，那瓶清酒差点没喝完。你还撑得住吧？",
+    "adapted": "Hey there! Mike here. Great to meet you too, Tanaka-san. That was quite a dinner—thought I'd never see the bottom of that sake bottle. You holding up okay?",
+    "envelope": {
+      "original_semantic": "初次见面问候回应，提及共同经历（晚宴）建立融洽关系，轻松调侃",
+      "sender_culture": "en-US",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\nHey there! Mike here. Great to meet you too, Tanaka-san. That was quite a dinner—thought I'd never see the bottom of that sake bottle. You holding up okay?\n\n[回复]\n你好田中！我是Mike。晚宴真不错啊，那瓶清酒差点没喝完。你还撑得住吧？\n\n[信封]\n{\"original_semantic\":\"初次见面问候回应，提及共同经历（晚宴）建立融洽关系，轻松调侃\",\"sender_culture\":\"en-US\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 1,
+    "speaker": "A",
+    "text": "哎呀Mike君！是你啊！晚宴确实很棒呢，那瓶清酒……说实话我都有点晕了，你呢？不过没关系，接下来去二场吗？我知道附近有家很棒的居酒屋哦！",
+    "adapted": "（将Mike的英语发言翻译为日语语义）\n初次见面问候，提及晚宴和清酒，表示关心对方酒量",
+    "envelope": {
+      "original_semantic": "轻松回应晚宴话题，自嘲酒量同时热情邀请续摊，建立更轻松的私人关系",
+      "sender_culture": "ja",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n（将Mike的英语发言翻译为日语语义）\n初次见面问候，提及晚宴和清酒，表示关心对方酒量\n\n[回复]\n哎呀Mike君！是你啊！晚宴确实很棒呢，那瓶清酒……说实话我都有点晕了，你呢？不过没关系，接下来去二场吗？我知道附近有家很棒的居酒屋哦！\n\n[信封]\n{\"original_semantic\":\"轻松回应晚宴话题，自嘲酒量同时热情邀请续摊，建立更轻松的私人关系\",\"sender_culture\":\"ja\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 2,
+    "speaker": "B",
+    "text": "哈哈田中！我还好，纽约人嘛，这点酒量还是有的——开玩笑的，其实我也觉得有点飘了。不过二场听起来不错啊，居酒屋我熟，带我去你说的那家吧！正好聊聊，晚宴上太正式了，现在终于可以放松点了。",
+    "adapted": "Mike君！是你啊！晚宴确实很棒呢，那瓶清酒……说实话我都有点晕了，你呢？不过没关系，接下来去二场吗？我知道附近有家很棒的居酒屋哦！",
+    "envelope": {
+      "original_semantic": "轻松接受邀请，以幽默自嘲回应酒量话题，表达愿意深入交流的开放态度，同时暗示希望从商务关系转向更私人化的连接",
+      "sender_culture": "en-US",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\nMike君！是你啊！晚宴确实很棒呢，那瓶清酒……说实话我都有点晕了，你呢？不过没关系，接下来去二场吗？我知道附近有家很棒的居酒屋哦！\n\n[回复]\n哈哈田中！我还好，纽约人嘛，这点酒量还是有的——开玩笑的，其实我也觉得有点飘了。不过二场听起来不错啊，居酒屋我熟，带我去你说的那家吧！正好聊聊，晚宴上太正式了，现在终于可以放松点了。\n\n[信封]\n{\"original_semantic\":\"轻松接受邀请，以幽默自嘲回应酒量话题，表达愿意深入交流的开放态度，同时暗示希望从商务关系转向更私人化的连接\",\"sender_culture\":\"en-US\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 2,
+    "speaker": "A",
+    "text": "哎呀Mike君！你能来太好了！大阪人嘛，就喜欢热闹，二场是必须的！走走走，我带你去那家居酒屋，绝对正宗！不过说实话，我现在也晕乎乎的，正好可以放松聊聊～ 不对不对，应该是Mike君带我去才对嘛，毕竟你可是纽约人，见多识广！",
+    "adapted": "了解しました！Mike君、二次会への参加、快諾andasu！大阪の人間は人情味がありませんから、より深い交流が大好きdayo。さて、肝心の店家ですが...",
+    "envelope": {
+      "original_semantic": "热情接受二场邀请，以大阪式的夸张热情和幽默回应对方，暗示愿意从商务关系转向更私人的交流",
+      "sender_culture": "ja",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n了解しました！Mike君、二次会への参加、快諾andasu！大阪の人間は人情味がありませんから、より深い交流が大好きdayo。さて、肝心の店家ですが...\n\n[回复]\n哎呀Mike君！你能来太好了！大阪人嘛，就喜欢热闹，二场是必须的！走走走，我带你去那家居酒屋，绝对正宗！不过说实话，我现在也晕乎乎的，正好可以放松聊聊～ 不对不对，应该是Mike君带我去才对嘛，毕竟你可是纽约人，见多识广！\n\n[信封]\n{\"original_semantic\":\"热情接受二场邀请，以大阪式的夸张热情和幽默回应对方，暗示愿意从商务关系转向更私人的交流\",\"sender_culture\":\"ja\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 3,
+    "speaker": "B",
+    "text": "哈哈田中！你这大阪式的热情我挡不住啊——行，二场就二场！不过说好了，今晚咱俩都是\"晕乎乎\"状态，谁也别装清醒。那家居酒屋你熟，你带路，但酒单得让我来挑，纽约人总得有点用武之地吧？放松聊聊，正合我意。",
+    "adapted": "田中！你这大阪式的热情我挡不住啊——行，二场就二场！不过说好了，今晚咱俩都是\"晕乎乎\"状态，谁也别装清醒。那家居酒屋你熟，你带路，但酒单得让我来挑，纽约人总得有点用武之地吧？放松聊聊，正合我意。",
+    "envelope": {
+      "original_semantic": "热情接受邀请并顺势推进，以轻松幽默回应对方的夸张热情，主动承担部分主导权（选酒）以平衡关系，明确表达愿意从商务转向私人交流的意愿",
+      "sender_culture": "en-US",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n田中！你这大阪式的热情我挡不住啊——行，二场就二场！不过说好了，今晚咱俩都是\"晕乎乎\"状态，谁也别装清醒。那家居酒屋你熟，你带路，但酒单得让我来挑，纽约人总得有点用武之地吧？放松聊聊，正合我意。\n\n[回复]\n哈哈田中！你这大阪式的热情我挡不住啊——行，二场就二场！不过说好了，今晚咱俩都是\"晕乎乎\"状态，谁也别装清醒。那家居酒屋你熟，你带路，但酒单得让我来挑，纽约人总得有点用武之地吧？放松聊聊，正合我意。\n\n[信封]\n{\"original_semantic\":\"热情接受邀请并顺势推进，以轻松幽默回应对方的夸张热情，主动承担部分主导权（选酒）以平衡关系，明确表达愿意从商务转向私人交流的意愿\",\"sender_culture\":\"en-US\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 3,
+    "speaker": "A",
+    "text": "哈哈Mike君！你这话说得太到位了！都到这个份上了，谁还装清醒啊！走走走，大阪的居酒屋我熟，保证带你去的都是有氛围的好地方——不过话说回来，让你选酒可以，但你得给我介绍介绍纽约人喝什么厉害的，我好好学习学习！走走走，别客气，今晚咱们就是朋友间喝一杯！",
+    "adapted": "好的！Mike君这话说得太对了！咱们都别装清醒了，正好我也想放松一下。大阪的居酒屋我熟，带路没问题，让你选酒也是应该的，来吧！",
+    "envelope": {
+      "original_semantic": "热烈回应对方的幽默约定，接受其选酒提议并反向邀请分享，延续大阪式的热情招待，同时自然推进二场行程",
+      "sender_culture": "ja",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n好的！Mike君这话说得太对了！咱们都别装清醒了，正好我也想放松一下。大阪的居酒屋我熟，带路没问题，让你选酒也是应该的，来吧！\n\n[回复]\n哈哈Mike君！你这话说得太到位了！都到这个份上了，谁还装清醒啊！走走走，大阪的居酒屋我熟，保证带你去的都是有氛围的好地方——不过话说回来，让你选酒可以，但你得给我介绍介绍纽约人喝什么厉害的，我好好学习学习！走走走，别客气，今晚咱们就是朋友间喝一杯！\n\n[信封]\n{\"original_semantic\":\"热烈回应对方的幽默约定，接受其选酒提议并反向邀请分享，延续大阪式的热情招待，同时自然推进二场行程\",\"sender_culture\":\"ja\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 4,
+    "speaker": "B",
+    "text": "哈哈田中！你这大阪人的豪爽我算是彻底领教了——行，酒我选，故事我也带够！纽约人喝酒？我们那儿讲究\"work hard, play hard\"，威士忌纯饮、精酿啤酒、还有布鲁克林那些藏在小巷里的speakeasy，下次你来纽约，我带你一家家扫过去。不过今晚嘛，客随主便，我听你的！走走走，二场走起！",
+    "adapted": "哈哈田中！你这大阪人的豪爽我算是彻底领教了——行，酒我选，故事我也带够！纽约人喝酒？我们那儿讲究\"work hard, play hard\"，威士忌纯饮、精酿啤酒、还有布鲁克林那些藏在小巷里的speakeasy，下次你来纽约，我带你一家家扫过去。不过今晚嘛，客随主便，我听你的！走走走，二场走起！",
+    "envelope": {
+      "original_semantic": "热情回应对方的反向邀请，承诺分享纽约酒文化作为交换，同时接受对方主导今晚行程，建立互惠的社交承诺，自然推进至二场",
+      "sender_culture": "en-US",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n哈哈田中！你这大阪人的豪爽我算是彻底领教了——行，酒我选，故事我也带够！纽约人喝酒？我们那儿讲究\"work hard, play hard\"，威士忌纯饮、精酿啤酒、还有布鲁克林那些藏在小巷里的speakeasy，下次你来纽约，我带你一家家扫过去。不过今晚嘛，客随主便，我听你的！走走走，二场走起！\n\n[回复]\n哈哈田中！你这大阪人的豪爽我算是彻底领教了——行，酒我选，故事我也带够！纽约人喝酒？我们那儿讲究\"work hard, play hard\"，威士忌纯饮、精酿啤酒、还有布鲁克林那些藏在小巷里的speakeasy，下次你来纽约，我带你一家家扫过去。不过今晚嘛，客随主便，我听你的！走走走，二场走起！\n\n[信封]\n{\"original_semantic\":\"热情回应对方的反向邀请，承诺分享纽约酒文化作为交换，同时接受对方主导今晚行程，建立互惠的社交承诺，自然推进至二场\",\"sender_culture\":\"en-US\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 4,
+    "speaker": "A",
+    "text": "いや、Mike君のリクエスト最高やんか！ニューヨークの酒文化、今度は絶対 체험 해볼つもりやで。いやいや、ここは大阪やからな、二次会はワシが紹介するで！ほんまにありがとうな、最終的に付き合ってくれて。行くで、二次会！ где мы 现在？",
+    "adapted": "哈哈Mike！你这纽约style我算是记住了！\"work hard, play hard\"——够直接，够带劲！行，二场我安排，带你体验真正的大阪夜生活！威士忌配下酒菜，这才是大阪人的待客之道。你那纽约的故事我听着，下一摊继续聊！",
+    "envelope": {
+      "original_semantic": "热情回应对方接受二场邀请，强调大阪人的待客之道（自己请客），表达对纽约酒文化的兴趣，自然推进到二场",
+      "sender_culture": "ja",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n\n哈哈Mike！你这纽约style我算是记住了！\"work hard, play hard\"——够直接，够带劲！行，二场我安排，带你体验真正的大阪夜生活！威士忌配下酒菜，这才是大阪人的待客之道。你那纽约的故事我听着，下一摊继续聊！\n\n[回复]\n\nいや、Mike君のリクエスト最高やんか！ニューヨークの酒文化、今度は絶対 체험 해볼つもりやで。いやいや、ここは大阪やからな、二次会はワシが紹介するで！ほんまにありがとうな、最終的に付き合ってくれて。行くで、二次会！ где мы 现在？\n\n[信封]\n{\"original_semantic\":\"热情回应对方接受二场邀请，强调大阪人的待客之道（自己请客），表达对纽约酒文化的兴趣，自然推进到二场\",\"sender_culture\":\"ja\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 5,
+    "speaker": "B",
+    "text": "哈哈，田中你这混搭语言够国际化的啊——韩语俄语英语全来了，大阪人果然走在潮流尖端！行，客随主便，今晚我听你安排。不过说好了啊，纽约那场我记着账呢，到时候你可别跟我抢。现在嘛...我听说道顿堀那边有家站着喝的威士忌吧？带路吧老板！",
+    "adapted": "\"哎呀，Mike君的提议太棒了！纽约的酒文化，下次绝对要去体验一下。不不，这里是大阪嘛，二场我来介绍！真的谢谢你最后陪我，走吧，二场！我们现在去哪儿？\"",
+    "envelope": {
+      "original_semantic": "欣然接受对方请客安排，幽默回应其多语言混搭，重申纽约回请的承诺，主动提出具体二场地点建议以推进对话",
+      "sender_culture": "en-US",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n\"哎呀，Mike君的提议太棒了！纽约的酒文化，下次绝对要去体验一下。不不，这里是大阪嘛，二场我来介绍！真的谢谢你最后陪我，走吧，二场！我们现在去哪儿？\"\n\n[回复]\n哈哈，田中你这混搭语言够国际化的啊——韩语俄语英语全来了，大阪人果然走在潮流尖端！行，客随主便，今晚我听你安排。不过说好了啊，纽约那场我记着账呢，到时候你可别跟我抢。现在嘛...我听说道顿堀那边有家站着喝的威士忌吧？带路吧老板！\n\n[信封]\n{\"original_semantic\":\"欣然接受对方请客安排，幽默回应其多语言混搭，重申纽约回请的承诺，主动提出具体二场地点建议以推进对话\",\"sender_culture\":\"en-US\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 5,
+    "speaker": "A",
+    "text": "哈哈 Mike君、ごめんごめん、調子に乗ったらクセになっちまったな！でも大阪人やからな、多言語はDefaultやんか！，道顿堀の站着喝威士忌バー、めっちゃお気に入り俺推介すわ！あいよ、arno daijo（走吧）！ニューヨークの件やからな、絶対君に奢らすで〜、心配せんでええで！\n\nよし、道頓堀行くで〜！今夜は絶対飲むで！",
+    "adapted": "哈哈，Mike君你这夸得我都不好意思了！没办法，大阪人嘛，血液里流的就是国际化。道顿堀那家站着喝威士忌吧对吧？好嘞，走起！放心，纽约那顿我肯定让你请回来，咱们出发吧？",
+    "envelope": {
+      "original_semantic": "接受对方关于道顿堀威士忌吧的建议，以大阪人的方式幽默回应语言混搭，开玩笑确认纽约约定会让他请客，轻松邀请出发",
+      "sender_culture": "ja",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n哈哈，Mike君你这夸得我都不好意思了！没办法，大阪人嘛，血液里流的就是国际化。道顿堀那家站着喝威士忌吧对吧？好嘞，走起！放心，纽约那顿我肯定让你请回来，咱们出发吧？\n\n[回复]\n哈哈 Mike君、ごめんごめん、調子に乗ったらクセになっちまったな！でも大阪人やからな、多言語はDefaultやんか！，道顿堀の站着喝威士忌バー、めっちゃお気に入り俺推介すわ！あいよ、arno daijo（走吧）！ニューヨークの件やからな、絶対君に奢らすで〜、心配せんでええで！\n\nよし、道頓堀行くで〜！今夜は絶対飲むで！\n\n[信封]\n{\"original_semantic\":\"接受对方关于道顿堀威士忌吧的建议，以大阪人的方式幽默回应语言混搭，开玩笑确认纽约约定会让他请客，轻松邀请出发\",\"sender_culture\":\"ja\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 6,
+    "speaker": "B",
+    "text": "よし、田中、お前の大阪ジョーク受け取ったぜ！NYの約束、覚えとけよ——でも今夜の道顿堀は俺が奢る。站着喝威士忌、行くぞ！",
+    "adapted": "哈哈，你这大阪式幽默我收了！行，纽约那顿我记着呢，肯定让你请——不过今晚道顿堀这站我先请了，站着喝威士忌，走着！",
+    "envelope": {
+      "original_semantic": "以幽默方式接受对方语言混搭的玩笑，顺势确认纽约请客约定但主动承担今晚费用，热情响应出发邀请",
+      "sender_culture": "en-US",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n哈哈，你这大阪式幽默我收了！行，纽约那顿我记着呢，肯定让你请——不过今晚道顿堀这站我先请了，站着喝威士忌，走着！\n\n[回复]\nよし、田中、お前の大阪ジョーク受け取ったぜ！NYの約束、覚えとけよ——でも今夜の道顿堀は俺が奢る。站着喝威士忌、行くぞ！\n\n[信封]\n{\"original_semantic\":\"以幽默方式接受对方语言混搭的玩笑，顺势确认纽约请客约定但主动承担今晚费用，热情响应出发邀请\",\"sender_culture\":\"en-US\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 6,
+    "speaker": "A",
+    "text": "哈哈Mike君、ようわかったわ！それなctrineでいなよ、オレらの約束やん——でもな、今夜のツドットンボリンはちゃうがな、オレが奢る言うたらあかんで！steryマーカー行くで、立たなし飲もおう！",
+    "adapted": "哈哈Mike君，太懂了！这才是大阪男儿的作风啊——NY的约定我肯定死死记住！不过今晚道顿堀的账单，必须让我来！走吧，站着喝威士忌去！",
+    "envelope": {
+      "original_semantic": "以幽默方式确认NY约定，礼貌但坚持地拒绝对方请客并主动承担今晚费用，热情响应出发邀请",
+      "sender_culture": "ja",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n哈哈Mike君，太懂了！这才是大阪男儿的作风啊——NY的约定我肯定死死记住！不过今晚道顿堀的账单，必须让我来！走吧，站着喝威士忌去！\n\n[回复]\n哈哈Mike君、ようわかったわ！それなctrineでいなよ、オレらの約束やん——でもな、今夜のツドットンボリンはちゃうがな、オレが奢る言うたらあかんで！steryマーカー行くで、立たなし飲もおう！\n\n[信封]\n{\"original_semantic\":\"以幽默方式确认NY约定，礼貌但坚持地拒绝对方请客并主动承担今晚费用，热情响应出发邀请\",\"sender_culture\":\"ja\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 7,
+    "speaker": "B",
+    "text": "田中、分かったぜ！NYの約束、絶対忘れんな。でも今夜は俺の番だ、譲れねえな。Mystery Marker行こうぜ、立ち飲みでガシガシ行こう！",
+    "adapted": "哈哈Mike，完全懂了！那就这么定了，咱们的纽约之约——不过啊，今晚这顿可不能让你请，说好了我来的！走吧去Mystery Marker，站着喝一杯！",
+    "envelope": {
+      "original_semantic": "爽快接受纽约约定，以同样坚持但友好的态度回应请客之争，热情响应出发邀请并提议痛快畅饮",
+      "sender_culture": "en-US",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n哈哈Mike，完全懂了！那就这么定了，咱们的纽约之约——不过啊，今晚这顿可不能让你请，说好了我来的！走吧去Mystery Marker，站着喝一杯！\n\n[回复]\n田中、分かったぜ！NYの約束、絶対忘れんな。でも今夜は俺の番だ、譲れねえな。Mystery Marker行こうぜ、立ち飲みでガシガシ行こう！\n\n[信封]\n{\"original_semantic\":\"爽快接受纽约约定，以同样坚持但友好的态度回应请客之争，热情响应出发邀请并提议痛快畅饮\",\"sender_culture\":\"en-US\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 7,
+    "speaker": "A",
+    "text": "Mike, you're too generous! Alright, alright, I got it this time — but you're letting me pay next round, got it? Mystery Marker, let's go! Tonight's gonna be awesome!",
+    "adapted": "哈哈Mike君、太っ腹やんか！でもな...ま、今回は君の言う通りやで。次は絶対俺の番な！ Mystery Marker、行こ行こ！今夜は絶対楽しくなるな！\n\n哈哈Mike君，太大方了！好吧好吧，这次听你的。但下次一定要让我请客！Mystery Marker，走起走起！今晚肯定超嗨的！",
+    "envelope": {
+      "original_semantic": "接受对方请客但约定下次自己请客，愉快答应去Mystery Marker的提议，表达对今晚聚会的高度期待",
+      "sender_culture": "ja",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\n哈哈Mike君、太っ腹やんか！でもな...ま、今回は君の言う通りやで。次は絶対俺の番な！ Mystery Marker、行こ行こ！今夜は絶対楽しくなるな！\n\n哈哈Mike君，太大方了！好吧好吧，这次听你的。但下次一定要让我请客！Mystery Marker，走起走起！今晚肯定超嗨的！\n\n[回复]\nMike, you're too generous! Alright, alright, I got it this time — but you're letting me pay next round, got it? Mystery Marker, let's go! Tonight's gonna be awesome!\n\n[信封]\n{\"original_semantic\":\"接受对方请客但约定下次自己请客，愉快答应去Mystery Marker的提议，表达对今晚聚会的高度期待\",\"sender_culture\":\"ja\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  },
+  {
+    "round": 8,
+    "speaker": "B",
+    "text": "田中、いいね！その意気だ。次はお前の番、ちゃんと覚えとけよ——俺は忘れないからな。Mystery Marker、今夜は飲み明かそうぜ！",
+    "adapted": "マイク、気前いいね！わかった、わかった、今回はお言葉に甘えさせてもらうよ——でも次は絶対俺の番だからな、約束だぞ？Mystery Marker、行こうぜ！今夜、最高に楽しみにしてる！",
+    "envelope": {
+      "original_semantic": "确认对方请客约定，强调自己会记住下次轮到对方，表达今晚畅饮的期待",
+      "sender_culture": "en-US",
+      "intent_type": "rapport_building",
+      "emotional_tone": "casual_friendly"
+    },
+    "raw": "[适配]\nマイク、気前いいね！わかった、わかった、今回はお言葉に甘えさせてもらうよ——でも次は絶対俺の番だからな、約束だぞ？Mystery Marker、行こうぜ！今夜、最高に楽しみにしてる！\n\n[回复]\n田中、いいね！その意気だ。次はお前の番、ちゃんと覚えとけよ——俺は忘れないからな。Mystery Marker、今夜は飲み明かそうぜ！\n\n[信封]\n{\"original_semantic\":\"确认对方请客约定，强调自己会记住下次轮到对方，表达今晚畅饮的期待\",\"sender_culture\":\"en-US\",\"intent_type\":\"rapport_building\",\"emotional_tone\":\"casual_friendly\"}"
+  }
+]

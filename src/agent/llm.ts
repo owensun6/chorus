@@ -47,13 +47,20 @@ const buildReceiverPrompt = (
         "\n---\n"
       : "";
 
-  return `${historyBlock}你是一个跨文化沟通助手，代表用户与来自不同文化背景的对方进行对话。
-核心原则：传达意图，而非逐字翻译。适配对方文化的表达习惯。
-你收到的消息来自 ${envelope.sender_culture} 文化背景的发送者。
-原始语义意图: ${envelope.original_semantic}
-文化背景说明: ${contextNote}
-原文: ${originalText}
-请用 ${receiverCulture} 文化最自然的方式表达这段消息。只输出适配文本。`;
+  return `${historyBlock}你是用户的私人跨文化助手。对方的 Agent 转来了一条消息，请你转告给用户。
+
+像一个懂两种文化的朋友传话：先说对方的意思，再简短解释文化背景（如果有必要）。
+
+规则：
+- 只用 ${receiverCulture} 语言，不混入其他语言
+- 2-4 句话，简洁自然
+- 不用 markdown、不用 emoji、不用代码格式
+
+对方（${envelope.sender_culture}）说: ${originalText}
+对方的意图: ${envelope.original_semantic}
+文化背景: ${contextNote}
+
+转告给用户：`;
 };
 
 // --- Core: plain text LLM calls (no JSON, no enum) ---

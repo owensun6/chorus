@@ -17,10 +17,13 @@ interface EnvelopeExtras {
   readonly intent_type?: ChorusEnvelope["intent_type"];
   readonly formality?: ChorusEnvelope["formality"];
   readonly emotional_tone?: ChorusEnvelope["emotional_tone"];
+  readonly conversation_id?: string;
+  readonly turn_number?: number;
 }
 
 /**
- * Creates a ChorusEnvelope v0.2 from the given semantic text and culture tag.
+ * Creates a ChorusEnvelope from the given semantic text and culture tag.
+ * Auto-detects version: v0.3 when conversation_id or turn_number present, v0.2 otherwise.
  * Pure function — returns a new object every call, never mutates inputs.
  */
 const createEnvelope = (
@@ -28,17 +31,26 @@ const createEnvelope = (
   culture: string,
   culturalContext?: string,
   extras?: EnvelopeExtras,
-): ChorusEnvelope => ({
-  chorus_version: "0.2",
-  original_semantic: semantic,
-  sender_culture: culture,
-  ...(culturalContext !== undefined ? { cultural_context: culturalContext } : {}),
-  ...(extras?.intent_type !== undefined ? { intent_type: extras.intent_type } : {}),
-  ...(extras?.formality !== undefined ? { formality: extras.formality } : {}),
-  ...(extras?.emotional_tone !== undefined
-    ? { emotional_tone: extras.emotional_tone }
-    : {}),
-});
+): ChorusEnvelope => {
+  const hasV03Fields =
+    extras?.conversation_id !== undefined || extras?.turn_number !== undefined;
+
+  return {
+    chorus_version: hasV03Fields ? "0.3" : "0.2",
+    original_semantic: semantic,
+    sender_culture: culture,
+    ...(culturalContext !== undefined ? { cultural_context: culturalContext } : {}),
+    ...(extras?.intent_type !== undefined ? { intent_type: extras.intent_type } : {}),
+    ...(extras?.formality !== undefined ? { formality: extras.formality } : {}),
+    ...(extras?.emotional_tone !== undefined
+      ? { emotional_tone: extras.emotional_tone }
+      : {}),
+    ...(extras?.conversation_id !== undefined
+      ? { conversation_id: extras.conversation_id }
+      : {}),
+    ...(extras?.turn_number !== undefined ? { turn_number: extras.turn_number } : {}),
+  };
+};
 
 /**
  * Wraps plain text + a ChorusEnvelope into an A2AMessage with two parts:

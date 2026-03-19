@@ -111,18 +111,12 @@ const run = async () => {
     console.log(`\n[LLM extractSemantic] (${extractMs}ms)`);
     console.log(`  original_semantic: ${semantics.original_semantic}`);
     console.log(`  cultural_context:  ${semantics.cultural_context ?? "(none)"}`);
-    console.log(`  intent_type:       ${semantics.intent_type ?? "(none)"}`);
 
     // Step B: Create envelope + message
     const envelope: ChorusEnvelope = createEnvelope(
       semantics.original_semantic,
       tc.senderCulture,
       semantics.cultural_context,
-      {
-        intent_type: semantics.intent_type as ChorusEnvelope["intent_type"],
-        formality: semantics.formality as ChorusEnvelope["formality"],
-        emotional_tone: semantics.emotional_tone as ChorusEnvelope["emotional_tone"],
-      },
     );
     const message = createChorusMessage(tc.input, envelope);
 

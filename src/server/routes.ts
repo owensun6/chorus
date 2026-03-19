@@ -100,7 +100,7 @@ const createApp = (registry: AgentRegistry): Hono => {
       );
     }
 
-    const TIMEOUT_MS = 10_000;
+    const TIMEOUT_MS = 120_000;
 
     try {
       const controller = new AbortController();

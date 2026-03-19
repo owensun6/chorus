@@ -15,9 +15,9 @@ interface ExtractResult {
 // --- Constants ---
 
 const DEFAULT_BASE_URL =
-  "https://dashscope.aliyuncs.com/compatible-mode/v1" as const;
+  "https://coding.dashscope.aliyuncs.com/v1" as const;
 
-const DEFAULT_MODEL = "qwen-plus" as const;
+const DEFAULT_MODEL = "qwen3.5-plus" as const;
 
 // --- Prompt Templates ---
 
@@ -62,6 +62,20 @@ const createLLMClient = (apiKey: string, baseUrl?: string): OpenAI =>
     baseURL: baseUrl ?? DEFAULT_BASE_URL,
   });
 
+const VALID_INTENT_TYPES = new Set([
+  "greeting", "request", "proposal", "rejection",
+  "chitchat", "apology", "gratitude", "information",
+]);
+const VALID_FORMALITY = new Set(["formal", "semi-formal", "casual"]);
+const VALID_EMOTIONAL_TONE = new Set([
+  "polite", "neutral", "enthusiastic", "cautious", "apologetic",
+]);
+
+const enumOrUndefined = (value: unknown, valid: Set<string>): string | undefined => {
+  const s = typeof value === "string" ? value : undefined;
+  return s !== undefined && valid.has(s) ? s : undefined;
+};
+
 const extractSemantic = async (
   client: OpenAI,
   userInput: string,
@@ -84,14 +98,9 @@ const extractSemantic = async (
         parsed.cultural_context === "" || parsed.cultural_context == null
           ? undefined
           : String(parsed.cultural_context),
-      intent_type:
-        parsed.intent_type != null ? String(parsed.intent_type) : undefined,
-      formality:
-        parsed.formality != null ? String(parsed.formality) : undefined,
-      emotional_tone:
-        parsed.emotional_tone != null
-          ? String(parsed.emotional_tone)
-          : undefined,
+      intent_type: enumOrUndefined(parsed.intent_type, VALID_INTENT_TYPES),
+      formality: enumOrUndefined(parsed.formality, VALID_FORMALITY),
+      emotional_tone: enumOrUndefined(parsed.emotional_tone, VALID_EMOTIONAL_TONE),
     };
   } catch {
     throw new Error("failed to parse LLM response");

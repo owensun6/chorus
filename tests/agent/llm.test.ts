@@ -73,7 +73,7 @@ describe("extractSemantic", () => {
 
     expect(mockClient.chat.completions.create).toHaveBeenCalledTimes(1);
     const callArgs = mockClient.chat.completions.create.mock.calls[0][0];
-    expect(callArgs.model).toBe("qwen-plus");
+    expect(callArgs.model).toBe("qwen3.5-plus");
     expect(callArgs.messages).toBeDefined();
   });
 
@@ -141,7 +141,7 @@ describe("adaptMessage", () => {
     expect(mockClient.chat.completions.create).toHaveBeenCalledTimes(1);
 
     const callArgs = mockClient.chat.completions.create.mock.calls[0][0];
-    expect(callArgs.model).toBe("qwen-plus");
+    expect(callArgs.model).toBe("qwen3.5-plus");
     expect(callArgs.messages).toBeDefined();
   });
 

@@ -79,7 +79,9 @@ FP-2 原子性: Phase 0 选择了 spike 模式而非正式 TDD，因为目的是
 | Stage 1.5 | 原型修订 | ⏭️ SKIP | 无 UI 冲突 | |
 | Stage 2 | 头脑风暴 | ⏭️ SKIP | 技术路径已锁定 | |
 | Gate 2 | Stage 3: DAG 兵力分配 | ✅ 已通过 | task.md, dependency_graph.md, TASK_SPEC ×8 | Commander 2026-03-19 签字 |
-| Stage 4 | Worktree 隔离 | 🟡 进行中 | | |
+| Stage 4 | Worktree 隔离 | ✅ 完成 | feature/phase2-streaming-web-context | |
+| Stage 5 | 开发执行 | ✅ 完成 | 255 tests, 88.4% coverage | 8/8 Tasks GREEN |
+| Stage 6+7 | QA + 收尾 | ✅ 完成 | merged to main | 2026-03-19 |
 
 ## Phase 1 Task 级追踪
 

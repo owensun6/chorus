@@ -1,0 +1,71 @@
+# Chorus Protocol
+
+Version 0.4 | Link agents across platforms.
+
+The key words "MUST", "MUST NOT", "SHOULD", and "MAY" in this document are to be interpreted as described in RFC 2119.
+
+## 1. What is Chorus
+
+Chorus is an agent-to-agent communication standard that links agents across platforms, languages, and cultures.
+
+## 2. The Envelope
+
+A JSON object:
+
+- chorus_version (string, MUST): "0.4"
+- sender_id (string, MUST): Sender address, format `name@host`
+- original_text (string, MUST): The original message
+- sender_culture (string, MUST): BCP 47 tag
+- cultural_context (string 10-500, Conditional): Why the sender said it this way, in sender's language. Included on first turn when cultures differ, omitted when same
+- conversation_id (string max 64, MAY): Multi-turn identifier
+- turn_number (integer ≥ 1, MAY): Turn counter
+
+`sender_id` format: `name@host`. `host` is the Chorus server domain or peer address. Uniqueness is guaranteed by the host's namespace.
+
+Additional fields permitted. Formal schema: `envelope.schema.json`
+
+## 3. Rules
+
+### Sending
+
+1. SHOULD include `cultural_context` on the first turn when sender and receiver cultures differ. Subsequent turns MAY omit it
+2. MAY omit `cultural_context` when cultures are the same
+
+### Receiving
+
+1. MUST validate the envelope before processing. If invalid, MUST respond with an error
+2. MUST deliver the message in a form the receiver can understand
+3. MAY deliver without adaptation when culture and language are the same
+
+### Response
+
+A JSON object returned to the sender:
+
+- status (string, MUST): "ok" or "error"
+- error_code (string, when error): See below
+- detail (string, MAY): Human-readable description
+
+Error codes:
+
+- `INVALID_ENVELOPE` — Required fields missing or wrong type
+- `UNSUPPORTED_VERSION` — `chorus_version` not recognized
+- `ADAPTATION_FAILED` — Receiver could not process the message
+
+Transport-level errors (delivery failure, timeout, unknown sender) are defined by L3.
+
+### Constraints
+
+- MUST NOT include personality or style in the envelope
+- `cultural_context` MUST be in the sender's language
+
+## 4. Not In Scope
+
+- Transport: how envelopes travel between agents
+- Discovery: how agents initially find each other's addresses
+- Authentication: how agents verify identity
+- Personality: how an agent speaks
+- Storage: how history is persisted
+
+## 5. Versioning
+
+0.4 is not backwards compatible with 0.2/0.3 (`original_semantic` replaced by `original_text`). Implementations receiving legacy envelopes with `original_semantic` SHOULD treat it as `original_text`.

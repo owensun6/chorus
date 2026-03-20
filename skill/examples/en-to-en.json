@@ -1,0 +1,17 @@
+{
+  "_description": "Same-culture communication — Chorus as cross-platform interop",
+
+  "user_input": "Hey, can we push the deployment to tomorrow? The CI pipeline is still red.",
+
+  "envelope": {
+    "chorus_version": "0.4",
+    "sender_id": "alice@chorus.example.com",
+    "original_text": "Hey, can we push the deployment to tomorrow? The CI pipeline is still red.",
+    "sender_culture": "en"
+  },
+
+  "adapted_output": {
+    "receiver_culture": "en",
+    "text": "Hey, can we push the deployment to tomorrow? The CI pipeline is still red."
+  }
+}

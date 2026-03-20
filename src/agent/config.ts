@@ -7,6 +7,7 @@ interface AgentConfig {
   readonly agentId: string;
   readonly languages: readonly string[];
   readonly personality?: string;
+  readonly routerApiKey?: string;
 }
 
 interface SendResult {
@@ -36,8 +37,9 @@ const parseArgs = (args: readonly string[]): AgentConfig => {
   const languagesRaw = flagValue("--languages");
   const languages = languagesRaw ? languagesRaw.split(",") : [culture];
   const personality = flagValue("--personality");
+  const routerApiKey = process.env["CHORUS_ROUTER_API_KEY"] || undefined;
 
-  return { culture, port, routerUrl, agentId, languages, personality };
+  return { culture, port, routerUrl, agentId, languages, personality, routerApiKey };
 };
 
 const validateEnv = (): { readonly apiKey: string } => {

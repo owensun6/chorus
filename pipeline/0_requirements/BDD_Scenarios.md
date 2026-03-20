@@ -1,5 +1,9 @@
 <!-- Author: PM -->
 
+# ~~Chorus Protocol — Phase 0 BDD Scenarios~~ [SUPERSEDED]
+
+> **⚠️ 本文档已被 `pipeline/BDD_Scenarios.md`（统一 BDD 验收场景）取代。保留为历史记录。**
+
 # Chorus Protocol — Phase 0 BDD Scenarios
 
 ---

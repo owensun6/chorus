@@ -171,4 +171,18 @@ describe("Agent CRUD Routes", () => {
       expect(json.error.code).toBe("ERR_NOT_FOUND");
     });
   });
+
+  describe("GET /health", () => {
+    it("returns status ok with version and uptime", async () => {
+      const res = await app.request("/health", { method: "GET" });
+
+      expect(res.status).toBe(200);
+      const json: Json = await res.json();
+      expect(json.success).toBe(true);
+      expect(json.data.status).toBe("ok");
+      expect(json.data.version).toBe("1.0.0");
+      expect(typeof json.data.uptime_seconds).toBe("number");
+      expect(json.data.uptime_seconds).toBeGreaterThanOrEqual(0);
+    });
+  });
 });

@@ -1,0 +1,12 @@
+node_modules
+dist
+tests
+.claude
+.github
+.git
+pipeline
+memory-bank
+memory
+docs
+demo
+*.md

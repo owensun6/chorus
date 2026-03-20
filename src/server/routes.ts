@@ -136,6 +136,17 @@ const createApp = (registry: AgentRegistry): Hono => {
     }
   });
 
+  app.get("/health", (c) => {
+    return c.json(
+      successResponse({
+        status: "ok",
+        version: "1.0.0",
+        uptime_seconds: Math.floor(process.uptime()),
+      }),
+      200,
+    );
+  });
+
   return app;
 };
 

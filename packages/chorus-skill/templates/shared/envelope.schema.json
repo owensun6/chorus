@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chorus-protocol.org/schemas/envelope/v0.4",
+  "title": "Chorus Envelope",
+  "description": "Chorus Protocol v0.4 — Agent-to-agent communication envelope",
+  "type": "object",
+  "required": ["chorus_version", "sender_id", "original_text", "sender_culture"],
+  "additionalProperties": true,
+  "properties": {
+    "chorus_version": {
+      "type": "string",
+      "enum": ["0.4"],
+      "description": "Protocol version"
+    },
+    "sender_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+$",
+      "description": "Sender address (name@host)"
+    },
+    "original_text": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The original message"
+    },
+    "sender_culture": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Z][a-z]{3})?(-[A-Z]{2}|-[0-9]{3})?$",
+      "description": "Sender culture (BCP 47 tag)"
+    },
+    "cultural_context": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 500,
+      "description": "Cultural background in sender's language. Include on first turn when cultures differ"
+    },
+    "conversation_id": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "Multi-turn conversation identifier"
+    },
+    "turn_number": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Turn counter"
+    }
+  }
+}

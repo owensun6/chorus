@@ -1,4 +1,6 @@
 // Author: be-domain-modeler
+// L3 Reference Implementation — CLI agent. Using Chorus protocol does NOT require this code.
+// Protocol: skill/PROTOCOL.md | Schema: skill/envelope.schema.json
 import { serve } from "@hono/node-server";
 import { createLLMClient, extractSemanticStream } from "./llm";
 import { createReceiver } from "./receiver";
@@ -13,8 +15,13 @@ import type { ChorusEnvelope } from "../shared/types";
 
 // --- Agent Lifecycle ---
 
+const routerHeaders = (apiKey?: string): Record<string, string> =>
+  apiKey
+    ? { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` }
+    : { "Content-Type": "application/json" };
+
 const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
-  const { culture, port, routerUrl, agentId, languages } = config;
+  const { culture, port, routerUrl, agentId, languages, routerApiKey } = config;
 
   const { apiKey } = validateEnv();
   const llmClient = createLLMClient(apiKey);
@@ -51,7 +58,7 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
 
   const regResponse = await fetch(`${routerUrl}/agents`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: routerHeaders(routerApiKey),
     body: JSON.stringify(registrationBody),
   });
 
@@ -86,7 +93,7 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
 
     const response = await fetch(`${routerUrl}/messages`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: routerHeaders(routerApiKey),
       body: JSON.stringify({ sender_agent_id: agentId, target_agent_id: targetId, message, stream: true }),
     });
 
@@ -133,7 +140,10 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
   const shutdown = async (): Promise<void> => {
     log(agentId, "Shutting down...");
     try {
-      await fetch(`${routerUrl}/agents/${agentId}`, { method: "DELETE" });
+      await fetch(`${routerUrl}/agents/${agentId}`, {
+        method: "DELETE",
+        headers: routerHeaders(routerApiKey),
+      });
       log(agentId, "Deregistered from router");
     } catch (err: unknown) {
       const msg = extractErrorMessage(err);

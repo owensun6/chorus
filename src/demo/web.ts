@@ -1,4 +1,5 @@
 // Author: be-api-router
+// L3 Reference Implementation — Web demo UI。非协议必需组件。
 import { Hono } from "hono";
 import { readFileSync } from "fs";
 import { join } from "path";

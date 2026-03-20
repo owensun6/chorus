@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/server/index.js",
     "test": "jest",
     "test:coverage": "jest --coverage"
   },

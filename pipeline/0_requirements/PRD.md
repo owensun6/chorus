@@ -1,5 +1,9 @@
 <!-- Author: PM -->
 
+# ~~Chorus Protocol — Phase 0 PRD~~ [SUPERSEDED]
+
+> **⚠️ 本文档已被 `pipeline/PRD.md`（统一 PRD v2.0）取代。保留为历史记录。与统一 PRD 冲突的内容以统一 PRD 为准。**
+
 # Chorus Protocol — Phase 0 PRD
 
 project: Chorus Protocol

@@ -1,4 +1,5 @@
 <!-- Author: PM -->
+<!-- ⚠️ SUPERSEDED: 本文档已被 pipeline/PRD.md（统一 PRD v2.0）取代。保留为历史记录。 -->
 
 project: Chorus Protocol — Phase 3: Agent Personality
 compiled_from: "Agent Card 人格字段 — 让每个 Agent 在注册时通过 Agent Card 声明自己的人格/沟通风格（personality），接收方 Agent 在做文化适配时参考发送方人格信息。"

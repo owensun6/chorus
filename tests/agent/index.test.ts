@@ -129,6 +129,22 @@ describe("parseArgs", () => {
   it("throws when --culture is missing", () => {
     expect(() => parseArgs(["--port", "3001"])).toThrow("--culture is required");
   });
+
+  it("reads routerApiKey from CHORUS_ROUTER_API_KEY env var", () => {
+    const prev = process.env["CHORUS_ROUTER_API_KEY"];
+    process.env["CHORUS_ROUTER_API_KEY"] = "my-secret";
+    const config = parseArgs(["--culture", "zh-CN"]);
+    expect(config.routerApiKey).toBe("my-secret");
+    if (prev === undefined) { delete process.env["CHORUS_ROUTER_API_KEY"]; } else { process.env["CHORUS_ROUTER_API_KEY"] = prev; }
+  });
+
+  it("leaves routerApiKey undefined when env var not set", () => {
+    const prev = process.env["CHORUS_ROUTER_API_KEY"];
+    delete process.env["CHORUS_ROUTER_API_KEY"];
+    const config = parseArgs(["--culture", "zh-CN"]);
+    expect(config.routerApiKey).toBeUndefined();
+    if (prev !== undefined) { process.env["CHORUS_ROUTER_API_KEY"] = prev; }
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -253,6 +269,37 @@ describe("startAgent", () => {
 
     expect(handle).toHaveProperty("shutdown");
     expect(handle).toHaveProperty("sendMessage");
+
+    fetchSpy.mockRestore();
+  });
+
+  it("sends Authorization header when routerApiKey is provided", async () => {
+    const fetchSpy = mockFetch([
+      { status: 200, body: { success: true, data: { agent_id: "agent-zh-CN-3001" } } },
+      { status: 200, body: { data: [] } },
+    ]);
+
+    const config = {
+      culture: "zh-CN",
+      port: 3001,
+      routerUrl: "http://localhost:3000",
+      agentId: "agent-zh-CN-3001",
+      languages: ["zh-CN"],
+      routerApiKey: "test-router-key",
+    };
+
+    await startAgent(config);
+
+    // Verify POST /agents included Authorization header
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "http://localhost:3000/agents",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          Authorization: "Bearer test-router-key",
+        }),
+      }),
+    );
 
     fetchSpy.mockRestore();
   });
@@ -521,5 +568,42 @@ describe("shutdown (via AgentHandle)", () => {
     expect(mockServerClose).toHaveBeenCalled();
 
     shutdownFetchSpy.mockRestore();
+  });
+
+  it("sends Authorization header on deregister when routerApiKey is provided", async () => {
+    const fetchSpy = mockFetch([
+      { status: 200, body: { success: true, data: {} } },
+      { status: 200, body: { data: [] } },
+    ]);
+
+    const config = {
+      culture: "en-US",
+      port: 3005,
+      routerUrl: "http://localhost:3000",
+      agentId: "agent-en-US-3005",
+      languages: ["en-US"],
+      routerApiKey: "shutdown-key",
+    };
+
+    const handle = await startAgent(config);
+    fetchSpy.mockRestore();
+
+    const shutdownSpy = mockFetch([
+      { status: 200, body: { success: true, data: {} } },
+    ]);
+
+    await handle.shutdown();
+
+    expect(shutdownSpy).toHaveBeenCalledWith(
+      "http://localhost:3000/agents/agent-en-US-3005",
+      expect.objectContaining({
+        method: "DELETE",
+        headers: expect.objectContaining({
+          Authorization: "Bearer shutdown-key",
+        }),
+      }),
+    );
+
+    shutdownSpy.mockRestore();
   });
 });

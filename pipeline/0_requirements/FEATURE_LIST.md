@@ -1,5 +1,9 @@
 <!-- Author: PM -->
 
+# ~~功能追踪矩阵 (Phase 0)~~ [SUPERSEDED]
+
+> **⚠️ 本文档已被 `pipeline/FEATURE_LIST.md`（统一功能追踪矩阵）取代。保留为历史记录。**
+
 # 功能追踪矩阵 (Feature Traceability Matrix)
 
 > 项目追踪脊柱。各阶段角色按职责更新对应列，Commander 随时可查看整体进度。

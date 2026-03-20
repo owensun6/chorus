@@ -1,13 +1,14 @@
 # 战略全景沙盘 (Fusion Global Monitor)
 
-> 最后更新: 2026-03-18 Phase 1 Gate 0 通过，Stage 1 启动
+> 最后更新: 2026-03-19 Phase 5 Gate 0 通过，/scale quick 激活
 
 ## 当前阶段
 
 | 项目 | 值 |
 |------|---|
-| 项目名称 | Chorus Protocol |
-| 当前 Stage | Phase 0 ✅ 归档 — 等待 Phase 1 启动 |
+| 项目名称 | Chorus — 跨文化语义适配协议与平台 |
+| 当前 Stage | Phase 5 ✅ 完成 |
+| 启动日期 | 2026-03-19 |
 | 启动日期 | 2026-03-17 |
 
 ## Phase 0 阶段推进看板
@@ -95,3 +96,18 @@ FP-2 原子性: Phase 0 选择了 spike 模式而非正式 TDD，因为目的是
 | T-06 | be-api-router | T-05 | [x] | [✓] | [ ] | |
 | T-07 | be-api-router | T-02,T-04 | [x] | [✓] | [ ] | |
 | T-08 | be-domain-modeler | T-02,T-03,T-04,T-07 | [x] | [✓] | [ ] | |
+
+---
+
+## Phase 5 看板
+
+| Gate | 阶段名称 | 状态 | 产出物链路 | 风险与重审日志 |
+|------|---------|------|-----------|--------------|
+| Gate 0 | Stage 0: PM 需求解构 | ✅ 已通过 | pipeline/PRD.md, FEATURE_LIST.md, BDD_Scenarios.md | Commander 2026-03-19 签字。3 轮 FP 审计。Schema 删除 intent_type 等 3 字段 |
+| Gate 0.5 | Stage 0.5: 低保真原型 | ⏭️ SKIP | 纯协议项目，无 UI | |
+| Gate 1 | Stage 1: 差距分析 | ✅ 已通过 | Gap_Analysis.md — D1(P0) 已完成，剩 D2+D3 | FP 审计删除 4 份冗余文档。Commander 2026-03-19 签字 |
+| Stage 1.5 | 原型修订 | ⏭️ SKIP | 无 UI | |
+| Stage 2 | 头脑风暴 | ✅ 完成 | 2026-03-19-skill-redesign.md — 混合方案（Role-First + Protocol-First） | FP 审计发现 SKILL.old.md 思想未对齐新 PRD |
+| Gate 2 | Stage 3: DAG 兵力分配 | ✅ 已通过 | task.md (8 Tasks), dependency_graph.md | Commander 2026-03-19 签字 |
+| Stage 5 | 开发执行 | ✅ 完成 | 8/8 Tasks GREEN. 跨平台验证 3/3 PASS | PROTOCOL.md v0.4 + SKILL.md + npm CLI |
+| Stage 6+7 | QA + 收尾 | ✅ 完成 | cross-platform-validation.md (3/3 PASS) | 2026-03-19 |

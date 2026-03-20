@@ -1,4 +1,5 @@
 // Author: be-api-router
+// L3 Reference Implementation — Chorus 接收端参考实现。协议行为规范见 skill/SKILL.md。
 import { Hono } from "hono";
 import type OpenAI from "openai";
 import { findChorusDataPart } from "./envelope";

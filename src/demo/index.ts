@@ -1,4 +1,6 @@
 // Author: be-api-router
+// L3 Reference Implementation — Demo orchestrator. Using Chorus protocol does NOT require this code.
+// Protocol: skill/PROTOCOL.md | Schema: skill/envelope.schema.json
 import { serve } from "@hono/node-server";
 import { createApp } from "../server/routes";
 import { AgentRegistry } from "../server/registry";

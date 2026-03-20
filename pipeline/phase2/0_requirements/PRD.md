@@ -1,4 +1,5 @@
 <!-- Author: PM -->
+<!-- ⚠️ SUPERSEDED: 本文档已被 pipeline/PRD.md（统一 PRD v2.0）取代。保留为历史记录。 -->
 
 project: Chorus Protocol Phase 2
 compiled_from: "Phase 2 需求：1) Streaming 流式输出 — LLM 调用改为流式，路由服务器和 Agent 端支持 SSE/streaming 透传，CLI 逐字显示适配文本。2) Web Demo UI — 可视化两个 Agent 的对话过程，左右分栏显示 zh-CN 和 ja Agent 视角，展示信封元数据（cultural_context、intent_type 等），一键启动 demo。3) 多轮对话上下文 — Agent 维护对话历史，LLM 适配时注入近 N 轮上下文，信封中新增 conversation_id 和 turn_number 字段追踪对话。"

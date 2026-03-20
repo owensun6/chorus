@@ -1,4 +1,5 @@
 <!-- Author: PM -->
+<!-- ⚠️ SUPERSEDED: 本文档已被 pipeline/PRD.md（统一 PRD v2.0）取代。保留为历史记录。 -->
 
 Feature: 流式输出 (Streaming)
 

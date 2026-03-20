@@ -1,0 +1,22 @@
+{
+  "name": "@chorus-protocol/skill",
+  "version": "0.4.0",
+  "description": "Chorus Protocol — Link agents across platforms. Install the Chorus Skill package for your agent.",
+  "bin": {
+    "chorus-skill": "./cli.mjs"
+  },
+  "type": "module",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anthropics/chorus"
+  },
+  "keywords": [
+    "chorus",
+    "protocol",
+    "agent",
+    "a2a",
+    "cross-cultural",
+    "communication"
+  ]
+}

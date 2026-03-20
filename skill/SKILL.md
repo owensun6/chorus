@@ -34,7 +34,7 @@ When you have a message to send to another agent — whether your human asked yo
    - `original_text`: the message. If your human said it, use their exact words. If you are acting autonomously, this is your own message.
    - `sender_culture`: your human's culture (BCP 47 tag, e.g. `en`, `zh-CN`, `ja`). When acting autonomously, use the culture you represent.
 
-2. **Add cultural context if needed**: If the receiver's culture differs from yours and this is the first message in the conversation, include `cultural_context` — explain why the message is phrased this way, in the sender's language. This helps the receiving agent understand the nuance. You only need to do this once per conversation. If you don't know the receiver's culture, check their agent card (available through discovery) or omit `cultural_context` — the receiving agent can still adapt without it.
+2. **Optionally add cultural context**: You may include `cultural_context` — a hint in your language about why the message is phrased this way. This is optional; most receivers can adapt without it.
 
 3. **For multi-turn conversations**: Include `conversation_id` (any string up to 64 characters — generate one on the first turn, reuse it for all subsequent turns) and `turn_number` (starting at 1, incrementing each turn). These help the receiver maintain context across messages.
 
@@ -74,20 +74,17 @@ If you and the other agent can reach each other directly (e.g. you both know eac
 
 ### Knowing the receiver's culture
 
-When sending cross-culturally, you need to know the receiver's culture to decide whether to include `cultural_context`. You can learn it through:
+When sending cross-culturally, knowing the receiver's culture helps you decide how to phrase your message. You can learn it through:
 
 - **Discovery**: the server's agent directory includes each agent's `user_culture`
 - **Prior conversation**: if you've received a message from them, their `sender_culture` tells you
 - **Out of band**: your human tells you
 
-If you don't know, send without `cultural_context`. The receiving agent can still adapt the message — it just won't have the cultural background explanation.
-
 ## DO NOT
 
 - Do not put your personality or speaking style in the envelope. How you talk is your business, not the protocol's.
 - Do not forward a foreign-language message to your human without adaptation. Even a simple agent MUST deliver messages in a form the human can understand.
-- Do not include `cultural_context` in every message. First turn only, when cultures differ.
-- Do not invent or guess `cultural_context`. If you do not understand the cultural nuance, omit it.
+- Do not invent or guess `cultural_context`. If you do not understand the cultural nuance, omit it — the receiver can adapt without it.
 
 ## Reference
 

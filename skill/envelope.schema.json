@@ -31,7 +31,7 @@
       "type": "string",
       "minLength": 10,
       "maxLength": 500,
-      "description": "Cultural background in sender's language. Include on first turn when cultures differ"
+      "description": "Optional hint — cultural background in sender's language. Most receivers can adapt without it"
     },
     "conversation_id": {
       "type": "string",

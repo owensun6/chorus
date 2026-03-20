@@ -1,0 +1,39 @@
+# EXP-02 Server Log — PILOT RUN (not formal evidence)
+# Server started: 2026-03-20T06:34:32Z (approx)
+# Experiment T₀: ~06:40 UTC (Commander reports 10:40 local)
+
+[demo] Router started on :3000
+[agent-zh-cn@localhost] Receiver listening on port 3001
+[agent-zh-cn@localhost] Registered with router at http://localhost:3000
+[agent-zh-cn@localhost] Discovered 1 compatible agent(s): agent-zh-cn@localhost
+[demo] Agent zh-CN started on :3001
+[agent-ja@localhost] Receiver listening on port 3002
+[agent-ja@localhost] Registered with router at http://localhost:3000
+[agent-ja@localhost] Discovered 2 compatible agent(s): agent-zh-cn@localhost, agent-ja@localhost
+[demo] Agent ja started on :3002
+[demo] Web server started on :5100
+[demo] Opening browser: http://localhost:5100
+
+# --- Experiment activity ---
+
+# xiaov registration: 06:44:49 UTC (from GET /agents response)
+# Agent ID: xiaov@localhost
+# Endpoint: http://localhost:3005/receive
+# agent_card: { chorus_version: "0.2", user_culture: "zh-CN", supported_languages: ["zh-CN", "en"] }
+
+# xiaov outbound send #1 → agent-zh-cn@localhost
+[agent-zh-cn@localhost] Message from xiaov@localhost:
+[agent-zh-cn@localhost]   Original: Hello! This is XiaoV from the English-speaking world. Nice to meet you!
+[agent-zh-cn@localhost]   Adapted:  嘿，刚收到一条消息，是个叫XiaoV的外国朋友发的，说他在英语世界那边，挺热情地跟咱打招呼呢！
+人家挺有礼貌的，还特意说了"Nice to meet you"，听着挺真诚的～
+你要是想回点啥，我随时帮您琢磨，地道又不掉面儿！
+
+# xiaov outbound send #2 → agent-ja@localhost
+[agent-ja@localhost] Message from xiaov@localhost:
+[agent-ja@localhost]   Original: Hello from XiaoV! I speak Chinese and English.
+[agent-ja@localhost]   Adapted:  小V（XiaoV）様よりごあいさつをいただiatingいたします。中国語と英語のご案内が可能とのことです。
+お忙しいところ恐れ入りますが、何卒よろしくお願い申し上げます。
+
+# Conductor inbound → xiaov@localhost: 06:49:25 UTC
+# POST /messages { receiver_id: "xiaov@localhost", envelope: { chorus_version: "0.4", sender_id: "agent-zh-cn@localhost", original_text: "周末我们组织了一次团建..." } }
+# Response: { success: true, data: { delivery: "delivered", receiver_response: { status: "ok" } } }

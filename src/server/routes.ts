@@ -100,18 +100,16 @@ const createApp = (registry: AgentRegistry): Hono => {
       return handleStreamForward(c, target.endpoint, envelope, TIMEOUT_MS);
     }
 
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
+    try {
       const targetRes = await fetch(target.endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ envelope }),
         signal: controller.signal,
       });
-
-      clearTimeout(timer);
 
       if (targetRes.status >= 500) {
         return c.json(
@@ -136,6 +134,8 @@ const createApp = (registry: AgentRegistry): Hono => {
         ),
         502
       );
+    } finally {
+      clearTimeout(timer);
     }
   });
 
@@ -169,18 +169,16 @@ const handleStreamForward = async (
   envelope: unknown,
   timeoutMs: number,
 ): Promise<Response> => {
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
+  try {
     const targetRes = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "text/event-stream" },
       body: JSON.stringify({ envelope }),
       signal: controller.signal,
     });
-
-    clearTimeout(timer);
 
     if (targetRes.status >= 500) {
       return sseErrorResponse("ERR_AGENT_UNREACHABLE", "Receiver agent returned a server error");
@@ -190,6 +188,8 @@ const handleStreamForward = async (
   } catch (err: unknown) {
     const errMessage = extractErrorMessage(err);
     return sseErrorResponse("ERR_AGENT_UNREACHABLE", `Failed to reach receiver agent: ${errMessage}`);
+  } finally {
+    clearTimeout(timer);
   }
 };
 

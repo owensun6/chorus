@@ -25,6 +25,18 @@ jest.mock("@hono/node-server", () => ({
   serve: mockServe,
 }));
 
+// Replace global.fetch with jest.fn() BEFORE any test runs.
+// jest.spyOn(global, "fetch") would touch Node's native fetch, initializing
+// undici's internal connection pool (keepAlive timers) that survive spy restore
+// and prevent jest from exiting. Full replacement avoids this entirely.
+const originalFetch = global.fetch;
+const fetchMock = jest.fn() as jest.MockedFunction<typeof global.fetch>;
+global.fetch = fetchMock;
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
+
 // Import after mocks are wired
 import { parseArgs, validateEnv, startAgent } from "../../src/agent/index";
 import { parseSSEChunks } from "../../src/shared/sse";
@@ -34,7 +46,6 @@ import { parseSSEChunks } from "../../src/shared/sse";
 // ---------------------------------------------------------------------------
 
 const mockFetch = (responses: Array<{ status: number; body: any; sseBody?: string }>) => {
-  const spy = jest.spyOn(global, "fetch");
   for (const r of responses) {
     if (r.sseBody !== undefined) {
       const encoder = new TextEncoder();
@@ -45,7 +56,7 @@ const mockFetch = (responses: Array<{ status: number; body: any; sseBody?: strin
           controller.close();
         },
       });
-      spy.mockResolvedValueOnce({
+      fetchMock.mockResolvedValueOnce({
         ok: r.status >= 200 && r.status < 300,
         status: r.status,
         statusText: r.status === 200 ? "OK" : "Error",
@@ -53,7 +64,7 @@ const mockFetch = (responses: Array<{ status: number; body: any; sseBody?: strin
         body: stream,
       } as Response);
     } else {
-      spy.mockResolvedValueOnce({
+      fetchMock.mockResolvedValueOnce({
         ok: r.status >= 200 && r.status < 300,
         status: r.status,
         statusText: r.status === 200 ? "OK" : "Error",
@@ -62,7 +73,7 @@ const mockFetch = (responses: Array<{ status: number; body: any; sseBody?: strin
       } as unknown as Response);
     }
   }
-  return spy;
+  return fetchMock;
 };
 
 const createStartedAgent = async (overrides?: Partial<{
@@ -87,7 +98,7 @@ const createStartedAgent = async (overrides?: Partial<{
   };
 
   const handle = await startAgent(config);
-  fetchSpy.mockRestore();
+  fetchMock.mockClear();
   return handle;
 };
 
@@ -244,6 +255,7 @@ describe("startAgent", () => {
 
     const handle = await startAgent(config);
 
+
     // Verify POST /agents was called
     expect(fetchSpy).toHaveBeenCalledWith(
       "http://localhost:3000/agents",
@@ -262,7 +274,7 @@ describe("startAgent", () => {
     expect(handle).toHaveProperty("shutdown");
     expect(handle).toHaveProperty("sendMessage");
 
-    fetchSpy.mockRestore();
+    fetchMock.mockClear();
   });
 
   it("sends Authorization header when routerApiKey is provided", async () => {
@@ -280,7 +292,8 @@ describe("startAgent", () => {
       routerApiKey: "test-router-key",
     };
 
-    await startAgent(config);
+    const handle = await startAgent(config);
+
 
     expect(fetchSpy).toHaveBeenCalledWith(
       "http://localhost:3000/agents",
@@ -292,7 +305,7 @@ describe("startAgent", () => {
       }),
     );
 
-    fetchSpy.mockRestore();
+    fetchMock.mockClear();
   });
 
   it("creates ConversationHistory and passes it to createReceiver", async () => {
@@ -309,7 +322,8 @@ describe("startAgent", () => {
       languages: ["zh-CN"],
     };
 
-    await startAgent(config);
+    const handle = await startAgent(config);
+
 
     expect(mockCreateReceiver).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -322,7 +336,7 @@ describe("startAgent", () => {
       }),
     );
 
-    fetchSpy.mockRestore();
+    fetchMock.mockClear();
   });
 });
 
@@ -385,7 +399,7 @@ describe("sendMessage (via AgentHandle)", () => {
     expect(postBody.envelope.conversation_id).toBeDefined();
     expect(postBody.envelope.turn_number).toBe(1);
 
-    sendFetchSpy.mockRestore();
+    fetchMock.mockClear();
   });
 
   it("increments turn_number on consecutive sends to same target", async () => {
@@ -400,7 +414,7 @@ describe("sendMessage (via AgentHandle)", () => {
     const body1 = JSON.parse(fetchSpy1.mock.calls[0][1]?.body as string);
     expect(body1.envelope.turn_number).toBe(1);
     const convId1 = body1.envelope.conversation_id;
-    fetchSpy1.mockRestore();
+    fetchMock.mockClear();
 
     // Second message to same target
     mockGenerateCulturalContext.mockResolvedValueOnce({});
@@ -411,7 +425,7 @@ describe("sendMessage (via AgentHandle)", () => {
     const body2 = JSON.parse(fetchSpy2.mock.calls[0][1]?.body as string);
     expect(body2.envelope.turn_number).toBe(2);
     expect(body2.envelope.conversation_id).toBe(convId1);
-    fetchSpy2.mockRestore();
+    fetchMock.mockClear();
   });
 
   it("records sent turn in history after sendMessage", async () => {
@@ -433,7 +447,7 @@ describe("sendMessage (via AgentHandle)", () => {
     expect(turns[0].originalText).toBe("test input");
     expect(turns[0].adaptedText).toBe("adapted test");
 
-    sendSpy.mockRestore();
+    fetchMock.mockClear();
   });
 
   it("records received turn in history via onMessage callback", async () => {
@@ -476,7 +490,7 @@ describe("sendMessage (via AgentHandle)", () => {
       expect.arrayContaining(["Hello ", "there ", "friend"]),
     );
 
-    sendSpy.mockRestore();
+    fetchMock.mockClear();
   });
 });
 
@@ -515,7 +529,7 @@ describe("shutdown (via AgentHandle)", () => {
     };
 
     const handle = await startAgent(config);
-    fetchSpy.mockRestore();
+    fetchMock.mockClear();
 
     const shutdownFetchSpy = mockFetch([
       { status: 200, body: { success: true, data: {} } },
@@ -530,7 +544,7 @@ describe("shutdown (via AgentHandle)", () => {
 
     expect(mockServerClose).toHaveBeenCalled();
 
-    shutdownFetchSpy.mockRestore();
+    fetchMock.mockClear();
   });
 
   it("sends Authorization header on deregister when routerApiKey is provided", async () => {
@@ -549,7 +563,7 @@ describe("shutdown (via AgentHandle)", () => {
     };
 
     const handle = await startAgent(config);
-    fetchSpy.mockRestore();
+    fetchMock.mockClear();
 
     const shutdownSpy = mockFetch([
       { status: 200, body: { success: true, data: {} } },
@@ -567,6 +581,6 @@ describe("shutdown (via AgentHandle)", () => {
       }),
     );
 
-    shutdownSpy.mockRestore();
+    fetchMock.mockClear();
   });
 });

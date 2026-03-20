@@ -5,6 +5,17 @@ import { AgentRegistry } from "../../src/server/registry";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Json = any;
 
+// Replace global.fetch before any test touches it. jest.spyOn would
+// initialize Node's undici connection pool (keepAlive timers) that
+// survive spy restore and prevent jest from exiting.
+const originalFetch = global.fetch;
+const fetchMock = jest.fn() as jest.MockedFunction<typeof global.fetch>;
+global.fetch = fetchMock;
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
+
 const SENDER_AGENT = {
   id: "agent-alpha@chorus.example",
   endpoint: "https://alpha.example.com/receive",
@@ -40,7 +51,7 @@ const validMessage = {
 describe("POST /messages", () => {
   let app: ReturnType<typeof createApp>;
   let registry: AgentRegistry;
-  let fetchSpy: jest.SpiedFunction<typeof global.fetch>;
+  let fetchSpy: jest.MockedFunction<typeof global.fetch>;
 
   beforeEach(() => {
     registry = new AgentRegistry();
@@ -48,11 +59,12 @@ describe("POST /messages", () => {
     registry.register(RECEIVER_AGENT.id, RECEIVER_AGENT.endpoint, RECEIVER_AGENT.card);
     app = createApp(registry);
 
-    fetchSpy = jest.spyOn(global, "fetch");
+    fetchMock.mockClear();
+    fetchSpy = fetchMock;
   });
 
   afterEach(() => {
-    fetchSpy.mockRestore();
+    fetchMock.mockClear();
   });
 
   const postMessage = (body: unknown) =>
@@ -215,7 +227,7 @@ const makeMockSSEStream = (events: string): ReadableStream<Uint8Array> => {
 describe("POST /messages (streaming)", () => {
   let app: ReturnType<typeof createApp>;
   let registry: AgentRegistry;
-  let fetchSpy: jest.SpiedFunction<typeof global.fetch>;
+  let fetchSpy: jest.MockedFunction<typeof global.fetch>;
 
   const streamMessage = {
     ...validMessage,
@@ -227,11 +239,12 @@ describe("POST /messages (streaming)", () => {
     registry.register(SENDER_AGENT.id, SENDER_AGENT.endpoint, SENDER_AGENT.card);
     registry.register(RECEIVER_AGENT.id, RECEIVER_AGENT.endpoint, RECEIVER_AGENT.card);
     app = createApp(registry);
-    fetchSpy = jest.spyOn(global, "fetch");
+    fetchMock.mockClear();
+    fetchSpy = fetchMock;
   });
 
   afterEach(() => {
-    fetchSpy.mockRestore();
+    fetchMock.mockClear();
   });
 
   const postMessage = (body: unknown) =>

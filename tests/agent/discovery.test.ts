@@ -86,6 +86,17 @@ describe("canCommunicate", () => {
 
 // --- discoverCompatibleAgents ---
 
+// Replace global.fetch before any test touches it. jest.spyOn would
+// initialize Node's undici connection pool (keepAlive timers) that
+// survive spy restore and prevent jest from exiting.
+const originalFetch = global.fetch;
+const fetchMock = jest.fn() as jest.MockedFunction<typeof global.fetch>;
+global.fetch = fetchMock;
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
+
 describe("discoverCompatibleAgents", () => {
   const routerUrl = "https://router.example.com";
 
@@ -100,11 +111,11 @@ describe("discoverCompatibleAgents", () => {
   ];
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    fetchMock.mockClear();
   });
 
   it("filters out incompatible agents and returns only compatible ones", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValueOnce({
+    fetchMock.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: agents, metadata: { timestamp: new Date().toISOString() } }),
     } as Response);
@@ -116,7 +127,7 @@ describe("discoverCompatibleAgents", () => {
   });
 
   it("throws an error with routerUrl on HTTP failure", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValueOnce({
+    fetchMock.mockResolvedValueOnce({
       ok: false,
       status: 500,
       statusText: "Internal Server Error",
@@ -128,7 +139,7 @@ describe("discoverCompatibleAgents", () => {
   });
 
   it("throws an error when fetch itself rejects (network error)", async () => {
-    jest.spyOn(global, "fetch").mockRejectedValueOnce(new Error("network down"));
+    fetchMock.mockRejectedValueOnce(new Error("network down"));
 
     await expect(discoverCompatibleAgents(routerUrl, myCard)).rejects.toThrow();
   });

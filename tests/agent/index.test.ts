@@ -234,7 +234,7 @@ describe("startAgent", () => {
               agent_id: "agent-en-US@localhost",
               endpoint: "http://localhost:3002/receive",
               agent_card: {
-                chorus_version: "0.2",
+                card_version: "0.3",
                 user_culture: "en-US",
                 supported_languages: ["en-US", "zh-CN"],
               },
@@ -268,7 +268,7 @@ describe("startAgent", () => {
     const postCall = fetchSpy.mock.calls[0];
     const postBody = JSON.parse(postCall[1]?.body as string);
     expect(postBody.agent_id).toBe("agent-zh-CN@localhost");
-    expect(postBody.agent_card.chorus_version).toBe("0.2");
+    expect(postBody.agent_card.card_version).toBe("0.3");
     expect(postBody.agent_card.user_culture).toBe("zh-CN");
 
     expect(handle).toHaveProperty("shutdown");

@@ -86,7 +86,7 @@ const run = async () => {
     body: JSON.stringify({
       agent_id: "agent-zh-cn@localhost",
       endpoint: `http://localhost:${AGENT_A_PORT}/receive`,
-      agent_card: { chorus_version: "0.2", user_culture: "zh-CN", supported_languages: ["zh-CN", "ja", "en"] },
+      agent_card: { card_version: "0.3", user_culture: "zh-CN", supported_languages: ["zh-CN", "ja", "en"] },
     }),
   });
 
@@ -96,7 +96,7 @@ const run = async () => {
     body: JSON.stringify({
       agent_id: "agent-ja@localhost",
       endpoint: `http://localhost:${AGENT_B_PORT}/receive`,
-      agent_card: { chorus_version: "0.2", user_culture: "ja", supported_languages: ["ja", "zh-CN", "en"] },
+      agent_card: { card_version: "0.3", user_culture: "ja", supported_languages: ["ja", "zh-CN", "en"] },
     }),
   });
 

@@ -25,7 +25,7 @@ POST /agents
   "agent_id": "my-agent@chorus.example",
   "endpoint": "https://my-agent.example/receive",
   "agent_card": {
-    "chorus_version": "0.2",
+    "card_version": "0.3",
     "user_culture": "en",
     "supported_languages": ["en"]
   }
@@ -73,6 +73,8 @@ Your endpoint responds: `{"status": "ok"}`
 
 That's it. You are now sending and receiving Chorus envelopes.
 
+**Important: envelope nesting.** The Chorus envelope is always wrapped inside a JSON object — never sent as the top-level body. When sending: `{ "receiver_id": "...", "envelope": { ...chorus fields... } }`. When receiving: `{ "envelope": { ...chorus fields... } }`. The envelope fields (`chorus_version`, `sender_id`, `original_text`, `sender_culture`) go inside the `"envelope"` key, not at the root of the request body.
+
 ## 2. Addressing
 
 An agent address follows the format `name@host`.
@@ -115,9 +117,11 @@ An agent announces itself to a server.
 Request:
 - `agent_id` (string, MUST): the agent's `name@host` address
 - `endpoint` (string, MUST): URL where the agent receives envelopes
-- `agent_card` (object, SHOULD): agent capabilities — `chorus_version`, `user_culture` (BCP 47), `supported_languages` (BCP 47 array)
+- `agent_card` (object, SHOULD): agent capabilities — `card_version` (agent card schema version, currently `"0.3"`), `user_culture` (BCP 47), `supported_languages` (BCP 47 array)
 
-Note on version fields: `agent_card.chorus_version` is the agent card schema version (currently `"0.2"`). This is independent from the envelope's `chorus_version` (currently `"0.4"` per PROTOCOL.md). They version different things — do not use the envelope version in the agent card or vice versa.
+Note: the agent card field is `card_version` (not `chorus_version`). The envelope has its own `chorus_version` field (`"0.4"`). They are different fields versioning different things.
+
+**Migration from card v0.2**: In v0.2, the agent card field was named `chorus_version` (same name as the envelope field). This caused confusion, so v0.3 renames it to `card_version`. Agents using the old `chorus_version` field in their agent card MUST update to `card_version: "0.3"`. Servers MAY return a generic validation error if the old field name is used.
 
 Result: registration record with `registered_at` timestamp.
 
@@ -213,7 +217,7 @@ POST /agents
   "agent_id": "alice@chorus.example",
   "endpoint": "https://alice.example/receive",
   "agent_card": {
-    "chorus_version": "0.2",     // agent card schema version, NOT the envelope version
+    "card_version": "0.3",
     "user_culture": "zh-CN",
     "supported_languages": ["zh-CN", "en"]
   }

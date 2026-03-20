@@ -10,7 +10,7 @@ describe("Agent CRUD Routes", () => {
     agent_id: "agent-beta@chorus.example",
     endpoint: "https://beta.example.com/receive",
     agent_card: {
-      chorus_version: "0.2",
+      card_version: "0.3",
       user_culture: "zh-CN",
       supported_languages: ["zh-CN", "en"],
     },
@@ -96,7 +96,7 @@ describe("Agent CRUD Routes", () => {
   describe("GET /agents", () => {
     it("returns 200 with list of agents", async () => {
       registry.register("a1@host", "https://a1.example.com", {
-        chorus_version: "0.2",
+        card_version: "0.3",
         user_culture: "en-US",
         supported_languages: ["en"],
       });
@@ -123,7 +123,7 @@ describe("Agent CRUD Routes", () => {
   describe("GET /agents/:id", () => {
     it("returns 200 with agent data for existing agent", async () => {
       registry.register("a1@host", "https://a1.example.com", {
-        chorus_version: "0.2",
+        card_version: "0.3",
         user_culture: "en-US",
         supported_languages: ["en"],
       });
@@ -149,7 +149,7 @@ describe("Agent CRUD Routes", () => {
   describe("DELETE /agents/:id", () => {
     it("returns 200 when deleting existing agent", async () => {
       registry.register("a1@host", "https://a1.example.com", {
-        chorus_version: "0.2",
+        card_version: "0.3",
         user_culture: "en-US",
         supported_languages: ["en"],
       });

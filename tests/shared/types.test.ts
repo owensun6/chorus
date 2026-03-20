@@ -97,16 +97,16 @@ describe("ChorusEnvelope v0.4", () => {
   });
 });
 
-describe("ChorusAgentCard v0.2", () => {
+describe("ChorusAgentCard v0.3", () => {
   const validCard = {
-    chorus_version: "0.2" as const,
+    card_version: "0.3" as const,
     user_culture: "zh-CN",
     supported_languages: ["zh-CN", "ja", "en"],
   };
 
   test("test_case_5: valid card passes", () => {
     const result = ChorusAgentCardSchema.parse(validCard);
-    expect(result.chorus_version).toBe("0.2");
+    expect(result.card_version).toBe("0.3");
     expect(result.user_culture).toBe("zh-CN");
     expect(result.supported_languages).toEqual(["zh-CN", "ja", "en"]);
   });

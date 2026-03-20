@@ -52,7 +52,7 @@ type OnChunkCallback = (text: string) => void;
 
 const ChorusAgentCardSchema = z
   .object({
-    chorus_version: z.literal("0.2"),
+    card_version: z.literal("0.3"),
     user_culture: bcp47String,
     supported_languages: z
       .array(bcp47String)

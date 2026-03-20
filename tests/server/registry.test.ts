@@ -4,7 +4,7 @@ import type { AgentRegistration } from "../../src/shared/types";
 
 describe("AgentRegistry", () => {
   const validCard = {
-    chorus_version: "0.2" as const,
+    card_version: "0.3" as const,
     user_culture: "en-US",
     supported_languages: ["en", "zh-CN"],
   };

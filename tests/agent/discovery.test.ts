@@ -12,7 +12,7 @@ const makeCard = (
   userCulture: string,
   supportedLanguages: readonly string[]
 ): ChorusAgentCard => ({
-  chorus_version: "0.2",
+  card_version: "0.3",
   user_culture: userCulture,
   supported_languages: [...supportedLanguages],
 });
@@ -60,14 +60,14 @@ describe("canCommunicate", () => {
 
   it("returns false when cardA has empty supported_languages", () => {
     // Note: Zod schema requires min(1), but canCommunicate should still guard
-    const cardA = { chorus_version: "0.2" as const, user_culture: "zh-CN", supported_languages: [] as string[] };
+    const cardA = { card_version: "0.3" as const, user_culture: "zh-CN", supported_languages: [] as string[] };
     const cardB = makeCard("ja", ["ja", "zh"]);
     expect(canCommunicate(cardA as ChorusAgentCard, cardB)).toBe(false);
   });
 
   it("returns false when cardB has empty supported_languages", () => {
     const cardA = makeCard("zh-CN", ["zh", "ja"]);
-    const cardB = { chorus_version: "0.2" as const, user_culture: "ja", supported_languages: [] as string[] };
+    const cardB = { card_version: "0.3" as const, user_culture: "ja", supported_languages: [] as string[] };
     expect(canCommunicate(cardA, cardB as ChorusAgentCard)).toBe(false);
   });
 

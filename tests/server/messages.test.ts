@@ -20,7 +20,7 @@ const SENDER_AGENT = {
   id: "agent-alpha@chorus.example",
   endpoint: "https://alpha.example.com/receive",
   card: {
-    chorus_version: "0.2" as const,
+    card_version: "0.3" as const,
     user_culture: "en-US",
     supported_languages: ["en"],
   },
@@ -30,7 +30,7 @@ const RECEIVER_AGENT = {
   id: "agent-beta@chorus.example",
   endpoint: "https://beta.example.com/receive",
   card: {
-    chorus_version: "0.2" as const,
+    card_version: "0.3" as const,
     user_culture: "zh-CN",
     supported_languages: ["zh-CN", "en"],
   },

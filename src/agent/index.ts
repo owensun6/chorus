@@ -53,7 +53,7 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
   const registrationBody = {
     agent_id: agentId,
     endpoint: `http://localhost:${port}/receive`,
-    agent_card: { chorus_version: "0.2" as const, user_culture: culture, supported_languages: [...languages] },
+    agent_card: { card_version: "0.3" as const, user_culture: culture, supported_languages: [...languages] },
   };
 
   const regResponse = await fetch(`${routerUrl}/agents`, {
@@ -68,7 +68,7 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
   log(agentId, `Registered with router at ${routerUrl}`);
 
   const compatible = await discoverCompatibleAgents(routerUrl, {
-    chorus_version: "0.2",
+    card_version: "0.3",
     user_culture: culture,
     supported_languages: [...languages],
   });
@@ -166,7 +166,7 @@ if (require.main === module) {
 
       const target = { id: "" };
       discoverCompatibleAgents(config.routerUrl, {
-        chorus_version: "0.2",
+        card_version: "0.3",
         user_culture: config.culture,
         supported_languages: [...config.languages],
       }).then((agents) => {

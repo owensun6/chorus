@@ -1,11 +1,11 @@
-// Author: Lead — Phase 1 E2E smoke test
+// Author: Lead — Phase 1 E2E smoke test (v0.4)
 // Usage: DASHSCOPE_API_KEY=xxx npx ts-node tests/e2e/smoke.ts
 import { serve } from "@hono/node-server";
 import { AgentRegistry } from "../../src/server/registry";
 import { createApp } from "../../src/server/routes";
 import { createReceiver } from "../../src/agent/receiver";
-import { createLLMClient, extractSemantic } from "../../src/agent/llm";
-import { createEnvelope, createChorusMessage } from "../../src/agent/envelope";
+import { createLLMClient, generateCulturalContext } from "../../src/agent/llm";
+import { createEnvelope } from "../../src/agent/envelope";
 import type { ChorusEnvelope } from "../../src/shared/types";
 
 // --- Config ---
@@ -27,19 +27,23 @@ const TEST_CASES = [
     name: "中国式寒暄→日本文化适配",
     input: "你吃了吗？",
     senderCulture: "zh-CN",
+    senderId: "agent-zh-cn@localhost",
     receiverCulture: "ja",
+    targetId: "agent-ja@localhost",
   },
   {
     name: "日本谦逊→中国文化适配",
     input: "つまらないものですが、お受け取りください。",
     senderCulture: "ja",
+    senderId: "agent-ja@localhost",
     receiverCulture: "zh-CN",
+    targetId: "agent-zh-cn@localhost",
   },
 ];
 
 // --- Orchestrate ---
 const run = async () => {
-  console.log("=== Phase 1 E2E Smoke Test ===\n");
+  console.log("=== E2E Smoke Test (v0.4) ===\n");
 
   // 1. Start routing server
   const registry = new AgentRegistry();
@@ -80,7 +84,7 @@ const run = async () => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      agent_id: "agent-zh-cn",
+      agent_id: "agent-zh-cn@localhost",
       endpoint: `http://localhost:${AGENT_A_PORT}/receive`,
       agent_card: { chorus_version: "0.2", user_culture: "zh-CN", supported_languages: ["zh-CN", "ja", "en"] },
     }),
@@ -90,9 +94,9 @@ const run = async () => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      agent_id: "agent-ja",
+      agent_id: "agent-ja@localhost",
       endpoint: `http://localhost:${AGENT_B_PORT}/receive`,
-      agent_card: { chorus_version: "0.2", user_culture: "ja", supported_languages: ["ja", "zh", "en"] },
+      agent_card: { chorus_version: "0.2", user_culture: "ja", supported_languages: ["ja", "zh-CN", "en"] },
     }),
   });
 
@@ -103,32 +107,28 @@ const run = async () => {
     console.log(`--- ${tc.name} ---`);
     console.log(`Input: "${tc.input}" (${tc.senderCulture} → ${tc.receiverCulture})`);
 
-    // Step A: Extract semantic + cultural context via LLM
+    // Step A: Generate cultural context via LLM
     const t0 = Date.now();
-    const semantics = await extractSemantic(llmClient, tc.input, tc.senderCulture);
-    const extractMs = Date.now() - t0;
+    const context = await generateCulturalContext(llmClient, tc.input, tc.senderCulture);
+    const contextMs = Date.now() - t0;
 
-    console.log(`\n[LLM extractSemantic] (${extractMs}ms)`);
-    console.log(`  original_semantic: ${semantics.original_semantic}`);
-    console.log(`  cultural_context:  ${semantics.cultural_context ?? "(none)"}`);
+    console.log(`\n[LLM generateCulturalContext] (${contextMs}ms)`);
+    console.log(`  cultural_context: ${context.cultural_context ?? "(none)"}`);
 
-    // Step B: Create envelope + message
+    // Step B: Create v0.4 envelope
     const envelope: ChorusEnvelope = createEnvelope(
-      semantics.original_semantic,
+      tc.senderId,
+      tc.input,
       tc.senderCulture,
-      semantics.cultural_context,
+      context.cultural_context,
     );
-    const message = createChorusMessage(tc.input, envelope);
 
-    // Step C: Send via router
-    const senderId = tc.senderCulture === "zh-CN" ? "agent-zh-cn" : "agent-ja";
-    const targetId = tc.receiverCulture === "ja" ? "agent-ja" : "agent-zh-cn";
-
+    // Step C: Send via router (v0.4 naked envelope format)
     const t1 = Date.now();
     const routerRes = await fetch(`${routerUrl}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender_agent_id: senderId, target_agent_id: targetId, message }),
+      body: JSON.stringify({ receiver_id: tc.targetId, envelope }),
     });
     const forwardMs = Date.now() - t1;
 

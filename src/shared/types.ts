@@ -62,32 +62,6 @@ const ChorusAgentCardSchema = z
 
 type ChorusAgentCard = z.infer<typeof ChorusAgentCardSchema>;
 
-// --- A2A Message Types ---
-
-const TextPartSchema = z.object({
-  text: z.string(),
-  mediaType: z.string(),
-});
-
-const DataPartSchema = z.object({
-  data: z.record(z.string(), z.unknown()),
-  mediaType: z.string(),
-});
-
-const PartSchema = z.union([TextPartSchema, DataPartSchema]);
-
-type TextPart = z.infer<typeof TextPartSchema>;
-type DataPart = z.infer<typeof DataPartSchema>;
-type Part = z.infer<typeof PartSchema>;
-
-const A2AMessageSchema = z.object({
-  role: z.enum(["ROLE_USER", "ROLE_AGENT"]),
-  parts: z.array(PartSchema).min(1),
-  extensions: z.array(z.string()).optional(),
-});
-
-type A2AMessage = z.infer<typeof A2AMessageSchema>;
-
 // --- Routing Server Types (plain interfaces — no runtime schema needed) ---
 
 interface AgentRegistration {
@@ -103,19 +77,11 @@ export {
   bcp47String,
   ChorusEnvelopeSchema,
   ChorusAgentCardSchema,
-  TextPartSchema,
-  DataPartSchema,
-  PartSchema,
-  A2AMessageSchema,
 };
 
 export type {
   ChorusEnvelope,
   ChorusAgentCard,
-  TextPart,
-  DataPart,
-  Part,
-  A2AMessage,
   AgentRegistration,
   ConversationTurn,
   OnTokenCallback,

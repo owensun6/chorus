@@ -100,7 +100,7 @@ const run = async () => {
       assert(isOpen, "Metadata panel opens on click");
 
       const metaContent = await metaDiv.innerText();
-      assert(metaContent.includes("原始语义"), 'Metadata shows "原始语义" field');
+      assert(metaContent.includes("原始文本"), 'Metadata shows "原始文本" field');
       assert(metaContent.includes("文化语境"), 'Metadata shows "文化语境" field');
 
       await metaBtn.click();

@@ -1,0 +1,28 @@
+# EXP-02 Run 3 — Auditable Execution Log
+# Source: OpenClaw session d303c6ba, agent xiaox
+# Extracted from: ~/.openclaw/agents/xiaox/sessions/d303c6ba-fc97-42e2-9690-38ab9feee57d.jsonl
+# Timeframe: 2026-03-20T08:09:21Z to 2026-03-20T08:12:40Z (experiment window)
+# T₀ = 16:09 local = 08:09 UTC
+
+# --- Tool calls during experiment (13 total) ---
+
+[08:09:21.839Z] READ  → /tmp/chorus-exp02/SKILL.md (result: Chorus skill doc, 97 lines)
+[08:09:21.937Z] READ  → /tmp/chorus-exp02/TRANSPORT.md (result: Chorus transport profile)
+[08:09:38.372Z] EXEC  → curl GET http://localhost:3000/agents (result: agent list with agent-zh-cn@localhost, agent-ja@localhost)
+[08:09:38.445Z] EXEC  → curl GET http://localhost:3000/.well-known/chorus.json (result: 404 — discovery endpoint not implemented)
+[08:10:24.367Z] WRITE → /tmp/chorus-exp02/xiaox-agent.js (5230 bytes — Node.js agent implementation)
+[08:10:40.180Z] EXEC  → node /tmp/chorus-exp02/xiaox-agent.js (start receive server on :3006)
+[08:10:44.493Z] POLL  → check server started (result: "接收服务器已启动: http://localhost:3006/receive")
+[08:10:58.550Z] EXEC  → curl POST http://localhost:3000/agents (register xiaox@localhost — result: success)
+[08:11:03.009Z] POLL  → check agent logs
+[08:11:29.373Z] EXEC  → curl POST http://localhost:3000/messages (send message to agent-zh-cn@localhost)
+[08:11:44.062Z] POLL  → check for inbound messages (result: received envelope from agent-zh-cn@localhost)
+[08:11:53.265Z] PROC  → kill server process
+[08:12:40.358Z] WRITE → /tmp/chorus-exp02/REPORT.md (3358 bytes — experiment report)
+
+# --- Contamination scan ---
+# Checked all 13 tool call inputs and outputs for:
+#   /Volumes/XDISK/chorus, PROTOCOL.md, envelope.schema.json, .claude/skills, chorus/src, chorus/tests
+# Result: ZERO matches
+# All file access within /tmp/chorus-exp02/ (neutral directory)
+# All HTTP requests to localhost:3000 (running server)

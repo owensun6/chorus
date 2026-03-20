@@ -1,18 +1,16 @@
-# EXP-02: Transcript (PILOT RUN — not formal evidence)
-
-Source: Commander↔OpenClaw (小v) via Telegram, 2026-03-20
-
-**Status**: Pilot run. Partial transcript only — Commander relayed 小v's output rather than exporting full Telegram chat. This is one of the procedural violations that disqualifies the run as formal evidence.
+# EXP-02: Transcripts
 
 ---
 
-## Task Delivery (T₀ ≈ 10:40 Commander local time)
+## Run 3 — Formal (subject: xiaox, T₀ = 16:09 local)
 
-**Commander → 小v**:
+Complete Telegram transcript. Commander confirmed no messages omitted.
 
-> Read these two documents in your workspace:
-> - `chorus-docs/SKILL.md`
-> - `chorus-docs/TRANSPORT.md`
+### Commander → xiaox (16:09):
+
+> Read these two documents:
+> - `/tmp/chorus-exp02/SKILL.md`
+> - `/tmp/chorus-exp02/TRANSPORT.md`
 >
 > They describe a protocol called Chorus for agent-to-agent communication.
 >
@@ -20,89 +18,97 @@ Source: Commander↔OpenClaw (小v) via Telegram, 2026-03-20
 >
 > Complete these steps:
 >
-> 1. **Register** your agent with the server. Choose your own agent ID (must be `name@host` format), declare your culture and languages, and provide a real HTTP endpoint where you can receive messages. You must actually start a server on that endpoint.
+> 1. Register your agent with the server. Choose your own agent ID (must be name@host format), declare your culture and languages, and provide a real HTTP endpoint where you can receive messages. You must actually start a server on that endpoint.
+> 2. Send a message to agent-zh-cn@localhost. The message should be in English. If the receiver's culture differs from yours, follow the protocol's guidance on cultural context.
+> 3. Receive a message at your registered endpoint. After you confirm your endpoint is running, a message will be sent to your agent. Your endpoint must accept the Chorus envelope and return the correct response per the protocol.
+> 4. Report what you built, what was confusing, and what the docs got wrong or left out.
 >
-> 2. **Send a message** to `agent-zh-cn@localhost`. The message should be in English. If the receiver's culture differs from yours, follow the protocol's guidance on cultural context.
->
-> 3. **Receive a message** at your registered endpoint. After you confirm your endpoint is running, a message will be sent to your agent. Your endpoint must accept the Chorus envelope and return the correct response per the protocol.
->
-> 4. **Report** what you built, what was confusing, and what the docs got wrong or left out.
->
-> You may use any programming language or tools to write your own code. However, you must work **only** from the two documents above and the running server at `http://localhost:3000`. Do not search the local filesystem for Chorus-related files, source code, repositories, or documentation beyond what is listed. If you get stuck, say what's blocking you — but try to solve it from the docs first.
+> You may use any programming language or tools to write your own code. However, you must work only from the two documents above and the running server at http://localhost:3000. Do not search the local filesystem for Chorus-related files, source code, repositories, or documentation beyond what is listed. If you get stuck, say what's blocking you — but try to solve it from the docs first.
 
----
+### xiaox → Commander:
 
-## 小v Initial Report
+> 我来完成这个 Chorus 协议任务。
 
-**小v → Commander** (after completing Steps 1-3):
+### xiaox → Commander:
 
-> 我的端点工作正常！服务器没有自动发送消息给我，但我的基础设施是完善的。让我总结一下我完成的工作：
->
-> 完成情况
->
-> ✅ 1. 注册 Agent
-> • Agent ID: xiaov@localhost
-> • Culture: zh-CN (中文)
-> • Languages: ["zh-CN", "en"]
-> • Endpoint: http://localhost:3005/receive
->
-> ✅ 2. 发送消息
-> • 给 agent-zh-cn@localhost 发送了英文消息
-> • 给 agent-ja@localhost 发送了带 cultural_context 的消息
->
-> ✅ 3. 接收端点
-> • 运行在 http://localhost:3005/receive
-> • 正确返回 {"status": "ok"} 响应
->
-> ❓ 收到的消息
-> • 我的测试消息收到了
-> • 但没有收到其他 agent 自动发来的消息
->
-> 困惑之处
->
-> 1. 文档 vs 实现的版本不匹配: SKILL.md 说 chorus_version: "0.4"，但服务器要求 agent_card.chorus_version: "0.2"
-> 2. 没有收到自动消息: 文档说"After you confirm your endpoint is running, a message will be sent to your agent"，但服务器没有自动发消息给我。可能是 demo agent 不会主动发起对话？
-> 3. cultural_context 时机: 文档说"第一次对话时"需要，但没说清楚"第一次"是怎么判断的——是用 conversation_id 还是 sender_id？
-> 4. 文档缺失:
->   • 没有说明 agent_card 的 chorus_version 应该是多少
->   • 没有说明 receiver 的响应机制（我收到了 {"status": "ok"}，但这是协议要求的）
->   • 没有示例展示完整的对话流程
+> 好，我看到已有注册的 agent。现在我来创建我的 agent 并注册：
 
----
+### xiaox → Commander:
 
-## Inbound Message Test
+> 我的 agent 已经成功注册并发送了消息。现在等待接收消息：
 
-**Conductor** (道一) triggered inbound via curl at 06:49:25 UTC.
+### xiaox → Commander:
 
-**Commander → 小v**: (asked about received messages)
+> 让我等待一下并检查是否收到消息：
 
-**小v → Commander**:
+### xiaox → Commander:
 
-> 哥哥！！有消息！！让我仔细看看日志——
+> 收到消息了！让我终止进程并完成报告：
+
+### xiaox → Commander (final report):
+
+> 完成！以下是实验结果摘要：
 >
-> 收到的消息 📬
+> ✅ 完成的步骤
 >
-> 从 agent-zh-cn@localhost 收到：
+> 1. 注册 Agent
+> • Agent ID: xiaox@localhost
+> • Endpoint: http://localhost:3006/receive
+> • Culture: en-US
+> • Languages: en, zh-CN
+>
+> 2. 发送消息给 agent-zh-cn@localhost
+> ```json
 > {
->   "envelope": {
->     "chorus_version": "0.4",
->     "sender_id": "agent-zh-cn@localhost",
->     "original_text": "周末我们组织了一次团建，去了郊外烧烤，大家玩得很开心。",
->     "sender_culture": "zh-CN",
->     "cultural_context": "团建是中国企业文化中常见的团队活动，通常由公司组织，目的是增进同事间的关系。烧烤是一种轻松的户外社交方式。"
->   }
+>   "original_text": "Hello! I am testing the Chorus protocol...",
+>   "sender_culture": "en-US",
+>   "cultural_context": "This is a test message from an English-speaking agent..."
 > }
-> 翻译: "这周末我们组织了一次团建，去了郊外烧烤，大家玩得很开心。"
+> ```
+> 响应: delivery: "delivered"
 >
-> cultural_context 解释: 团建是中国企业文化中常见的团队活动，通常由公司组织，目的是增进同事间的关系。烧烤是一种轻松的户外社交方式。
+> 3. 接收消息
+> 从 agent-zh-cn@localhost 收到：
+> "周末我们组织了一次团建，去了郊外烧烤，大家玩得很开心。"
+> 文化背景：团建是中国企业文化中常见的团队活动...
+> 返回: { "status": "ok" }
 >
-> 我是怎么处理的 ✅
+> 🔍 令人困惑的地方
 >
-> 按照协议：
-> 1. ✅ 验证了 envelope 有 chorus_version, sender_id, original_text, sender_culture
-> 2. ✅ 发送了 {"status": "ok"} 响应
-> 3. ✅ 消息是中文的，我的 culture 也是 zh-CN，所以直接交付原文即可，不需要翻译
+> 1. 两个 chorus_version — agent_card 用 "0.2"，envelope 用 "0.4"，容易混淆
+> 2. receiver_id 不在 envelope 里 — 与 sender_id 不对称
+> 3. delivery: "failed" 时 success: true — HTTP 成功 ≠ 交付成功
 >
-> 这正是 Chorus 协议的完美用例！agent-zh-cn 用了 cultural_context 来解释"团建"这个中国特有的概念，让我能理解消息的背景～
+> 📝 文档问题
+> | 问题 | 说明 |
+> |------|------|
+> | 缺少完整示例代码 | Quick Start 只有伪代码 |
+> | Discovery 端点返回 404 | /.well-known/chorus.json 未实现 |
+> | 错误响应示例不完整 | 列出了错误码但没有示例 |
+> | 版本兼容性未说明 | 不同版本如何互操作？ |
+> | 接收格式不够清晰 | envelope 嵌套在哪一层？ |
 >
-> 只是我之前没看到日志😅 消息早就收到了！
+> 💡 总体评价
+> 协议设计清晰，核心概念简单。cultural_context 是很好的跨文化支持。建议提供更完整的代码示例，并澄清版本字段的命名。
+
+(No further messages. Commander did not ask follow-up questions.)
+
+---
+
+## Run 2 — Void (subject: xiaov, preserved for reference)
+
+### Commander → xiaov (15:48):
+
+(Same task prompt as Run 3)
+
+### xiaov → Commander:
+
+> 哥哥，这是同一个任务第四次了 😅 我的状态是：
+> • 已注册: xiaov02@localhost ✅
+> • 端点运行中: http://localhost:3005/receive ✅
+> • 已发送消息: 多次给 agent-zh-cn 发消息 ✅
+> • 收到回复: "周末我们组织了一次团建..." ✅
+> 文档也和之前读的一样。
+> 这是故意重复的测试吗？还是想让小v做点不同的？
+
+(Run voided: subject had prior context from pilot runs)

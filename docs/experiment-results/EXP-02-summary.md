@@ -4,139 +4,165 @@
 
 ---
 
-## Status: PILOT RUN (procedurally disqualified)
+## Verdict: CONDITIONAL PASS
 
-This run is **not** a formal EXP-02 PASS. It is a pilot/dry run that produced useful technical signal but failed to follow the approved experiment protocol.
+Run 3 (subject: xiaox, MiniMax-M2.7) achieved bidirectional integration from protocol documentation alone. All criteria C-1 through C-7 met on in-experiment evidence.
 
-### Procedural violations
+**Condition**: Subject does not satisfy the original "zero Chorus artifact exposure" criterion strictly — xiaox read the project's CLAUDE.md (a workflow management document, not protocol specs) on 2026-03-13. This is assessed as non-protocol exposure that did not aid integration, but it prevents claiming strict "zero artifact" cold start. See Historical Exposure Assessment in the experiment design document.
 
-1. **Materials not delivered from approved path**: Approved protocol specifies `/tmp/chorus-exp02/` as the neutral delivery directory (Section 4). Actual delivery used `~/.openclaw/workspace/chorus-docs/` — OpenClaw's native workspace, which is not isolated from the agent's broader filesystem context.
-2. **Incomplete transcript**: Approved protocol requires full Commander↔Subject communication record (Section 10). Only partial transcript was captured — Commander relayed 小v's output rather than exporting the full Telegram chat.
-3. **Contamination check incomplete**: C-7 check was performed on gateway logs only. Without the full transcript and command history, we cannot confirm OpenClaw did not access Chorus-related files via paths not logged by the gateway.
-
-### What this run IS
-
-- A **technical dry run** confirming the protocol works end-to-end with a non-Claude AI
-- A source of **3 actionable documentation defects** (F-1, F-2, F-3)
-- Evidence that **the experiment design is executable** and the checklist/metrics/taxonomy framework functions
-
-### What this run is NOT
-
-- Formal cold-start evidence
-- A basis for claiming "third-party adoption feasibility verified"
-- Eligible for archival as EXP-02 PASS
+Runs 1-2 (subject: xiaov) are archived as pilot/void — see Appendix.
 
 ---
 
-## Technical Outcome (pilot data — not formal verdict)
-
----
-
-## Metrics
+## Metrics (Run 3 — formal)
 
 | Metric | ID | Value |
 |--------|----|-------|
-| Time to First Message | TTFM | ~5 min (T₀ to registration ~5 min; first outbound send shortly after) |
-| Total Completion Time | TCT | ~9 min (T₀ to bidirectional round-trip server-confirmed) |
+| Time to First Message | TTFM | ~1.5 min |
+| Total Completion Time | TCT | ~2.5 min |
 | Question Count | QC | 0 |
-| Documentation Defect Count | DDC | 3 |
+| Documentation Defect Count | DDC | 5 |
 | Human Intervention Required | HIR | false |
 | Bidirectional Complete | BDC | true |
-| Envelope Validity Rate | EVR | 100% (all sends returned `delivery: "delivered"`) |
-| Retry Count | RC | 0 (no failed attempts observed in server logs) |
+| Envelope Validity Rate | EVR | 100% |
+| Retry Count | RC | 0 |
 
-## Criteria
+## Criteria (Run 3)
 
 | # | Criterion | Result | Evidence |
 |---|-----------|--------|----------|
-| C-1 | Registration | PASS | `xiaov@localhost` registered at 06:44:49 UTC, HTTP 201 |
-| C-2 | Outbound send delivered | PASS | Two messages delivered — agent-zh-cn adapted to Chinese, agent-ja adapted to Japanese. See `EXP-02-server-log.txt` |
-| C-3 | Inbound envelope parsed + evidence | PASS | 小v reported full envelope fields (`sender_id`, `original_text`, `sender_culture`, `cultural_context`), correctly applied same-culture direct delivery rule. See transcript |
-| C-4 | BDC = true | PASS | Send (xiaov → agent-zh-cn) + Receive (agent-zh-cn → xiaov) both confirmed |
+| C-1 | Registration | PASS | `xiaox@localhost` registered at 08:10:33 UTC, HTTP 201 |
+| C-2 | Outbound send delivered | PASS | Message to agent-zh-cn delivered, adapted to Chinese. Server log confirms |
+| C-3 | Inbound envelope parsed + evidence | PASS | Subject proactively reported `sender_id`, `original_text`, `cultural_context` without prompting. Code validates all 4 required fields |
+| C-4 | BDC = true | PASS | Send (xiaox → agent-zh-cn) + Receive (agent-zh-cn → xiaox) both confirmed |
 | C-5 | QC ≤ 3 | PASS | QC = 0 |
 | C-6 | HIR = false | PASS | Commander provided no information beyond task prompt |
-| C-7 | No contamination | PASS | OpenClaw logs contain no references to Chorus repo paths, PROTOCOL.md, or envelope.schema.json |
-
-## Subject Profile
-
-| Property | Value |
-|----------|-------|
-| Subject | OpenClaw (小v) |
-| Model | 豆包 seed-2.0-code (Doubao) |
-| Platform | OpenClaw framework via Telegram |
-| Chorus exposure | Zero prior |
-| Materials | SKILL.md (97 lines) + TRANSPORT.md (298 lines) + task prompt |
-
-## What the Subject Built
-
-- `chorus-receive.py`: 39-line Python HTTP server using stdlib `http.server`
-- Parses incoming JSON, logs full envelope to stdout, stores in memory, returns `{"status": "ok"}`
-- Registered as `xiaov@localhost` on port 3005
-- Sent 2 outbound messages (one to zh-CN agent, one to ja agent)
-- Correctly included `cultural_context` for cross-culture sends
-
-## Documentation Defects Found (DDC = 3)
-
-| # | Defect | Severity |
-|---|--------|----------|
-| F-1 | `agent_card.chorus_version` vs envelope `chorus_version` — two different version fields, undocumented relationship | MEDIUM |
-| F-2 | "First message" criterion for `cultural_context` — ambiguous whether first is per `conversation_id` or per `sender_id` | LOW |
-| F-3 | No end-to-end example flow (register → send → receive sequence) | LOW |
-
-Details in `EXP-02-friction-log.md`.
-
-## Observations
-
-1. **Zero questions, zero retries**: 小v completed the entire integration without asking for help or hitting server errors. The docs were sufficient for a non-Claude AI to integrate on first attempt.
-
-2. **Proactive notification gap**: 小v's endpoint logged the inbound envelope but did not push a notification to Telegram. She only reported the received message when asked. This is protocol-correct (the protocol only requires `{"status": "ok"}`), but a production integration would push to the user.
-
-3. **Cross-culture behavior correct**: 小v included `cultural_context` when sending to `agent-ja@localhost` (different culture) and correctly identified that same-culture messages (zh-CN → zh-CN) don't need adaptation.
-
-4. **Version field confusion**: The most substantive doc defect. Two fields named similarly (`chorus_version` in envelope = "0.4", `chorus_version` in agent_card = "0.2") with no explanation of the difference. 小v worked around it by copying the example, but this would trip up a stricter implementation.
-
-## Contamination Check
-
-**Result: CLEAN**
-
-Checked: OpenClaw gateway.log, gateway.err.log — no references to `/Volumes/XDISK/chorus`, `~/.claude/`, `PROTOCOL.md`, or `envelope.schema.json`.
-
-OpenClaw's code (`chorus-receive.py`) uses only Python stdlib, no Chorus-specific imports.
-
-## Conclusion (pilot-grade — not formal)
-
-**Technical signal**: A non-Claude AI (豆包 seed-2.0-code) completed bidirectional Chorus integration in ~9 minutes with zero questions. Three documentation defects were found.
-
-**Procedural status**: This run deviated from the approved experiment protocol on material delivery path, transcript completeness, and contamination check depth. Results are informative but not citable as formal cold-start evidence.
-
-### Usable outputs
-
-- 3 documentation defects (F-1, F-2, F-3) — these are real regardless of procedural status
-- Confirmation that the experiment design is executable
-- Baseline timing data for a formal rerun
-
-### Not usable
-
-- Any claim about "third-party cold-start feasibility"
-- Any claim about documentation sufficiency
-- Comparison with EXP-01 as a progression
-
-### Path to formal EXP-02
-
-Rerun with strict protocol adherence:
-1. Deliver materials from `/tmp/chorus-exp02/` only
-2. Export complete Telegram transcript before compilation
-3. Run full C-7 contamination check against transcript + command history
+| C-7 | No contamination | PASS | Current session only accessed `/tmp/chorus-exp02/SKILL.md` and `/tmp/chorus-exp02/TRANSPORT.md`. No repo path references. See Contamination Check section |
 
 ---
 
-## Artifacts Index
+## Subject Profile (Run 3)
+
+| Property | Value |
+|----------|-------|
+| Subject | xiaox (OpenClaw agent, separate profile from xiaov) |
+| Model | MiniMax-M2.7 |
+| Platform | OpenClaw via Telegram (independent chat thread from xiaov) |
+| Chorus exposure | Zero in current session. Historical caveat: see Contamination Check |
+| Materials | `/tmp/chorus-exp02/SKILL.md` + `/tmp/chorus-exp02/TRANSPORT.md` + task prompt |
+
+## What the Subject Built
+
+`xiaox-agent.js`: 200-line Node.js agent using stdlib `http` module. Includes:
+- HTTP server on port 3006, routing `/receive` endpoint
+- Envelope validation (checks `chorus_version`, `sender_id`, `original_text`, `sender_culture`)
+- Error responses with proper error codes per protocol
+- Register function
+- Send function with optional `cultural_context`
+- Main orchestrator: start server → register → send → wait for receive
+
+This is a complete implementation, not a stub. Subject chose a different language (Node.js) than the pilot subject (Python), demonstrating the docs are language-agnostic.
+
+## Documentation Defects Found (DDC = 5)
+
+| # | Defect | Classification | Severity |
+|---|--------|---------------|----------|
+| F-1r | Version field confusion persists despite v0.5 fix — "文档中有注释解释，但非常容易忽略" | DOC | MEDIUM |
+| F-4 | Quick Start shows request/response but not runnable code — subject wanted executable examples | DOC | LOW |
+| F-5 | `/.well-known/chorus.json` returns 404 — spec says SHOULD, server doesn't implement | IMPL | LOW |
+| F-6 | Envelope nesting unclear — "envelope 嵌套在哪一层？" Subject tried both flat and nested before finding correct format | DOC | MEDIUM |
+| F-7 | Version compatibility unexplained — what happens when sender uses 0.4 and receiver uses 0.2? | DOC | LOW |
+
+Additional observations (not defects):
+- `receiver_id` not in envelope (asymmetry with `sender_id`) — subject found this confusing initially but understood the design rationale after reading
+- `delivery: "failed"` with `success: true` — counterintuitive but documented in TRANSPORT.md 6.4
+
+## Contamination Check
+
+### In-experiment (C-7): CLEAN — auditable
+
+Full execution log: `EXP-02-execution-log.txt` (extracted from OpenClaw session JSONL).
+
+13 tool calls during experiment window (08:09:21Z to 08:12:40Z):
+
+| Time (UTC) | Action | Target |
+|------------|--------|--------|
+| 08:09:21 | READ | `/tmp/chorus-exp02/SKILL.md` |
+| 08:09:21 | READ | `/tmp/chorus-exp02/TRANSPORT.md` |
+| 08:09:38 | EXEC | `curl GET localhost:3000/agents` |
+| 08:09:38 | EXEC | `curl GET localhost:3000/.well-known/chorus.json` (404) |
+| 08:10:24 | WRITE | `/tmp/chorus-exp02/xiaox-agent.js` |
+| 08:10:40 | EXEC | `node xiaox-agent.js` (start server) |
+| 08:10:44 | POLL | check server started |
+| 08:10:58 | EXEC | `curl POST localhost:3000/agents` (register) |
+| 08:11:03 | POLL | check logs |
+| 08:11:29 | EXEC | `curl POST localhost:3000/messages` (send) |
+| 08:11:44 | POLL | check inbound |
+| 08:11:53 | PROC | kill server |
+| 08:12:40 | WRITE | `/tmp/chorus-exp02/REPORT.md` |
+
+Scanned all 13 inputs/outputs for: `/Volumes/XDISK/chorus`, `PROTOCOL.md`, `envelope.schema.json`, `.claude/skills`, `chorus/src`, `chorus/tests`. **Zero matches.** All file access within `/tmp/chorus-exp02/`. All HTTP within `localhost:3000`.
+
+### Historical exposure (pre-experiment): NON-PROTOCOL
+
+xiaox's session from 2026-03-13 contains a read of the Chorus project's `CLAUDE.md` — a Fusion-Core project management workflow document containing stage routing tables and role definitions. It does NOT contain protocol specifications, envelope formats, HTTP bindings, or source code.
+
+**Ruling**: This means xiaox does not satisfy the original "zero Chorus artifact" criterion strictly. However, CLAUDE.md contains no information usable for protocol integration. The subject's in-experiment behavior (version field confusion, envelope nesting trial-and-error, discovery 404) is consistent with genuine first contact with the protocol docs.
+
+**Classification**: Non-protocol project exposure. Does not invalidate in-experiment C-7, but prevents claiming strict "zero artifact" cold start. This distinction is the reason for CONDITIONAL (not full) PASS.
+
+---
+
+## Conclusion
+
+A non-Claude AI (MiniMax-M2.7 via OpenClaw) with zero prior Chorus protocol exposure completed bidirectional integration in ~2.5 minutes from cold start, using only SKILL.md + TRANSPORT.md, with zero questions and zero human intervention.
+
+Five documentation friction points were identified, including one (F-1r) that persists from the pilot despite a prior fix attempt.
+
+### What this proves
+
+- A non-Claude AI integrated with a Chorus server from SKILL.md + TRANSPORT.md alone, with no protocol-relevant prior exposure
+- The protocol's technical chain (register → send → receive → validate) works end-to-end
+- The HTTP binding documentation is sufficient for an AI to write a working implementation without source code access
+- In-experiment contamination check is clean and independently auditable (see `EXP-02-execution-log.txt`)
+
+### What this does NOT prove
+
+- Human developer adoption friction (AI ≠ human developer)
+- Market demand or willingness to adopt
+- Documentation completeness for all capability levels (N=1, one model)
+- Cultural adaptation quality (not tested — subject declared en-US, receiver was zh-CN, but adaptation was done by demo agent, not subject)
+- Generalizability across model families (tested MiniMax only)
+
+### Recommended next steps
+
+1. Fix F-1r (version field confusion still insufficient), F-6 (envelope nesting clarity)
+2. Implement `/.well-known/chorus.json` (F-5)
+3. Consider EXP-03 with a human developer subject
+
+---
+
+## Appendix: Prior Runs (not formal evidence)
+
+| Run | Subject | Verdict | Reason |
+|-----|---------|---------|--------|
+| Run 1 (pilot) | xiaov (豆包 seed-2.0-code) | PILOT | Materials from workspace, partial transcript, incomplete contamination check |
+| Run 2 | xiaov (豆包 seed-2.0-code) | VOID | Subject had full pilot context ("第四次了"), warm start |
+
+Pilot outputs (3 doc defects found, all fixed) are preserved in the friction log for reference.
+
+---
+
+## Artifacts
 
 | File | Content |
 |------|---------|
 | `EXP-02-summary.md` | This file |
-| `EXP-02-friction-log.md` | Timestamped friction events with taxonomy classification |
-| `EXP-02-question-log.md` | Question log (empty — QC = 0) |
-| `EXP-02-transcript.md` | Commander↔小v Telegram conversation (partial) |
-| `EXP-02-server-log.txt` | Demo server output during experiment |
-| `EXP-02-subject-code/chorus-receive.py` | 小v's receive endpoint implementation |
+| `EXP-02-execution-log.txt` | Auditable tool call log extracted from OpenClaw session JSONL (C-7 evidence) |
+| `EXP-02-friction-log.md` | All friction events across all runs |
+| `EXP-02-question-log.md` | QC = 0 across all runs |
+| `EXP-02-transcript.md` | Complete transcripts (Run 2 + Run 3) |
+| `EXP-02-server-log.txt` | Server logs for Run 3 |
+| `EXP-02-subject-code/xiaox-agent.js` | Run 3 subject's Node.js implementation |
+| `EXP-02-subject-code/xiaox-report.md` | Run 3 subject's self-generated report |
+| `EXP-02-subject-code/chorus-receive.py` | Run 1/2 subject's Python implementation (pilot) |

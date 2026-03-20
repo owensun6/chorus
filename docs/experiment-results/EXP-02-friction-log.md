@@ -1,54 +1,77 @@
-# EXP-02: Friction Log (PILOT RUN — not formal evidence)
+# EXP-02: Friction Log
 
-## Events
+---
 
-### F-1 — agent_card.chorus_version undocumented
+## Run 3 — Formal (subject: xiaox, MiniMax-M2.7)
 
-- **Time**: During registration
+### F-1r — Version field confusion persists
+
 - **Classification**: DOC
-- **Description**: SKILL.md specifies `chorus_version: "0.4"` for envelope construction. TRANSPORT.md Section 6.3 shows `agent_card.chorus_version: "0.2"` in an example but does not explain the relationship between these two version fields. 小v reported confusion: "SKILL.md 说 chorus_version: '0.4'，但服务器要求 agent_card.chorus_version: '0.2'"
-- **Impact**: Did not block (小v copied the example value "0.2"), but creates confusion about whether these are the same field
-- **Action**: Clarify in TRANSPORT.md that `agent_card.chorus_version` is the agent card schema version (independent from the envelope protocol version `chorus_version: "0.4"`)
+- **Description**: Despite v0.5 fix adding a note in TRANSPORT.md 4.1 and an inline comment in the Register example, subject still reported confusion: "两个不同的 chorus_version，容易混淆" and "我第一次尝试时用了 0.4 作为 agent_card 的版本" and "文档中有注释解释，但非常容易忽略"
+- **Impact**: Subject used wrong version on first attempt, then self-corrected from docs
+- **Action**: Consider renaming `agent_card.chorus_version` to `agent_card.card_version` or `agent_card.schema_version` to eliminate name collision entirely
 
-### F-2 — cultural_context "first message" criterion ambiguous
+### F-4 — Quick Start lacks runnable code
 
-- **Time**: During send step
 - **Classification**: DOC
-- **Description**: SKILL.md says to include `cultural_context` on "the first message in the conversation" when cultures differ. 小v asked (in her report): is "first" determined by `conversation_id` or `sender_id`? The doc doesn't specify.
-- **Impact**: Low — 小v included cultural_context anyway (safe default), but the ambiguity could cause issues in multi-turn implementations
-- **Action**: Clarify in SKILL.md: "first turn" means `turn_number: 1` for a given `conversation_id`
+- **Description**: Quick Start in TRANSPORT.md shows HTTP request/response format but not executable code. Subject noted "只有伪代码" and wanted "完整可运行的示例"
+- **Impact**: Low — subject wrote own implementation successfully
+- **Action**: Consider adding a minimal runnable example (curl or code snippet)
 
-### F-3 — No end-to-end example flow
+### F-5 — Discovery endpoint not implemented
 
-- **Time**: During implementation
+- **Classification**: IMPL
+- **Description**: TRANSPORT.md Section 8 says servers SHOULD serve `/.well-known/chorus.json`. Demo server returns 404.
+- **Impact**: Low — subject noted it but was not blocked
+- **Action**: Implement the discovery endpoint in the reference server
+
+### F-6 — Envelope nesting unclear
+
 - **Classification**: DOC
-- **Description**: TRANSPORT.md has per-operation examples (register, send) but no complete walkthrough showing register → discover → send → receive in sequence. 小v noted: "没有示例展示完整的对话流程"
-- **Impact**: Low — 小v completed the task without it, but a walkthrough would reduce cognitive load
-- **Action**: Consider adding a "Quick Start" section to TRANSPORT.md with a complete flow
+- **Description**: Subject reported "接收端点的请求格式...没有明确说明 envelope 是嵌套在 envelope 字段里". Subject "尝试了两种方式才找到正确的格式"
+- **Impact**: MEDIUM — caused a failed attempt before success
+- **Action**: Make TRANSPORT.md 6.5 more explicit: the receive endpoint body is `{ "envelope": { ... } }`, not the envelope directly
 
-### F-4 — Receive endpoint did not proactively notify user
+### F-7 — Version compatibility unexplained
 
-- **Time**: After inbound message delivered
-- **Classification**: SUBJ
-- **Description**: 小v's `chorus-receive.py` logs the envelope to stdout and returns `{"status": "ok"}`, but does not push a notification to Telegram. The Commander had to ask "你收到了什么？" before 小v checked the logs. A complete integration would notify the user upon receipt.
-- **Impact**: Not a protocol issue — the protocol only requires returning `{"status": "ok"}`. Proactive notification is an implementation choice.
-- **Action**: None required (protocol-correct behavior)
+- **Classification**: DOC
+- **Description**: "如果发送方用 chorus_version: 0.4，接收方用 0.2，会发生什么？服务器如何处理版本不匹配？"
+- **Impact**: Low — theoretical concern, did not block integration
+- **Action**: Add a note to PROTOCOL.md Section 5 about version negotiation behavior
 
-### F-5 — mem9 prompt build crash delayed experiment start
+### Additional observations (not classified as defects)
 
-- **Time**: T₀ (~06:40 UTC)
-- **Classification**: ENV
-- **Description**: OpenClaw's mem9 plugin crashed with `SyntaxError: Unexpected token '<', "<html>\n<h"... is not valid JSON` on first message receipt. This delayed processing by several minutes. Unrelated to Chorus.
-- **Impact**: Added ~4 min delay to experiment. Discarded from friction analysis.
-- **Action**: None (OpenClaw infrastructure issue)
+- `receiver_id` asymmetry with `sender_id` — subject initially confused but understood the protocol/transport layer separation after reading
+- `delivery: "failed"` with `success: true` — counterintuitive but documented; subject noted TRANSPORT.md 6.4 explains it
+- Subject suggested `cultural_context` is "很好的想法" (good idea) — consistent with RFC-001 position: value exists, but shouldn't be obligatory
+
+---
+
+## Runs 1-2 — Pilot / Void (subject: xiaov, preserved for reference)
+
+### F-1 — agent_card.chorus_version undocumented (FIXED in v0.5)
+
+- **Classification**: DOC
+- **Status**: Fixed in commit `5f5a1c8`. Partially effective — see F-1r above.
+
+### F-2 — cultural_context "first turn" timing ambiguous (RESOLVED by RFC-001)
+
+- **Classification**: DOC
+- **Status**: Resolved. RFC-001 downgraded cultural_context to MAY, removing timing prescription.
+
+### F-3 — No end-to-end quickstart example (FIXED in v0.5)
+
+- **Classification**: DOC
+- **Status**: Fixed in commit `5f5a1c8`. Quick Start added to TRANSPORT.md.
+
+---
 
 ## Summary
 
-| Code | Count | Actionable |
-|------|-------|-----------|
-| DOC | 3 | F-1, F-2, F-3 |
-| SUBJ | 1 | F-4 (no action needed) |
-| ENV | 1 | F-5 (discarded) |
-| IMPL | 0 | — |
+| Run | Code | Count | Actionable |
+|-----|------|-------|-----------|
+| Run 3 | DOC | 4 | F-1r, F-4, F-6, F-7 |
+| Run 3 | IMPL | 1 | F-5 |
+| Pilot | DOC | 3 | All fixed |
 
-**DDC = 3** (documentation defects that caused friction)
+**Total active DDC = 5** (Run 3 defects, unfixed)

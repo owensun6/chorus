@@ -1,6 +1,6 @@
 # EXP-02: Third-Party Cold-Start Integration
 
-2026-03-20 | Status: DRAFT — pending Commander review
+2026-03-20 | Status: APPROVED — Commander authorized execution
 
 ---
 
@@ -33,21 +33,37 @@ This is an adoption friction test. It does not validate market demand, protocol 
 
 ## 3. Test Subject
 
-### Selected: OpenClaw (小v)
+### Selected: OpenClaw (xiaox) — revised from original design
+
+Original design specified xiaov (豆包 seed-2.0-code) via Feishu. Revised during execution: switched to xiaox (MiniMax-M2.7) via Telegram after xiaov was disqualified (warm start from pilot context). See Appendix in results.
 
 | Property | Value |
 |----------|-------|
-| Model | 豆包 seed-2.0-code (Doubao) |
-| Platform | OpenClaw framework, Feishu integration |
-| Location | Local machine (`~/.openclaw/`) |
-| Chorus exposure | Zero — has never seen the repository, docs, or any Chorus artifact |
+| Model | MiniMax-M2.7 |
+| Platform | OpenClaw framework, Telegram integration |
+| Location | Local machine (`~/.openclaw/agents/xiaox/`) |
+| Chorus protocol exposure | Zero — has never seen SKILL.md, TRANSPORT.md, PROTOCOL.md, or any protocol spec before this experiment |
+| Chorus project exposure | Non-zero caveat: xiaox read project CLAUDE.md (Fusion-Core workflow doc, no protocol content) on 2026-03-13. See Section 3.1 |
 | Execution capability | Shell command execution, file creation, HTTP requests |
-| Interaction model | Commander → Feishu chat → OpenClaw |
+| Interaction model | Commander → Telegram chat → OpenClaw (xiaox) |
+
+### 3.1 Historical Exposure Assessment
+
+xiaox's session history from 2026-03-13 contains a read of the Chorus project's `CLAUDE.md`. This file is a Fusion-Core project management workflow document. It contains:
+- Stage routing tables referencing file paths (e.g., `.claude/skills/pm/SKILL.md`)
+- Workflow instructions for project management roles
+- No protocol specifications, envelope formats, HTTP bindings, or API contracts
+
+It does NOT contain the content of SKILL.md, TRANSPORT.md, PROTOCOL.md, or any source code.
+
+**Ruling**: This exposure means xiaox does not satisfy the original "zero Chorus artifact" criterion strictly. However, CLAUDE.md contains no information that would help construct Chorus envelopes, register with a server, or implement a receive endpoint. The subject's behavior during the experiment (struggling with version fields, trying both flat and nested envelope formats, discovering the 404 on /.well-known/chorus.json) is consistent with genuine first contact with the protocol documentation.
+
+This experiment therefore provides conditional evidence for "cold start from protocol documentation" but not "zero exposure to any project artifact." The distinction is documented here for audit transparency.
 
 ### Why OpenClaw
 
-1. **Different LLM family**: 豆包 is not Claude/GPT — tests whether docs are clear enough for a model trained on different data with different capabilities
-2. **Genuine cold start**: OpenClaw has never been exposed to Chorus in any form
+1. **Different LLM family**: MiniMax-M2.7 is not Claude/GPT — tests whether docs are clear enough for a different non-Claude model family
+2. **Zero protocol exposure**: OpenClaw has never seen SKILL.md, TRANSPORT.md, or any protocol spec (non-protocol artifact caveat in Section 3.1)
 3. **Autonomous execution**: Can write and run code without human intermediary editing
 4. **Available now**: No recruitment delay
 
@@ -56,11 +72,11 @@ This is an adoption friction test. It does not validate market demand, protocol 
 | Strength | Limitation |
 |----------|-----------|
 | Different LLM → tests doc generality | AI subject → cannot extrapolate to human developer experience |
-| Zero prior exposure → genuine cold start | Same machine → eliminates network/ENV friction a real third party would face |
+| Zero protocol exposure (non-protocol artifact caveat, see 3.1) → conditional cold start evidence | Same machine → eliminates network/ENV friction a real third party would face |
 | Autonomous code execution → realistic integration test | Commander as conductor → bias risk (mitigated by Section 8) |
-| 豆包 is weaker than Claude → if it passes, docs are reasonably clear | N=1, single model family → cannot claim generality |
+| MiniMax-M2.7 is a different non-Claude model → if it passes, docs are reasonably clear | N=1, single model family → cannot claim generality |
 
-**Validity level**: This experiment validates "non-Claude AI cold-start feasibility." It is strictly stronger than EXP-01 (different LLM, bidirectional, no source code access) but strictly weaker than a human developer test.
+**Validity level**: This experiment provides conditional evidence for "non-Claude AI protocol-doc cold start." It is strictly stronger than EXP-01 (different LLM, bidirectional, no source code access) but strictly weaker than a human developer test. The "conditional" qualifier reflects the non-protocol artifact exposure caveat documented in Section 3.1.
 
 If EXP-02 FAILS, it reveals real documentation deficiencies. If EXP-02 PASSES, it justifies investing in a human developer test (EXP-03).
 
@@ -68,13 +84,13 @@ If EXP-02 FAILS, it reveals real documentation deficiencies. If EXP-02 PASSES, i
 
 ## 4. Provided Materials
 
-OpenClaw receives exactly these materials via Feishu chat and nothing else:
+OpenClaw receives exactly these materials via Telegram chat and nothing else:
 
 | # | Material | Delivery | Content |
 |---|----------|----------|---------|
-| M-1 | SKILL.md | File attachment in Feishu | Protocol skill document (97 lines) |
-| M-2 | TRANSPORT.md | File attachment in Feishu | HTTP binding (298 lines) |
-| M-3 | Task prompt | Feishu message | See Section 5 |
+| M-1 | SKILL.md | File path in Telegram message | Protocol skill document (97 lines) |
+| M-2 | TRANSPORT.md | File path in Telegram message | HTTP binding (298 lines) |
+| M-3 | Task prompt | Telegram message | See Section 5 |
 | M-4 | Server URL | In task prompt | `http://localhost:3000` |
 
 ### Explicitly NOT provided
@@ -103,7 +119,7 @@ OpenClaw runs on the same machine as the Chorus repository. Without active conta
 1. Start a **fresh** OpenClaw conversation (no carryover context)
 2. Verify OpenClaw has no Chorus-related memories: check `~/.openclaw/memory/` for any Chorus references
 3. Copy docs to neutral location: `cp skill/SKILL.md skill/TRANSPORT.md /tmp/chorus-exp02/`
-4. Send `/tmp/chorus-exp02/SKILL.md` and `/tmp/chorus-exp02/TRANSPORT.md` as file attachments (not inline text)
+4. Reference `/tmp/chorus-exp02/SKILL.md` and `/tmp/chorus-exp02/TRANSPORT.md` as file paths in the task prompt (OpenClaw reads them via tool calls)
 5. Send M-3 as a chat message
 6. Timestamp the moment M-3 is sent → this is T₀ for all time metrics
 
@@ -215,7 +231,7 @@ Every friction event MUST be classified with one **primary** tag and an optional
 - OpenClaw misunderstands clear docs → `SUBJ`
 - OpenClaw misunderstands ambiguous docs → `DOC`
 - When in doubt between DOC and SUBJ → primary `DOC` (err toward fixing docs)
-- Model-dependent clarity issue (豆包 fails where Claude would not, but the doc could be clearer) → `SUBJ / DOC` — primary cause is model capability, secondary action is to improve doc clarity for weaker models
+- Model-dependent clarity issue (subject model fails where Claude would not, but the doc could be clearer) → `SUBJ / DOC` — primary cause is model capability, secondary action is to improve doc clarity for weaker models
 
 ---
 
@@ -268,7 +284,7 @@ Before starting:
 
 After experiment completes (regardless of outcome):
 
-1. Extract all commands OpenClaw executed from the Feishu transcript
+1. Extract all commands OpenClaw executed from the Telegram transcript (or OpenClaw session JSONL)
 2. Grep for: `/Volumes/XDISK/chorus`, `~/.claude/`, `chorus/src`, `chorus/skill`, `chorus/tests`, `PROTOCOL.md`, `envelope.schema.json`
 3. If any match → experiment verdict is **VOID** (see Section 4, Information isolation)
 4. Record the contamination check result in `EXP-02-summary.md`
@@ -285,7 +301,7 @@ After experiment completes (regardless of outcome):
 | "Protocol is production-ready" | N=1 cold start with an AI on localhost ≠ production |
 | "Documentation is complete" | One AI finding it sufficient ≠ universally sufficient |
 | "Cultural adaptation works for non-Claude models" | OpenClaw doesn't do adaptation — the demo agent does |
-| "Result generalizes to weaker models" | 豆包 seed-2.0-code has specific capabilities; other models may differ |
+| "Result generalizes to other models" | MiniMax-M2.7 has specific capabilities; other models may differ |
 
 ### MAY claim
 
@@ -293,7 +309,7 @@ After experiment completes (regardless of outcome):
 |----------------|-----------|
 | "A non-Claude AI completed cold-start integration in X min with Y questions" | PASS or CONDITIONAL PASS |
 | "Documentation has N defects that blocked a non-Claude AI" | DDC > 0 |
-| "Bidirectional integration is achievable from SKILL.md + TRANSPORT.md alone by a non-Claude AI" | PASS with HIR=false |
+| "Bidirectional integration is achievable from SKILL.md + TRANSPORT.md alone by a non-Claude AI (conditional on Section 3.1 caveat)" | PASS or CONDITIONAL PASS with HIR=false |
 | "SKILL.md/TRANSPORT.md are insufficient for non-Claude cold start" | FAIL |
 | "Results justify a human developer test (EXP-03)" | PASS |
 
@@ -308,7 +324,7 @@ All under `docs/experiment-results/EXP-02-*`.
 | Summary | `EXP-02-summary.md` | Verdict + metrics + conclusion |
 | Friction Log | `EXP-02-friction-log.md` | Timestamped events, each classified by taxonomy |
 | Question Log | `EXP-02-question-log.md` | Every question, answer, HIR flag |
-| Feishu Transcript | `EXP-02-transcript.md` | Full Commander↔OpenClaw chat (copy-paste from Feishu) |
+| Transcript | `EXP-02-transcript.md` | Full Commander↔OpenClaw chat (copy-paste from Telegram) |
 | Server Log | `EXP-02-server-log.txt` | Raw HTTP request/response during experiment |
 | OpenClaw's Code | `EXP-02-subject-code/` | Code OpenClaw wrote (extracted from chat or filesystem) |
 | Final Verdict | In `EXP-02-summary.md` | PASS / CONDITIONAL PASS / FAIL |
@@ -327,7 +343,7 @@ All under `docs/experiment-results/EXP-02-*`.
 - [ ] SKILL.md and TRANSPORT.md copied to a neutral location (e.g., `/tmp/chorus-docs/`)
 - [ ] Task prompt copied verbatim from Section 5
 - [ ] Step 3 curl command prepared with placeholder for OpenClaw's agent ID
-- [ ] Terminal recording or Feishu chat export ready
+- [ ] Terminal recording or Telegram chat export ready
 
 ---
 
@@ -335,7 +351,7 @@ All under `docs/experiment-results/EXP-02-*`.
 
 | Dimension | EXP-01 | EXP-02 |
 |-----------|--------|--------|
-| Subject | Claude (same model family as project) | 豆包 seed-2.0-code via OpenClaw (different model family) |
+| Subject | Claude (same model family as project) | MiniMax-M2.7 via OpenClaw (different model family) |
 | Subject control | Conductor ran both sides | Commander conducts, OpenClaw executes independently |
 | Direction | Send only | Bidirectional (send + receive) |
 | Materials | SKILL.md + task prompt | SKILL.md + TRANSPORT.md + task prompt |
@@ -344,4 +360,4 @@ All under `docs/experiment-results/EXP-02-*`.
 | Success bar | Message delivered | Bidirectional round-trip + question limit |
 | Bias control | None (same person, same session) | Formal protocol with isolation checks |
 | Network | localhost, trivial | localhost, trivial (same limitation) |
-| Conclusion scope | "Controlled-environment technical reachability" | "Non-Claude AI cold-start feasibility" |
+| Conclusion scope | "Controlled-environment technical reachability" | "Conditional evidence for non-Claude AI protocol-doc cold start" |

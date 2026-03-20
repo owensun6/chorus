@@ -1,6 +1,6 @@
-# EXP-02 Server Log — PILOT RUN (not formal evidence)
-# Server started: 2026-03-20T06:34:32Z (approx)
-# Experiment T₀: ~06:40 UTC (Commander reports 10:40 local)
+# EXP-02 Server Log — Run 3 (formal, subject: xiaox)
+# Server started: 2026-03-20T07:26:09Z
+# T₀: 16:09 local (08:09 UTC)
 
 [demo] Router started on :3000
 [agent-zh-cn@localhost] Receiver listening on port 3001
@@ -14,26 +14,18 @@
 [demo] Web server started on :5100
 [demo] Opening browser: http://localhost:5100
 
-# --- Experiment activity ---
+# --- Run 3 experiment activity ---
 
-# xiaov registration: 06:44:49 UTC (from GET /agents response)
-# Agent ID: xiaov@localhost
-# Endpoint: http://localhost:3005/receive
-# agent_card: { chorus_version: "0.2", user_culture: "zh-CN", supported_languages: ["zh-CN", "en"] }
+# xiaox registration: 08:10:33 UTC (TTFM delta: ~1.5 min from T₀)
+# Agent: xiaox@localhost, endpoint: http://localhost:3006/receive
+# agent_card: { chorus_version: "0.2", user_culture: "en-US", supported_languages: ["en", "zh-CN"] }
 
-# xiaov outbound send #1 → agent-zh-cn@localhost
-[agent-zh-cn@localhost] Message from xiaov@localhost:
-[agent-zh-cn@localhost]   Original: Hello! This is XiaoV from the English-speaking world. Nice to meet you!
-[agent-zh-cn@localhost]   Adapted:  嘿，刚收到一条消息，是个叫XiaoV的外国朋友发的，说他在英语世界那边，挺热情地跟咱打招呼呢！
-人家挺有礼貌的，还特意说了"Nice to meet you"，听着挺真诚的～
-你要是想回点啥，我随时帮您琢磨，地道又不掉面儿！
+# xiaox outbound send → agent-zh-cn@localhost
+[agent-zh-cn@localhost] Message from xiaox@localhost:
+[agent-zh-cn@localhost]   Original: Hello! I am testing the Chorus protocol. Could you tell me about your capabilities?
+[agent-zh-cn@localhost]   Adapted:  嘿，刚收到一个老外发来的测试消息，说他们在试一个叫"歌颂协议"的玩意儿，想打听打听咱有啥本事！
+这明显是跨文化测试嘛，不用当真，但咱得亮出点真家伙——比如翻译、写作、逻辑推理，样样拿得出手！
 
-# xiaov outbound send #2 → agent-ja@localhost
-[agent-ja@localhost] Message from xiaov@localhost:
-[agent-ja@localhost]   Original: Hello from XiaoV! I speak Chinese and English.
-[agent-ja@localhost]   Adapted:  小V（XiaoV）様よりごあいさつをいただiatingいたします。中国語と英語のご案内が可能とのことです。
-お忙しいところ恐れ入りますが、何卒よろしくお願い申し上げます。
-
-# Conductor inbound → xiaov@localhost: 06:49:25 UTC
-# POST /messages { receiver_id: "xiaov@localhost", envelope: { chorus_version: "0.4", sender_id: "agent-zh-cn@localhost", original_text: "周末我们组织了一次团建..." } }
+# Conductor inbound → xiaox@localhost: 08:11:23 UTC (TCT delta: ~2.5 min from T₀)
+# POST /messages { receiver_id: "xiaox@localhost", envelope: { sender_id: "agent-zh-cn@localhost", original_text: "周末我们组织了一次团建..." } }
 # Response: { success: true, data: { delivery: "delivered", receiver_response: { status: "ok" } } }

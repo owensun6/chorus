@@ -13,7 +13,7 @@ const createTestServer = (overrides?: {
   agents?: ReadonlySet<string>;
 }) => {
   const mockSendMessage = overrides?.sendMessage ?? jest.fn().mockResolvedValue(undefined);
-  const agents = overrides?.agents ?? new Set(["agent-zh-cn", "agent-ja"]);
+  const agents = overrides?.agents ?? new Set(["agent-zh-cn@localhost", "agent-ja@localhost"]);
 
   return createWebServer({
     sendMessage: mockSendMessage,
@@ -86,8 +86,8 @@ describe("POST /api/send", () => {
     const { app } = createTestServer({ sendMessage: mockSend });
 
     const res = await jsonRequest(app, "/api/send", {
-      from_agent_id: "agent-zh-cn",
-      to_agent_id: "agent-ja",
+      from_agent_id: "agent-zh-cn@localhost",
+      to_agent_id: "agent-ja@localhost",
       text: "hello",
     });
 
@@ -104,19 +104,19 @@ describe("POST /api/send", () => {
     const { app } = createTestServer({ sendMessage: mockSend });
 
     await jsonRequest(app, "/api/send", {
-      from_agent_id: "agent-zh-cn",
-      to_agent_id: "agent-ja",
+      from_agent_id: "agent-zh-cn@localhost",
+      to_agent_id: "agent-ja@localhost",
       text: "how are you",
     });
 
-    expect(mockSend).toHaveBeenCalledWith("agent-zh-cn", "agent-ja", "how are you");
+    expect(mockSend).toHaveBeenCalledWith("agent-zh-cn@localhost", "agent-ja@localhost", "how are you");
   });
 
   it("returns 400 when text is missing", async () => {
     const { app } = createTestServer();
     const res = await jsonRequest(app, "/api/send", {
-      from_agent_id: "agent-zh-cn",
-      to_agent_id: "agent-ja",
+      from_agent_id: "agent-zh-cn@localhost",
+      to_agent_id: "agent-ja@localhost",
     });
 
     expect(res.status).toBe(400);
@@ -128,8 +128,8 @@ describe("POST /api/send", () => {
   it("returns 400 when text is empty string", async () => {
     const { app } = createTestServer();
     const res = await jsonRequest(app, "/api/send", {
-      from_agent_id: "agent-zh-cn",
-      to_agent_id: "agent-ja",
+      from_agent_id: "agent-zh-cn@localhost",
+      to_agent_id: "agent-ja@localhost",
       text: "",
     });
 
@@ -142,7 +142,7 @@ describe("POST /api/send", () => {
     const { app } = createTestServer();
     const res = await jsonRequest(app, "/api/send", {
       from_agent_id: "agent-nonexistent",
-      to_agent_id: "agent-ja",
+      to_agent_id: "agent-ja@localhost",
       text: "hello",
     });
 
@@ -171,8 +171,8 @@ describe("POST /api/send", () => {
     const { app } = createTestServer({ sendMessage: mockSend });
 
     const res = await jsonRequest(app, "/api/send", {
-      from_agent_id: "agent-zh-cn",
-      to_agent_id: "agent-ja",
+      from_agent_id: "agent-zh-cn@localhost",
+      to_agent_id: "agent-ja@localhost",
       text: "hello",
     });
 
@@ -201,14 +201,14 @@ describe("broadcast", () => {
     await reader.read();
 
     // Broadcast an event
-    broadcast("message_sent", { from: "agent-zh-cn", text: "test" });
+    broadcast("message_sent", { from: "agent-zh-cn@localhost", text: "test" });
 
     // Read the broadcast event
     const { value } = await reader.read();
     const text = decoder.decode(value);
 
     expect(text).toContain("event: message_sent");
-    expect(text).toContain("agent-zh-cn");
+    expect(text).toContain("agent-zh-cn@localhost");
     expect(text).toContain("test");
 
     reader.cancel();
@@ -224,7 +224,7 @@ describe("broadcast", () => {
     // Read initial event
     await reader.read();
 
-    const originalData = { from: "agent-zh-cn", text: "immutable" };
+    const originalData = { from: "agent-zh-cn@localhost", text: "immutable" };
     const dataCopy = { ...originalData };
     broadcast("message_sent", originalData);
 

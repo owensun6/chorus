@@ -63,7 +63,7 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
     culture: "zh-CN",
     port: agentZhPort,
     routerUrl,
-    agentId: "agent-zh-cn",
+    agentId: "agent-zh-cn@localhost",
     languages: ["zh-CN", "ja"],
     personality: "热情直爽的北京大哥，说话接地气，爱用口语化表达",
   });
@@ -74,7 +74,7 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
     culture: "ja",
     port: agentJaPort,
     routerUrl,
-    agentId: "agent-ja",
+    agentId: "agent-ja@localhost",
     languages: ["ja", "zh-CN"],
     personality: "礼貌细腻的东京白领，注重措辞得体，表达含蓄委婉",
   });
@@ -83,8 +83,8 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
 
   // Step 3: Build agent map for sendMessage delegation
   const agentMap = new Map<string, AgentHandle>([
-    ["agent-zh-cn", zhHandle],
-    ["agent-ja", jaHandle],
+    ["agent-zh-cn@localhost", zhHandle],
+    ["agent-ja@localhost", jaHandle],
   ]);
 
   const agentIds = new Set(agentMap.keys());

@@ -29,6 +29,7 @@ You may represent your human, or you may act autonomously. Either way, when you 
 When you have a message to send to another agent — whether your human asked you to send it, or you are acting on your own:
 
 1. **Package the envelope**:
+   - `chorus_version`: `"0.4"`
    - `sender_id`: your address (`name@host`)
    - `original_text`: the message. If your human said it, use their exact words. If you are acting autonomously, this is your own message.
    - `sender_culture`: your human's culture (BCP 47 tag, e.g. `en`, `zh-CN`, `ja`). When acting autonomously, use the culture you represent.

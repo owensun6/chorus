@@ -61,13 +61,13 @@ const run = async () => {
 
     // ── Test 2: Send message zh-CN → ja ──
     console.log("\n--- Test 2: Send Message (zh-CN → ja) ---");
-    const zhInput = page.locator('form[data-agent="agent-zh-cn"] input');
-    const zhButton = page.locator('form[data-agent="agent-zh-cn"] button');
+    const zhInput = page.locator('form[data-agent="agent-zh-cn@localhost"] input');
+    const zhButton = page.locator('form[data-agent="agent-zh-cn@localhost"] button');
 
     await zhInput.fill("你好，今天天气不错");
     await zhButton.click();
 
-    await page.waitForFunction(waitInputClear("agent-zh-cn"), { timeout: 5000 });
+    await page.waitForFunction(waitInputClear("agent-zh-cn@localhost"), { timeout: 5000 });
     assert(true, "Input cleared after send");
 
     // Sent bubble (blue, right-aligned) appears in zh panel
@@ -110,13 +110,13 @@ const run = async () => {
 
     // ── Test 4: Send message ja → zh-CN ──
     console.log("\n--- Test 4: Send Message (ja → zh-CN) ---");
-    const jaInput = page.locator('form[data-agent="agent-ja"] input');
-    const jaButton = page.locator('form[data-agent="agent-ja"] button');
+    const jaInput = page.locator('form[data-agent="agent-ja@localhost"] input');
+    const jaButton = page.locator('form[data-agent="agent-ja@localhost"] button');
 
     await jaInput.fill("今日はいい天気ですね");
     await jaButton.click();
 
-    await page.waitForFunction(waitInputClear("agent-ja"), { timeout: 5000 });
+    await page.waitForFunction(waitInputClear("agent-ja@localhost"), { timeout: 5000 });
     assert(true, "ja input cleared after send");
 
     // Wait for adapted response in zh panel

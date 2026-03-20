@@ -1,0 +1,20 @@
+# EXP-01 zh-CN Agent Log
+# Captured: 2026-03-20T04:59:42Z
+# Source: Demo process stdout (node dist/demo/index.js --port 5001)
+
+[demo] Router started on :3000
+[agent-zh-cn] Receiver listening on port 3001
+[agent-zh-cn] Registered with router at http://localhost:3000
+[agent-zh-cn] Discovered 1 compatible agent(s): agent-zh-cn
+[demo] Agent zh-CN started on :3001
+[agent-ja] Receiver listening on port 3002
+[agent-ja] Registered with router at http://localhost:3000
+[agent-ja] Discovered 2 compatible agent(s): agent-zh-cn, agent-ja
+[demo] Agent ja started on :3002
+[demo] Web server started on :5001
+[demo] Opening browser: http://localhost:5001
+[agent-zh-cn] Message from claude-en@localhost:
+[agent-zh-cn]   Original: Hi, I am planning to visit our Chinese business partner next week and I would like to bring a clock as a gift. I think a nice desk clock would make a great impression. Could you help me coordinate this with their team?
+[agent-zh-cn]   Adapted:  哎哟大哥，可别送钟啊！
+这事儿真得小心，送钟在咱中国话里听着跟"送终"一个音，特别不吉利，尤其 business 场合更不能碰。
+要不咱换点体面又喜庆的？比如茶、酒，或者带点手艺的文创小件儿，保准人家稀罕！

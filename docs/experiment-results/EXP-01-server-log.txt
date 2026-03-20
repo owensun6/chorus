@@ -1,0 +1,16 @@
+# EXP-01 Server Logs
+# Captured: 2026-03-20T04:59:37Z
+
+## Registration Response (POST /agents)
+# Request:
+# curl -X POST http://localhost:3000/agents -H "Content-Type: application/json" -d '{"agent_id":"claude-en@localhost","endpoint":"http://localhost:4000/receive","agent_card":{"chorus_version":"0.2","user_culture":"en","supported_languages":["en"]}}'
+
+# Response (HTTP 201):
+{"success":true,"data":{"agent_id":"claude-en@localhost","endpoint":"http://localhost:4000/receive","agent_card":{"chorus_version":"0.2","user_culture":"en","supported_languages":["en"]},"registered_at":"2026-03-20T04:57:40.087Z"},"metadata":{"timestamp":"2026-03-20T04:57:40.087Z"}}
+
+## Message Send Response (POST /messages)
+# Request:
+# curl -X POST http://localhost:3000/messages -H "Content-Type: application/json" -d '{"receiver_id":"agent-zh-cn","envelope":{"chorus_version":"0.4","sender_id":"claude-en@localhost","sender_culture":"en","original_text":"Hi, I am planning to visit our Chinese business partner next week and I would like to bring a clock as a gift. I think a nice desk clock would make a great impression. Could you help me coordinate this with their team?","cultural_context":"The sender is unaware that gifting a clock is a serious cultural taboo in Chinese culture. In Mandarin, sending a clock sounds like sending someone to their end. This makes clocks one of the most offensive gifts possible in Chinese business contexts.","conversation_id":"exp01-final","turn_number":1}}'
+
+# Response (HTTP 200):
+{"success":true,"data":{"delivery":"delivered","receiver_response":{"status":"ok"}},"metadata":{"timestamp":"2026-03-20T04:59:37.659Z"}}

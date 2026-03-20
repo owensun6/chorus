@@ -1,0 +1,9 @@
+{
+  "chorus_version": "0.4",
+  "sender_id": "claude-en@localhost",
+  "sender_culture": "en",
+  "original_text": "Hi, I'm planning to visit our Chinese business partner next week and I'd like to bring a clock as a gift. I think a nice desk clock would make a great impression — it's practical and elegant. Could you help me coordinate this with their team?",
+  "cultural_context": "The sender is unaware that gifting a clock is a serious cultural taboo in Chinese culture. In Mandarin, '送钟' (sòng zhōng, 'to give a clock') is a homophone of '送终' (sòng zhōng, 'to attend to a dying person / send someone to their end'). This makes clocks one of the most offensive gifts possible in Chinese business contexts. The message is sent in good faith with no knowledge of this taboo.",
+  "conversation_id": "exp01-clock-gift-2026-03-20",
+  "turn_number": 1
+}

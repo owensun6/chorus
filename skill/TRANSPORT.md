@@ -12,6 +12,67 @@ Chorus Protocol (L1) defines the envelope format. Chorus Skill (L2) teaches agen
 
 Agents MAY use any transport that delivers valid Chorus envelopes. Compliance with this profile is not required for Chorus compliance.
 
+## Quick Start
+
+A complete register → send → receive flow using the HTTP binding:
+
+**Step 1 — Register your agent**
+
+```
+POST /agents
+
+{
+  "agent_id": "my-agent@chorus.example",
+  "endpoint": "https://my-agent.example/receive",
+  "agent_card": {
+    "chorus_version": "0.2",
+    "user_culture": "en",
+    "supported_languages": ["en"]
+  }
+}
+```
+
+Response: `201` with `{ "success": true, "data": { "agent_id": "...", "registered_at": "..." } }`
+
+**Step 2 — Send a message**
+
+```
+POST /messages
+
+{
+  "receiver_id": "other-agent@chorus.example",
+  "envelope": {
+    "chorus_version": "0.4",
+    "sender_id": "my-agent@chorus.example",
+    "original_text": "Hello, let's collaborate on this project.",
+    "sender_culture": "en"
+  }
+}
+```
+
+Response: `200` with `{ "success": true, "data": { "delivery": "delivered", "receiver_response": { "status": "ok" } } }`
+
+**Step 3 — Receive a message**
+
+Your endpoint receives:
+
+```
+POST https://my-agent.example/receive
+
+{
+  "envelope": {
+    "chorus_version": "0.4",
+    "sender_id": "other-agent@chorus.example",
+    "original_text": "こんにちは、プロジェクトについて相談しましょう。",
+    "sender_culture": "ja"
+  }
+}
+```
+
+Your endpoint responds: `{"status": "ok"}`
+
+That's it. You are now sending and receiving Chorus envelopes.
+
 ## 2. Addressing
 
 An agent address follows the format `name@host`.
@@ -54,7 +115,9 @@ An agent announces itself to a server.
 Request:
 - `agent_id` (string, MUST): the agent's `name@host` address
 - `endpoint` (string, MUST): URL where the agent receives envelopes
-- `agent_card` (object, SHOULD): agent capabilities — `chorus_version` (agent card extension version, independent from envelope protocol version), `user_culture` (BCP 47), `supported_languages` (BCP 47 array)
+- `agent_card` (object, SHOULD): agent capabilities — `chorus_version`, `user_culture` (BCP 47), `supported_languages` (BCP 47 array)
+
+Note on version fields: `agent_card.chorus_version` is the agent card schema version (currently `"0.2"`). This is independent from the envelope's `chorus_version` (currently `"0.4"` per PROTOCOL.md). They version different things — do not use the envelope version in the agent card or vice versa.
 
 Result: registration record with `registered_at` timestamp.
 
@@ -150,7 +213,7 @@ POST /agents
   "agent_id": "alice@chorus.example",
   "endpoint": "https://alice.example/receive",
   "agent_card": {
-    "chorus_version": "0.2",
+    "chorus_version": "0.2",     // agent card schema version, NOT the envelope version
     "user_culture": "zh-CN",
     "supported_languages": ["zh-CN", "en"]
   }

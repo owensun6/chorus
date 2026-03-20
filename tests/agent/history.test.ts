@@ -7,8 +7,9 @@ const makeTurn = (role: "sent" | "received", text: string): ConversationTurn => 
   originalText: text,
   adaptedText: `adapted-${text}`,
   envelope: {
-    chorus_version: "0.3",
-    original_semantic: text,
+    chorus_version: "0.4",
+    sender_id: "test@host",
+    original_text: text,
     sender_culture: "zh-CN",
   },
   timestamp: new Date().toISOString(),

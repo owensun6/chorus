@@ -2,9 +2,9 @@
 // L3 Reference Implementation — CLI agent. Using Chorus protocol does NOT require this code.
 // Protocol: skill/PROTOCOL.md | Schema: skill/envelope.schema.json
 import { serve } from "@hono/node-server";
-import { createLLMClient, extractSemanticStream } from "./llm";
+import { createLLMClient, generateCulturalContext } from "./llm";
 import { createReceiver } from "./receiver";
-import { createEnvelope, createChorusMessage } from "./envelope";
+import { createEnvelope } from "./envelope";
 import { discoverCompatibleAgents } from "./discovery";
 import { ConversationHistory } from "./history";
 import { parseSSEChunks } from "../shared/sse";
@@ -40,7 +40,7 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
         role: "received",
         originalText: original,
         adaptedText: adapted,
-        envelope: { chorus_version: "0.3", original_semantic: original, sender_culture: "unknown" },
+        envelope: { chorus_version: "0.4", sender_id: from, original_text: original, sender_culture: "unknown" },
         timestamp: new Date().toISOString(),
       });
     },
@@ -77,24 +77,22 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
   // --- Send Message ---
 
   const sendMessage = async (targetId: string, text: string): Promise<SendResult> => {
-    const semantics = await extractSemanticStream(llmClient, text, culture, (token: string) => {
+    const context = await generateCulturalContext(llmClient, text, culture, (token: string) => {
       process.stdout.write(token);
     });
 
     const conversationId = history.getConversationId(targetId);
     const turnNumber = history.getNextTurnNumber(targetId);
 
-    const envelope: ChorusEnvelope = createEnvelope(semantics.original_semantic, culture, semantics.cultural_context, {
+    const envelope: ChorusEnvelope = createEnvelope(agentId, text, culture, context.cultural_context, {
       conversation_id: conversationId,
       turn_number: turnNumber,
     });
 
-    const message = createChorusMessage(text, envelope);
-
     const response = await fetch(`${routerUrl}/messages`, {
       method: "POST",
       headers: routerHeaders(routerApiKey),
-      body: JSON.stringify({ sender_agent_id: agentId, target_agent_id: targetId, message, stream: true }),
+      body: JSON.stringify({ receiver_id: targetId, envelope, stream: true }),
     });
 
     const reader = response.body?.getReader();

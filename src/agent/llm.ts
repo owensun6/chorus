@@ -5,8 +5,7 @@ import { extractErrorMessage } from "../shared/log";
 
 // --- Types ---
 
-interface ExtractResult {
-  readonly original_semantic: string;
+interface CulturalContextResult {
   readonly cultural_context?: string;
 }
 
@@ -18,10 +17,6 @@ const DEFAULT_BASE_URL =
 const DEFAULT_MODEL = "qwen3-coder-next" as const;
 
 // --- Prompt Templates ---
-
-const buildSemanticPrompt = (userInput: string): string =>
-  `用一句话提取以下内容的核心语义意图，直接输出结果，不要解释：
-${userInput}`;
 
 const buildCulturalContextPrompt = (
   userInput: string,
@@ -60,8 +55,7 @@ const buildReceiverPrompt = (
 - 2-4 句话，简洁自然
 - 不用 markdown、不用 emoji、不用代码格式
 
-对方（${envelope.sender_culture}）说: ${originalText}
-对方的意图: ${envelope.original_semantic}
+对方（${envelope.sender_culture}）说: ${envelope.original_text}
 文化背景: ${contextNote}
 
 转告给用户：`;
@@ -92,22 +86,13 @@ const callLLMStream = async (
   return accumulated.trim();
 };
 
-const extractSemanticStream = async (
+const generateCulturalContext = async (
   client: OpenAI,
   userInput: string,
   senderCulture: string,
   onToken?: (chunk: string) => void,
   model: string = DEFAULT_MODEL,
-): Promise<ExtractResult> => {
-  // Call 1: extract semantic intent (plain text)
-  const original_semantic = await callLLMStream(
-    client,
-    buildSemanticPrompt(userInput),
-    undefined, // no streaming for this short call
-    model,
-  );
-
-  // Call 2: generate cultural context (plain text, streamed for UX)
+): Promise<CulturalContextResult> => {
   const cultural_context = await callLLMStream(
     client,
     buildCulturalContextPrompt(userInput, senderCulture),
@@ -116,7 +101,6 @@ const extractSemanticStream = async (
   );
 
   return {
-    original_semantic: original_semantic || userInput,
     cultural_context: cultural_context && cultural_context.length >= 10
       ? cultural_context
       : undefined,
@@ -126,7 +110,6 @@ const extractSemanticStream = async (
 const adaptMessageStream = async (
   client: OpenAI,
   envelope: ChorusEnvelope,
-  originalText: string,
   receiverCulture: string,
   history?: readonly ConversationTurn[],
   receiverPersonality?: string,
@@ -134,7 +117,7 @@ const adaptMessageStream = async (
   model: string = DEFAULT_MODEL,
 ): Promise<string> => {
   try {
-    const prompt = buildReceiverPrompt(envelope, originalText, receiverCulture, history, receiverPersonality);
+    const prompt = buildReceiverPrompt(envelope, envelope.original_text, receiverCulture, history, receiverPersonality);
     return await callLLMStream(client, prompt, onChunk, model);
   } catch (err: unknown) {
     const message = extractErrorMessage(err);
@@ -145,24 +128,15 @@ const adaptMessageStream = async (
   }
 };
 
-// Non-streaming: thin wrappers
-const extractSemantic = (
-  client: OpenAI,
-  userInput: string,
-  senderCulture: string,
-  model: string = DEFAULT_MODEL,
-): Promise<ExtractResult> =>
-  extractSemanticStream(client, userInput, senderCulture, undefined, model);
-
+// Non-streaming: thin wrapper
 const adaptMessage = (
   client: OpenAI,
   envelope: ChorusEnvelope,
-  originalText: string,
   receiverCulture: string,
   receiverPersonality?: string,
   model: string = DEFAULT_MODEL,
 ): Promise<string> =>
-  adaptMessageStream(client, envelope, originalText, receiverCulture, undefined, receiverPersonality, undefined, model);
+  adaptMessageStream(client, envelope, receiverCulture, undefined, receiverPersonality, undefined, model);
 
 const createLLMClient = (apiKey: string, baseUrl?: string): OpenAI =>
   new OpenAI({
@@ -170,5 +144,5 @@ const createLLMClient = (apiKey: string, baseUrl?: string): OpenAI =>
     baseURL: baseUrl ?? DEFAULT_BASE_URL,
   });
 
-export { createLLMClient, extractSemantic, adaptMessage, extractSemanticStream, adaptMessageStream };
-export type { ExtractResult };
+export { createLLMClient, adaptMessage, generateCulturalContext, adaptMessageStream };
+export type { CulturalContextResult };

@@ -1,6 +1,6 @@
 // Author: be-api-router
 import { z } from "zod";
-import { ChorusAgentCardSchema } from "../shared/types";
+import { ChorusAgentCardSchema, ChorusEnvelopeSchema } from "../shared/types";
 
 const RegisterAgentBodySchema = z.object({
   agent_id: z.string().min(1, "agent_id is required"),
@@ -11,12 +11,8 @@ const RegisterAgentBodySchema = z.object({
 type RegisterAgentBody = z.infer<typeof RegisterAgentBodySchema>;
 
 const MessagePayloadBodySchema = z.object({
-  sender_agent_id: z.string().min(1),
-  target_agent_id: z.string().min(1),
-  message: z.object({
-    role: z.string(),
-    parts: z.array(z.unknown()).min(1),
-  }).passthrough(),
+  receiver_id: z.string().min(1),
+  envelope: ChorusEnvelopeSchema,
   stream: z.boolean().optional().default(false),
 });
 

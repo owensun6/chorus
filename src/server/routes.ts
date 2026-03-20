@@ -41,7 +41,7 @@ const createApp = (registry: AgentRegistry): Hono => {
     const agent = registry.get(c.req.param("id"));
     if (!agent) {
       return c.json(
-        errorResponse("ERR_NOT_FOUND", "Agent not found"),
+        errorResponse("ERR_AGENT_NOT_FOUND", "Agent not found"),
         404
       );
     }
@@ -52,7 +52,7 @@ const createApp = (registry: AgentRegistry): Hono => {
     const removed = registry.remove(c.req.param("id"));
     if (!removed) {
       return c.json(
-        errorResponse("ERR_NOT_FOUND", "Agent not found"),
+        errorResponse("ERR_AGENT_NOT_FOUND", "Agent not found"),
         404
       );
     }
@@ -66,7 +66,7 @@ const createApp = (registry: AgentRegistry): Hono => {
     const body = await c.req.json().catch(() => null);
     if (body === null) {
       return c.json(
-        errorResponse("ERR_INVALID_BODY", "Invalid JSON body"),
+        errorResponse("ERR_VALIDATION", "Invalid JSON body"),
         400
       );
     }
@@ -74,22 +74,22 @@ const createApp = (registry: AgentRegistry): Hono => {
     const parsed = MessagePayloadBodySchema.safeParse(body);
     if (!parsed.success) {
       const message = formatZodErrors(parsed.error.issues);
-      return c.json(errorResponse("ERR_INVALID_BODY", message), 400);
+      return c.json(errorResponse("ERR_VALIDATION", message), 400);
     }
 
-    const { sender_agent_id, target_agent_id, message, stream } = parsed.data;
+    const { receiver_id, envelope, stream } = parsed.data;
 
-    if (!registry.get(sender_agent_id)) {
+    if (!registry.get(envelope.sender_id)) {
       return c.json(
-        errorResponse("ERR_INVALID_BODY", "Sender agent not registered"),
+        errorResponse("ERR_SENDER_NOT_REGISTERED", "Sender agent not registered"),
         400
       );
     }
 
-    const target = registry.get(target_agent_id);
+    const target = registry.get(receiver_id);
     if (!target) {
       return c.json(
-        errorResponse("ERR_AGENT_NOT_FOUND", "Target agent not found"),
+        errorResponse("ERR_AGENT_NOT_FOUND", "Receiver agent not found"),
         404
       );
     }
@@ -97,7 +97,7 @@ const createApp = (registry: AgentRegistry): Hono => {
     const TIMEOUT_MS = 120_000;
 
     if (stream) {
-      return handleStreamForward(c, target.endpoint, sender_agent_id, message, TIMEOUT_MS);
+      return handleStreamForward(c, target.endpoint, envelope, TIMEOUT_MS);
     }
 
     try {
@@ -107,7 +107,7 @@ const createApp = (registry: AgentRegistry): Hono => {
       const targetRes = await fetch(target.endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sender_agent_id, message }),
+        body: JSON.stringify({ envelope }),
         signal: controller.signal,
       });
 
@@ -117,19 +117,22 @@ const createApp = (registry: AgentRegistry): Hono => {
         return c.json(
           errorResponse(
             "ERR_AGENT_UNREACHABLE",
-            "Target agent returned a server error"
+            "Receiver agent returned a server error"
           ),
           502
         );
       }
 
       const targetBody = await targetRes.json();
-      return c.json(successResponse({ target_response: targetBody }), 200);
+      return c.json(
+        successResponse({ delivery: "delivered", receiver_response: targetBody }),
+        200
+      );
     } catch {
       return c.json(
         errorResponse(
           "ERR_AGENT_UNREACHABLE",
-          "Failed to reach target agent"
+          "Failed to reach receiver agent"
         ),
         502
       );
@@ -163,8 +166,7 @@ const sseErrorResponse = (code: string, message: string): Response =>
 const handleStreamForward = async (
   c: { body: (stream: ReadableStream | null) => Response },
   endpoint: string,
-  senderAgentId: string,
-  message: unknown,
+  envelope: unknown,
   timeoutMs: number,
 ): Promise<Response> => {
   try {
@@ -174,20 +176,20 @@ const handleStreamForward = async (
     const targetRes = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "text/event-stream" },
-      body: JSON.stringify({ sender_agent_id: senderAgentId, message }),
+      body: JSON.stringify({ envelope }),
       signal: controller.signal,
     });
 
     clearTimeout(timer);
 
     if (targetRes.status >= 500) {
-      return sseErrorResponse("ERR_AGENT_UNREACHABLE", "Target agent returned a server error");
+      return sseErrorResponse("ERR_AGENT_UNREACHABLE", "Receiver agent returned a server error");
     }
 
     return new Response(targetRes.body, { headers: SSE_HEADERS });
   } catch (err: unknown) {
     const errMessage = extractErrorMessage(err);
-    return sseErrorResponse("ERR_AGENT_UNREACHABLE", `Failed to reach target agent: ${errMessage}`);
+    return sseErrorResponse("ERR_AGENT_UNREACHABLE", `Failed to reach receiver agent: ${errMessage}`);
   }
 };
 

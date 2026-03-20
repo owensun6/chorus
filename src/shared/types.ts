@@ -5,51 +5,27 @@ import { z } from "zod";
 
 const BCP47_REGEX = /^[a-z]{2,3}(-[A-Z][a-z]{3})?(-[A-Z]{2}|-[0-9]{3})?$/;
 
-const CHORUS_MEDIA_TYPE = "application/vnd.chorus.envelope+json" as const;
-
-const CHORUS_EXTENSION_URI =
-  "https://chorus-protocol.org/extensions/envelope/v0.2" as const;
-
 // --- Shared Primitives ---
 
 const bcp47String = z
   .string()
   .regex(BCP47_REGEX, "Invalid BCP47 language tag");
 
-const IntentType = z.enum([
-  "greeting",
-  "request",
-  "proposal",
-  "rejection",
-  "chitchat",
-  "apology",
-  "gratitude",
-  "information",
-]);
+const SENDER_ID_REGEX = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+$/;
 
-const Formality = z.enum(["formal", "semi-formal", "casual"]);
-
-const EmotionalTone = z.enum([
-  "polite",
-  "neutral",
-  "enthusiastic",
-  "cautious",
-  "apologetic",
-]);
-
-// --- ChorusEnvelope v0.2/v0.3 ---
+// --- ChorusEnvelope v0.4 ---
 
 const ChorusEnvelopeSchema = z
   .object({
-    chorus_version: z.enum(["0.2", "0.3"]),
-    original_semantic: z
+    chorus_version: z.literal("0.4"),
+    sender_id: z
       .string()
-      .min(1, "original_semantic must not be empty"),
+      .regex(SENDER_ID_REGEX, "sender_id must be name@host format"),
+    original_text: z
+      .string()
+      .min(1, "original_text must not be empty"),
     sender_culture: bcp47String,
     cultural_context: z.string().min(10).max(500).optional(),
-    intent_type: IntentType.optional(),
-    formality: Formality.optional(),
-    emotional_tone: EmotionalTone.optional(),
     conversation_id: z.string().max(64).optional(),
     turn_number: z.number().int().min(1).optional(),
   })
@@ -123,12 +99,8 @@ interface AgentRegistration {
 
 export {
   BCP47_REGEX,
-  CHORUS_MEDIA_TYPE,
-  CHORUS_EXTENSION_URI,
+  SENDER_ID_REGEX,
   bcp47String,
-  IntentType,
-  Formality,
-  EmotionalTone,
   ChorusEnvelopeSchema,
   ChorusAgentCardSchema,
   TextPartSchema,

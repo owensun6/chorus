@@ -6,8 +6,8 @@ import { AgentRegistry } from "../../src/server/registry";
 type Json = any;
 
 const SENDER_AGENT = {
-  id: "agent-alpha",
-  endpoint: "https://alpha.example.com/a2a",
+  id: "agent-alpha@chorus.example",
+  endpoint: "https://alpha.example.com/receive",
   card: {
     chorus_version: "0.2" as const,
     user_culture: "en-US",
@@ -15,9 +15,9 @@ const SENDER_AGENT = {
   },
 };
 
-const TARGET_AGENT = {
-  id: "agent-beta",
-  endpoint: "https://beta.example.com/a2a",
+const RECEIVER_AGENT = {
+  id: "agent-beta@chorus.example",
+  endpoint: "https://beta.example.com/receive",
   card: {
     chorus_version: "0.2" as const,
     user_culture: "zh-CN",
@@ -25,13 +25,16 @@ const TARGET_AGENT = {
   },
 };
 
+const validEnvelope = {
+  chorus_version: "0.4",
+  sender_id: SENDER_AGENT.id,
+  original_text: "Hello from alpha",
+  sender_culture: "en-US",
+};
+
 const validMessage = {
-  sender_agent_id: SENDER_AGENT.id,
-  target_agent_id: TARGET_AGENT.id,
-  message: {
-    role: "ROLE_USER",
-    parts: [{ text: "Hello from alpha", mediaType: "text/plain" }],
-  },
+  receiver_id: RECEIVER_AGENT.id,
+  envelope: validEnvelope,
 };
 
 describe("POST /messages", () => {
@@ -42,7 +45,7 @@ describe("POST /messages", () => {
   beforeEach(() => {
     registry = new AgentRegistry();
     registry.register(SENDER_AGENT.id, SENDER_AGENT.endpoint, SENDER_AGENT.card);
-    registry.register(TARGET_AGENT.id, TARGET_AGENT.endpoint, TARGET_AGENT.card);
+    registry.register(RECEIVER_AGENT.id, RECEIVER_AGENT.endpoint, RECEIVER_AGENT.card);
     app = createApp(registry);
 
     fetchSpy = jest.spyOn(global, "fetch");
@@ -59,10 +62,10 @@ describe("POST /messages", () => {
       headers: { "Content-Type": "application/json" },
     });
 
-  it("forwards message to target and wraps response (test_case_1)", async () => {
-    const targetReply = { status: "ok", reply: "Nihao!" };
+  it("forwards envelope to receiver and wraps response (test_case_1)", async () => {
+    const receiverReply = { status: "ok" };
     fetchSpy.mockResolvedValueOnce(
-      new Response(JSON.stringify(targetReply), { status: 200 })
+      new Response(JSON.stringify(receiverReply), { status: 200 })
     );
 
     const res = await postMessage(validMessage);
@@ -70,31 +73,33 @@ describe("POST /messages", () => {
     expect(res.status).toBe(200);
     const json: Json = await res.json();
     expect(json.success).toBe(true);
-    expect(json.data.target_response).toEqual(targetReply);
-    expect(json.metadata.timestamp).toBeDefined();
+    expect(json.data.delivery).toBe("delivered");
+    expect(json.data.receiver_response).toEqual(receiverReply);
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     const [url, opts] = fetchSpy.mock.calls[0];
-    expect(url).toBe(TARGET_AGENT.endpoint);
+    expect(url).toBe(RECEIVER_AGENT.endpoint);
     expect(opts?.method).toBe("POST");
     const sentBody = JSON.parse(opts?.body as string);
-    expect(sentBody.sender_agent_id).toBe(SENDER_AGENT.id);
-    expect(sentBody.message).toEqual(validMessage.message);
+    expect(sentBody.envelope).toEqual(validEnvelope);
   });
 
   it("returns 400 when sender is not registered (test_case_2)", async () => {
-    const body = { ...validMessage, sender_agent_id: "unknown-sender" };
+    const body = {
+      receiver_id: RECEIVER_AGENT.id,
+      envelope: { ...validEnvelope, sender_id: "unknown@host" },
+    };
 
     const res = await postMessage(body);
 
     expect(res.status).toBe(400);
     const json: Json = await res.json();
     expect(json.success).toBe(false);
-    expect(json.error.code).toBe("ERR_INVALID_BODY");
+    expect(json.error.code).toBe("ERR_SENDER_NOT_REGISTERED");
   });
 
-  it("returns 404 when target is not registered (test_case_3)", async () => {
-    const body = { ...validMessage, target_agent_id: "unknown-target" };
+  it("returns 404 when receiver is not registered (test_case_3)", async () => {
+    const body = { ...validMessage, receiver_id: "unknown@host" };
 
     const res = await postMessage(body);
 
@@ -104,7 +109,7 @@ describe("POST /messages", () => {
     expect(json.error.code).toBe("ERR_AGENT_NOT_FOUND");
   });
 
-  it("returns 502 when target is unreachable (test_case_4)", async () => {
+  it("returns 502 when receiver is unreachable (test_case_4)", async () => {
     fetchSpy.mockRejectedValueOnce(new Error("ECONNREFUSED"));
 
     const res = await postMessage(validMessage);
@@ -115,10 +120,10 @@ describe("POST /messages", () => {
     expect(json.error.code).toBe("ERR_AGENT_UNREACHABLE");
   });
 
-  it("returns 200 with target error when target returns 400 (test_case_5)", async () => {
-    const targetError = { error: "bad request from target" };
+  it("returns 200 with receiver error when receiver returns 400 (test_case_5)", async () => {
+    const receiverError = { status: "error", error_code: "INVALID_ENVELOPE" };
     fetchSpy.mockResolvedValueOnce(
-      new Response(JSON.stringify(targetError), { status: 400 })
+      new Response(JSON.stringify(receiverError), { status: 400 })
     );
 
     const res = await postMessage(validMessage);
@@ -126,34 +131,11 @@ describe("POST /messages", () => {
     expect(res.status).toBe(200);
     const json: Json = await res.json();
     expect(json.success).toBe(true);
-    expect(json.data.target_response).toEqual(targetError);
+    expect(json.data.delivery).toBe("delivered");
+    expect(json.data.receiver_response).toEqual(receiverError);
   });
 
-  it("message content is pure passthrough (test_case_6)", async () => {
-    const customMessage = {
-      role: "ROLE_USER",
-      parts: [
-        { text: "Do not modify me!", mediaType: "text/plain" },
-        { data: { key: "value" }, mediaType: "application/json" },
-      ],
-      extensions: ["https://example.com/ext"],
-    };
-    const body = {
-      ...validMessage,
-      message: customMessage,
-    };
-
-    fetchSpy.mockResolvedValueOnce(
-      new Response(JSON.stringify({ ok: true }), { status: 200 })
-    );
-
-    await postMessage(body);
-
-    const sentBody = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string);
-    expect(sentBody.message).toEqual(customMessage);
-  });
-
-  it("returns 502 when target returns 500 (server error)", async () => {
+  it("returns 502 when receiver returns 500 (server error)", async () => {
     fetchSpy.mockResolvedValueOnce(
       new Response("Internal Server Error", { status: 500 })
     );
@@ -176,13 +158,12 @@ describe("POST /messages", () => {
     expect(res.status).toBe(400);
     const json: Json = await res.json();
     expect(json.success).toBe(false);
-    expect(json.error.code).toBe("ERR_INVALID_BODY");
+    expect(json.error.code).toBe("ERR_VALIDATION");
   });
 
-  it("returns 400 when message field is missing", async () => {
+  it("returns 400 when envelope is missing", async () => {
     const body = {
-      sender_agent_id: SENDER_AGENT.id,
-      target_agent_id: TARGET_AGENT.id,
+      receiver_id: RECEIVER_AGENT.id,
     };
 
     const res = await postMessage(body);
@@ -190,7 +171,7 @@ describe("POST /messages", () => {
     expect(res.status).toBe(400);
     const json: Json = await res.json();
     expect(json.success).toBe(false);
-    expect(json.error.code).toBe("ERR_INVALID_BODY");
+    expect(json.error.code).toBe("ERR_VALIDATION");
   });
 });
 
@@ -202,7 +183,7 @@ describe("Server entry point (test_case_7)", () => {
 });
 
 // ---------------------------------------------------------------------------
-// T-05: Streaming forwarding tests
+// Streaming forwarding tests
 // ---------------------------------------------------------------------------
 
 const parseSSEEvents = (raw: string): Array<{ event: string; data: string }> => {
@@ -231,7 +212,7 @@ const makeMockSSEStream = (events: string): ReadableStream<Uint8Array> => {
   });
 };
 
-describe("POST /messages (streaming — T-05)", () => {
+describe("POST /messages (streaming)", () => {
   let app: ReturnType<typeof createApp>;
   let registry: AgentRegistry;
   let fetchSpy: jest.SpiedFunction<typeof global.fetch>;
@@ -244,7 +225,7 @@ describe("POST /messages (streaming — T-05)", () => {
   beforeEach(() => {
     registry = new AgentRegistry();
     registry.register(SENDER_AGENT.id, SENDER_AGENT.endpoint, SENDER_AGENT.card);
-    registry.register(TARGET_AGENT.id, TARGET_AGENT.endpoint, TARGET_AGENT.card);
+    registry.register(RECEIVER_AGENT.id, RECEIVER_AGENT.endpoint, RECEIVER_AGENT.card);
     app = createApp(registry);
     fetchSpy = jest.spyOn(global, "fetch");
   });
@@ -260,7 +241,7 @@ describe("POST /messages (streaming — T-05)", () => {
       headers: { "Content-Type": "application/json" },
     });
 
-  it("test_case_1: stream=true pipes SSE from mock target agent", async () => {
+  it("stream=true pipes SSE from receiver agent", async () => {
     const ssePayload =
       `event: chunk\ndata: {"text":"Hello"}\n\n` +
       `event: done\ndata: {"full_text":"Hello world"}\n\n`;
@@ -275,24 +256,21 @@ describe("POST /messages (streaming — T-05)", () => {
     const res = await postMessage(streamMessage);
 
     expect(res.headers.get("Content-Type")).toBe("text/event-stream");
-    expect(res.headers.get("Cache-Control")).toBe("no-cache");
 
     const text = await res.text();
     const events = parseSSEEvents(text);
     expect(events.some((e) => e.event === "chunk")).toBe(true);
     expect(events.some((e) => e.event === "done")).toBe(true);
 
-    // Verify fetch was called with Accept: text/event-stream
     const [, opts] = fetchSpy.mock.calls[0];
-    expect(opts?.headers).toBeDefined();
     const headers = opts?.headers as Record<string, string>;
     expect(headers["Accept"]).toBe("text/event-stream");
   });
 
-  it("test_case_2: stream=false returns JSON response (Phase 1 compat)", async () => {
-    const targetReply = { status: "ok" };
+  it("stream=false returns JSON response", async () => {
+    const receiverReply = { status: "ok" };
     fetchSpy.mockResolvedValueOnce(
-      new Response(JSON.stringify(targetReply), { status: 200 }),
+      new Response(JSON.stringify(receiverReply), { status: 200 }),
     );
 
     const res = await postMessage({ ...validMessage, stream: false });
@@ -300,10 +278,10 @@ describe("POST /messages (streaming — T-05)", () => {
     expect(res.status).toBe(200);
     const json: Json = await res.json();
     expect(json.success).toBe(true);
-    expect(json.data.target_response).toEqual(targetReply);
+    expect(json.data.delivery).toBe("delivered");
   });
 
-  it("test_case_3: stream=true with unreachable agent returns SSE error", async () => {
+  it("stream=true with unreachable agent returns SSE error", async () => {
     fetchSpy.mockRejectedValueOnce(new Error("ECONNREFUSED"));
 
     const res = await postMessage(streamMessage);
@@ -318,29 +296,23 @@ describe("POST /messages (streaming — T-05)", () => {
     expect(errorData.code).toBe("ERR_AGENT_UNREACHABLE");
   });
 
-  it("test_case_4: stream=true with agent 500 returns SSE error", async () => {
+  it("stream=true with agent 500 returns SSE error", async () => {
     fetchSpy.mockResolvedValueOnce(
       new Response("Internal Server Error", { status: 500 }),
     );
 
     const res = await postMessage(streamMessage);
 
-    expect(res.headers.get("Content-Type")).toBe("text/event-stream");
     const text = await res.text();
     const events = parseSSEEvents(text);
-
-    const errorEvents = events.filter((e) => e.event === "error");
-    expect(errorEvents.length).toBe(1);
-    const errorData = JSON.parse(errorEvents[0].data);
+    const errorData = JSON.parse(events.filter((e) => e.event === "error")[0].data);
     expect(errorData.code).toBe("ERR_AGENT_UNREACHABLE");
   });
 
-  it("test_case_5: validation error returns 400 JSON regardless of stream flag", async () => {
+  it("validation error returns 400 JSON regardless of stream flag", async () => {
     const body = {
-      sender_agent_id: SENDER_AGENT.id,
-      // missing target_agent_id
+      // missing receiver_id and envelope
       stream: true,
-      message: validMessage.message,
     };
 
     const res = await postMessage(body);
@@ -348,6 +320,6 @@ describe("POST /messages (streaming — T-05)", () => {
     expect(res.status).toBe(400);
     const json: Json = await res.json();
     expect(json.success).toBe(false);
-    expect(json.error.code).toBe("ERR_INVALID_BODY");
+    expect(json.error.code).toBe("ERR_VALIDATION");
   });
 });

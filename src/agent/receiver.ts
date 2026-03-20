@@ -2,12 +2,11 @@
 // L3 Reference Implementation — Chorus 接收端参考实现。协议行为规范见 skill/SKILL.md。
 import { Hono } from "hono";
 import type OpenAI from "openai";
-import { findChorusDataPart } from "./envelope";
+import { validateEnvelopeData } from "./envelope";
 import { adaptMessage, adaptMessageStream } from "./llm";
 import { formatSSE, SSE_ENCODER } from "../shared/sse";
-import { successResponse, errorResponse } from "../shared/response";
 import { extractErrorMessage } from "../shared/log";
-import type { A2AMessage, ChorusEnvelope } from "../shared/types";
+import type { ChorusEnvelope } from "../shared/types";
 import type { ConversationHistory } from "./history";
 
 // --- Receiver Config ---
@@ -21,16 +20,6 @@ interface ReceiverConfig {
   readonly personality?: string;
 }
 
-// --- Internal Helper ---
-
-const extractOriginalText = (message: A2AMessage): string => {
-  const textPart = message.parts.find(
-    (p): p is { text: string; mediaType: string } =>
-      "text" in p && p.mediaType === "text/plain",
-  );
-  return textPart?.text ?? "";
-};
-
 // --- Public API ---
 
 const createReceiver = (config: ReceiverConfig) => {
@@ -38,37 +27,35 @@ const createReceiver = (config: ReceiverConfig) => {
   const app = new Hono();
 
   app.post("/receive", async (c) => {
-    const body = await c.req.json().catch(() => null) as { sender_agent_id: string; message: A2AMessage } | null;
+    const body = await c.req.json().catch(() => null) as { envelope: unknown } | null;
     if (body === null) {
       return c.json(
-        errorResponse("ERR_VALIDATION", "Invalid JSON body"),
+        { status: "error", error_code: "INVALID_ENVELOPE", detail: "Invalid JSON body" },
         400,
       );
     }
 
-    const { sender_agent_id, message } = body;
-
-    // Step 1-2: Find and validate Chorus DataPart
-    const result = findChorusDataPart(message);
+    // Validate envelope
+    const result = validateEnvelopeData(body.envelope);
 
     if (result.status === "not_found") {
       return c.json(
-        errorResponse("ERR_INVALID_ENVELOPE", "no Chorus DataPart found"),
+        { status: "error", error_code: "INVALID_ENVELOPE", detail: "no envelope found in request" },
         400,
       );
     }
 
     if (result.status === "invalid") {
       return c.json(
-        errorResponse("ERR_INVALID_ENVELOPE", result.error),
+        { status: "error", error_code: "INVALID_ENVELOPE", detail: result.error },
         400,
       );
     }
 
-    // Step 3: Extract original text
-    const originalText = extractOriginalText(message);
+    const { envelope } = result;
+    const senderId = envelope.sender_id;
 
-    // Step 4: Check streaming mode
+    // Check streaming mode
     const wantsStream =
       c.req.header("Accept")?.includes("text/event-stream") === true;
 
@@ -76,32 +63,30 @@ const createReceiver = (config: ReceiverConfig) => {
       return handleStreaming(
         c,
         llmClient,
-        result.envelope,
-        originalText,
+        envelope,
         receiverCulture,
-        sender_agent_id,
+        senderId,
         onMessage,
         history,
         personality,
       );
     }
 
-    // Non-streaming: Phase 1 behavior
+    // Non-streaming
     try {
       const adaptedText = await adaptMessage(
         llmClient,
-        result.envelope,
-        originalText,
+        envelope,
         receiverCulture,
         personality,
       );
 
-      onMessage(sender_agent_id, originalText, adaptedText);
+      onMessage(senderId, envelope.original_text, adaptedText);
 
-      return c.json(successResponse({ processed: true }), 200);
+      return c.json({ status: "ok" }, 200);
     } catch (err: unknown) {
       return c.json(
-        errorResponse("ERR_ADAPTATION_FAILED", extractErrorMessage(err)),
+        { status: "error", error_code: "ADAPTATION_FAILED", detail: extractErrorMessage(err) },
         500,
       );
     }
@@ -116,15 +101,14 @@ const handleStreaming = (
   c: { body: (stream: ReadableStream) => Response },
   llmClient: OpenAI,
   envelope: ChorusEnvelope,
-  originalText: string,
   receiverCulture: string,
-  senderAgentId: string,
+  senderId: string,
   onMessage: (from: string, original: string, adapted: string) => void,
   history?: ConversationHistory,
   senderPersonality?: string,
 ): Response => {
   const historyTurns = history
-    ? history.getTurns(senderAgentId)
+    ? history.getTurns(senderId)
     : undefined;
 
   const stream = new ReadableStream({
@@ -132,7 +116,6 @@ const handleStreaming = (
       adaptMessageStream(
         llmClient,
         envelope,
-        originalText,
         receiverCulture,
         historyTurns,
         senderPersonality,
@@ -142,7 +125,7 @@ const handleStreaming = (
       )
         .then((fullText) => {
           controller.enqueue(SSE_ENCODER.encode(formatSSE("done", { full_text: fullText, envelope })));
-          onMessage(senderAgentId, originalText, fullText);
+          onMessage(senderId, envelope.original_text, fullText);
           controller.close();
         })
         .catch((err: unknown) => {

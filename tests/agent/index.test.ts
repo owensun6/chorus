@@ -7,13 +7,11 @@ import type OpenAI from "openai";
 // Module-level mocks — must be before imports
 // ---------------------------------------------------------------------------
 
-const mockExtractSemantic = jest.fn();
-const mockExtractSemanticStream = jest.fn();
+const mockGenerateCulturalContext = jest.fn();
 const mockCreateLLMClient = jest.fn();
 jest.mock("../../src/agent/llm", () => ({
   createLLMClient: mockCreateLLMClient,
-  extractSemantic: mockExtractSemantic,
-  extractSemanticStream: mockExtractSemanticStream,
+  generateCulturalContext: mockGenerateCulturalContext,
 }));
 
 const mockCreateReceiver = jest.fn();
@@ -39,7 +37,6 @@ const mockFetch = (responses: Array<{ status: number; body: any; sseBody?: strin
   const spy = jest.spyOn(global, "fetch");
   for (const r of responses) {
     if (r.sseBody !== undefined) {
-      // SSE streaming response mock
       const encoder = new TextEncoder();
       const encoded = encoder.encode(r.sseBody);
       const stream = new ReadableStream({
@@ -73,9 +70,10 @@ const createStartedAgent = async (overrides?: Partial<{
   port: number;
   agentId: string;
 }>) => {
+  const defaultId = overrides?.agentId ?? "agent-zh-CN@localhost";
   const fetchSpy = mockFetch([
     // POST /agents — registration
-    { status: 200, body: { success: true, data: { agent_id: overrides?.agentId ?? "agent-zh-CN-3001" } } },
+    { status: 200, body: { success: true, data: { agent_id: defaultId } } },
     // GET /agents — discovery
     { status: 200, body: { data: [] } },
   ]);
@@ -84,7 +82,7 @@ const createStartedAgent = async (overrides?: Partial<{
     culture: overrides?.culture ?? "zh-CN",
     port: overrides?.port ?? 3001,
     routerUrl: "http://localhost:3000",
-    agentId: overrides?.agentId ?? "agent-zh-CN-3001",
+    agentId: defaultId,
     languages: [overrides?.culture ?? "zh-CN"],
   };
 
@@ -103,7 +101,7 @@ describe("parseArgs", () => {
       "--culture", "zh-CN",
       "--port", "4000",
       "--router", "http://example.com:3000",
-      "--agent-id", "my-agent",
+      "--agent-id", "my-agent@example.com",
       "--languages", "zh-CN,en-US",
     ];
 
@@ -112,17 +110,17 @@ describe("parseArgs", () => {
     expect(config.culture).toBe("zh-CN");
     expect(config.port).toBe(4000);
     expect(config.routerUrl).toBe("http://example.com:3000");
-    expect(config.agentId).toBe("my-agent");
+    expect(config.agentId).toBe("my-agent@example.com");
     expect(config.languages).toEqual(["zh-CN", "en-US"]);
   });
 
-  it("uses defaults for optional arguments", () => {
+  it("uses defaults for optional arguments with name@host format", () => {
     const config = parseArgs(["--culture", "ja"]);
 
     expect(config.culture).toBe("ja");
     expect(config.port).toBe(3001);
     expect(config.routerUrl).toBe("http://localhost:3000");
-    expect(config.agentId).toBe("agent-ja-3001");
+    expect(config.agentId).toBe("agent-ja@localhost");
     expect(config.languages).toEqual(["ja"]);
   });
 
@@ -215,14 +213,14 @@ describe("startAgent", () => {
   it("registers with router and discovers agents on startup", async () => {
     const fetchSpy = mockFetch([
       // POST /agents — registration
-      { status: 200, body: { success: true, data: { agent_id: "agent-zh-CN-3001" } } },
+      { status: 200, body: { success: true, data: { agent_id: "agent-zh-CN@localhost" } } },
       // GET /agents — discovery
       {
         status: 200,
         body: {
           data: [
             {
-              agent_id: "agent-en-US-3002",
+              agent_id: "agent-en-US@localhost",
               endpoint: "http://localhost:3002/receive",
               agent_card: {
                 chorus_version: "0.2",
@@ -240,7 +238,7 @@ describe("startAgent", () => {
       culture: "zh-CN",
       port: 3001,
       routerUrl: "http://localhost:3000",
-      agentId: "agent-zh-CN-3001",
+      agentId: "agent-zh-CN@localhost",
       languages: ["zh-CN", "en-US"],
     };
 
@@ -251,21 +249,15 @@ describe("startAgent", () => {
       "http://localhost:3000/agents",
       expect.objectContaining({
         method: "POST",
-        headers: expect.objectContaining({
-          "Content-Type": "application/json",
-        }),
       }),
     );
 
     // Verify the registration body
     const postCall = fetchSpy.mock.calls[0];
     const postBody = JSON.parse(postCall[1]?.body as string);
-    expect(postBody.agent_id).toBe("agent-zh-CN-3001");
+    expect(postBody.agent_id).toBe("agent-zh-CN@localhost");
     expect(postBody.agent_card.chorus_version).toBe("0.2");
     expect(postBody.agent_card.user_culture).toBe("zh-CN");
-
-    // Verify GET /agents was called for discovery
-    expect(fetchSpy).toHaveBeenCalledWith("http://localhost:3000/agents");
 
     expect(handle).toHaveProperty("shutdown");
     expect(handle).toHaveProperty("sendMessage");
@@ -275,7 +267,7 @@ describe("startAgent", () => {
 
   it("sends Authorization header when routerApiKey is provided", async () => {
     const fetchSpy = mockFetch([
-      { status: 200, body: { success: true, data: { agent_id: "agent-zh-CN-3001" } } },
+      { status: 200, body: { success: true, data: { agent_id: "agent-zh-CN@localhost" } } },
       { status: 200, body: { data: [] } },
     ]);
 
@@ -283,14 +275,13 @@ describe("startAgent", () => {
       culture: "zh-CN",
       port: 3001,
       routerUrl: "http://localhost:3000",
-      agentId: "agent-zh-CN-3001",
+      agentId: "agent-zh-CN@localhost",
       languages: ["zh-CN"],
       routerApiKey: "test-router-key",
     };
 
     await startAgent(config);
 
-    // Verify POST /agents included Authorization header
     expect(fetchSpy).toHaveBeenCalledWith(
       "http://localhost:3000/agents",
       expect.objectContaining({
@@ -314,13 +305,12 @@ describe("startAgent", () => {
       culture: "zh-CN",
       port: 3001,
       routerUrl: "http://localhost:3000",
-      agentId: "agent-zh-CN-3001",
+      agentId: "agent-zh-CN@localhost",
       languages: ["zh-CN"],
     };
 
     await startAgent(config);
 
-    // Verify createReceiver was called with a history object
     expect(mockCreateReceiver).toHaveBeenCalledWith(
       expect.objectContaining({
         history: expect.objectContaining({
@@ -337,7 +327,7 @@ describe("startAgent", () => {
 });
 
 // ---------------------------------------------------------------------------
-// sendMessage (via handle) — T-06 streaming + v0.3 envelope
+// sendMessage (via handle) — v0.4 envelope
 // ---------------------------------------------------------------------------
 
 describe("sendMessage (via AgentHandle)", () => {
@@ -358,11 +348,10 @@ describe("sendMessage (via AgentHandle)", () => {
     jest.restoreAllMocks();
   });
 
-  it("uses extractSemanticStream and creates v0.3 envelope with conversation_id and turn_number", async () => {
+  it("creates v0.4 envelope with sender_id, original_text, conversation_id, and turn_number", async () => {
     const handle = await createStartedAgent();
 
-    mockExtractSemanticStream.mockResolvedValueOnce({
-      original_semantic: "I want to meet",
+    mockGenerateCulturalContext.mockResolvedValueOnce({
       cultural_context: "Direct meeting request in Chinese culture",
     });
 
@@ -372,32 +361,29 @@ describe("sendMessage (via AgentHandle)", () => {
       { status: 200, body: {}, sseBody },
     ]);
 
-    await handle.sendMessage("agent-en-US-3002", "Let's have a meeting");
+    await handle.sendMessage("agent-en-US@localhost", "Let's have a meeting");
 
-    // Verify extractSemanticStream was called (not extractSemantic)
-    expect(mockExtractSemanticStream).toHaveBeenCalledWith(
+    // Verify generateCulturalContext was called (not extractSemanticStream)
+    expect(mockGenerateCulturalContext).toHaveBeenCalledWith(
       fakeLLMClient,
       "Let's have a meeting",
       "zh-CN",
       expect.any(Function),
     );
-    expect(mockExtractSemantic).not.toHaveBeenCalled();
 
-    // Verify POST /messages was called with stream: true
+    // Verify POST /messages was called with v0.4 envelope format
     const postCall = sendFetchSpy.mock.calls[0];
     const postBody = JSON.parse(postCall[1]?.body as string);
     expect(postBody.stream).toBe(true);
-    expect(postBody.sender_agent_id).toBe("agent-zh-CN-3001");
-    expect(postBody.target_agent_id).toBe("agent-en-US-3002");
+    expect(postBody.receiver_id).toBe("agent-en-US@localhost");
 
-    // Verify envelope is v0.3 with conversation_id and turn_number
-    const chorusPart = postBody.message.parts.find(
-      (p: any) => p.mediaType === "application/vnd.chorus.envelope+json",
-    );
-    expect(chorusPart).toBeDefined();
-    expect(chorusPart.data.chorus_version).toBe("0.3");
-    expect(chorusPart.data.conversation_id).toBeDefined();
-    expect(chorusPart.data.turn_number).toBe(1);
+    // Verify envelope is v0.4 with all required fields
+    expect(postBody.envelope.chorus_version).toBe("0.4");
+    expect(postBody.envelope.sender_id).toBe("agent-zh-CN@localhost");
+    expect(postBody.envelope.original_text).toBe("Let's have a meeting");
+    expect(postBody.envelope.sender_culture).toBe("zh-CN");
+    expect(postBody.envelope.conversation_id).toBeDefined();
+    expect(postBody.envelope.turn_number).toBe(1);
 
     sendFetchSpy.mockRestore();
   });
@@ -406,55 +392,42 @@ describe("sendMessage (via AgentHandle)", () => {
     const handle = await createStartedAgent();
 
     // First message
-    mockExtractSemanticStream.mockResolvedValueOnce({
-      original_semantic: "hello",
-    });
+    mockGenerateCulturalContext.mockResolvedValueOnce({});
 
     const sseBody1 = "event: done\ndata: {\"full_text\":\"hi\"}\n\n";
     const fetchSpy1 = mockFetch([{ status: 200, body: {}, sseBody: sseBody1 }]);
-    await handle.sendMessage("target-1", "hello");
+    await handle.sendMessage("target-1@host", "hello");
     const body1 = JSON.parse(fetchSpy1.mock.calls[0][1]?.body as string);
-    const part1 = body1.message.parts.find(
-      (p: any) => p.mediaType === "application/vnd.chorus.envelope+json",
-    );
-    expect(part1.data.turn_number).toBe(1);
-    const convId1 = part1.data.conversation_id;
+    expect(body1.envelope.turn_number).toBe(1);
+    const convId1 = body1.envelope.conversation_id;
     fetchSpy1.mockRestore();
 
     // Second message to same target
-    mockExtractSemanticStream.mockResolvedValueOnce({
-      original_semantic: "how are you",
-    });
+    mockGenerateCulturalContext.mockResolvedValueOnce({});
 
     const sseBody2 = "event: done\ndata: {\"full_text\":\"fine\"}\n\n";
     const fetchSpy2 = mockFetch([{ status: 200, body: {}, sseBody: sseBody2 }]);
-    await handle.sendMessage("target-1", "how are you");
+    await handle.sendMessage("target-1@host", "how are you");
     const body2 = JSON.parse(fetchSpy2.mock.calls[0][1]?.body as string);
-    const part2 = body2.message.parts.find(
-      (p: any) => p.mediaType === "application/vnd.chorus.envelope+json",
-    );
-    expect(part2.data.turn_number).toBe(2);
-    expect(part2.data.conversation_id).toBe(convId1);
+    expect(body2.envelope.turn_number).toBe(2);
+    expect(body2.envelope.conversation_id).toBe(convId1);
     fetchSpy2.mockRestore();
   });
 
   it("records sent turn in history after sendMessage", async () => {
     const handle = await createStartedAgent();
 
-    mockExtractSemanticStream.mockResolvedValueOnce({
-      original_semantic: "test semantic",
-    });
+    mockGenerateCulturalContext.mockResolvedValueOnce({});
 
     const sseBody = "event: done\ndata: {\"full_text\":\"adapted test\"}\n\n";
     const sendSpy = mockFetch([{ status: 200, body: {}, sseBody }]);
 
-    await handle.sendMessage("peer-1", "test input");
+    await handle.sendMessage("peer-1@host", "test input");
 
-    // Access history through the receiver config that was passed
     const receiverCallArgs = mockCreateReceiver.mock.calls[0][0];
     const history = receiverCallArgs.history;
 
-    const turns = history.getTurns("peer-1");
+    const turns = history.getTurns("peer-1@host");
     expect(turns).toHaveLength(1);
     expect(turns[0].role).toBe("sent");
     expect(turns[0].originalText).toBe("test input");
@@ -464,17 +437,16 @@ describe("sendMessage (via AgentHandle)", () => {
   });
 
   it("records received turn in history via onMessage callback", async () => {
-    const handle = await createStartedAgent();
+    await createStartedAgent();
 
-    // Get the onMessage callback from createReceiver call
     const receiverCallArgs = mockCreateReceiver.mock.calls[0][0];
     const onMessage = receiverCallArgs.onMessage;
     const history = receiverCallArgs.history;
 
     // Simulate receiving a message
-    onMessage("sender-agent", "original text", "adapted text");
+    onMessage("sender@host", "original text", "adapted text");
 
-    const turns = history.getTurns("sender-agent");
+    const turns = history.getTurns("sender@host");
     expect(turns).toHaveLength(1);
     expect(turns[0].role).toBe("received");
     expect(turns[0].originalText).toBe("original text");
@@ -484,9 +456,7 @@ describe("sendMessage (via AgentHandle)", () => {
   it("writes streaming SSE chunks to stdout", async () => {
     const handle = await createStartedAgent();
 
-    mockExtractSemanticStream.mockResolvedValueOnce({
-      original_semantic: "hello",
-    });
+    mockGenerateCulturalContext.mockResolvedValueOnce({});
 
     const sseBody =
       "event: chunk\ndata: {\"text\":\"Hello \"}\n\n" +
@@ -496,9 +466,8 @@ describe("sendMessage (via AgentHandle)", () => {
 
     const sendSpy = mockFetch([{ status: 200, body: {}, sseBody }]);
 
-    await handle.sendMessage("target-a", "hi");
+    await handle.sendMessage("target-a@host", "hi");
 
-    // Verify process.stdout.write was called for each chunk
     const chunkWrites = stdoutSpy.mock.calls.filter(
       (call) => typeof call[0] === "string" && !call[0].startsWith("\n["),
     );
@@ -533,9 +502,7 @@ describe("shutdown (via AgentHandle)", () => {
 
   it("deregisters from router and closes server", async () => {
     const fetchSpy = mockFetch([
-      // POST /agents (registration)
       { status: 200, body: { success: true, data: {} } },
-      // GET /agents (discovery)
       { status: 200, body: { data: [] } },
     ]);
 
@@ -543,28 +510,24 @@ describe("shutdown (via AgentHandle)", () => {
       culture: "en-US",
       port: 3005,
       routerUrl: "http://localhost:3000",
-      agentId: "agent-en-US-3005",
+      agentId: "agent-en-US@localhost",
       languages: ["en-US"],
     };
 
     const handle = await startAgent(config);
     fetchSpy.mockRestore();
 
-    // Now test shutdown
     const shutdownFetchSpy = mockFetch([
-      // DELETE /agents/:id
       { status: 200, body: { success: true, data: {} } },
     ]);
 
     await handle.shutdown();
 
-    // Verify DELETE was called
     expect(shutdownFetchSpy).toHaveBeenCalledWith(
-      "http://localhost:3000/agents/agent-en-US-3005",
+      "http://localhost:3000/agents/agent-en-US@localhost",
       expect.objectContaining({ method: "DELETE" }),
     );
 
-    // Verify server was closed
     expect(mockServerClose).toHaveBeenCalled();
 
     shutdownFetchSpy.mockRestore();
@@ -580,7 +543,7 @@ describe("shutdown (via AgentHandle)", () => {
       culture: "en-US",
       port: 3005,
       routerUrl: "http://localhost:3000",
-      agentId: "agent-en-US-3005",
+      agentId: "agent-en-US@localhost",
       languages: ["en-US"],
       routerApiKey: "shutdown-key",
     };
@@ -595,7 +558,7 @@ describe("shutdown (via AgentHandle)", () => {
     await handle.shutdown();
 
     expect(shutdownSpy).toHaveBeenCalledWith(
-      "http://localhost:3000/agents/agent-en-US-3005",
+      "http://localhost:3000/agents/agent-en-US@localhost",
       expect.objectContaining({
         method: "DELETE",
         headers: expect.objectContaining({

@@ -33,7 +33,10 @@ const parseArgs = (args: readonly string[]): AgentConfig => {
 
   const port = Number(flagValue("--port") ?? "3001");
   const routerUrl = flagValue("--router") ?? "http://localhost:3000";
-  const agentId = flagValue("--agent-id") ?? `agent-${culture}-${port}`;
+  const host = (() => {
+    try { return new URL(routerUrl).hostname; } catch { return "localhost"; }
+  })();
+  const agentId = flagValue("--agent-id") ?? `agent-${culture}@${host}`;
   const languagesRaw = flagValue("--languages");
   const languages = languagesRaw ? languagesRaw.split(",") : [culture];
   const personality = flagValue("--personality");

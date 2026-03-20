@@ -2,9 +2,8 @@
 import type { ChorusEnvelope, ConversationTurn } from "../../src/shared/types";
 import {
   createLLMClient,
-  extractSemantic,
   adaptMessage,
-  extractSemanticStream,
+  generateCulturalContext,
   adaptMessageStream,
 } from "../../src/agent/llm";
 
@@ -38,64 +37,39 @@ const buildTimeoutClient = () => ({
   },
 });
 
-// --- extractSemantic (now 2 plain-text calls) ---
+// --- generateCulturalContext (single LLM call) ---
 
-describe("extractSemantic", () => {
-  test("returns semantic + cultural_context from 2 LLM calls", async () => {
-    const mockClient = buildMultiCallClient([
-      ["关心对方健康"],  // call 1: semantic
-      ["中国文化中直接评论体重是亲近关系的关心表达"],  // call 2: cultural context
-    ]);
+describe("generateCulturalContext", () => {
+  test("returns cultural_context from LLM call", async () => {
+    const mockClient = buildSingleCallClient(
+      ["中国文化中直接评论体重是亲近关系的关心表达"],
+    );
 
-    const result = await extractSemantic(mockClient as any, "你最近胖了", "zh-CN");
+    const result = await generateCulturalContext(mockClient as any, "你最近胖了", "zh-CN");
 
-    expect(result.original_semantic).toBe("关心对方健康");
     expect(result.cultural_context).toBe("中国文化中直接评论体重是亲近关系的关心表达");
-    expect(mockClient.chat.completions.create).toHaveBeenCalledTimes(2);
+    expect(mockClient.chat.completions.create).toHaveBeenCalledTimes(1);
   });
 
   test("cultural_context too short is dropped", async () => {
-    const mockClient = buildMultiCallClient([
-      ["问候"],  // semantic
-      ["short"],  // cultural context < 10 chars
-    ]);
+    const mockClient = buildSingleCallClient(["short"]);
 
-    const result = await extractSemantic(mockClient as any, "hi", "en-US");
+    const result = await generateCulturalContext(mockClient as any, "hi", "en-US");
 
-    expect(result.original_semantic).toBe("问候");
     expect(result.cultural_context).toBeUndefined();
   });
 
-  test("falls back to user input when semantic is empty", async () => {
-    const mockClient = buildMultiCallClient([
-      [""],  // empty semantic
-      ["some cultural context that is long enough"],
-    ]);
-
-    const result = await extractSemantic(mockClient as any, "hello", "en-US");
-
-    expect(result.original_semantic).toBe("hello");
-  });
-});
-
-// --- extractSemanticStream ---
-
-describe("extractSemanticStream", () => {
-  test("calls onToken during cultural context generation", async () => {
-    const mockClient = buildMultiCallClient([
-      ["语义意图"],
-      ["文化", "背景", "说明长文本"],
-    ]);
+  test("calls onToken during generation", async () => {
+    const mockClient = buildSingleCallClient(["文化", "背景", "说明长文本"]);
     const tokens: string[] = [];
 
-    await extractSemanticStream(
+    await generateCulturalContext(
       mockClient as any,
       "test",
       "zh-CN",
       (chunk: string) => { tokens.push(chunk); },
     );
 
-    // onToken receives chunks from 2nd call (cultural context)
     expect(tokens).toEqual(["文化", "背景", "说明长文本"]);
   });
 });
@@ -104,8 +78,9 @@ describe("extractSemanticStream", () => {
 
 describe("adaptMessage", () => {
   const envelope: ChorusEnvelope = {
-    chorus_version: "0.2",
-    original_semantic: "关心对方健康",
+    chorus_version: "0.4",
+    sender_id: "alice@example.com",
+    original_text: "关心对方健康",
     sender_culture: "zh-CN",
     cultural_context: "中国文化中直接评论体重是亲近关系的关心表达不带恶意",
   };
@@ -113,7 +88,7 @@ describe("adaptMessage", () => {
   test("returns adapted text", async () => {
     const mockClient = buildSingleCallClient(["I hope you're", " taking care of yourself!"]);
 
-    const result = await adaptMessage(mockClient as any, envelope, "多运动", "en-US");
+    const result = await adaptMessage(mockClient as any, envelope, "en-US");
 
     expect(result).toBe("I hope you're taking care of yourself!");
   });
@@ -122,7 +97,7 @@ describe("adaptMessage", () => {
     const mockClient = buildTimeoutClient();
 
     await expect(
-      adaptMessage(mockClient as any, envelope, "多运动", "en-US"),
+      adaptMessage(mockClient as any, envelope, "en-US"),
     ).rejects.toThrow("LLM request timeout");
   });
 });
@@ -131,8 +106,9 @@ describe("adaptMessage", () => {
 
 describe("adaptMessageStream", () => {
   const envelope: ChorusEnvelope = {
-    chorus_version: "0.2",
-    original_semantic: "test",
+    chorus_version: "0.4",
+    sender_id: "alice@example.com",
+    original_text: "test",
     sender_culture: "zh-CN",
   };
 
@@ -143,7 +119,6 @@ describe("adaptMessageStream", () => {
     await adaptMessageStream(
       mockClient as any,
       envelope,
-      "你好",
       "en-US",
       undefined,
       undefined,
@@ -168,7 +143,6 @@ describe("adaptMessageStream", () => {
     await adaptMessageStream(
       mockClient as any,
       envelope,
-      "你最近怎么样",
       "en-US",
       history,
     );
@@ -182,7 +156,7 @@ describe("adaptMessageStream", () => {
   test("without history omits history section", async () => {
     const mockClient = buildSingleCallClient(["adapted"]);
 
-    await adaptMessageStream(mockClient as any, envelope, "你好", "en-US");
+    await adaptMessageStream(mockClient as any, envelope, "en-US");
 
     const callArgs = mockClient.chat.completions.create.mock.calls[0][0];
     const promptContent = callArgs.messages[0].content as string;

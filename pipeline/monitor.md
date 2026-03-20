@@ -1,14 +1,13 @@
 # 战略全景沙盘 (Fusion Global Monitor)
 
-> 最后更新: 2026-03-19 Phase 5 Gate 0 通过，/scale quick 激活
+> 最后更新: 2026-03-20 Phase 5 整改完成，全量提交 67ab683
 
 ## 当前阶段
 
 | 项目 | 值 |
 |------|---|
-| 项目名称 | Chorus — 跨文化语义适配协议与平台 |
-| 当前 Stage | Phase 5 ✅ 完成 |
-| 启动日期 | 2026-03-19 |
+| 项目名称 | Chorus — 跨平台 Agent 通信标准 |
+| 当前 Stage | Phase 5 ✅ 完成（含整改 8 Step + 跨平台验证 5/5 PASS） |
 | 启动日期 | 2026-03-17 |
 
 ## Phase 0 阶段推进看板
@@ -109,5 +108,5 @@ FP-2 原子性: Phase 0 选择了 spike 模式而非正式 TDD，因为目的是
 | Stage 1.5 | 原型修订 | ⏭️ SKIP | 无 UI | |
 | Stage 2 | 头脑风暴 | ✅ 完成 | 2026-03-19-skill-redesign.md — 混合方案（Role-First + Protocol-First） | FP 审计发现 SKILL.old.md 思想未对齐新 PRD |
 | Gate 2 | Stage 3: DAG 兵力分配 | ✅ 已通过 | task.md (8 Tasks), dependency_graph.md | Commander 2026-03-19 签字 |
-| Stage 5 | 开发执行 | ✅ 完成 | 8/8 Tasks GREEN. 跨平台验证 3/3 PASS | PROTOCOL.md v0.4 + SKILL.md + npm CLI |
-| Stage 6+7 | QA + 收尾 | ✅ 完成 | cross-platform-validation.md (3/3 PASS) | 2026-03-19 |
+| Stage 5 | 开发执行 | ✅ 完成 | 8/8 Tasks GREEN + 整改 8 Step + 跨平台验证 5/5 PASS | PROTOCOL.md v0.4 + SKILL.md + TRANSPORT.md + npm CLI |
+| Stage 6+7 | QA + 收尾 | ✅ 完成 | cross-platform-validation.md (5/5 PASS). Commit 67ab683 | 2026-03-20 |

@@ -139,6 +139,19 @@ const createApp = (registry: AgentRegistry): Hono => {
     }
   });
 
+  app.get("/.well-known/chorus.json", (c) => {
+    return c.json({
+      chorus_version: "0.4",
+      server_name: "Chorus Hub",
+      endpoints: {
+        register: "/agents",
+        discover: "/agents",
+        send: "/messages",
+        health: "/health",
+      },
+    }, 200);
+  });
+
   app.get("/health", (c) => {
     return c.json(
       successResponse({

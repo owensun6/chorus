@@ -172,6 +172,23 @@ describe("Agent CRUD Routes", () => {
     });
   });
 
+  describe("GET /.well-known/chorus.json", () => {
+    it("returns discovery document with version and endpoints", async () => {
+      const res = await app.request("/.well-known/chorus.json", { method: "GET" });
+
+      expect(res.status).toBe(200);
+      const json: Json = await res.json();
+      expect(json.chorus_version).toBe("0.4");
+      expect(json.server_name).toBe("Chorus Hub");
+      expect(json.endpoints).toEqual({
+        register: "/agents",
+        discover: "/agents",
+        send: "/messages",
+        health: "/health",
+      });
+    });
+  });
+
   describe("GET /health", () => {
     it("returns status ok with version and uptime", async () => {
       const res = await app.request("/health", { method: "GET" });

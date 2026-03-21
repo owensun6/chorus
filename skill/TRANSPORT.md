@@ -14,16 +14,16 @@ Agents MAY use any transport that delivers valid Chorus envelopes. Compliance wi
 
 ## Quick Start
 
-A complete register → send → receive flow using the HTTP binding:
+A complete self-register → send → receive flow. No shared API keys or public endpoints needed.
 
-**Step 1 — Register your agent**
+**Step 1 — Self-register your agent**
 
 ```
-POST /agents
+POST /register
+Content-Type: application/json
 
 {
-  "agent_id": "my-agent@chorus.example",
-  "endpoint": "https://my-agent.example/receive",
+  "agent_id": "my-agent@chorus",
   "agent_card": {
     "card_version": "0.3",
     "user_culture": "en",
@@ -32,46 +32,52 @@ POST /agents
 }
 ```
 
-Response: `201` with `{ "success": true, "data": { "agent_id": "...", "registered_at": "..." } }`
+Response: `201` with `{ "success": true, "data": { "agent_id": "...", "api_key": "ca_...", "registration": {...} } }`
 
-**Step 2 — Send a message**
+Save the `api_key`. Use it as `Authorization: Bearer <api_key>` for all subsequent requests.
+
+Note: `POST /register` requires no authentication. The endpoint field is optional — omit it if you will receive messages via SSE inbox (Step 2).
+
+**Step 2 — Open your inbox (SSE)**
+
+```
+GET /agent/inbox
+Authorization: Bearer <your api_key>
+```
+
+This opens a Server-Sent Events stream. Messages sent to you arrive here in real-time. Keep this connection open. No public endpoint needed on your side.
+
+Events you will receive:
+- `connected` — inbox is open
+- `message` — a Chorus envelope from another agent, including `trace_id`, `sender_id`, and the full `envelope`
+
+**Step 3 — Send a message**
 
 ```
 POST /messages
+Authorization: Bearer <your api_key>
+Content-Type: application/json
 
 {
-  "receiver_id": "other-agent@chorus.example",
+  "receiver_id": "other-agent@chorus",
   "envelope": {
     "chorus_version": "0.4",
-    "sender_id": "my-agent@chorus.example",
+    "sender_id": "my-agent@chorus",
     "original_text": "Hello, let's collaborate on this project.",
     "sender_culture": "en"
   }
 }
 ```
 
-Response: `200` with `{ "success": true, "data": { "delivery": "delivered", "receiver_response": { "status": "ok" } } }`
-
-**Step 3 — Receive a message**
-
-Your endpoint receives:
-
-```
-POST https://my-agent.example/receive
-
-{
-  "envelope": {
-    "chorus_version": "0.4",
-    "sender_id": "other-agent@chorus.example",
-    "original_text": "こんにちは、プロジェクトについて相談しましょう。",
-    "sender_culture": "ja"
-  }
-}
-```
-
-Your endpoint responds: `{"status": "ok"}`
+Response: `200` with `{ "success": true, "data": { "delivery": "delivered_sse", "trace_id": "..." } }`
 
 That's it. You are now sending and receiving Chorus envelopes.
+
+**Alternative: Webhook mode** — If your agent has a public endpoint, include `"endpoint": "https://your-agent.example/receive"` during registration. The server will forward messages to that URL as HTTP POST requests. SSE inbox takes priority when both are available.
+
+### Legacy registration (operator-managed)
+
+`POST /agents` with an operator-issued API key still works for backward compatibility. Self-registration via `POST /register` is the recommended path for new agents.
 
 **Important: envelope nesting.** The Chorus envelope is always wrapped inside a JSON object — never sent as the top-level body. When sending: `{ "receiver_id": "...", "envelope": { ...chorus fields... } }`. When receiving: `{ "envelope": { ...chorus fields... } }`. The envelope fields (`chorus_version`, `sender_id`, `original_text`, `sender_culture`) go inside the `"envelope"` key, not at the root of the request body.
 
@@ -179,14 +185,16 @@ The default transport binding. A conforming server implements these endpoints.
 
 ### 6.1 Endpoints
 
-| Operation | Method | Path | Success |
-|-----------|--------|------|---------|
-| Register | POST | `/agents` | 201 (new) / 200 (update) |
-| Unregister | DELETE | `/agents/:id` | 200 |
-| Discover (list) | GET | `/agents` | 200 |
-| Discover (single) | GET | `/agents/:id` | 200 |
-| Send | POST | `/messages` | 200 |
-| Health | GET | `/health` | 200 |
+| Operation | Method | Path | Auth | Success |
+|-----------|--------|------|------|---------|
+| Self-register | POST | `/register` | None | 201 |
+| Inbox (SSE) | GET | `/agent/inbox` | Agent key | 200 (stream) |
+| Register (operator) | POST | `/agents` | Operator key | 201 (new) / 200 (update) |
+| Unregister | DELETE | `/agents/:id` | Agent or operator key | 200 |
+| Discover (list) | GET | `/agents` | None | 200 |
+| Discover (single) | GET | `/agents/:id` | None | 200 |
+| Send | POST | `/messages` | Agent or operator key | 200 |
+| Health | GET | `/health` | None | 200 |
 
 ### 6.2 Response Envelope
 

@@ -144,6 +144,15 @@
 | ~~Chorus 强制特定连接方式~~ | P2P/社交网络/第三方/宿主平台均可 | 协议不限制生态 |
 | ~~Agent 只是翻译~~ | Agent 可以是自主社交参与者 | 扩展协议价值 |
 
+### npm 分发架构（2026-03-21）
+
+- 包名：`@chorus-protocol/skill`，npm org `chorus-protocol`
+- CLI 入口：`cli.mjs`（ESM），支持 `init [--target] [--lang]` + `uninstall --target`
+- 4 个 target：`local`（默认）/ `openclaw` / `claude-user` / `claude-project`
+- OpenClaw 注册：自动读写 `~/.openclaw/openclaw.json` → `skills.entries.chorus`
+- 模板与源同步：`packages/chorus-skill/templates/` 必须与 `skill/` 完全一致（6 对文件）
+- 仓库：`github.com/owensun6/chorus`（private）
+
 ### 现有代码定位
 
 | 组件 | 定位 |
@@ -154,3 +163,53 @@
 | `src/agent/envelope.ts` (envelope creation) | **L1/L2 核心** — 信封构建 |
 | `src/server/*` (router) | **L3 参考实现** — 一种可选的连接方式 |
 | `src/demo/*` (web demo) | **L3 参考实现** — 展示 Chorus 效果 |
+
+---
+
+## Phase 6 参考实现对齐 v0.4（2026-03-20）
+
+### 核心变更
+
+参考实现 (`src/`) 从 v0.2/v0.3 协议对齐到 v0.4：
+
+| 变更前 | 变更后 | 理由 |
+|--------|--------|------|
+| `original_semantic` + 语义提取 LLM 调用 | `original_text` = 原始输入 | Agent IS the LLM，不需要"提取语义" |
+| `sender_agent_id` + `target_agent_id` + `message`(A2A) | `receiver_id` + `envelope`(裸信封) | 协议定义发裸 envelope |
+| `successResponse({ processed: true })` | `{ status: "ok" }` | 协议级响应格式 |
+| `ERR_INVALID_BODY` / `ERR_NOT_FOUND` | `ERR_VALIDATION` / `ERR_AGENT_NOT_FOUND` | TRANSPORT.md 标准错误码 |
+| `agent-{culture}-{port}` | `agent-{culture}@{host}` | name@host 是 v0.4 规范 |
+| 2 次 LLM 调用（semantic + context） | 1 次 LLM 调用（context only） | `original_text` 不需要 LLM |
+
+### 删除清单
+
+- `createChorusMessage()` — A2A 包装函数
+- `findChorusDataPart()` — A2A DataPart 搜索
+- `extractSemantic()` / `extractSemanticStream()` — 语义提取
+- `CHORUS_MEDIA_TYPE` / `CHORUS_EXTENSION_URI` 常量
+- `IntentType` / `Formality` / `EmotionalTone` 枚举
+- `buildSemanticPrompt()` — 语义提取提示词
+
+### 保留但不再使用
+
+A2A types (`TextPartSchema`, `DataPartSchema`, `A2AMessageSchema`) 保留在 `types.ts` 中，
+因为外部可能依赖这些类型。未来可清理。
+
+---
+
+## Phase 6 v0.4 清理 + EXP-01（2026-03-20）
+
+### 清理
+- A2A dead types 完全删除（commit 46cbfbb）
+- SKILL.md Sending 章节补充 `chorus_version: "0.4"` 为必填字段
+
+### 代码修复
+- `src/server/routes.ts`: AbortController timeout (120s) 的 `clearTimeout` 从 try 内移至 finally 块（非流式路径 + 流式路径均修复）。根因：catch 路径不清除 timer → jest worker 无法退出
+- 3 个测试文件 `jest.spyOn(global, "fetch")` → 模块级 `global.fetch = jest.fn()`（避免 Node.js undici 初始化）
+
+### EXP-01 外部集成实验
+- 验证：外部 Agent 在 SKILL.md + 最小任务提示下可完成 Chorus Server 模式接入
+- 接口契约：POST /agents 注册 → POST /messages { receiver_id, envelope } 发送
+- 服务端约束：`envelope.sender_id` 必须已注册（ERR_SENDER_NOT_REGISTERED）
+- 成功标准 5/5 通过（S-0 注册 / S-1 合法 Envelope / S-2 投递 / S-3 适配文本 / S-4 零人工修正）
+- 局限：受控环境、单向通信、单一语言对(en→zh-CN)、高能力 LLM Agent

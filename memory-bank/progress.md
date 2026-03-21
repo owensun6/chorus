@@ -141,3 +141,62 @@
 - /.well-known/chorus.json 发现机制：SHOULD，非 MUST
 - SSE streaming：MAY 扩展，明确是"接收方内容流透传"，非"投递进度流"
 - agent_card.chorus_version 是 agent card extension 版本（"0.2"），独立于 envelope protocol 版本（"0.4"）
+
+### 2026-03-21 13:00–14:30
+
+**操作**: npm 分发闭环 — 包发布 + CLI 增强 + 入口统一
+**结果**:
+- `@chorus-protocol/skill@0.4.0` 首次发布到 npm，registry smoke test 通过
+- `@chorus-protocol/skill@0.4.1` 发布：CLI 新增 `--target openclaw|claude-user|claude-project`，OpenClaw 一键安装+自动注册 `openclaw.json`
+- 包审计修复：模板 PROTOCOL.md 同步（en+zh-CN）、README/LICENSE 加入包、版本号动态读取、`files`/`engines` 字段
+- GitHub 仓库 `owensun6/chorus`（private）创建并推送
+- npm org `@chorus-protocol` 创建，账号 `sunyimin111`
+- 本地 OpenClaw 安装测试通过（文件+注册+卸载）
+- 5 份分发文档：openclaw-install.md、npm-release-checklist.md、quick-trial.md、outreach-targets.md、release-0.4.0.md + release-0.4.1.md
+- 所有对外入口统一到 `npx @chorus-protocol/skill init --target openclaw`
+
+**决策**:
+- OpenClaw 是主要触达渠道，`--target openclaw` 为默认推荐入口
+- `repository`/`homepage`/`bugs` 等 npm 元数据只填真实地址，不猜测
+- npm token 不在对话中传递，由 Commander 本地配置
+- 分发文档闭环后进入"等外部信号"状态，不再补内部材料
+
+### 2026-03-20 14:00
+
+**操作**: Phase 6 v0.4 清理 + 状态报告审计 + EXP-01 外部集成实验 + 测试泄漏修复
+**结果**:
+- Commit 46cbfbb: v0.4 cleanup — A2A dead types 删除 + E2E 对齐 + v0.3 schemas 移除
+- 状态报告 v1→v2 重写：从"工作总结"改为"可决策文档"。4 轮 Commander 审计。删除自评分，增加证据索引表，结论收紧为 3 句话
+- 实验规格 `docs/experiment-external-integration.md` 编写。5 轮 Commander 审计修正接口契约（receiver_id + envelope body、sender 注册前置、data.delivery 字段名、onMessage 日志 vs 不存在的回复 Envelope）
+- **EXP-01 执行通过**：外部 Claude 在 SKILL.md + 最小任务提示下 ~60s 完成受控接入。送钟禁忌场景，zh-CN Agent 准确适配
+- SKILL.md 修复：Sending 章节增加 `chorus_version: "0.4"` 为必填字段（EXP-01 发现的文档缺陷）
+- **jest 泄漏根因修复**：`src/server/routes.ts` 两处 AbortController 120s timeout 在 catch 路径不清除 → 改为 finally 块。3 个测试文件 `jest.spyOn(global, "fetch")` → 模块级 `global.fetch = jest.fn()`
+- 141 tests, 82.56% coverage, 干净退出无警告
+
+**决策**:
+- 状态报告结论锚定为：技术可用已初步验证 / 采纳价值尚未验证 / 外部接入仍有信任边界未封口
+- 身份边界分层澄清：L1/L2 永远不管 auth，L3 可定义可选 auth profile，Chorus 不运营 PKI/CA
+- EXP-01 结论边界：受控环境 + SKILL.md + 最小任务提示 + 高能力 Agent。文化适配效果不能单独归因协议增益（含 personality prompt）
+- 不接受 forceExit 作为泄漏修复方案 — 必须定位并消除根因
+
+---
+
+### 2026-03-20 14:00（旧条目保留供上下文）
+
+**操作**: Phase 5 全量提交 + Phase 6 参考实现对齐 v0.4 协议
+**结果**:
+- Commit 67ab683: Phase 5 全量提交（78 files, +4053 lines）— PROTOCOL.md v0.4 + SKILL.md + TRANSPORT.md + npm CLI + Gene Bank + 跨平台验证 5/5
+- Commit d8f4f5d: 参考实现对齐 v0.4（18 files, -868 +393 = net -475 lines）
+- types.ts: Envelope v0.4 — `sender_id`(name@host) + `original_text` 替代 `original_semantic`，删除 `intent_type`/`formality`/`emotional_tone`
+- transport 层: `sender_agent_id`+`target_agent_id`+`message`(A2A) → `receiver_id`+`envelope`(裸信封)
+- LLM 调用从 2 次减为 1 次: 删除语义提取调用（`original_text` 就是原始输入），只保留 `cultural_context` 生成
+- receiver 返回协议级 `{ status: "ok" }` 替代 `successResponse()` 包装
+- 错误码对齐: `ERR_SENDER_NOT_REGISTERED`, `ERR_AGENT_NOT_FOUND`, `ERR_VALIDATION`
+- Agent ID 默认格式 `agent-{culture}@{host}`
+- 141 tests PASS, tsc 零错误, coverage 82.82%
+
+**决策**:
+- A2A 包装层从传输路径完全移除 — 发送裸 envelope 更简单、更符合协议精神
+- 语义提取 LLM 调用删除 — 协议 v0.4 定义 `original_text` 就是原始文本，Agent IS the LLM 不需要"提取语义"
+- receiver 响应格式改为协议级（非 API 包装）— 协议定义的响应格式应优先于框架约定
+- A2A types (TextPart/DataPart/A2AMessage) 保留在 types.ts 但不再被传输路径使用 — 向后兼容，未来可清理

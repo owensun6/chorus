@@ -16,8 +16,7 @@ Who to contact first, why, and what counts as a real signal.
 Same package for all categories:
 
 - **Install**: `npx @chorus-protocol/skill init --target openclaw` — [npm](https://www.npmjs.com/package/@chorus-protocol/skill)
-- **Try it**: [quick-trial.md](quick-trial.md) — install, generate an envelope, see it work in 5-10 min
-- **All install paths**: [openclaw-install.md](openclaw-install.md) — OpenClaw, Claude Code, local, or direct copy
+- **Try it**: [quick-trial.md](quick-trial.md) — install, verify, generate an envelope in 5 min
 - **One-line pitch**: "Chorus is an open envelope format that lets agents send messages across languages and cultures — not just translate, but adapt."
 
 ## 3. What Counts as a Signal

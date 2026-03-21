@@ -6,7 +6,19 @@ import { successResponse, errorResponse, formatZodErrors } from "../shared/respo
 import { singleSSEStream } from "../shared/sse";
 import { extractErrorMessage } from "../shared/log";
 
-const createApp = (registry: AgentRegistry): Hono => {
+interface ServerConfig {
+  readonly maxAgents: number;
+  readonly maxBodyBytes: number;
+  readonly rateLimitPerMin: number;
+}
+
+const DEFAULT_SERVER_CONFIG: ServerConfig = {
+  maxAgents: 100,
+  maxBodyBytes: 65536,
+  rateLimitPerMin: 60,
+};
+
+const createApp = (registry: AgentRegistry, config: ServerConfig = DEFAULT_SERVER_CONFIG): Hono => {
   const app = new Hono();
 
   app.post("/agents", async (c) => {
@@ -27,6 +39,14 @@ const createApp = (registry: AgentRegistry): Hono => {
     const { agent_id, endpoint, agent_card } = parsed.data;
     const existed = registry.get(agent_id) !== undefined;
     const registration = registry.register(agent_id, endpoint, agent_card);
+
+    if (registration === null) {
+      return c.json(
+        errorResponse("ERR_REGISTRY_FULL", "Agent registry is full. Contact operator."),
+        429
+      );
+    }
+
     const status = existed ? 200 : 201;
 
     return c.json(successResponse(registration), status);
@@ -112,6 +132,7 @@ const createApp = (registry: AgentRegistry): Hono => {
       });
 
       if (targetRes.status >= 500) {
+        registry.recordFailure();
         return c.json(
           errorResponse(
             "ERR_AGENT_UNREACHABLE",
@@ -122,11 +143,13 @@ const createApp = (registry: AgentRegistry): Hono => {
       }
 
       const targetBody = await targetRes.json();
+      registry.recordDelivery();
       return c.json(
         successResponse({ delivery: "delivered", receiver_response: targetBody }),
         200
       );
     } catch {
+      registry.recordFailure();
       return c.json(
         errorResponse(
           "ERR_AGENT_UNREACHABLE",
@@ -142,22 +165,37 @@ const createApp = (registry: AgentRegistry): Hono => {
   app.get("/.well-known/chorus.json", (c) => {
     return c.json({
       chorus_version: "0.4",
-      server_name: "Chorus Hub",
+      server_name: "Chorus Public Alpha Hub",
+      server_status: "alpha",
       endpoints: {
         register: "/agents",
         discover: "/agents",
         send: "/messages",
         health: "/health",
       },
+      limits: {
+        max_agents: config.maxAgents,
+        max_message_bytes: config.maxBodyBytes,
+        rate_limit_per_minute: config.rateLimitPerMin,
+      },
+      warnings: [
+        "experimental — registry may reset without notice",
+        "no identity guarantees",
+        "do not send sensitive content",
+      ],
     }, 200);
   });
 
   app.get("/health", (c) => {
+    const stats = registry.getStats();
     return c.json(
       successResponse({
         status: "ok",
-        version: "1.0.0",
+        version: "0.4.0-alpha",
         uptime_seconds: Math.floor(process.uptime()),
+        agents_registered: stats.agents_registered,
+        messages_delivered: stats.messages_delivered,
+        messages_failed: stats.messages_failed,
       }),
       200,
     );
@@ -206,4 +244,5 @@ const handleStreamForward = async (
   }
 };
 
-export { createApp };
+export { createApp, DEFAULT_SERVER_CONFIG };
+export type { ServerConfig };

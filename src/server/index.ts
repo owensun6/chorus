@@ -9,6 +9,7 @@ import { createAuthMiddleware } from "./auth";
 import { createRateLimitMiddleware } from "./rate-limit";
 import { AgentRegistry } from "./registry";
 import { createActivityStream } from "./activity";
+import { createInboxManager } from "./inbox";
 import { log, logError } from "../shared/log";
 
 const readEnvInt = (key: string, fallback: number): number => {
@@ -26,11 +27,12 @@ const RATE_LIMIT_PER_KEY_MIN = readEnvInt("CHORUS_RATE_LIMIT_PER_KEY_MIN", 120);
 
 const registry = new AgentRegistry(MAX_AGENTS);
 const activity = createActivityStream();
+const inbox = createInboxManager();
 const app = createApp(registry, {
   maxAgents: MAX_AGENTS,
   maxBodyBytes: MAX_BODY_BYTES,
   rateLimitPerMin: RATE_LIMIT_PER_MIN,
-}, activity);
+}, activity, inbox);
 
 if (require.main === module) {
   const apiKeysRaw = process.env["CHORUS_API_KEYS"];
@@ -46,13 +48,18 @@ if (require.main === module) {
   const prodApp = new Hono();
   prodApp.use("*", createRateLimitMiddleware(RATE_LIMIT_PER_MIN, RATE_LIMIT_PER_KEY_MIN));
   prodApp.use("*", bodyLimit({ maxSize: MAX_BODY_BYTES }));
-  prodApp.use("*", createAuthMiddleware(apiKeys));
+  prodApp.use("*", createAuthMiddleware(
+    apiKeys,
+    (token) => registry.isValidAgentKey(token),
+    new Set(["/register"]),
+  ));
   prodApp.route("/", app);
 
   serve({ fetch: prodApp.fetch, port: PORT }, (info) => {
     log("router", `Chorus Alpha Hub listening on port ${info.port} (auth + rate-limit enabled)`);
     log("router", `Limits: ${MAX_AGENTS} agents, ${MAX_BODY_BYTES}B body, ${RATE_LIMIT_PER_MIN} req/min/IP`);
+    log("router", `Self-registration enabled at POST /register (no auth required)`);
   });
 }
 
-export { app, registry, activity };
+export { app, registry, activity, inbox };

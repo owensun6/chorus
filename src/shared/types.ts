@@ -66,7 +66,7 @@ type ChorusAgentCard = z.infer<typeof ChorusAgentCardSchema>;
 
 interface AgentRegistration {
   readonly agent_id: string;
-  readonly endpoint: string;
+  readonly endpoint?: string;
   readonly agent_card: ChorusAgentCard;
   readonly registered_at: string;
 }

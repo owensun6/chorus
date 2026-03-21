@@ -209,9 +209,11 @@ describe("Agent CRUD Routes", () => {
       expect(json.chorus_version).toBe("0.4");
       expect(json.server_name).toBe("Chorus Public Alpha Hub");
       expect(json.endpoints).toEqual({
+        self_register: "/register",
         register: "/agents",
         discover: "/agents",
         send: "/messages",
+        inbox: "/agent/inbox",
         health: "/health",
         activity: "/activity",
         events: "/events",
@@ -248,7 +250,7 @@ describe("Agent CRUD Routes", () => {
       const json: Json = await res.json();
       expect(json.success).toBe(true);
       expect(json.data.status).toBe("ok");
-      expect(json.data.version).toBe("0.4.0-alpha");
+      expect(json.data.version).toBe("0.5.0-alpha");
       expect(typeof json.data.uptime_seconds).toBe("number");
       expect(json.data.uptime_seconds).toBeGreaterThanOrEqual(0);
     });

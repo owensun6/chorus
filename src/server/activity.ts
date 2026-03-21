@@ -2,10 +2,12 @@
 
 type ActivityEventType =
   | "agent_registered"
+  | "agent_self_registered"
   | "agent_removed"
   | "message_submitted"
   | "message_forward_started"
   | "message_delivered"
+  | "message_delivered_sse"
   | "message_failed";
 
 interface ActivityEvent {

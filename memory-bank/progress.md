@@ -200,3 +200,32 @@
 - 语义提取 LLM 调用删除 — 协议 v0.4 定义 `original_text` 就是原始文本，Agent IS the LLM 不需要"提取语义"
 - receiver 响应格式改为协议级（非 API 包装）— 协议定义的响应格式应优先于框架约定
 - A2A types (TextPart/DataPart/A2AMessage) 保留在 types.ts 但不再被传输路径使用 — 向后兼容，未来可清理
+
+### 2026-03-21 16:00–17:00
+
+**操作**: Phase B — Public Alpha Hub 设计冻结 + 代码实现 + Fly.io 部署 + 公网验证 + 监控体系
+**结果**:
+- `docs/server/public-alpha-plan.md` 设计冻结稿（Commander APPROVED）
+- `docs/server/public-alpha-operator-guide.md` Fly.io 运维手册
+- `docs/server/public-alpha-user-guide.md` 外部 tester 接入指南（Commander 重写版）
+- 代码变更：`src/server/rate-limit.ts`(新建) + `registry.ts`(agent上限+计数器) + `routes.ts`(well-known/health增强) + `index.ts`(串接全部中间件)
+- `fly.toml` 创建：单机 sjc shared-cpu-1x/256MB
+- Fly.io 部署成功：`chorus-alpha` app, 域名 `chorus-alpha.fly.dev`
+- 公网 happy path 8/8 通过：health/well-known/register/discover/send/auth-reject/counters
+- 公网负向 smoke 9/9 通过：重复注册幂等/错误schema/空body/非JSON/不存在receiver/缺字段envelope/目标5xx/目标不可达/计数器递增
+- 并发测试通过：10并发注册 0 丢失，5并发投递 0 失败，70并发限流 49 个 429
+- 持久化验证：重启后 registry 清空（符合设计）
+- 175 tests, 82.6% functions, 83.7% lines coverage
+- `bin/alpha-smoke.sh` 自动化 14 项 smoke 脚本
+- `bin/alpha-probe-light.sh` JSONL 健康探针 + `bin/alpha-probe-report.sh` 24h 汇总
+- UptimeRobot 外部监控就位：5min 间隔，100% uptime，198ms 平均延迟
+- 本地 cron 双轨：10min 轻探 + 2h 深探
+
+**决策**:
+- 域名 `alpha.chorus.sh`（确认，DNS 待绑定），当前用 `chorus-alpha.fly.dev`
+- Fly.io 为部署平台（~$3/month，单机足够 alpha）
+- API key 手动分发，per-tester 独立 key，可随时撤销
+- 单机部署（Fly 默认创建 2 台导致 in-memory registry 不一致，已删除第二台并锁定 max=1）
+- `auto_stop_machines = "off"` 保持 hub 持续在线
+- 监控架构：外部 UptimeRobot（独立证据）+ 本地 cron（深度链路验证）
+- 24h 后跑 `bin/alpha-probe-report.sh` 出持续性证据汇总

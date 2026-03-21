@@ -1,36 +1,40 @@
 # Chorus — Quick Trial
 
-Install the Chorus skill, generate a valid envelope, and optionally send it through a local server. Takes 5-10 minutes.
+Install the Chorus skill, verify it works, and generate a valid envelope. Takes 5 minutes.
 
 ## 1. Install
-
-**OpenClaw** (one command, auto-registers):
 
 ```bash
 npx @chorus-protocol/skill init --target openclaw
 ```
 
-**Claude Code** (user-level skill):
+Expected output:
 
-```bash
-npx @chorus-protocol/skill init --target claude-user
+```
+✓ Files installed to ~/.openclaw/skills/chorus/ (en)
+✓ Registered in ~/.openclaw/openclaw.json
 ```
 
-**Local directory** (inspect the files):
+Chinese variant: add `--lang zh-CN`.
+
+## 2. Verify
 
 ```bash
-npx @chorus-protocol/skill init
+npx @chorus-protocol/skill verify --target openclaw
 ```
 
-Chinese variant: add `--lang zh-CN` to any command above.
+Expected output:
 
-**Success signal**: `SKILL.md`, `PROTOCOL.md`, `TRANSPORT.md`, `envelope.schema.json`, and `examples/` are present in the target location.
+```
+✓ SKILL.md exists (4.2 KB)
+✓ openclaw.json: chorus registered and enabled
+```
 
-## 2. Generate an Envelope
+## 3. Envelope Test
 
-Give your agent `SKILL.md` (paste it into the prompt, or it's already loaded if you used `--target openclaw` or `--target claude-user`). Then ask:
+Ask your agent (SKILL.md is already loaded if you used `--target openclaw`):
 
-> Compose a Chorus envelope from a Japanese agent to a Chinese agent, saying "Let's discuss the project schedule."
+> "Compose a Chorus envelope from a Japanese agent to a Chinese agent, saying 'Let's discuss the project schedule.'"
 
 Your agent should produce something like:
 
@@ -43,23 +47,17 @@ Your agent should produce something like:
 }
 ```
 
-**Success signal**: a JSON object with all 4 required fields (`chorus_version`, `sender_id`, `original_text`, `sender_culture`). The text should be in the sender's language, not the receiver's.
-
-## 3. Validate the Envelope
+Validate it:
 
 ```bash
-node -e "
-const e = {chorus_version:'0.4',sender_id:'agent-ja@example',original_text:'プロジェクトのスケジュールについて相談しましょう。',sender_culture:'ja'};
-const missing = ['chorus_version','sender_id','original_text','sender_culture'].filter(k => !e[k]);
-console.log(missing.length === 0 ? 'VALID' : 'MISSING: ' + missing.join(', '));
-"
+npx @chorus-protocol/skill verify --envelope '{"chorus_version":"0.4","sender_id":"agent-ja@example","original_text":"プロジェクトのスケジュールについて相談しましょう。","sender_culture":"ja"}'
 ```
 
-**Success signal**: prints `VALID`.
+**Success signal**: prints `✓ Valid Chorus envelope (4/4 required fields present)`.
 
-## 4. Optional: Send Through a Local Server
+## 4. Optional: Send Through a Server
 
-If you want to see end-to-end delivery, follow the [deployment guide](../deployment-guide.md) to start a server and two agents, then send a message. The key steps:
+To see end-to-end delivery (register, send, receive), follow the [deployment guide](../deployment-guide.md):
 
 ```bash
 # Build the reference implementation
@@ -85,7 +83,7 @@ Type a message at the `chorus>` prompt in Terminal 3.
 
 | Step | What it proves |
 |------|---------------|
-| Install | The skill package is reachable and complete |
-| Generate | Your agent can read SKILL.md and produce a valid envelope |
-| Validate | The envelope has the required structure |
+| Install | Skill package is reachable and complete |
+| Verify | Files exist and registration is correct |
+| Envelope test | Your agent can read SKILL.md and produce a valid envelope |
 | Send (optional) | End-to-end: envelope travels through server, receiver adapts the message |

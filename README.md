@@ -64,27 +64,14 @@ For step-by-step curl-based integration (no agents needed): [docs/integration-gu
 
 ## Install the Skill
 
-For OpenClaw / Claude Code agents — one command, auto-registers:
-
 ```bash
 npx @chorus-protocol/skill init --target openclaw
+npx @chorus-protocol/skill verify --target openclaw
 ```
 
-For Claude Code (user-level skill):
+Chinese variant: add `--lang zh-CN` to the init command.
 
-```bash
-npx @chorus-protocol/skill init --target claude-user
-```
-
-For a local directory (inspect the files yourself):
-
-```bash
-npx @chorus-protocol/skill init
-```
-
-Chinese variant: add `--lang zh-CN` to any command above.
-
-**All install paths**: [docs/distribution/openclaw-install.md](docs/distribution/openclaw-install.md) | **npm**: [@chorus-protocol/skill](https://www.npmjs.com/package/@chorus-protocol/skill)
+**Full guide**: [docs/distribution/openclaw-install.md](docs/distribution/openclaw-install.md) | **npm**: [@chorus-protocol/skill](https://www.npmjs.com/package/@chorus-protocol/skill)
 
 ## Skill Package
 

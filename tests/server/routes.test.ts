@@ -1,5 +1,6 @@
 // Author: be-api-router
-import { createApp } from "../../src/server/routes";
+import { createApp, DEFAULT_SERVER_CONFIG } from "../../src/server/routes";
+import type { ServerConfig } from "../../src/server/routes";
 import { AgentRegistry } from "../../src/server/registry";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -91,6 +92,33 @@ describe("Agent CRUD Routes", () => {
       expect(json.success).toBe(true);
       expect(json.data.endpoint).toBe(updatedBody.endpoint);
     });
+
+    it("returns 429 when registry is full", async () => {
+      const tinyRegistry = new AgentRegistry(1);
+      const tinyApp = createApp(tinyRegistry, { maxAgents: 1, maxBodyBytes: 65536, rateLimitPerMin: 60 });
+
+      // Fill the registry
+      await tinyApp.request("/agents", {
+        method: "POST",
+        body: JSON.stringify(validBody),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      // Try to register a second agent
+      const res = await tinyApp.request("/agents", {
+        method: "POST",
+        body: JSON.stringify({
+          ...validBody,
+          agent_id: "agent-gamma@chorus.example",
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      expect(res.status).toBe(429);
+      const json: Json = await res.json();
+      expect(json.success).toBe(false);
+      expect(json.error.code).toBe("ERR_REGISTRY_FULL");
+    });
   });
 
   describe("GET /agents", () => {
@@ -179,13 +207,36 @@ describe("Agent CRUD Routes", () => {
       expect(res.status).toBe(200);
       const json: Json = await res.json();
       expect(json.chorus_version).toBe("0.4");
-      expect(json.server_name).toBe("Chorus Hub");
+      expect(json.server_name).toBe("Chorus Public Alpha Hub");
       expect(json.endpoints).toEqual({
         register: "/agents",
         discover: "/agents",
         send: "/messages",
         health: "/health",
+        activity: "/activity",
+        events: "/events",
+        console: "/console",
       });
+    });
+
+    it("includes server_status, limits, and warnings", async () => {
+      const customConfig: ServerConfig = { maxAgents: 50, maxBodyBytes: 32768, rateLimitPerMin: 30 };
+      const customApp = createApp(new AgentRegistry(50), customConfig);
+
+      const res = await customApp.request("/.well-known/chorus.json", { method: "GET" });
+      const json: Json = await res.json();
+
+      expect(json.server_status).toBe("alpha");
+      expect(json.limits).toEqual({
+        max_agents: 50,
+        max_message_bytes: 32768,
+        rate_limit_per_minute: 30,
+      });
+      expect(json.warnings).toEqual([
+        "experimental — registry may reset without notice",
+        "no identity guarantees",
+        "do not send sensitive content",
+      ]);
     });
   });
 
@@ -197,9 +248,27 @@ describe("Agent CRUD Routes", () => {
       const json: Json = await res.json();
       expect(json.success).toBe(true);
       expect(json.data.status).toBe("ok");
-      expect(json.data.version).toBe("1.0.0");
+      expect(json.data.version).toBe("0.4.0-alpha");
       expect(typeof json.data.uptime_seconds).toBe("number");
       expect(json.data.uptime_seconds).toBeGreaterThanOrEqual(0);
+    });
+
+    it("includes registry stats in health response", async () => {
+      registry.register("a1@host", "https://a1.example.com", {
+        card_version: "0.3",
+        user_culture: "en-US",
+        supported_languages: ["en"],
+      });
+      registry.recordDelivery();
+      registry.recordDelivery();
+      registry.recordFailure();
+
+      const res = await app.request("/health", { method: "GET" });
+      const json: Json = await res.json();
+
+      expect(json.data.agents_registered).toBe(1);
+      expect(json.data.messages_delivered).toBe(2);
+      expect(json.data.messages_failed).toBe(1);
     });
   });
 });

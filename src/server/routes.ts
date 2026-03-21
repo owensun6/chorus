@@ -1,12 +1,27 @@
 // Author: be-api-router
 import { Hono } from "hono";
+import { randomUUID } from "crypto";
 import { AgentRegistry } from "./registry";
 import { RegisterAgentBodySchema, MessagePayloadBodySchema } from "./validation";
 import { successResponse, errorResponse, formatZodErrors } from "../shared/response";
-import { singleSSEStream } from "../shared/sse";
+import { formatSSE, singleSSEStream, SSE_ENCODER } from "../shared/sse";
 import { extractErrorMessage } from "../shared/log";
+import type { ActivityStream } from "./activity";
+import { CONSOLE_HTML } from "./console-html";
 
-const createApp = (registry: AgentRegistry): Hono => {
+interface ServerConfig {
+  readonly maxAgents: number;
+  readonly maxBodyBytes: number;
+  readonly rateLimitPerMin: number;
+}
+
+const DEFAULT_SERVER_CONFIG: ServerConfig = {
+  maxAgents: 100,
+  maxBodyBytes: 65536,
+  rateLimitPerMin: 60,
+};
+
+const createApp = (registry: AgentRegistry, config: ServerConfig = DEFAULT_SERVER_CONFIG, activity?: ActivityStream): Hono => {
   const app = new Hono();
 
   app.post("/agents", async (c) => {
@@ -27,7 +42,23 @@ const createApp = (registry: AgentRegistry): Hono => {
     const { agent_id, endpoint, agent_card } = parsed.data;
     const existed = registry.get(agent_id) !== undefined;
     const registration = registry.register(agent_id, endpoint, agent_card);
+
+    if (registration === null) {
+      return c.json(
+        errorResponse("ERR_REGISTRY_FULL", "Agent registry is full. Contact operator."),
+        429
+      );
+    }
+
     const status = existed ? 200 : 201;
+
+    if (activity) {
+      activity.append("agent_registered", {
+        agent_id,
+        endpoint,
+        culture: agent_card.user_culture,
+      });
+    }
 
     return c.json(successResponse(registration), status);
   });
@@ -56,6 +87,10 @@ const createApp = (registry: AgentRegistry): Hono => {
         404
       );
     }
+    if (activity) {
+      activity.append("agent_removed", { agent_id: c.req.param("id") });
+    }
+
     return c.json(
       successResponse({ deleted: true, agent_id: c.req.param("id") }),
       200
@@ -95,9 +130,33 @@ const createApp = (registry: AgentRegistry): Hono => {
     }
 
     const TIMEOUT_MS = 120_000;
+    const traceId = randomUUID();
+
+    if (activity) {
+      activity.append("message_submitted", {
+        trace_id: traceId,
+        sender_id: envelope.sender_id,
+        receiver_id,
+      });
+    }
 
     if (stream) {
+      if (activity) {
+        activity.append("message_forward_started", {
+          trace_id: traceId,
+          receiver_id,
+          endpoint: target.endpoint,
+        });
+      }
       return handleStreamForward(c, target.endpoint, envelope, TIMEOUT_MS);
+    }
+
+    if (activity) {
+      activity.append("message_forward_started", {
+        trace_id: traceId,
+        receiver_id,
+        endpoint: target.endpoint,
+      });
     }
 
     const controller = new AbortController();
@@ -112,6 +171,14 @@ const createApp = (registry: AgentRegistry): Hono => {
       });
 
       if (targetRes.status >= 500) {
+        registry.recordFailure();
+        if (activity) {
+          activity.append("message_failed", {
+            trace_id: traceId,
+            receiver_id,
+            error: "Receiver agent returned a server error",
+          });
+        }
         return c.json(
           errorResponse(
             "ERR_AGENT_UNREACHABLE",
@@ -122,11 +189,27 @@ const createApp = (registry: AgentRegistry): Hono => {
       }
 
       const targetBody = await targetRes.json();
+      registry.recordDelivery();
+      if (activity) {
+        activity.append("message_delivered", {
+          trace_id: traceId,
+          receiver_id,
+          status: targetRes.status,
+        });
+      }
       return c.json(
         successResponse({ delivery: "delivered", receiver_response: targetBody }),
         200
       );
-    } catch {
+    } catch (err: unknown) {
+      registry.recordFailure();
+      if (activity) {
+        activity.append("message_failed", {
+          trace_id: traceId,
+          receiver_id,
+          error: extractErrorMessage(err),
+        });
+      }
       return c.json(
         errorResponse(
           "ERR_AGENT_UNREACHABLE",
@@ -142,25 +225,87 @@ const createApp = (registry: AgentRegistry): Hono => {
   app.get("/.well-known/chorus.json", (c) => {
     return c.json({
       chorus_version: "0.4",
-      server_name: "Chorus Hub",
+      server_name: "Chorus Public Alpha Hub",
+      server_status: "alpha",
       endpoints: {
         register: "/agents",
         discover: "/agents",
         send: "/messages",
         health: "/health",
+        activity: "/activity",
+        events: "/events",
+        console: "/console",
       },
+      limits: {
+        max_agents: config.maxAgents,
+        max_message_bytes: config.maxBodyBytes,
+        rate_limit_per_minute: config.rateLimitPerMin,
+      },
+      warnings: [
+        "experimental — registry may reset without notice",
+        "no identity guarantees",
+        "do not send sensitive content",
+      ],
     }, 200);
   });
 
   app.get("/health", (c) => {
+    const stats = registry.getStats();
     return c.json(
       successResponse({
         status: "ok",
-        version: "1.0.0",
+        version: "0.4.0-alpha",
         uptime_seconds: Math.floor(process.uptime()),
+        agents_registered: stats.agents_registered,
+        messages_delivered: stats.messages_delivered,
+        messages_failed: stats.messages_failed,
       }),
       200,
     );
+  });
+
+  // --- Activity & Console Endpoints ---
+
+  app.get("/activity", (c) => {
+    const sinceRaw = c.req.query("since");
+    const since = sinceRaw ? parseInt(sinceRaw, 10) : undefined;
+    const events = activity ? activity.list(since) : [];
+    return c.json(successResponse(events), 200);
+  });
+
+  app.get("/events", (c) => {
+    const clientId = randomUUID();
+
+    const stream = new ReadableStream({
+      start(controller) {
+        const hello = SSE_ENCODER.encode(formatSSE("connected", { client_id: clientId }));
+        controller.enqueue(hello);
+
+        if (activity) {
+          const subscriber = (event: { readonly type: string; readonly id: number; readonly timestamp: string; readonly data: Readonly<Record<string, unknown>> }) => {
+            try {
+              controller.enqueue(SSE_ENCODER.encode(formatSSE(event.type, { ...event.data, id: event.id, timestamp: event.timestamp })));
+            } catch {
+              activity.unsubscribe(subscriber);
+            }
+          };
+          activity.subscribe(subscriber);
+
+          // Clean up on client disconnect
+          c.req.raw.signal.addEventListener("abort", () => {
+            activity.unsubscribe(subscriber);
+          });
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", "Connection": "keep-alive" },
+    });
+  });
+
+  app.get("/console", (c) => {
+    return c.html(CONSOLE_HTML);
   });
 
   return app;
@@ -206,4 +351,5 @@ const handleStreamForward = async (
   }
 };
 
-export { createApp };
+export { createApp, DEFAULT_SERVER_CONFIG };
+export type { ServerConfig };

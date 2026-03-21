@@ -213,6 +213,9 @@ describe("Agent CRUD Routes", () => {
         discover: "/agents",
         send: "/messages",
         health: "/health",
+        activity: "/activity",
+        events: "/events",
+        console: "/console",
       });
     });
 

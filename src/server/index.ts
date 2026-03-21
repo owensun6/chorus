@@ -8,6 +8,7 @@ import { createApp } from "./routes";
 import { createAuthMiddleware } from "./auth";
 import { createRateLimitMiddleware } from "./rate-limit";
 import { AgentRegistry } from "./registry";
+import { createActivityStream } from "./activity";
 import { log, logError } from "../shared/log";
 
 const readEnvInt = (key: string, fallback: number): number => {
@@ -24,11 +25,12 @@ const RATE_LIMIT_PER_MIN = readEnvInt("CHORUS_RATE_LIMIT_PER_MIN", 60);
 const RATE_LIMIT_PER_KEY_MIN = readEnvInt("CHORUS_RATE_LIMIT_PER_KEY_MIN", 120);
 
 const registry = new AgentRegistry(MAX_AGENTS);
+const activity = createActivityStream();
 const app = createApp(registry, {
   maxAgents: MAX_AGENTS,
   maxBodyBytes: MAX_BODY_BYTES,
   rateLimitPerMin: RATE_LIMIT_PER_MIN,
-});
+}, activity);
 
 if (require.main === module) {
   const apiKeysRaw = process.env["CHORUS_API_KEYS"];
@@ -53,4 +55,4 @@ if (require.main === module) {
   });
 }
 
-export { app, registry };
+export { app, registry, activity };

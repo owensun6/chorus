@@ -1,47 +1,55 @@
 # Chorus Protocol — Skill Package
 
-Chorus 是一个跨文化语义适配协议。Agent 加载 `SKILL.md` 后即学会跨文化通信——提取语义、包信封、文化适配。
+Chorus is an agent-to-agent communication protocol. An agent loads `SKILL.md` and learns how to send and receive messages across platforms, languages, and cultures.
 
-## 快速上手
+## Quick Start
 
-### 1. 加载 Skill
+### 1. Load the Skill
 
-把 `SKILL.md` 加入你的 Agent 的 skill/prompt 配置中。Agent 读取后即学会 Chorus 协议。
+Add `SKILL.md` to your agent's skill/prompt configuration. The agent reads it and learns the Chorus protocol.
 
-### 2. 发送一条跨文化消息
+### 2. Send a message
 
-你的 Agent 会自动执行两次 LLM 调用：
-
-1. 提取语义意图（一句话）
-2. 生成文化背景说明（10-500 字）
-
-然后组装成 Chorus Envelope：
+Your agent packages a Chorus envelope:
 
 ```json
 {
-  "chorus_version": "0.3",
-  "original_semantic": "对同事在项目中的付出表达真诚感谢",
-  "sender_culture": "zh-CN",
-  "cultural_context": "在中国职场文化中，'辛苦了'是对同事辛勤付出的认可..."
+  "chorus_version": "0.4",
+  "sender_id": "my-agent@chorus.example",
+  "original_text": "Let's sync on the project timeline.",
+  "sender_culture": "en"
 }
 ```
 
-### 3. 接收并适配
+And delivers it through a Chorus server or directly to the receiver.
 
-收到对方的 Envelope 后，你的 Agent 会读取其中的语义意图和文化背景，以你用户的文化方式转述。
+### 3. Receive and adapt
 
-## 文件清单
+When a message arrives from another agent, your agent validates the envelope, adapts the message for its human (translating language and bridging cultural context as needed), and responds with `{"status": "ok"}`.
 
-| 文件 | 内容 |
-|------|------|
-| `SKILL.md` | 协议行为规范——Agent 读这个文件学会 Chorus |
-| `envelope.schema.json` | Envelope v0.3 JSON Schema |
-| `examples/zh-CN-to-ja.json` | 示例：中文→日文适配 |
-| `examples/ja-to-zh-CN.json` | 示例：日文→中文适配 |
+## Connecting to a Server
 
-## 设计原则
+To connect via a Chorus server (see `TRANSPORT.md`):
 
-- **传输无关**：Envelope 可通过任何方式传输，协议不关心
-- **模型无关**：任何支持多语言的 LLM 均可
-- **纯文本调用**：不要求 LLM 输出 JSON
-- **personality 不在协议中**：你怎么说话是你自己的事
+1. **Register** — announce your agent ID, receive endpoint, and capabilities (`card_version: "0.3"`, culture, languages)
+2. **Discover** — query the server for other registered agents
+3. **Send** — post your envelope with the receiver's address
+
+Agents can also exchange envelopes directly (P2P) without a server.
+
+## Files
+
+| File | Content |
+|------|---------|
+| `SKILL.md` | Agent learning document — teaches the Chorus protocol |
+| `PROTOCOL.md` | Formal protocol specification (v0.4) |
+| `TRANSPORT.md` | HTTP binding — register, send, receive, discover |
+| `envelope.schema.json` | Envelope v0.4 JSON Schema |
+| `examples/` | Sample envelopes (en↔en, zh-CN↔ja, ja↔zh-CN) |
+
+## Design Principles
+
+- **Transport-agnostic**: the envelope can travel over any channel
+- **Model-agnostic**: any LLM that handles multilingual text works
+- **No personality in the protocol**: how your agent speaks is its own business
+- **Pre-1.0**: backwards compatibility is not guaranteed until 1.0

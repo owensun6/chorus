@@ -1,6 +1,6 @@
 # Chorus Skill — Installation Guide
 
-How to install the Chorus protocol skill for your AI agent. Four paths: npm (any Node.js environment), Claude Code user-level, Claude Code project-level, or direct copy.
+How to install the Chorus protocol skill for your AI agent. Five paths: npm (any Node.js environment), OpenClaw, Claude Code user-level, Claude Code project-level, or direct copy.
 
 ## What You're Installing
 
@@ -37,7 +37,60 @@ ls chorus/
 # Expected: PROTOCOL.md  SKILL.md  TRANSPORT.md  envelope.schema.json  examples/
 ```
 
-## Path 2: Claude Code — User-Level Skill
+## Path 2: OpenClaw
+
+Install Chorus as an OpenClaw skill. Two steps: place files, then register.
+
+```bash
+# 1. Init the skill files
+mkdir -p ~/.openclaw/skills/chorus
+npx @chorus-protocol/skill init
+mv chorus/* ~/.openclaw/skills/chorus/
+rmdir chorus
+```
+
+```bash
+# 2. Register in OpenClaw config
+node -e "
+const fs = require('fs');
+const p = require('os').homedir() + '/.openclaw/openclaw.json';
+const c = JSON.parse(fs.readFileSync(p, 'utf8'));
+if (!c.skills) c.skills = {};
+if (!c.skills.entries) c.skills.entries = {};
+c.skills.entries.chorus = { enabled: true };
+fs.writeFileSync(p, JSON.stringify(c, null, 4));
+console.log('chorus registered in openclaw.json');
+"
+```
+
+**Verify:**
+
+```bash
+ls ~/.openclaw/skills/chorus/SKILL.md
+# Should print the path — file exists
+
+node -e "
+const c = JSON.parse(require('fs').readFileSync(require('os').homedir() + '/.openclaw/openclaw.json', 'utf8'));
+console.log('registered:', !!c.skills?.entries?.chorus?.enabled);
+"
+# Should print: registered: true
+```
+
+**Unregister:**
+
+```bash
+rm -rf ~/.openclaw/skills/chorus
+node -e "
+const fs = require('fs');
+const p = require('os').homedir() + '/.openclaw/openclaw.json';
+const c = JSON.parse(fs.readFileSync(p, 'utf8'));
+delete c.skills.entries.chorus;
+fs.writeFileSync(p, JSON.stringify(c, null, 4));
+console.log('chorus removed from openclaw.json');
+"
+```
+
+## Path 3: Claude Code — User-Level Skill
 
 Install Chorus as a global skill available in all Claude Code sessions.
 
@@ -58,7 +111,7 @@ ls ~/.claude/skills/chorus/SKILL.md
 
 Claude Code will now list `chorus` as an available skill. Your agent can reference `SKILL.md` to learn the Chorus protocol.
 
-## Path 3: Claude Code — Project-Level Skill
+## Path 4: Claude Code — Project-Level Skill
 
 Install Chorus as a skill scoped to a specific project.
 
@@ -72,12 +125,12 @@ rmdir chorus
 
 The skill is now available only when Claude Code is running in this project directory.
 
-## Path 4: Direct Copy (no npm)
+## Path 5: Direct Copy (no npm)
 
 If you can't use npm, copy the files directly from the repository:
 
 ```
-https://github.com/anthropics/chorus/tree/main/skill
+https://github.com/owensun6/chorus/tree/main/skill
 ```
 
 Download `SKILL.md`, `PROTOCOL.md`, `TRANSPORT.md`, `envelope.schema.json`, and the `examples/` directory. Place them wherever your agent can read them.
@@ -123,11 +176,13 @@ The npm package version tracks the protocol version. `@chorus-protocol/skill@0.4
 
 ## Uninstalling
 
-Delete the installed directory:
+Delete the installed directory. For OpenClaw, also remove the config entry (see Path 2 unregister above).
 
 ```bash
 # npm path
 rm -rf chorus/
+
+# OpenClaw — see Path 2 unregister section
 
 # Claude Code user-level
 rm -rf ~/.claude/skills/chorus/

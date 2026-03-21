@@ -5,6 +5,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(join(__dirname, "package.json"), "utf8"));
 
 const LANGS = ["en", "zh-CN"];
 const DEFAULT_LANG = "en";
@@ -65,7 +66,7 @@ if (command === "init") {
   console.log(`  chorus/examples/`);
   console.log(`\nGive your agent chorus/SKILL.md to teach it the Chorus protocol.`);
 } else {
-  console.log(`@chorus-protocol/skill v0.4.0`);
+  console.log(`@chorus-protocol/skill v${pkg.version}`);
   console.log(`\nUsage:`);
   console.log(`  chorus-skill init [--lang en|zh-CN]    Initialize Chorus Skill package`);
   console.log(`\nExamples:`);

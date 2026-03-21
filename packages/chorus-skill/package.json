@@ -7,9 +7,23 @@
   },
   "type": "module",
   "license": "Apache-2.0",
+  "files": [
+    "cli.mjs",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/chorus"
+    "url": "https://github.com/owensun6/chorus.git",
+    "directory": "packages/chorus-skill"
+  },
+  "homepage": "https://github.com/owensun6/chorus/tree/main/packages/chorus-skill",
+  "bugs": {
+    "url": "https://github.com/owensun6/chorus/issues"
   },
   "keywords": [
     "chorus",

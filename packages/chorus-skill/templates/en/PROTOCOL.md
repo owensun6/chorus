@@ -16,7 +16,7 @@ A JSON object:
 - sender_id (string, MUST): Sender address, format `name@host`
 - original_text (string, MUST): The original message
 - sender_culture (string, MUST): BCP 47 tag
-- cultural_context (string 10-500, Conditional): Why the sender said it this way, in sender's language. Included on first turn when cultures differ, omitted when same
+- cultural_context (string 10-500, MAY): Optional hint — why the sender said it this way, in sender's language. Most receivers can adapt without it
 - conversation_id (string max 64, MAY): Multi-turn identifier
 - turn_number (integer ≥ 1, MAY): Turn counter
 
@@ -28,8 +28,8 @@ Additional fields permitted. Formal schema: `envelope.schema.json`
 
 ### Sending
 
-1. SHOULD include `cultural_context` on the first turn when sender and receiver cultures differ. Subsequent turns MAY omit it
-2. MAY omit `cultural_context` when cultures are the same
+1. MAY include `cultural_context` as a hint to the receiver when sender and receiver cultures differ
+2. MUST NOT include personality or style in `cultural_context`
 
 ### Receiving
 
@@ -56,7 +56,7 @@ Transport-level errors (delivery failure, timeout, unknown sender) are defined b
 ### Constraints
 
 - MUST NOT include personality or style in the envelope
-- `cultural_context` MUST be in the sender's language
+- When present, `cultural_context` MUST be in the sender's language
 
 ## 4. Not In Scope
 

@@ -68,4 +68,9 @@ Transport-level errors (delivery failure, timeout, unknown sender) are defined b
 
 ## 5. Versioning
 
-0.4 is not backwards compatible with 0.2/0.3 (`original_semantic` replaced by `original_text`). Implementations receiving legacy envelopes with `original_semantic` SHOULD treat it as `original_text`.
+0.4 is not backwards compatible with 0.2/0.3. Breaking changes from 0.2/0.3:
+
+- `original_semantic` renamed to `original_text`
+- `cultural_context` changed from conditional to optional (MAY)
+
+Legacy envelopes using `original_semantic` or `chorus_version` values below `"0.4"` are not accepted. Senders MUST upgrade to 0.4 envelope format. There is no migration bridge — this is a pre-1.0 protocol and backwards compatibility is not guaranteed until 1.0.

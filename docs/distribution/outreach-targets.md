@@ -15,16 +15,16 @@ Who to contact first, why, and what counts as a real signal.
 
 Same package for all categories:
 
-- **npm**: `npx @chorus-protocol/skill init` — [npmjs.com/@chorus-protocol/skill](https://www.npmjs.com/package/@chorus-protocol/skill)
+- **Install**: `npx @chorus-protocol/skill init --target openclaw` — [npm](https://www.npmjs.com/package/@chorus-protocol/skill)
 - **Try it**: [quick-trial.md](quick-trial.md) — install, generate an envelope, see it work in 5-10 min
-- **Install options**: [openclaw-install.md](openclaw-install.md) — npm, Claude Code, or direct copy
+- **All install paths**: [openclaw-install.md](openclaw-install.md) — OpenClaw, Claude Code, local, or direct copy
 - **One-line pitch**: "Chorus is an open envelope format that lets agents send messages across languages and cultures — not just translate, but adapt."
 
 ## 3. What Counts as a Signal
 
 | Signal | Value |
 |--------|-------|
-| Ran `npx @chorus-protocol/skill init` | They tried |
+| Ran `npx @chorus-protocol/skill init --target openclaw` | They tried |
 | Generated a valid envelope (with or without a server) | They understood the protocol |
 | Filed an issue or asked a question about integration | They hit real friction — actionable feedback |
 | Reported a doc gap or confusing step | Direct improvement input |

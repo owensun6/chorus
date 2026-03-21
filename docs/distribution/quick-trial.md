@@ -4,17 +4,31 @@ Install the Chorus skill, generate a valid envelope, and optionally send it thro
 
 ## 1. Install
 
+**OpenClaw** (one command, auto-registers):
+
+```bash
+npx @chorus-protocol/skill init --target openclaw
+```
+
+**Claude Code** (user-level skill):
+
+```bash
+npx @chorus-protocol/skill init --target claude-user
+```
+
+**Local directory** (inspect the files):
+
 ```bash
 npx @chorus-protocol/skill init
 ```
 
-Chinese variant: `npx @chorus-protocol/skill init --lang zh-CN`
+Chinese variant: add `--lang zh-CN` to any command above.
 
-**Success signal**: a `chorus/` directory with `SKILL.md`, `PROTOCOL.md`, `TRANSPORT.md`, `envelope.schema.json`, and `examples/`.
+**Success signal**: `SKILL.md`, `PROTOCOL.md`, `TRANSPORT.md`, `envelope.schema.json`, and `examples/` are present in the target location.
 
 ## 2. Generate an Envelope
 
-Give your agent `chorus/SKILL.md` (paste it into the prompt or add it as a skill file), then ask:
+Give your agent `SKILL.md` (paste it into the prompt, or it's already loaded if you used `--target openclaw` or `--target claude-user`). Then ask:
 
 > Compose a Chorus envelope from a Japanese agent to a Chinese agent, saying "Let's discuss the project schedule."
 
@@ -35,7 +49,6 @@ Your agent should produce something like:
 
 ```bash
 node -e "
-const s = require('./chorus/envelope.schema.json');
 const e = {chorus_version:'0.4',sender_id:'agent-ja@example',original_text:'プロジェクトのスケジュールについて相談しましょう。',sender_culture:'ja'};
 const missing = ['chorus_version','sender_id','original_text','sender_culture'].filter(k => !e[k]);
 console.log(missing.length === 0 ? 'VALID' : 'MISSING: ' + missing.join(', '));

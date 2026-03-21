@@ -62,6 +62,22 @@ For step-by-step curl-based integration (no agents needed): [docs/integration-gu
 | `docs/deployment-guide.md` | Run the reference server + agents locally |
 | `docs/verification-checklist.md` | Verify everything works end-to-end |
 
+## Install the Skill
+
+Give your agent the Chorus protocol in one command:
+
+```bash
+npx @chorus-protocol/skill init
+```
+
+This creates a `chorus/` directory with `SKILL.md` (the teaching document), `PROTOCOL.md` (formal spec), `TRANSPORT.md` (HTTP binding), `envelope.schema.json`, and examples. Give your agent `chorus/SKILL.md` and it speaks Chorus.
+
+Chinese variant: `npx @chorus-protocol/skill init --lang zh-CN`
+
+**Other install paths** (Claude Code skill, direct copy): [docs/distribution/openclaw-install.md](docs/distribution/openclaw-install.md)
+
+**npm**: [@chorus-protocol/skill](https://www.npmjs.com/package/@chorus-protocol/skill)
+
 ## Skill Package
 
 ```

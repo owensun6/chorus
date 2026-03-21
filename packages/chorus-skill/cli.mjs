@@ -94,15 +94,20 @@ if (command === "init") {
     process.exit(1);
   }
 
+  // For openclaw: verify registration is possible BEFORE writing files
+  if (target === "openclaw") {
+    const registered = registerOpenClaw();
+    if (!registered) {
+      console.error(`\nAborting — files were NOT written.`);
+      process.exit(1);
+    }
+  }
+
   copySkillFiles(targetDir, lang);
 
   console.log(`✓ Files installed to ${targetDir} (${lang})`);
 
   if (target === "openclaw") {
-    const registered = registerOpenClaw();
-    if (!registered) {
-      process.exit(1);
-    }
     console.log(`✓ Registered in ~/.openclaw/openclaw.json`);
     console.log(`\nNext: verify installation`);
     console.log(`  npx @chorus-protocol/skill verify --target openclaw`);
@@ -162,6 +167,12 @@ if (command === "init") {
     }
   } else {
     const target = getFlag("--target") || "openclaw";
+
+    if (!TARGETS.includes(target)) {
+      console.error(`✗ Unknown target: ${target}. Available: ${TARGETS.join(", ")}`);
+      process.exit(1);
+    }
+
     const targetDir = resolveTargetDir(target);
     const skillPath = join(targetDir, "SKILL.md");
 
@@ -194,21 +205,26 @@ if (command === "init") {
       }
     }
 
-    console.log(`\nEnvelope test — ask your agent:`);
-    console.log(`  "Compose a Chorus envelope from a Japanese agent to a Chinese agent, saying 'Let's discuss the project schedule.'"`);
-    console.log(`\nThen validate the output:`);
-    console.log(`  npx @chorus-protocol/skill verify --envelope '{"chorus_version":"0.4",...}'`);
+    console.log(`\n✓ Installation verified.`);
   }
 } else {
   console.log(`@chorus-protocol/skill v${pkg.version}`);
   console.log(`\nUsage:`);
-  console.log(`  chorus-skill init [--lang en|zh-CN] [--target local|openclaw|claude-user|claude-project]`);
-  console.log(`  chorus-skill uninstall --target openclaw|claude-user|claude-project`);
+  console.log(`  chorus-skill init --target openclaw [--lang en|zh-CN]`);
   console.log(`  chorus-skill verify --target openclaw`);
   console.log(`  chorus-skill verify --envelope '<json>'`);
+  console.log(`  chorus-skill uninstall --target openclaw`);
   console.log(`\nExamples:`);
-  console.log(`  npx @chorus-protocol/skill init --target openclaw      # Install (recommended)`);
+  console.log(`  npx @chorus-protocol/skill init --target openclaw      # Install`);
   console.log(`  npx @chorus-protocol/skill verify --target openclaw    # Verify installation`);
-  console.log(`  npx @chorus-protocol/skill init --target claude-user   # Alternative: Claude Code user skill`);
-  console.log(`  npx @chorus-protocol/skill init --lang zh-CN           # Chinese variant`);
+  console.log(`  npx @chorus-protocol/skill init --target openclaw --lang zh-CN`);
+
+  if (args.includes("--help-all")) {
+    console.log(`\nAlternative targets (advanced):`);
+    console.log(`  --target local           Copy to ./chorus (manual integration)`);
+    console.log(`  --target claude-user     Install to ~/.claude/skills/chorus`);
+    console.log(`  --target claude-project  Install to ./.claude/skills/chorus`);
+  } else {
+    console.log(`\nRun with --help-all to see alternative install targets.`);
+  }
 }

@@ -160,3 +160,25 @@ Stage 7: 合并记录（本地 merge / PR URL / 分支保留说明）
 ---
 
 > **DAG 规划参考**: `.claude/rules/dag-task-planning.md`（task.md 三问过滤 + 模板）
+
+---
+
+## 经验补丁（Gene Bank 毕业）
+
+### Evidence Before Claims (graduated: gene-20260320-evidence-before-claims)
+
+- **Trigger**: 写状态报告、实验总结或含数值声明的文档时
+- **Action**: 每条声明必须对应可验证的文件路径或命令。证据不足则显式标记 "evidence strength insufficient"。永远不写"已验证"而不附上 artifact
+- **Evidence**: 状态报告 v1 引用不存在的文件路径 + 覆盖率数值偏差；EXP-01 结论超出证据边界（"仅凭 SKILL.md" vs 实际含任务提示）
+
+### Verify Against Implementation (graduated: gene-20260320-verify-against-implementation)
+
+- **Trigger**: 写实验规格、测试计划或任何引用 API 行为的文档时
+- **Action**: 先读实际 handler 代码确认：精确字段名、精确响应结构、端点实际返回值。协议文档描述意图，实现代码是实验设计的 ground truth
+- **Evidence**: EXP-01 实验文档 3 处实现不匹配（字段名/返回值/路由机制），均由 Commander 读源码发现
+
+### Don't Guess Package Metadata (graduated: gene-20260321-dont-guess-metadata)
+
+- **Trigger**: 在 package.json 中写 repository/homepage/bugs URL 时
+- **Action**: 先 `git remote -v` 验证。无 remote 则留空，不猜测。发布后用户会被导向这些地址
+- **Evidence**: package.json 填了 github.com/anthropics/chorus（猜测值），Commander 发现无 remote 可证明

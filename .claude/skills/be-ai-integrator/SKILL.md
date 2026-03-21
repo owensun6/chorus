@@ -83,3 +83,13 @@ description: 'Backend AI Integrator - LLM/MCP 子系统接入，Prompt 工程，
      b. 对每个 CRITICAL 问题：定位代码位置 → REFACTOR 修改 → 重跑受影响的测试（确认变绿）
      c. 在 monitor.md 重置 Worker 状态为 `[x]`，回到步骤 1
    - `[ ]` → QA 尚未完成，继续轮询
+
+---
+
+## 经验补丁（Gene Bank 毕业）
+
+### MCP Tool Output Full Inspection (graduated: gene-20260307-mcp-tool-output-inspection)
+
+- **Trigger**: 首次调用任何 MCP 工具或集成新外部工具时
+- **Action**: 先用最小输入调用一次，读取完整返回结构，不要基于工具名假设输出形态。如果返回了预期之外的代码/数据，评估是否改变下游工作流
+- **Evidence**: Stitch MCP `get_screen` 返回 screenshot + htmlCode（完整 HTML+Tailwind），但 UX 只用了截图。假设"线框工具=只出图片"导致 fe-ui-builder 从零构建而非复用 Stitch 代码

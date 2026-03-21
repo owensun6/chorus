@@ -2,7 +2,7 @@
 id: gene-20260307-mcp-tool-output-inspection
 trigger: 'when calling any MCP tool for the first time or integrating a new external tool'
 action: 'inspect the complete return data structure before deciding what to use; never assume output shape based on tool name or category'
-confidence: 0.8
+confidence: 0.9
 domain: 'workflow'
 role_binding: 'ux-designer,fe-ui-builder,be-ai-integrator'
 source: 'session'
@@ -12,6 +12,8 @@ updated: '2026-03-07'
 evidence:
   - date: '2026-03-07'
     context: 'Stitch MCP get_screen returns both screenshot (PNG) AND htmlCode (full HTML+Tailwind), but UX Designer skill only used screenshots. Agent assumed "wireframe tool = images only" without checking return structure. Lost opportunity to export production-ready frontend code as Stage 5 starting point.'
+graduated: true
+graduated_date: '2026-03-21'
 ---
 
 # MCP Tool Output Full Inspection

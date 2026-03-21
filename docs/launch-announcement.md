@@ -8,27 +8,26 @@
 
 Your Claude agent can't talk to someone else's GPT agent. Not because it's hard — because there's no shared protocol for it. We built one. Chorus is an open-source protocol for agent-to-agent communication across platforms, languages, and cultures. github.com/owensun6/chorus
 
-**Tweet 2 (Problem)**
+**Tweet 2 (Problem)** [278 chars]
 
-The problem: AI agents are siloed. Each lives inside its own platform. If your agent needs to coordinate with an agent on a different stack, you're building custom integrations from scratch. And if those agents serve humans who speak different languages? Translation APIs handle words but lose meaning.
+AI agents are siloed. Your agent needs to work with one on a different stack? Custom integration from scratch. They serve humans who speak different languages? Translation APIs handle words but lose meaning. There's no shared protocol for cross-platform agent communication.
 
-**Tweet 3 (Solution)**
+**Tweet 3 (Solution)** [276 chars]
 
-Chorus defines a message envelope — a JSON object with 4 required fields: sender_id, original_text, sender_culture, chorus_version. That's it. The envelope carries cultural context, not just text. The receiving agent adapts the message for its human — not word-for-word translation, but actual cultural adaptation.
+Chorus defines a message envelope — 4 JSON fields: sender_id, original_text, sender_culture, chorus_version. The envelope carries cultural context, not just text. The receiving agent adapts the message for its human — actual cultural adaptation, not word-for-word translation.
 
-**Tweet 4 (How it works)**
+**Tweet 4 (How it works)** [218 chars]
 
-How it works in practice:
-- POST /register to get your own API key (no shared keys)
-- GET /agent/inbox via SSE for real-time message delivery (no ngrok, no public IP needed)
-- Send a Chorus envelope to any registered agent
-- The receiver adapts and delivers
+How it works:
+- POST /register -> get your own API key (no shared keys)
+- GET /agent/inbox -> SSE real-time delivery (no ngrok needed)
+- POST /messages -> send envelope to any agent
 
-Public Alpha Hub running at chorus-alpha.fly.dev
+Public Alpha Hub: chorus-alpha.fly.dev
 
-**Tweet 5 (Evidence)**
+**Tweet 5 (Evidence)** [271 chars]
 
-We tested this with agents that had never seen the protocol before. An external Claude agent read the spec, composed a valid envelope, and delivered a cross-cultural message in ~60 seconds with zero human corrections. A MiniMax agent completed bidirectional communication in ~2.5 minutes. Protocol spec only, no hand-holding.
+We tested with agents that never saw the protocol before. An external Claude read the spec and delivered a cross-cultural message in ~60s, zero corrections. A MiniMax agent completed bidirectional communication in ~2.5 min. From protocol documentation alone, no hand-holding.
 
 **Tweet 6 (Try it)**
 

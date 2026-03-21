@@ -12,6 +12,69 @@ Chorus Protocol (L1) defines the envelope format. Chorus Skill (L2) teaches agen
 
 Agents MAY use any transport that delivers valid Chorus envelopes. Compliance with this profile is not required for Chorus compliance.
 
+## Quick Start
+
+A complete register → send → receive flow using the HTTP binding:
+
+**Step 1 — Register your agent**
+
+```
+POST /agents
+
+{
+  "agent_id": "my-agent@chorus.example",
+  "endpoint": "https://my-agent.example/receive",
+  "agent_card": {
+    "card_version": "0.3",
+    "user_culture": "en",
+    "supported_languages": ["en"]
+  }
+}
+```
+
+Response: `201` with `{ "success": true, "data": { "agent_id": "...", "registered_at": "..." } }`
+
+**Step 2 — Send a message**
+
+```
+POST /messages
+
+{
+  "receiver_id": "other-agent@chorus.example",
+  "envelope": {
+    "chorus_version": "0.4",
+    "sender_id": "my-agent@chorus.example",
+    "original_text": "Hello, let's collaborate on this project.",
+    "sender_culture": "en"
+  }
+}
+```
+
+Response: `200` with `{ "success": true, "data": { "delivery": "delivered", "receiver_response": { "status": "ok" } } }`
+
+**Step 3 — Receive a message**
+
+Your endpoint receives:
+
+```
+POST https://my-agent.example/receive
+
+{
+  "envelope": {
+    "chorus_version": "0.4",
+    "sender_id": "other-agent@chorus.example",
+    "original_text": "こんにちは、プロジェクトについて相談しましょう。",
+    "sender_culture": "ja"
+  }
+}
+```
+
+Your endpoint responds: `{"status": "ok"}`
+
+That's it. You are now sending and receiving Chorus envelopes.
+
+**Important: envelope nesting.** The Chorus envelope is always wrapped inside a JSON object — never sent as the top-level body. When sending: `{ "receiver_id": "...", "envelope": { ...chorus fields... } }`. When receiving: `{ "envelope": { ...chorus fields... } }`. The envelope fields (`chorus_version`, `sender_id`, `original_text`, `sender_culture`) go inside the `"envelope"` key, not at the root of the request body.
+
 ## 2. Addressing
 
 An agent address follows the format `name@host`.
@@ -92,8 +155,6 @@ Request:
 The sender's identity is `envelope.sender_id`. There is no separate sender field — a single source of truth avoids mismatch.
 
 Result: delivery outcome (see Section 5).
-
-**Important: envelope nesting.** The Chorus envelope is always wrapped inside a JSON object — never sent as the top-level body. When sending: `{ "receiver_id": "...", "envelope": { ...chorus fields... } }`. When receiving: `{ "envelope": { ...chorus fields... } }`. The envelope fields (`chorus_version`, `sender_id`, `original_text`, `sender_culture`) go inside the `"envelope"` key, not at the root of the request body.
 
 ## 5. Delivery States
 

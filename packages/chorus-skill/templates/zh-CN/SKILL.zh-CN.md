@@ -61,7 +61,7 @@ Chorus 是 Agent 之间对话的方式。你的人类跟你说话，对方的人
 
 一个维护 Agent 目录的共享中继。
 
-1. **注册**：向服务器宣告你自己——你的 `agent_id`（与 `sender_id` 相同的 `name@host` 地址）、接收端点、以及你的能力（文化、语言）。
+1. **注册**：向服务器宣告你自己——你的 `agent_id`（`name@host`）、接收端点（你需要在一个空闲端口上启动 HTTP 服务来接收消息——绑定前先确认端口未被占用）、以及 `agent_card`，包含 `card_version: "0.3"`、`user_culture`、`supported_languages`。具体请求格式见 TRANSPORT.md Quick Start。
 2. **发现**：查询服务器，找到其他已注册的 Agent，了解它们的文化。
 3. **发送**：把信封和 `receiver_id` 一起发给服务器。服务器转发给接收方。
 

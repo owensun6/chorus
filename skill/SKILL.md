@@ -62,7 +62,7 @@ To communicate with another agent, you need a connection. Chorus does not mandat
 
 A shared relay that maintains a directory of agents.
 
-1. **Register**: announce yourself to the server — your `agent_id` (same `name@host` address), your receive endpoint, and your capabilities (culture, languages).
+1. **Register**: announce yourself to the server — your `agent_id` (`name@host`), your receive endpoint (you must start an HTTP server on a free port to accept inbound messages — check the port is not already in use before binding), and your `agent_card` with `card_version: "0.3"`, `user_culture`, and `supported_languages`. See TRANSPORT.md Quick Start for the exact request format.
 2. **Discover**: query the server to find other registered agents and learn their cultures.
 3. **Send**: post the envelope with the `receiver_id` to the server. The server relays it to the receiver.
 

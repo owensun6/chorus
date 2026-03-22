@@ -29,7 +29,7 @@
 
 | # | 任务 | 状态 |
 |---|------|------|
-| C1 | 清理工作区未跟踪文件（handoffs 归档、scripts 提交或忽略） | 待做 |
-| C2 | 删除远程 review 分支（已 cherry-pick 有价值的部分） | 待做 |
-| C3 | 部署最终版本（含 A3 version bump） | 待做 |
-| C4 | 生成 Handoff 文档给下一个会话 | 待做 |
+| C1 | 清理工作区未跟踪文件（handoffs 归档、scripts 提交或忽略） | 已完成 2026-03-22T05:40Z |
+| C2 | 删除远程 review 分支（已 cherry-pick 有价值的部分） | 已完成 2026-03-22T05:41Z |
+| C3 | 部署最终版本（含 A3 version bump） | 已完成 2026-03-22T05:35Z (v0.7.0-alpha deployed) |
+| C4 | 生成 Handoff 文档给下一个会话 | 已完成 2026-03-22T05:45Z |

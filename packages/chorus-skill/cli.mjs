@@ -105,7 +105,13 @@ if (command === "init") {
 
   copySkillFiles(targetDir, lang);
 
+  // Create ~/.chorus/ local storage directory
+  const chorusHome = join(homedir(), ".chorus");
+  const historyDir = join(chorusHome, "history");
+  mkdirSync(historyDir, { recursive: true });
+
   console.log(`✓ Files installed to ${targetDir} (${lang})`);
+  console.log(`✓ Local storage initialized at ${chorusHome}`);
 
   if (target === "openclaw") {
     console.log(`✓ Registered in ~/.openclaw/openclaw.json`);

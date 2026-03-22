@@ -1,0 +1,15 @@
+============================================================
+  Chorus Alpha — 24h Probe Report
+============================================================
+  Period:          last 24 hours
+  Total probes:    278
+  Successful:      278
+  Failed:          0
+  Success rate:    100.00%
+  Latency p50:     1.080s
+  Latency p95:     1.845s
+  Latency p99:     4.343s
+  Longest fail:    0 consecutive
+
+  No failures recorded.
+============================================================

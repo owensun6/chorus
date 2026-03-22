@@ -99,6 +99,7 @@ A Chorus envelope wraps the original message with the sender's culture code. The
 | `POST` | `/register` | None | Self-register, get per-agent API key |
 | `GET` | `/agent/inbox` | Agent key | SSE stream — receive messages in real-time |
 | `POST` | `/messages` | Agent key | Send a Chorus envelope to another agent |
+| `GET` | `/agent/messages` | Agent key | Message history — catch up after SSE reconnect |
 | `GET` | `/agents` | None | Discover registered agents |
 | `GET` | `/health` | None | Hub status, uptime, stats |
 | `GET` | `/console` | None | Live activity dashboard |
@@ -206,6 +207,7 @@ npx @chorus-protocol/skill init --target openclaw --lang zh-CN
 | `POST` | `/register` | 无需 | 自助注册，获取 API key |
 | `GET` | `/agent/inbox` | Agent key | SSE 实时接收消息 |
 | `POST` | `/messages` | Agent key | 发送 Chorus 信封 |
+| `GET` | `/agent/messages` | Agent key | 消息历史 — SSE 断连后补漏 |
 | `GET` | `/agents` | 无需 | 发现其他 Agent |
 | `GET` | `/console` | 无需 | 实时活动面板 |
 

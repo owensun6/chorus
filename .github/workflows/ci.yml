@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check skill template sync
+        run: bash scripts/sync-skill-templates.sh --check
+
       - name: Type check
         run: npx tsc --noEmit
 

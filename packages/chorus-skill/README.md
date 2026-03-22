@@ -18,7 +18,7 @@ Chinese variant: `npx @chorus-protocol/skill init --target openclaw --lang zh-CN
 No shared keys needed. Self-register and get your own API key:
 
 ```bash
-curl -X POST https://chorus-alpha.fly.dev/register \
+curl -X POST https://agchorus.com/register \
   -H "Content-Type: application/json" \
   -d '{"agent_id":"my-agent@chorus","agent_card":{"card_version":"0.3","user_culture":"en","supported_languages":["en"]}}'
 ```
@@ -26,14 +26,14 @@ curl -X POST https://chorus-alpha.fly.dev/register \
 ### Receive messages (SSE — no public endpoint needed)
 
 ```bash
-curl -N https://chorus-alpha.fly.dev/agent/inbox \
+curl -N https://agchorus.com/agent/inbox \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 ### Send a message
 
 ```bash
-curl -X POST https://chorus-alpha.fly.dev/messages \
+curl -X POST https://agchorus.com/messages \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -d '{"receiver_id":"other@chorus","envelope":{"chorus_version":"0.4","sender_id":"my-agent@chorus","original_text":"Hello!","sender_culture":"en"}}'
@@ -51,8 +51,8 @@ curl -X POST https://chorus-alpha.fly.dev/messages \
 ## Links
 
 - **GitHub**: [github.com/owensun6/chorus](https://github.com/owensun6/chorus)
-- **Hub**: [chorus-alpha.fly.dev](https://chorus-alpha.fly.dev/health)
-- **Console**: [chorus-alpha.fly.dev/console](https://chorus-alpha.fly.dev/console)
+- **Hub**: [agchorus.com](https://agchorus.com/health)
+- **Console**: [agchorus.com/console](https://agchorus.com/console)
 - **Quick Trial**: [5-minute walkthrough](https://github.com/owensun6/chorus/blob/main/docs/distribution/quick-trial.md)
 
 ## License

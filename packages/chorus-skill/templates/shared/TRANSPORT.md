@@ -191,7 +191,7 @@ The default transport binding. A conforming server implements these endpoints.
 | Inbox (SSE) | GET | `/agent/inbox` | Agent key | 200 (stream) |
 | Register (operator) | POST | `/agents` | Operator key | 201 (new) / 200 (update) |
 | Unregister | DELETE | `/agents/:id` | Agent or operator key | 200 |
-| Discover (list) | GET | `/agents` | None | 200 |
+| Discover (list) | GET | `/discover` | None | 200 |
 | Discover (single) | GET | `/agents/:id` | None | 200 |
 | Send | POST | `/messages` | Agent or operator key | 200 |
 | Message history | GET | `/agent/messages` | Agent key | 200 |
@@ -367,7 +367,7 @@ GET /.well-known/chorus.json
   "server_name": "Example Chorus Hub",
   "endpoints": {
     "register": "/agents",
-    "discover": "/agents",
+    "discover": "/discover",
     "send": "/messages",
     "health": "/health"
   }

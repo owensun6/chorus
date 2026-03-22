@@ -1,13 +1,13 @@
 # Chorus 项目进度与目标白皮书
 
 > 用途：给下一个会话、下一个专家的完整交接底稿
-> 日期：2026-03-21
-> 状态：交接版，需随关键里程碑持续更新
-> 更新日志（2026-03-21晚）：EXP-03 方案已优化为轻量化版本（npx init + 公网 Hub + API key）；CLI 回归已修复并发布 0.5.0；推荐执行顺序调整为 Console → EXP-03
+> 日期：2026-03-22
+> 状态：推广就绪版
+> 更新日志（2026-03-22）：自助注册 + SSE inbox + sender 身份验证 + 本地聊天记录持久化 + Hub 消息历史 + CI pipeline + 24h 100% 稳定性报告 + 双语推广素材 + GitHub Release/Discussion 已创建
 
 ## 1. 一句话结论
 
-Chorus 已经完成从“本地 demo”到“公网 Alpha Hub”的跃迁：协议链路可用、npm skill 已发布、公网 Hub 已部署并通过 happy path / negative / concurrent / rate-limit 验证；当前真正未闭环的是两件事：`24h 持续性证据`、`人类开发者冷启动验证（EXP-03 方案已优化，等待执行）`。
+Chorus 已完成推广就绪状态：自助注册（无需共享 key）、SSE 实时收消息（无需 ngrok）、Hub 侧消息历史、Agent 侧本地持久化、sender 身份验证、24h 探针 100% 通过（278 次零失败）、GitHub Release v0.6.0-alpha 已发布、多平台推广素材已就绪。npm @chorus-protocol/skill@0.7.1。剩余：EXP-03 人类冷启动实验待执行。
 
 ## 2. 项目当前定位
 

@@ -95,9 +95,15 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
       body: JSON.stringify({ receiver_id: targetId, envelope, stream: true }),
     });
 
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      throw new Error(`Router returned HTTP ${response.status}: ${body}`);
+    }
+
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();
     let fullAdaptedText = "";
+    let sseError: string | null = null;
 
     if (reader) {
       while (true) {
@@ -105,7 +111,14 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
         if (done) break;
         const events = parseSSEChunks(decoder.decode(value));
         for (const evt of events) {
-          if (evt.event === "chunk") {
+          if (evt.event === "error") {
+            try {
+              const parsed = JSON.parse(evt.data) as { code: string; message: string };
+              sseError = `${parsed.code}: ${parsed.message}`;
+            } catch {
+              sseError = evt.data;
+            }
+          } else if (evt.event === "chunk") {
             try {
               const parsed = JSON.parse(evt.data) as { text: string };
               process.stdout.write(parsed.text);
@@ -119,6 +132,10 @@ const startAgent = async (config: AgentConfig): Promise<AgentHandle> => {
           }
         }
       }
+    }
+
+    if (sseError) {
+      throw new Error(`Message delivery failed: ${sseError}`);
     }
 
     history.addTurn(targetId, {

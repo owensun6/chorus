@@ -210,17 +210,95 @@ describe("CLI: chorus-skill", () => {
       expect(stdout).toContain("Valid Chorus envelope");
     });
 
-    it("rejects an incomplete envelope", () => {
+    it("rejects an incomplete envelope (missing required fields)", () => {
       const envelope = JSON.stringify({ chorus_version: "0.4" });
       const { stderr, exitCode } = run(["verify", "--envelope", envelope]);
       expect(exitCode).toBe(1);
-      expect(stderr).toContain("missing fields");
+      expect(stderr).toContain("missing required fields");
     });
 
     it("rejects invalid JSON", () => {
       const { stderr, exitCode } = run(["verify", "--envelope", "not-json"]);
       expect(exitCode).toBe(1);
       expect(stderr).toContain("Invalid JSON");
+    });
+
+    it("rejects invalid chorus_version (schema enum)", () => {
+      const envelope = JSON.stringify({
+        chorus_version: "9.9",
+        sender_id: "a@b",
+        original_text: "hello",
+        sender_culture: "en",
+      });
+      const { stderr, exitCode } = run(["verify", "--envelope", envelope]);
+      expect(exitCode).toBe(1);
+      expect(stderr).toContain("chorus_version");
+    });
+
+    it("rejects turn_number: 0 (schema minimum: 1)", () => {
+      const envelope = JSON.stringify({
+        chorus_version: "0.4",
+        sender_id: "a@b",
+        original_text: "hello",
+        sender_culture: "en",
+        turn_number: 0,
+      });
+      const { stderr, exitCode } = run(["verify", "--envelope", envelope]);
+      expect(exitCode).toBe(1);
+      expect(stderr).toContain("turn_number");
+    });
+
+    it("rejects too-short cultural_context (schema minLength: 10)", () => {
+      const envelope = JSON.stringify({
+        chorus_version: "0.4",
+        sender_id: "a@b",
+        original_text: "hello",
+        sender_culture: "en",
+        cultural_context: "short",
+      });
+      const { stderr, exitCode } = run(["verify", "--envelope", envelope]);
+      expect(exitCode).toBe(1);
+      expect(stderr).toContain("cultural_context");
+    });
+
+    it("counts Unicode code points, not UTF-16 units (emoji minLength)", () => {
+      // 5 emoji = 5 code points but 10 UTF-16 code units — must fail minLength: 10
+      const envelope = JSON.stringify({
+        chorus_version: "0.4",
+        sender_id: "a@b",
+        original_text: "hello",
+        sender_culture: "en",
+        cultural_context: "\u{1F600}\u{1F600}\u{1F600}\u{1F600}\u{1F600}",
+      });
+      const { stderr, exitCode } = run(["verify", "--envelope", envelope]);
+      expect(exitCode).toBe(1);
+      expect(stderr).toContain("cultural_context");
+      expect(stderr).toContain("5 code points");
+    });
+
+    it("accepts BCP 47 culture tags like zh-Hant and zh-Hant-TW", () => {
+      for (const culture of ["zh-Hant", "zh-Hant-TW", "en-US", "ja", "yue-HK"]) {
+        const envelope = JSON.stringify({
+          chorus_version: "0.4",
+          sender_id: "a@b",
+          original_text: "hello",
+          sender_culture: culture,
+        });
+        const { exitCode } = run(["verify", "--envelope", envelope]);
+        expect(exitCode).toBe(0);
+      }
+    });
+
+    it("rejects malformed sender_culture", () => {
+      const envelope = JSON.stringify({
+        chorus_version: "0.4",
+        sender_id: "a@b",
+        original_text: "hello",
+        sender_culture: "BAD_CULTURE",
+      });
+      const { stderr, exitCode } = run(["verify", "--envelope", envelope]);
+      expect(exitCode).toBe(1);
+      expect(stderr).toContain("sender_culture");
     });
   });
 

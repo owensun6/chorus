@@ -132,19 +132,18 @@ describe("POST /messages", () => {
     expect(json.error.code).toBe("ERR_AGENT_UNREACHABLE");
   });
 
-  it("returns 200 with receiver error when receiver returns 400 (test_case_5)", async () => {
-    const receiverError = { status: "error", error_code: "INVALID_ENVELOPE" };
+  it("returns 502 when receiver returns 400 (non-2xx is failure)", async () => {
     fetchSpy.mockResolvedValueOnce(
-      new Response(JSON.stringify(receiverError), { status: 400 })
+      new Response(JSON.stringify({ status: "error", error_code: "INVALID_ENVELOPE" }), { status: 400 })
     );
 
     const res = await postMessage(validMessage);
 
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(502);
     const json: Json = await res.json();
-    expect(json.success).toBe(true);
-    expect(json.data.delivery).toBe("delivered");
-    expect(json.data.receiver_response).toEqual(receiverError);
+    expect(json.success).toBe(false);
+    expect(json.error.code).toBe("ERR_AGENT_UNREACHABLE");
+    expect(json.error.message).toContain("400");
   });
 
   it("returns 502 when receiver returns 500 (server error)", async () => {

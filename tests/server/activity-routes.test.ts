@@ -155,6 +155,7 @@ describe("Activity Routes", () => {
     it("produces submitted→forward→delivered on success", async () => {
       const originalFetch = global.fetch;
       global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
         status: 200,
         json: async () => ({ reply: "ok" }),
       });

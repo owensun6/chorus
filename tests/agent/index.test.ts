@@ -85,7 +85,7 @@ const createStartedAgent = async (overrides?: Partial<{
   const fetchSpy = mockFetch([
     // POST /agents — registration
     { status: 200, body: { success: true, data: { agent_id: defaultId } } },
-    // GET /agents — discovery
+    // GET /discover — discovery
     { status: 200, body: { data: [] } },
   ]);
 
@@ -255,13 +255,16 @@ describe("startAgent", () => {
 
     const handle = await startAgent(config);
 
-
     // Verify POST /agents was called
     expect(fetchSpy).toHaveBeenCalledWith(
       "http://localhost:3000/agents",
       expect.objectContaining({
         method: "POST",
       }),
+    );
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "http://localhost:3000/discover",
     );
 
     // Verify the registration body
@@ -294,7 +297,6 @@ describe("startAgent", () => {
 
     const handle = await startAgent(config);
 
-
     expect(fetchSpy).toHaveBeenCalledWith(
       "http://localhost:3000/agents",
       expect.objectContaining({
@@ -303,6 +305,10 @@ describe("startAgent", () => {
           Authorization: "Bearer test-router-key",
         }),
       }),
+    );
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "http://localhost:3000/discover",
     );
 
     fetchMock.mockClear();
@@ -323,7 +329,6 @@ describe("startAgent", () => {
     };
 
     const handle = await startAgent(config);
-
 
     expect(mockCreateReceiver).toHaveBeenCalledWith(
       expect.objectContaining({

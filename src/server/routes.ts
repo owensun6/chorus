@@ -1,6 +1,8 @@
 // Author: be-api-router
 import { Hono } from "hono";
 import { randomUUID } from "crypto";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 import { AgentRegistry } from "./registry";
 import { RegisterAgentBodySchema, SelfRegisterBodySchema, MessagePayloadBodySchema } from "./validation";
 import { successResponse, errorResponse, formatZodErrors } from "../shared/response";
@@ -10,6 +12,28 @@ import type { ActivityStream } from "./activity";
 import type { InboxManager } from "./inbox";
 import type { MessageStore } from "./message-store";
 import { CONSOLE_HTML } from "./console-html";
+import { ARENA_HTML } from "./arena-html";
+
+const escapeHtml = (s: string): string =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
+// Load endpoints.json — single source of truth for all endpoint paths
+const ENDPOINTS_DEF = JSON.parse(
+  readFileSync(resolve(__dirname, "../../skill/endpoints.json"), "utf-8"),
+);
+const ENDPOINT_MAP = Object.fromEntries(
+  Object.entries(ENDPOINTS_DEF.endpoints as Record<string, { path: string }>)
+    .map(([k, v]) => [k, v.path]),
+);
+
+// Load SKILL.md at startup for /skill endpoint
+const SKILL_TEXT = (() => {
+  try {
+    return readFileSync(resolve(__dirname, "../../skill/SKILL.md"), "utf-8");
+  } catch {
+    return "# Chorus SKILL\n\nSKILL.md not found. Check the repository.";
+  }
+})();
 
 interface ServerConfig {
   readonly maxAgents: number;
@@ -122,15 +146,17 @@ const createApp = (
       return c.json(errorResponse("ERR_NOT_AVAILABLE", "Inbox not enabled"), 503);
     }
 
+    // Support both Authorization header and ?token= query param (EventSource can't set headers)
     const auth = c.req.header("Authorization");
-    if (!auth || !auth.startsWith("Bearer ")) {
+    const queryToken = c.req.query("token");
+    const token = auth?.startsWith("Bearer ") ? auth.slice(7) : queryToken ?? "";
+    if (!token) {
       return c.json(
-        errorResponse("ERR_UNAUTHORIZED", "Missing or invalid Authorization header"),
+        errorResponse("ERR_UNAUTHORIZED", "Missing Authorization header or token query param"),
         401
       );
     }
 
-    const token = auth.slice(7);
     const agentId = registry.getAgentIdByKey(token);
     if (!agentId) {
       return c.json(errorResponse("ERR_UNAUTHORIZED", "Invalid agent key"), 401);
@@ -202,6 +228,64 @@ const createApp = (
       );
     }
     return c.json(successResponse(agent), 200);
+  });
+
+  // --- Public Directory (no auth, agents can discover each other) ---
+
+  app.get("/discover", (c) => {
+    const agents = registry.list();
+    const directory = agents.map((a) => ({
+      agent_id: a.agent_id,
+      culture: a.agent_card?.user_culture ?? null,
+      languages: a.agent_card?.supported_languages ?? [],
+      online: inbox?.isConnected(a.agent_id) ?? false,
+    }));
+    return c.json(successResponse(directory), 200);
+  });
+
+  // --- Invite Link ---
+
+  app.get("/invite/:id", (c) => {
+    const agentId = c.req.param("id");
+    const agent = registry.get(agentId);
+    const culture = agent?.agent_card?.user_culture ?? "unknown";
+    const online = agent ? (inbox?.isConnected(agentId) ?? false) : false;
+
+    // Accept header check: JSON for agents, HTML for browsers
+    const accept = c.req.header("Accept") ?? "";
+    if (accept.includes("application/json")) {
+      return c.json(successResponse({
+        agent_id: agentId,
+        hub: c.req.url.replace(/\/invite\/.*/, ""),
+        culture,
+        online,
+        exists: !!agent,
+        connect_instructions: "Register on this hub, then send a message to " + agentId,
+      }), 200);
+    }
+
+    // HTML page for humans to share — all user-controlled values escaped
+    const hubUrl = c.req.url.replace(/\/invite\/.*/, "");
+    const safeDisplayName = escapeHtml(agentId.split("@")[0]);
+    const safeCulture = escapeHtml(culture);
+    const safeAgentId = escapeHtml(agentId);
+    const safeHubUrl = escapeHtml(hubUrl);
+    const statusClass = online ? "online" : "offline";
+    const statusText = online ? "Online" : "Offline";
+    const html = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Chat with " + safeDisplayName + "</title>" +
+      "<style>body{font-family:system-ui;max-width:480px;margin:60px auto;padding:20px;background:#0a0a0a;color:#e5e5e5}" +
+      "h1{font-size:1.4em}code{background:#1a1a2e;padding:2px 6px;border-radius:4px;font-size:0.9em}" +
+      ".card{background:#111;border:1px solid #333;border-radius:12px;padding:24px;margin:20px 0}" +
+      ".online{color:#4ade80}.offline{color:#666}</style></head>" +
+      "<body><div class=\"card\">" +
+      "<h1>Chat with " + safeDisplayName + "</h1>" +
+      "<p>Culture: <code>" + safeCulture + "</code> &middot; Status: <span class=\"" + statusClass + "\">" + statusText + "</span></p>" +
+      "<p>Tell your AI agent:</p>" +
+      "<code style=\"display:block;padding:12px;margin:12px 0;line-height:1.6;white-space:pre-wrap\">" +
+      "Install the Chorus protocol from " + safeHubUrl + "/skill and register on this hub. Then send a message to " + safeAgentId + ".</code>" +
+      "<p style=\"color:#888;font-size:0.85em\">Your agent will handle registration, connection, and message delivery automatically.</p>" +
+      "</div></body></html>";
+    return c.html(html);
   });
 
   app.delete("/agents/:id", (c) => {
@@ -279,6 +363,8 @@ const createApp = (
         trace_id: traceId,
         sender_id: envelope.sender_id,
         receiver_id,
+        original_text: envelope.original_text,
+        sender_culture: envelope.sender_culture,
       });
     }
 
@@ -296,7 +382,10 @@ const createApp = (
         if (activity) {
           activity.append("message_delivered_sse", {
             trace_id: traceId,
+            sender_id: envelope.sender_id,
             receiver_id,
+            original_text: envelope.original_text,
+            sender_culture: envelope.sender_culture,
           });
         }
         return c.json(
@@ -352,19 +441,19 @@ const createApp = (
         signal: controller.signal,
       });
 
-      if (targetRes.status >= 500) {
+      if (!targetRes.ok) {
         registry.recordFailure();
         if (activity) {
           activity.append("message_failed", {
             trace_id: traceId,
             receiver_id,
-            error: "Receiver agent returned a server error",
+            error: `Receiver agent returned HTTP ${targetRes.status}`,
           });
         }
         return c.json(
           errorResponse(
             "ERR_AGENT_UNREACHABLE",
-            "Receiver agent returned a server error"
+            `Receiver agent returned HTTP ${targetRes.status}`
           ),
           502
         );
@@ -376,7 +465,10 @@ const createApp = (
       if (activity) {
         activity.append("message_delivered", {
           trace_id: traceId,
+          sender_id: envelope.sender_id,
           receiver_id,
+          original_text: envelope.original_text,
+          sender_culture: envelope.sender_culture,
           status: targetRes.status,
         });
       }
@@ -409,21 +501,10 @@ const createApp = (
 
   app.get("/.well-known/chorus.json", (c) => {
     return c.json({
-      chorus_version: "0.4",
+      chorus_version: ENDPOINTS_DEF.chorus_version,
       server_name: "Chorus Public Alpha Hub",
       server_status: "alpha",
-      endpoints: {
-        self_register: "/register",
-        register: "/agents",
-        discover: "/agents",
-        send: "/messages",
-        inbox: "/agent/inbox",
-        messages: "/agent/messages",
-        health: "/health",
-        activity: "/activity",
-        events: "/events",
-        console: "/console",
-      },
+      endpoints: ENDPOINT_MAP,
       limits: {
         max_agents: config.maxAgents,
         max_message_bytes: config.maxBodyBytes,
@@ -493,8 +574,29 @@ const createApp = (
     });
   });
 
+  // --- Skill Distribution (agents fetch protocol spec from here) ---
+
+  app.get("/skill", (c) => {
+    const accept = c.req.header("Accept") ?? "";
+    if (accept.includes("text/html") && !accept.includes("text/markdown")) {
+      const escaped = SKILL_TEXT.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const html = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Chorus SKILL</title>" +
+        "<style>body{font-family:system-ui;max-width:720px;margin:40px auto;padding:20px;background:#0a0a0a;color:#e5e5e5}" +
+        "pre{background:#111;padding:16px;border-radius:8px;overflow-x:auto;font-size:0.85em;line-height:1.5;white-space:pre-wrap}</style></head>" +
+        "<body><h1>Chorus Protocol SKILL</h1><p>Give this URL to your AI agent to install the protocol:</p>" +
+        "<pre>" + c.req.url + "</pre><p>Or copy the raw content below:</p>" +
+        "<pre>" + escaped + "</pre></body></html>";
+      return c.html(html);
+    }
+    return c.text(SKILL_TEXT, 200, { "Content-Type": "text/markdown; charset=utf-8" });
+  });
+
   app.get("/console", (c) => {
     return c.html(CONSOLE_HTML);
+  });
+
+  app.get("/arena", (c) => {
+    return c.html(ARENA_HTML);
   });
 
   return app;
@@ -527,8 +629,11 @@ const handleStreamForward = async (
       signal: controller.signal,
     });
 
-    if (targetRes.status >= 500) {
-      return sseErrorResponse("ERR_AGENT_UNREACHABLE", "Receiver agent returned a server error");
+    if (!targetRes.ok) {
+      return sseErrorResponse(
+        "ERR_AGENT_UNREACHABLE",
+        `Receiver agent returned HTTP ${targetRes.status}`,
+      );
     }
 
     return new Response(targetRes.body, { headers: SSE_HEADERS });

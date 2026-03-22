@@ -2,6 +2,17 @@
 import { createApp, DEFAULT_SERVER_CONFIG } from "../../src/server/routes";
 import type { ServerConfig } from "../../src/server/routes";
 import { AgentRegistry } from "../../src/server/registry";
+import { readFileSync } from "fs";
+import { resolve } from "path";
+
+// Load endpoints.json — same single source of truth the server uses
+const ENDPOINTS_DEF = JSON.parse(
+  readFileSync(resolve(__dirname, "../../skill/endpoints.json"), "utf-8"),
+);
+const EXPECTED_ENDPOINT_MAP = Object.fromEntries(
+  Object.entries(ENDPOINTS_DEF.endpoints as Record<string, { path: string }>)
+    .map(([k, v]) => [k, v.path]),
+);
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Json = any;
@@ -208,18 +219,7 @@ describe("Agent CRUD Routes", () => {
       const json: Json = await res.json();
       expect(json.chorus_version).toBe("0.4");
       expect(json.server_name).toBe("Chorus Public Alpha Hub");
-      expect(json.endpoints).toEqual({
-        self_register: "/register",
-        register: "/agents",
-        discover: "/agents",
-        send: "/messages",
-        inbox: "/agent/inbox",
-        messages: "/agent/messages",
-        health: "/health",
-        activity: "/activity",
-        events: "/events",
-        console: "/console",
-      });
+      expect(json.endpoints).toEqual(EXPECTED_ENDPOINT_MAP);
     });
 
     it("includes server_status, limits, and warnings", async () => {
@@ -272,6 +272,48 @@ describe("Agent CRUD Routes", () => {
       expect(json.data.agents_registered).toBe(1);
       expect(json.data.messages_delivered).toBe(2);
       expect(json.data.messages_failed).toBe(1);
+    });
+  });
+
+  describe("GET /invite/:id — XSS prevention", () => {
+    it("escapes HTML in agent_id to prevent reflected XSS", async () => {
+      const maliciousId = '<img src=x onerror=alert(1)>@evil';
+      registry.register(maliciousId, "https://evil.example.com", {
+        card_version: "0.3",
+        user_culture: '<script>alert("xss")</script>',
+        supported_languages: ["en"],
+      });
+
+      const res = await app.request(`/invite/${encodeURIComponent(maliciousId)}`, {
+        headers: { Accept: "text/html" },
+      });
+
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      // Must NOT contain raw angle brackets from user input
+      expect(html).not.toContain("<img src=x");
+      expect(html).not.toContain("<script>");
+      // Must contain escaped versions
+      expect(html).toContain("&lt;img");
+      expect(html).toContain("&lt;script&gt;");
+    });
+
+    it("returns JSON with raw agent_id when Accept: application/json", async () => {
+      const agentId = "test-agent@chorus.example";
+      registry.register(agentId, "https://test.example.com", {
+        card_version: "0.3",
+        user_culture: "en-US",
+        supported_languages: ["en"],
+      });
+
+      const res = await app.request(`/invite/${agentId}`, {
+        headers: { Accept: "application/json" },
+      });
+
+      expect(res.status).toBe(200);
+      const json: Json = await res.json();
+      expect(json.success).toBe(true);
+      expect(json.data.agent_id).toBe(agentId);
     });
   });
 });

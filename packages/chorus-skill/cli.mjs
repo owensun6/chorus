@@ -157,18 +157,52 @@ if (command === "init") {
   const envelopeJson = getFlag("--envelope");
 
   if (envelopeJson) {
-    const REQUIRED_FIELDS = ["chorus_version", "sender_id", "original_text", "sender_culture"];
+    const schema = JSON.parse(readFileSync(join(__dirname, "envelope.schema.json"), "utf8"));
+
+    // Minimal JSON Schema validator — covers the subset used by envelope.schema.json
+    const validateField = (value, name, propSchema) => {
+      const errors = [];
+      if (propSchema.type === "string") {
+        if (typeof value !== "string") { errors.push(`${name}: expected string, got ${typeof value}`); return errors; }
+        if (propSchema.enum && !propSchema.enum.includes(value)) { errors.push(`${name}: must be one of [${propSchema.enum.join(", ")}], got "${value}"`); }
+        if (propSchema.pattern && !new RegExp(propSchema.pattern).test(value)) { errors.push(`${name}: "${value}" does not match pattern ${propSchema.pattern}`); }
+        const codePoints = [...value].length;
+        if (propSchema.minLength != null && codePoints < propSchema.minLength) { errors.push(`${name}: too short (${codePoints} code points, min ${propSchema.minLength})`); }
+        if (propSchema.maxLength != null && codePoints > propSchema.maxLength) { errors.push(`${name}: too long (${codePoints} code points, max ${propSchema.maxLength})`); }
+      } else if (propSchema.type === "integer") {
+        if (typeof value !== "number" || !Number.isInteger(value)) { errors.push(`${name}: expected integer, got ${typeof value}`); return errors; }
+        if (propSchema.minimum != null && value < propSchema.minimum) { errors.push(`${name}: must be >= ${propSchema.minimum}, got ${value}`); }
+      }
+      return errors;
+    };
+
     try {
       const envelope = JSON.parse(envelopeJson);
-      const missing = REQUIRED_FIELDS.filter((k) => !envelope[k]);
-      if (missing.length === 0) {
-        console.log(`✓ Valid Chorus envelope (${REQUIRED_FIELDS.length}/${REQUIRED_FIELDS.length} required fields present)`);
-      } else {
-        console.error(`✗ Invalid envelope — missing fields: ${missing.join(", ")}`);
+      if (typeof envelope !== "object" || envelope === null || Array.isArray(envelope)) {
+        console.error(`✗ Invalid envelope — expected a JSON object`);
         process.exit(1);
       }
-    } catch {
-      console.error(`✗ Invalid JSON`);
+
+      const allErrors = [];
+      const missing = (schema.required || []).filter((k) => envelope[k] === undefined || envelope[k] === null);
+      if (missing.length > 0) {
+        allErrors.push(`missing required fields: ${missing.join(", ")}`);
+      }
+
+      for (const [field, propSchema] of Object.entries(schema.properties || {})) {
+        if (envelope[field] !== undefined && envelope[field] !== null) {
+          allErrors.push(...validateField(envelope[field], field, propSchema));
+        }
+      }
+
+      if (allErrors.length > 0) {
+        console.error(`✗ Invalid envelope:\n  ${allErrors.join("\n  ")}`);
+        process.exit(1);
+      }
+      console.log(`✓ Valid Chorus envelope (schema: ${schema.$id})`);
+    } catch (e) {
+      if (e.code === "ERR_MODULE_NOT_FOUND" || e.code === "ENOENT") throw e;
+      console.error(`✗ Invalid JSON: ${e.message}`);
       process.exit(1);
     }
   } else {

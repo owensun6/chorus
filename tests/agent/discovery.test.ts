@@ -122,6 +122,7 @@ describe("discoverCompatibleAgents", () => {
 
     const result = await discoverCompatibleAgents(routerUrl, myCard);
 
+    expect(fetchMock).toHaveBeenCalledWith("https://router.example.com/discover");
     expect(result).toHaveLength(1);
     expect(result[0].agent_id).toBe("agent-ja");
   });

@@ -32,7 +32,7 @@ const discoverCompatibleAgents = async (
   routerUrl: string,
   myCard: ChorusAgentCard
 ): Promise<AgentRegistration[]> => {
-  const url = `${routerUrl}/agents`;
+  const url = `${routerUrl}/discover`;
   const response = await fetch(url);
 
   if (!response.ok) {

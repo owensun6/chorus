@@ -225,6 +225,17 @@ const createApp = (
       );
     }
 
+    // Sender identity verification: per-agent key must match envelope.sender_id
+    const authHeader = c.req.header("Authorization") ?? "";
+    const callerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+    const callerAgentId = registry.getAgentIdByKey(callerToken);
+    if (callerAgentId && callerAgentId !== envelope.sender_id) {
+      return c.json(
+        errorResponse("ERR_SENDER_MISMATCH", "sender_id in envelope does not match authenticated agent"),
+        403
+      );
+    }
+
     const target = registry.get(receiver_id);
     if (!target) {
       return c.json(

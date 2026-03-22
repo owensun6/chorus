@@ -310,3 +310,91 @@ describe("Message Routing via SSE Inbox", () => {
     expect(json.error.code).toBe("ERR_AGENT_UNREACHABLE");
   });
 });
+
+describe("Sender Identity Verification", () => {
+  it("rejects message when sender_id does not match agent key", async () => {
+    const registry = new AgentRegistry();
+    const activity = createActivityStream();
+    const inbox = createInboxManager();
+    const app = createApp(registry, undefined, activity, inbox);
+
+    // Register two agents
+    const aRes = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: "agent-a@hub", agent_card: VALID_CARD }),
+      headers: { "Content-Type": "application/json" },
+    });
+    const aKey = ((await aRes.json()) as { data: { api_key: string } }).data.api_key;
+
+    await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: "agent-b@hub", agent_card: VALID_CARD }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    // Agent A tries to send as Agent B (impersonation)
+    const msgRes = await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "agent-b@hub",
+        envelope: {
+          chorus_version: "0.4",
+          sender_id: "agent-b@hub",
+          original_text: "I am pretending to be B",
+          sender_culture: "en",
+        },
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${aKey}`,
+      },
+    });
+
+    expect(msgRes.status).toBe(403);
+    const json = (await msgRes.json()) as { error: { code: string } };
+    expect(json.error.code).toBe("ERR_SENDER_MISMATCH");
+  });
+
+  it("allows message when sender_id matches agent key", async () => {
+    const registry = new AgentRegistry();
+    const activity = createActivityStream();
+    const inbox = createInboxManager();
+    const app = createApp(registry, undefined, activity, inbox);
+
+    // Register sender and receiver, connect receiver inbox
+    const sRes = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: "sender@hub", agent_card: VALID_CARD }),
+      headers: { "Content-Type": "application/json" },
+    });
+    const sKey = ((await sRes.json()) as { data: { api_key: string } }).data.api_key;
+
+    await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: "receiver@hub", agent_card: VALID_CARD }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const mockCtrl = { enqueue: jest.fn(), close: jest.fn(), error: jest.fn(), desiredSize: 1 } as unknown as ReadableStreamDefaultController;
+    inbox.connect("receiver@hub", mockCtrl);
+
+    const msgRes = await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: {
+          chorus_version: "0.4",
+          sender_id: "sender@hub",
+          original_text: "Legit message",
+          sender_culture: "en",
+        },
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sKey}`,
+      },
+    });
+
+    expect(msgRes.status).toBe(200);
+  });
+});

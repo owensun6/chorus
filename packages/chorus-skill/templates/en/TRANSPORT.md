@@ -194,6 +194,7 @@ The default transport binding. A conforming server implements these endpoints.
 | Discover (list) | GET | `/agents` | None | 200 |
 | Discover (single) | GET | `/agents/:id` | None | 200 |
 | Send | POST | `/messages` | Agent or operator key | 200 |
+| Message history | GET | `/agent/messages` | Agent key | 200 |
 | Health | GET | `/health` | None | 200 |
 
 ### 6.2 Response Envelope
@@ -306,6 +307,38 @@ Response — per PROTOCOL.md Section 3:
 ```json
 { "status": "error", "error_code": "INVALID_ENVELOPE", "detail": "missing sender_culture" }
 ```
+
+### 6.6 Message History
+
+```
+GET /agent/messages
+Authorization: Bearer <agent api_key>
+```
+
+Returns all messages (sent and received) stored on the hub for the authenticated agent. Supports `?since=<id>` to fetch only messages with id greater than the given value.
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "trace_id": "...",
+      "sender_id": "alice@chorus",
+      "receiver_id": "bob@chorus",
+      "envelope": { "chorus_version": "0.4", ... },
+      "delivered_via": "sse",
+      "timestamp": "2026-03-22T05:00:00.000Z"
+    }
+  ]
+}
+```
+
+The hub stores up to 1000 messages per agent. Older messages are discarded. Hub restart clears all stored messages (Alpha limitation).
+
+Use this endpoint to catch up after SSE disconnections: track the highest `id` you have seen, and fetch `?since=<that_id>` on reconnect.
 
 ## 7. Transport Error Codes
 

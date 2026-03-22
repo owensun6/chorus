@@ -8,6 +8,7 @@ import { formatSSE, singleSSEStream, SSE_ENCODER } from "../shared/sse";
 import { extractErrorMessage } from "../shared/log";
 import type { ActivityStream } from "./activity";
 import type { InboxManager } from "./inbox";
+import type { MessageStore } from "./message-store";
 import { CONSOLE_HTML } from "./console-html";
 
 interface ServerConfig {
@@ -27,6 +28,7 @@ const createApp = (
   config: ServerConfig = DEFAULT_SERVER_CONFIG,
   activity?: ActivityStream,
   inbox?: InboxManager,
+  messageStore?: MessageStore,
 ): Hono => {
   const app = new Hono();
 
@@ -159,6 +161,31 @@ const createApp = (
     });
   });
 
+  // --- Message History ---
+
+  app.get("/agent/messages", (c) => {
+    if (!messageStore) {
+      return c.json(errorResponse("ERR_NOT_AVAILABLE", "Message history not enabled"), 503);
+    }
+
+    const auth = c.req.header("Authorization");
+    if (!auth || !auth.startsWith("Bearer ")) {
+      return c.json(errorResponse("ERR_UNAUTHORIZED", "Missing or invalid Authorization header"), 401);
+    }
+
+    const token = auth.slice(7);
+    const agentId = registry.getAgentIdByKey(token);
+    if (!agentId) {
+      return c.json(errorResponse("ERR_UNAUTHORIZED", "Invalid agent key"), 401);
+    }
+
+    const sinceRaw = c.req.query("since");
+    const since = sinceRaw ? parseInt(sinceRaw, 10) : undefined;
+    const messages = messageStore.listForAgent(agentId, since);
+
+    return c.json(successResponse(messages), 200);
+  });
+
   // --- Discovery ---
 
   app.get("/agents", (c) => {
@@ -265,6 +292,7 @@ const createApp = (
 
       if (delivered) {
         registry.recordDelivery();
+        messageStore?.append({ trace_id: traceId, sender_id: envelope.sender_id, receiver_id, envelope, delivered_via: "sse" });
         if (activity) {
           activity.append("message_delivered_sse", {
             trace_id: traceId,
@@ -344,6 +372,7 @@ const createApp = (
 
       const targetBody = await targetRes.json();
       registry.recordDelivery();
+      messageStore?.append({ trace_id: traceId, sender_id: envelope.sender_id, receiver_id, envelope, delivered_via: "webhook" });
       if (activity) {
         activity.append("message_delivered", {
           trace_id: traceId,
@@ -389,6 +418,7 @@ const createApp = (
         discover: "/agents",
         send: "/messages",
         inbox: "/agent/inbox",
+        messages: "/agent/messages",
         health: "/health",
         activity: "/activity",
         events: "/events",
@@ -418,6 +448,7 @@ const createApp = (
         messages_delivered: stats.messages_delivered,
         messages_failed: stats.messages_failed,
         inbox_connections: inbox?.getConnectionCount() ?? 0,
+        messages_stored: messageStore?.getStats().total_stored ?? 0,
       }),
       200,
     );

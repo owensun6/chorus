@@ -442,7 +442,7 @@ const createApp = (
     return c.json(
       successResponse({
         status: "ok",
-        version: "0.5.0-alpha",
+        version: "0.7.0-alpha",
         uptime_seconds: Math.floor(process.uptime()),
         agents_registered: stats.agents_registered,
         messages_delivered: stats.messages_delivered,

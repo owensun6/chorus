@@ -251,7 +251,7 @@ describe("Agent CRUD Routes", () => {
       const json: Json = await res.json();
       expect(json.success).toBe(true);
       expect(json.data.status).toBe("ok");
-      expect(json.data.version).toBe("0.5.0-alpha");
+      expect(json.data.version).toBe("0.7.0-alpha");
       expect(typeof json.data.uptime_seconds).toBe("number");
       expect(json.data.uptime_seconds).toBeGreaterThanOrEqual(0);
     });

@@ -17,7 +17,7 @@ import {
   appendFileSync,
   readdirSync,
 } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { homedir } from "node:os";
 
 import { buildTrustBoundary } from "./guard.ts";
@@ -37,7 +37,8 @@ import { buildChorusRouterInjection } from "./router-hook.ts";
 
 const CHORUS_DIR = join(homedir(), ".chorus");
 const AGENTS_DIR = join(CHORUS_DIR, "agents");
-const CHORUS_PROJECT = "/Volumes/XDISK/chorus";
+// Resolve chorus project root from this template's location (packages/chorus-skill/templates/bridge/)
+const CHORUS_PROJECT = resolve(__dirname, "..", "..", "..", "..");
 const OPENCLAW_DIR = join(homedir(), ".openclaw");
 const WEIXIN_SRC = join(OPENCLAW_DIR, "extensions", "openclaw-weixin", "src");
 const WEIXIN_DIR = join(OPENCLAW_DIR, "extensions", "openclaw-weixin");

@@ -57,11 +57,15 @@ describe("Backup and Restore", () => {
     activity.append("message_delivered", { trace_id: "t-backup" });
     sourceDb.close();
 
-    // Run backup via the actual npm script entry point
-    execFileSync("npm", ["run", "db:backup", "--", backupPath], {
-      env: { ...process.env, CHORUS_DB_PATH: sourcePath },
-      stdio: "pipe",
-    });
+    // Run backup script via ts-node (no build step required)
+    execFileSync(
+      "npx",
+      ["ts-node", "src/scripts/backup-db.ts", backupPath],
+      {
+        env: { ...process.env, CHORUS_DB_PATH: sourcePath },
+        stdio: "pipe",
+      },
+    );
 
     expect(existsSync(backupPath)).toBe(true);
 

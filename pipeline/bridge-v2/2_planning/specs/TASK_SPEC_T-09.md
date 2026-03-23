@@ -54,7 +54,7 @@
 ## Structural Constraints
 
 - immutability: adapter does not store mutable state beyond acquired handles
-- error_handling: channel API failure → return DeliveryReceipt with status="failed" (do not throw)
+- error_handling: transient channel failure (timeout, network) → throw (pipeline catches, fact stays retryable); permanent channel failure (invalid target, channel removed) → return DeliveryReceipt with status="failed"
 - input_validation: validate route_key format before resolving anchor
 - auth_boundary: adapter uses host-provided credentials, never stores Hub API keys
 

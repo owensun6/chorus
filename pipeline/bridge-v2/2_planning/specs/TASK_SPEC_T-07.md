@@ -33,11 +33,7 @@
 
 - Given: inbound_fact exists with dedupe_result="new", delivery_evidence=null, no terminal_disposition
   When: recovery runs
-  Then: delivery is re-attempted via InboundPipeline (not skipped, not cursor-advanced)
-
-- Given: inbound_fact has been re-attempted N times (configurable limit) and Host Adapter keeps returning status="failed"
-  When: retry limit is reached
-  Then: terminal_disposition="delivery_failed_permanent" is set; cursor advances; error logged for operator investigation
+  Then: delivery is re-attempted via InboundPipeline; if Host Adapter throws (transient), fact remains retryable for next recovery cycle; if Host Adapter returns status="failed" (permanent), terminal_disposition is set by pipeline
 
 - Given: inbound_fact exists with delivery_evidence set, cursor_advanced=false
   When: recovery runs

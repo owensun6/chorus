@@ -126,7 +126,21 @@ FP-2 原子性: Phase 0 选择了 spike 模式而非正式 TDD，因为目的是
 | Stage 1.5 | 原型修订 | ⏭️ SKIP | 无 UI | |
 | Stage 2 | 头脑风暴 | ⏭️ SKIP | 技术路径已锁定（Hub 变更 + Bridge core + Host Adapter） | |
 | Gate 2 | Stage 3: DAG 兵力分配 | ✅ 已通过 | task.md (9 Tasks), dependency_graph.md, TASK_SPEC ×9 | Commander 2026-03-24 签字。多轮审查修复：idempotency fail-closed、delivery status enum、transient vs permanent failure、payload_hash、T-08/T-09 拆分 |
-| Stage 4 | Worktree 隔离 | 🟡 进行中 | | |
-| Stage 5 | 开发执行 | ⬜ 未开始 | | |
+| Stage 4 | Worktree 隔离 | ✅ 完成 | .worktrees/bridge-v2 (feature/bridge-v2) | 301/302 pass (1 pre-existing failure: backup.test MODULE_NOT_FOUND) |
+| Stage 5 | 开发执行 | 🟡 进行中 | | |
+
+## Bridge v2 Task 级追踪
+
+| T-ID | Assignee | Blocker | Worker | Simplify | QA | 审计报告 |
+|------|----------|---------|--------|----------|----|---------|
+| T-01 | be-api-router | None | [ ] | [ ] | [ ] | |
+| T-02 | be-api-router | None | [ ] | [ ] | [ ] | |
+| T-03 | be-domain-modeler | None | [ ] | [ ] | [ ] | |
+| T-04 | be-domain-modeler | T-03 | [ ] | [ ] | [ ] | |
+| T-05 | be-domain-modeler | T-03 | [ ] | [ ] | [ ] | |
+| T-06 | be-domain-modeler | T-01, T-03 | [ ] | [ ] | [ ] | |
+| T-07 | be-domain-modeler | T-04, T-05, T-06 | [ ] | [ ] | [ ] | |
+| T-08 | be-ai-integrator | T-03 | [ ] | [ ] | [ ] | |
+| T-09 | be-ai-integrator | T-04, T-05, T-08 | [ ] | [ ] | [ ] | |
 | Stage 6 | QA 审查 | ⬜ 未开始 | | |
 | Stage 7 | 收尾 | ⬜ 未开始 | | |

@@ -38,9 +38,13 @@
   When: delivery completes
   Then: delivery_evidence is recorded BEFORE cursor advances
 
-- Given: HostAdapter.deliverInbound throws or returns status="failed"
-  When: failure may be transient (host temporarily unavailable, network error)
+- Given: HostAdapter.deliverInbound throws (transient error: host unavailable, network timeout)
+  When: exception is caught by pipeline
   Then: no terminal_disposition is set; fact stays as dedupe="new", delivery_evidence=null; pipeline moves to next message; recovery engine will re-attempt on restart
+
+- Given: HostAdapter.deliverInbound returns status="failed" (permanent failure per INTERFACE.md §3.2)
+  When: delivery is permanently impossible
+  Then: terminal_disposition="delivery_failed_permanent" is set; cursor advances with disposition as evidence
 
 - Given: HostAdapter.deliverInbound returns status="unverifiable"
   When: host sent content but cannot confirm visibility (fire-and-forget channel)
@@ -55,16 +59,17 @@
 - Test file: `tests/bridge/inbound.test.ts` (new)
 - test_new_message: full pipeline → inbound_fact created, delivery_evidence set, cursor advanced
 - test_dedupe: duplicate trace_id → terminal_disposition, no delivery attempt
-- test_delivery_transient_failure: host returns status="failed" → NO terminal_disposition set, fact stays retryable (dedupe="new", delivery_evidence=null)
+- test_delivery_transient_throw: host adapter throws → no terminal_disposition, fact stays retryable
+- test_delivery_permanent_failed: host returns status="failed" → terminal_disposition="delivery_failed_permanent", cursor advances
 - test_delivery_unverifiable: host returns status="unverifiable" → terminal_disposition="delivery_unverifiable", NO delivery_evidence written
-- test_pipeline_continues_after_failure: transient failure on one message does not block processing of next message from different route
+- test_pipeline_continues_after_throw: transient throw on one message does not block processing of next message from different route
 - test_cursor_not_advanced_without_evidence: crash simulation between dedupe and delivery → cursor unchanged
 - test_per_route_lock: concurrent messages from same peer → sequential processing
 
 ## Structural Constraints
 
 - immutability: pipeline steps produce new state snapshots passed to DurableStateManager.save()
-- error_handling: HostAdapter transient failure → leave fact retryable (no terminal_disposition), log error, move on; only status="unverifiable" sets terminal_disposition from the delivery step
+- error_handling: HostAdapter throws (transient) → catch, log error, leave fact retryable, move on; HostAdapter returns status="failed" (permanent) → set terminal_disposition; HostAdapter returns status="unverifiable" → set terminal_disposition
 - input_validation: envelope schema validation via Zod before any state mutation
 - auth_boundary: N/A (internal pipeline, auth handled by Hub Client)
 

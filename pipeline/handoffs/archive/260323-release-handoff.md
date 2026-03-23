@@ -1,5 +1,8 @@
 # Handoff — 2026-03-23 Release Prep
 
+> ARCHIVED — 旧发布准备 handoff。
+> 不得作为 Bridge v2 的设计输入；仅可作为历史发布上下文引用。
+
 ## 先读这个
 
 这份 handoff 用于 **重启后的发布准备**。

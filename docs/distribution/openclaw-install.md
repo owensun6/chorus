@@ -1,5 +1,8 @@
 # Chorus — Installation Guide (OpenClaw)
 
+> ARCHIVED — 旧安装路径文档。
+> 不得作为 Bridge v2 的架构依据；仅可作为历史分发/安装说明引用。
+
 Install the Chorus skill and bridge runtime for your AI agent.
 
 ## What You're Installing

@@ -110,3 +110,23 @@ FP-2 原子性: Phase 0 选择了 spike 模式而非正式 TDD，因为目的是
 | Gate 2 | Stage 3: DAG 兵力分配 | ✅ 已通过 | task.md (8 Tasks), dependency_graph.md | Commander 2026-03-19 签字 |
 | Stage 5 | 开发执行 | ✅ 完成 | 8/8 Tasks GREEN + 整改 8 Step + 跨平台验证 5/5 PASS | PROTOCOL.md v0.4 + SKILL.md + TRANSPORT.md + npm CLI |
 | Stage 6+7 | QA + 收尾 | ✅ 完成 | cross-platform-validation.md (5/5 PASS). Commit 67ab683 | 2026-03-20 |
+
+---
+
+## Bridge v2 看板
+
+> 设计输入: `docs/bridge-v2-design-freeze.md` (问题定义冻结)
+> 目标: 围绕单一真相源、显式 continuity、durable bridge state 重建 Bridge 架构
+
+| Gate | 阶段名称 | 状态 | 产出物链路 | 风险与重审日志 |
+|------|---------|------|-----------|--------------|
+| Gate 0 | Stage 0: 问题定义冻结 | ✅ 已通过 | docs/bridge-v2-design-freeze.md | Commander 2026-03-24 确认冻结，指示直接进入架构设计 |
+| Gate 0.5 | Stage 0.5: 低保真原型 | ⏭️ SKIP | 纯协议/运行时项目，无 UI | |
+| Gate 1 | Stage 1: 系统架构设计 | ✅ 已通过 | System_Design.md, INTERFACE.md, Data_Models.md, ADR×3 | Commander 2026-03-24 签字。Hub 3 条契约已接受。多轮审查修复：cursor total-order、outbound replay、conversation_id 降级、skipped 删除 |
+| Stage 1.5 | 原型修订 | ⏭️ SKIP | 无 UI | |
+| Stage 2 | 头脑风暴 | ⏭️ SKIP | 技术路径已锁定（Hub 变更 + Bridge core + Host Adapter） | |
+| Gate 2 | Stage 3: DAG 兵力分配 | ✅ 已通过 | task.md (9 Tasks), dependency_graph.md, TASK_SPEC ×9 | Commander 2026-03-24 签字。多轮审查修复：idempotency fail-closed、delivery status enum、transient vs permanent failure、payload_hash、T-08/T-09 拆分 |
+| Stage 4 | Worktree 隔离 | 🟡 进行中 | | |
+| Stage 5 | 开发执行 | ⬜ 未开始 | | |
+| Stage 6 | QA 审查 | ⬜ 未开始 | | |
+| Stage 7 | 收尾 | ⬜ 未开始 | | |

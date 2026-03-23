@@ -6,3 +6,4 @@ coverage/
 dist/
 data/
 .astro/
+.worktrees/

@@ -1,5 +1,8 @@
 # Handoff — Chorus / OpenClaw Bridge 收尾状态（2026-03-23）
 
+> ARCHIVED — 旧 bridge 收尾状态文档。
+> 不得作为 Bridge v2 的现状判断或设计依据；仅可作为历史证据引用。
+
 ## 当前总判定
 
 - **Hub queued delivery**：PASS

@@ -1,5 +1,8 @@
 # OpenClaw Chorus Bridge Plugin — Spike 方案 (v8)
 
+> ARCHIVED — 旧 bridge spike 方案。
+> 不得作为 Bridge v2 的设计输入；仅可作为历史证据与失败案例引用。
+
 > 单渠道（WeChat）、单路径、可验证。解决：消息到了 agent 不通知人类、不翻译。
 
 ---

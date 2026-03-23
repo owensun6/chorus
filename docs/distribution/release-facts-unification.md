@@ -1,5 +1,8 @@
 # Release Facts Unification
 
+> ARCHIVED — 旧发布事实统一文档。
+> 不得作为 Bridge v2 的设计输入；仅可作为历史发布事实整理引用。
+
 > Status: active gate
 > Purpose: unify the factual layer before any public launch copy is finalized.
 

@@ -1,5 +1,8 @@
 # Chorus Bridge 验收方案与回归清单
 
+> ARCHIVED — 旧 bridge 验收/回归文档。
+> 不得作为 Bridge v2 的验收基线；仅可作为历史验证记录引用。
+
 > 配合 spec v8 使用。1号交付后立即执行。
 
 ---

@@ -1,5 +1,8 @@
 # Handoff — 2026-03-23 chorus-bridge 最终收口
 
+> ARCHIVED — 旧 bridge 收口 handoff。
+> 不得作为 Bridge v2 的状态结论或实现依据；仅可作为历史记录引用。
+
 ## 当前结论
 
 - 文档线：PASS

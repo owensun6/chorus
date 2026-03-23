@@ -511,3 +511,153 @@ describe("POST /messages (streaming)", () => {
     expect(json.error.code).toBe("ERR_VALIDATION");
   });
 });
+
+// ---------------------------------------------------------------------------
+// T-01: Hub transport contract — SSE timestamp + inclusive history
+// ---------------------------------------------------------------------------
+
+describe("T-01: SSE timestamp + inclusive history", () => {
+  let db: Database.Database;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  afterEach(() => {
+    db.close();
+  });
+
+  const makeApp = () => {
+    const registry = new AgentRegistry(db);
+    const activity = createActivityStream(db);
+    const inbox = createInboxManager();
+    const messageStore = createMessageStore(db);
+    return { registry, activity, inbox, messageStore, app: createApp(registry, undefined, activity, inbox, messageStore) };
+  };
+
+  const registerAgent = async (app: ReturnType<typeof createApp>, agentId: string, card: object) => {
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: agentId, agent_card: card }),
+      headers: { "Content-Type": "application/json" },
+    });
+    const json = (await res.json()) as { data: { api_key: string } };
+    return json.data.api_key;
+  };
+
+  const CARD_EN = { card_version: "0.3", user_culture: "en", supported_languages: ["en"] };
+  const CARD_ZH = { card_version: "0.3", user_culture: "zh-CN", supported_languages: ["zh-CN"] };
+
+  it("test_sse_timestamp: SSE event contains timestamp field with valid ISO8601", async () => {
+    const { app, inbox } = makeApp();
+    const senderKey = await registerAgent(app, "sender@hub", CARD_EN);
+    await registerAgent(app, "receiver@hub", CARD_ZH);
+
+    // Use a mock controller to capture what inbox.deliver enqueues
+    const enqueued: Uint8Array[] = [];
+    const mockController = {
+      enqueue: (chunk: Uint8Array) => { enqueued.push(chunk); },
+      close: () => {},
+    } as unknown as ReadableStreamDefaultController;
+    inbox.connect("receiver@hub", mockController);
+
+    // Send message via SSE
+    const sendRes = await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: { chorus_version: "0.4", sender_id: "sender@hub", original_text: "Timestamp check", sender_culture: "en" },
+      }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${senderKey}` },
+    });
+
+    expect(sendRes.status).toBe(200);
+    const sendJson: Json = await sendRes.json();
+    expect(sendJson.data.delivery).toBe("delivered_sse");
+
+    // Decode the enqueued SSE frames
+    const decoder = new TextDecoder();
+    const sseText = enqueued.map((chunk) => decoder.decode(chunk)).join("");
+    const events = parseSSEEvents(sseText);
+    const messageEvents = events.filter((e) => e.event === "message");
+    expect(messageEvents.length).toBe(1);
+
+    const messageData = JSON.parse(messageEvents[0].data);
+    expect(messageData.timestamp).toBeDefined();
+    // Verify ISO8601 format
+    expect(new Date(messageData.timestamp).toISOString()).toBe(messageData.timestamp);
+    // Verify other fields still present
+    expect(messageData.trace_id).toBeDefined();
+    expect(messageData.sender_id).toBe("sender@hub");
+    expect(messageData.envelope).toBeDefined();
+  });
+
+  it("test_inclusive_boundary: since=T returns messages with timestamp=T", async () => {
+    const { app, messageStore } = makeApp();
+    const senderKey = await registerAgent(app, "sender@hub", CARD_EN);
+    const receiverKey = await registerAgent(app, "receiver@hub", CARD_ZH);
+
+    // Send a message to create a stored record
+    await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: { chorus_version: "0.4", sender_id: "sender@hub", original_text: "Boundary test", sender_culture: "en" },
+      }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${senderKey}` },
+    });
+
+    // Get the message to know its timestamp
+    const pollRes = await app.request("/agent/messages", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${receiverKey}` },
+    });
+    const pollJson: Json = await pollRes.json();
+    expect(pollJson.data.length).toBe(1);
+    const msgTimestamp = pollJson.data[0].timestamp;
+
+    // Now query with since=exact_timestamp — should include the message (inclusive >=)
+    const sinceRes = await app.request(`/agent/messages?since=${encodeURIComponent(msgTimestamp)}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${receiverKey}` },
+    });
+    const sinceJson: Json = await sinceRes.json();
+    expect(sinceJson.data.length).toBe(1);
+    expect(sinceJson.data[0].envelope.original_text).toBe("Boundary test");
+  });
+
+  it("test_ordering: messages with same timestamp ordered by trace_id ASC", async () => {
+    const { messageStore } = makeApp();
+
+    // Directly insert messages with identical timestamps but different trace_ids
+    const fixedTime = "2026-03-24T00:00:00.000Z";
+    const insertStmt = db.prepare(`
+      INSERT INTO messages (trace_id, sender_id, receiver_id, envelope, delivered_via, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+    insertStmt.run("zzz-trace", "sender@hub", "receiver@hub", JSON.stringify({ chorus_version: "0.4", sender_id: "sender@hub", original_text: "Z msg", sender_culture: "en" }), "queued", fixedTime);
+    insertStmt.run("aaa-trace", "sender@hub", "receiver@hub", JSON.stringify({ chorus_version: "0.4", sender_id: "sender@hub", original_text: "A msg", sender_culture: "en" }), "queued", fixedTime);
+    insertStmt.run("mmm-trace", "sender@hub", "receiver@hub", JSON.stringify({ chorus_version: "0.4", sender_id: "sender@hub", original_text: "M msg", sender_culture: "en" }), "queued", fixedTime);
+
+    const messages = messageStore.listForAgent("receiver@hub", fixedTime);
+    expect(messages.length).toBe(3);
+    expect(messages[0].trace_id).toBe("aaa-trace");
+    expect(messages[1].trace_id).toBe("mmm-trace");
+    expect(messages[2].trace_id).toBe("zzz-trace");
+  });
+
+  it("test_since_iso8601_validation: malformed since param returns 400", async () => {
+    const { app } = makeApp();
+    const receiverKey = await registerAgent(app, "receiver@hub", CARD_ZH);
+
+    const res = await app.request("/agent/messages?since=not-a-date", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${receiverKey}` },
+    });
+
+    expect(res.status).toBe(400);
+    const json: Json = await res.json();
+    expect(json.success).toBe(false);
+    expect(json.error.code).toBe("ERR_VALIDATION");
+  });
+});

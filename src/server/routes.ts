@@ -8,9 +8,11 @@ import { RegisterAgentBodySchema, SelfRegisterBodySchema, MessagePayloadBodySche
 import { successResponse, errorResponse, formatZodErrors } from "../shared/response";
 import { formatSSE, singleSSEStream, SSE_ENCODER } from "../shared/sse";
 import { extractErrorMessage } from "../shared/log";
+import { computePayloadHash } from "./idempotency";
 import type { ActivityStream } from "./activity";
 import type { InboxManager } from "./inbox";
 import type { MessageStore } from "./message-store";
+import type { IdempotencyStore } from "./idempotency";
 import { CONSOLE_HTML } from "./console-html";
 import { ARENA_HTML } from "./arena-html";
 
@@ -53,6 +55,7 @@ const createApp = (
   activity?: ActivityStream,
   inbox?: InboxManager,
   messageStore?: MessageStore,
+  idempotencyStore?: IdempotencyStore,
 ): Hono => {
   const app = new Hono();
 
@@ -226,7 +229,13 @@ const createApp = (
     }
 
     const sinceRaw = c.req.query("since");
-    const since = sinceRaw ? parseInt(sinceRaw, 10) : undefined;
+    if (sinceRaw !== undefined) {
+      const parsed = Date.parse(sinceRaw);
+      if (Number.isNaN(parsed)) {
+        return c.json(errorResponse("ERR_VALIDATION", "since must be a valid ISO8601 timestamp"), 400);
+      }
+    }
+    const since = sinceRaw ?? undefined;
     const messages = messageStore.listForAgent(agentId, since);
 
     return c.json(successResponse(messages), 200);
@@ -367,6 +376,41 @@ const createApp = (
       );
     }
 
+    // --- Idempotency-Key dedup check ---
+    const idempotencyKey = c.req.header("Idempotency-Key");
+    if (idempotencyKey !== undefined) {
+      if (idempotencyKey.length > 256) {
+        return c.json(
+          errorResponse("ERR_VALIDATION", "Idempotency-Key header exceeds 256 characters"),
+          400
+        );
+      }
+
+      if (idempotencyStore) {
+        const payloadHash = computePayloadHash(body);
+        try {
+          const result = idempotencyStore.check(idempotencyKey, payloadHash);
+          if (result.kind === "replay" && result.record) {
+            const stored = JSON.parse(result.record.response) as { status: number; body: unknown };
+            return c.json(stored.body, stored.status as 200);
+          }
+          if (result.kind === "conflict") {
+            return c.json(
+              errorResponse("ERR_IDEMPOTENCY_CONFLICT", "Idempotency-Key already used with different payload"),
+              409
+            );
+          }
+          // kind === "new" — continue normal processing, store after success
+        } catch {
+          // FAIL CLOSED: if idempotency table is broken, refuse to process
+          return c.json(
+            errorResponse("ERR_IDEMPOTENCY_FAILED", "Idempotency check failed — request not processed"),
+            503
+          );
+        }
+      }
+    }
+
     const target = registry.get(receiver_id);
     if (!target) {
       return c.json(
@@ -390,10 +434,12 @@ const createApp = (
 
     // Priority 1: SSE inbox delivery
     if (inbox?.isConnected(receiver_id)) {
+      const sseTimestamp = new Date().toISOString();
       const delivered = inbox.deliver(receiver_id, {
         trace_id: traceId,
         sender_id: envelope.sender_id,
         envelope,
+        timestamp: sseTimestamp,
       });
 
       if (delivered) {
@@ -408,10 +454,11 @@ const createApp = (
             sender_culture: envelope.sender_culture,
           });
         }
-        return c.json(
-          successResponse({ delivery: "delivered_sse", trace_id: traceId }),
-          200
-        );
+        const sseResponse = successResponse({ delivery: "delivered_sse", trace_id: traceId });
+        if (idempotencyKey && idempotencyStore) {
+          try { idempotencyStore.store(idempotencyKey, computePayloadHash(body), traceId, { status: 200, body: sseResponse }); } catch { /* best-effort */ }
+        }
+        return c.json(sseResponse, 200);
       }
     }
 
@@ -430,10 +477,11 @@ const createApp = (
           sender_culture: envelope.sender_culture,
         });
       }
-      return c.json(
-        successResponse({ delivery: "queued", trace_id: traceId }),
-        202
-      );
+      const queuedResponse = successResponse({ delivery: "queued", trace_id: traceId });
+      if (idempotencyKey && idempotencyStore) {
+        try { idempotencyStore.store(idempotencyKey, computePayloadHash(body), traceId, { status: 202, body: queuedResponse }); } catch { /* best-effort */ }
+      }
+      return c.json(queuedResponse, 202);
     }
 
     if (stream) {
@@ -497,10 +545,11 @@ const createApp = (
           status: targetRes.status,
         });
       }
-      return c.json(
-        successResponse({ delivery: "delivered", receiver_response: targetBody }),
-        200
-      );
+      const webhookResponse = successResponse({ delivery: "delivered", receiver_response: targetBody });
+      if (idempotencyKey && idempotencyStore) {
+        try { idempotencyStore.store(idempotencyKey, computePayloadHash(body), traceId, { status: 200, body: webhookResponse }); } catch { /* best-effort */ }
+      }
+      return c.json(webhookResponse, 200);
     } catch (err: unknown) {
       registry.recordFailure();
       if (activity) {

@@ -54,15 +54,21 @@ describe("MessageStore", () => {
     expect(store.listForAgent("b@hub").length).toBe(1);
   });
 
-  it("supports since filter", () => {
+  it("supports since filter with ISO8601 timestamp (inclusive >=)", () => {
     const store = createMessageStore(db);
-    store.append({ trace_id: "t1", sender_id: "a@hub", receiver_id: "b@hub", envelope: { chorus_version: "0.4", sender_id: "a@hub", original_text: "1", sender_culture: "en" }, delivered_via: "sse" });
-    store.append({ trace_id: "t2", sender_id: "a@hub", receiver_id: "b@hub", envelope: { chorus_version: "0.4", sender_id: "a@hub", original_text: "2", sender_culture: "en" }, delivered_via: "sse" });
-    store.append({ trace_id: "t3", sender_id: "a@hub", receiver_id: "b@hub", envelope: { chorus_version: "0.4", sender_id: "a@hub", original_text: "3", sender_culture: "en" }, delivered_via: "sse" });
+    // Insert messages with controlled timestamps via direct DB insert
+    const insertStmt = db.prepare(
+      "INSERT INTO messages (trace_id, sender_id, receiver_id, envelope, delivered_via, timestamp) VALUES (?, ?, ?, ?, ?, ?)"
+    );
+    insertStmt.run("t1", "a@hub", "b@hub", JSON.stringify({ chorus_version: "0.4", sender_id: "a@hub", original_text: "1", sender_culture: "en" }), "sse", "2026-01-01T00:00:00.000Z");
+    insertStmt.run("t2", "a@hub", "b@hub", JSON.stringify({ chorus_version: "0.4", sender_id: "a@hub", original_text: "2", sender_culture: "en" }), "sse", "2026-01-02T00:00:00.000Z");
+    insertStmt.run("t3", "a@hub", "b@hub", JSON.stringify({ chorus_version: "0.4", sender_id: "a@hub", original_text: "3", sender_culture: "en" }), "sse", "2026-01-03T00:00:00.000Z");
 
-    const since1 = store.listForAgent("b@hub", 1);
-    expect(since1.length).toBe(2);
-    expect(since1[0].trace_id).toBe("t2");
+    // since is inclusive: >= "2026-01-02" should return t2 and t3
+    const sinceJan2 = store.listForAgent("b@hub", "2026-01-02T00:00:00.000Z");
+    expect(sinceJan2.length).toBe(2);
+    expect(sinceJan2[0].trace_id).toBe("t2");
+    expect(sinceJan2[1].trace_id).toBe("t3");
   });
 
   it("returns empty array for unknown agent", () => {
@@ -134,8 +140,8 @@ describe("GET /agent/messages", () => {
     expect(json.data[0].trace_id).toBe("t1");
   });
 
-  it("supports since parameter", async () => {
-    const { app, messageStore } = makeApp();
+  it("supports since parameter (ISO8601 timestamp, inclusive)", async () => {
+    const { app } = makeApp();
 
     const regRes = await app.request("/register", {
       method: "POST",
@@ -144,15 +150,20 @@ describe("GET /agent/messages", () => {
     });
     const key = ((await regRes.json()) as { data: { api_key: string } }).data.api_key;
 
-    messageStore.append({ trace_id: "t1", sender_id: "x@hub", receiver_id: "reader@hub", envelope: { chorus_version: "0.4", sender_id: "x@hub", original_text: "1", sender_culture: "en" }, delivered_via: "sse" });
-    messageStore.append({ trace_id: "t2", sender_id: "x@hub", receiver_id: "reader@hub", envelope: { chorus_version: "0.4", sender_id: "x@hub", original_text: "2", sender_culture: "en" }, delivered_via: "sse" });
+    // Insert messages with controlled timestamps
+    const insertStmt = db.prepare(
+      "INSERT INTO messages (trace_id, sender_id, receiver_id, envelope, delivered_via, timestamp) VALUES (?, ?, ?, ?, ?, ?)"
+    );
+    insertStmt.run("t1", "x@hub", "reader@hub", JSON.stringify({ chorus_version: "0.4", sender_id: "x@hub", original_text: "1", sender_culture: "en" }), "sse", "2026-01-01T00:00:00.000Z");
+    insertStmt.run("t2", "x@hub", "reader@hub", JSON.stringify({ chorus_version: "0.4", sender_id: "x@hub", original_text: "2", sender_culture: "en" }), "sse", "2026-01-02T00:00:00.000Z");
 
-    const res = await app.request("/agent/messages?since=1", {
+    const res = await app.request(`/agent/messages?since=${encodeURIComponent("2026-01-02T00:00:00.000Z")}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${key}` },
     });
 
     const json = (await res.json()) as { data: Array<{ trace_id: string }> };
+    // Inclusive >= : only t2 has timestamp >= 2026-01-02
     expect(json.data.length).toBe(1);
     expect(json.data[0].trace_id).toBe("t2");
   });

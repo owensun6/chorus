@@ -1,11 +1,23 @@
 // Author: be-domain-modeler
 import { createActivityStream } from "../../src/server/activity";
 import type { ActivityEvent, ActivitySubscriber } from "../../src/server/activity";
+import { createTestDb } from "../helpers/test-db";
+import type Database from "better-sqlite3";
 
 describe("ActivityStream", () => {
+  let db: Database.Database;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  afterEach(() => {
+    db.close();
+  });
+
   describe("append", () => {
     it("returns auto-incrementing IDs starting from 1", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       const e1 = stream.append("agent_registered", { agent_id: "a" });
       const e2 = stream.append("agent_registered", { agent_id: "b" });
       const e3 = stream.append("message_submitted", { trace_id: "t1" });
@@ -16,7 +28,7 @@ describe("ActivityStream", () => {
     });
 
     it("returns correct type, timestamp (ISO), and data", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       const event = stream.append("message_delivered", { trace_id: "t1", status: 200 });
 
       expect(event.type).toBe("message_delivered");
@@ -25,7 +37,7 @@ describe("ActivityStream", () => {
     });
 
     it("creates immutable event data (spread copy)", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       const originalData = { agent_id: "a", extra: "value" };
       const event = stream.append("agent_registered", originalData);
 
@@ -40,7 +52,7 @@ describe("ActivityStream", () => {
 
   describe("list", () => {
     it("returns all events when called without arguments", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       stream.append("agent_registered", { agent_id: "a" });
       stream.append("agent_registered", { agent_id: "b" });
       stream.append("message_submitted", { trace_id: "t1" });
@@ -52,7 +64,7 @@ describe("ActivityStream", () => {
     });
 
     it("filters events with since parameter (id > since)", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       stream.append("agent_registered", { agent_id: "a" });
       stream.append("agent_registered", { agent_id: "b" });
       stream.append("message_submitted", { trace_id: "t1" });
@@ -66,12 +78,12 @@ describe("ActivityStream", () => {
     });
 
     it("returns empty array for empty stream", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       expect(stream.list()).toEqual([]);
     });
 
     it("returns a new array each time", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       stream.append("agent_registered", { agent_id: "a" });
 
       const list1 = stream.list();
@@ -81,9 +93,9 @@ describe("ActivityStream", () => {
     });
   });
 
-  describe("ring buffer overflow", () => {
+  describe("event trimming (max events)", () => {
     it("retains only maxEvents most recent events", () => {
-      const stream = createActivityStream(500);
+      const stream = createActivityStream(db, 500);
 
       for (let i = 0; i < 502; i++) {
         stream.append("message_submitted", { index: i });
@@ -97,7 +109,7 @@ describe("ActivityStream", () => {
     });
 
     it("works with small buffer size", () => {
-      const stream = createActivityStream(3);
+      const stream = createActivityStream(db, 3);
 
       stream.append("agent_registered", { agent_id: "a" });
       stream.append("agent_registered", { agent_id: "b" });
@@ -113,7 +125,7 @@ describe("ActivityStream", () => {
 
   describe("subscribe / unsubscribe", () => {
     it("subscriber receives new events", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       const received: ActivityEvent[] = [];
       const subscriber: ActivitySubscriber = (e) => received.push(e);
 
@@ -127,7 +139,7 @@ describe("ActivityStream", () => {
     });
 
     it("unsubscribe stops receiving events", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       const received: ActivityEvent[] = [];
       const subscriber: ActivitySubscriber = (e) => received.push(e);
 
@@ -140,7 +152,7 @@ describe("ActivityStream", () => {
     });
 
     it("all subscribers receive events", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       const received1: ActivityEvent[] = [];
       const received2: ActivityEvent[] = [];
       const received3: ActivityEvent[] = [];
@@ -157,7 +169,7 @@ describe("ActivityStream", () => {
     });
 
     it("subscriber error does not affect other subscribers", () => {
-      const stream = createActivityStream();
+      const stream = createActivityStream(db);
       const received: ActivityEvent[] = [];
 
       stream.subscribe(() => { throw new Error("boom"); });

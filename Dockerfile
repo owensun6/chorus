@@ -20,6 +20,12 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist/ dist/
+COPY skill/ skill/
+
+# SQLite data directory — mount a Fly volume here
+RUN mkdir -p /data
+ENV CHORUS_DB_PATH=/data/chorus.db
+VOLUME /data
 
 EXPOSE 3000
 

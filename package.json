@@ -1,21 +1,23 @@
 {
   "name": "chorus",
-  "version": "1.0.0",
+  "version": "0.8.0-alpha",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/server/index.js",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "db:backup": "node dist/scripts/backup-db.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "type": "commonjs",
   "devDependencies": {
     "@astrojs/starlight": "^0.37.6",
     "@eslint/js": "^10.0.1",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "^30.0.0",
     "astro": "^5.18.0",
     "c8": "^11.0.0",
@@ -31,6 +33,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.11",
+    "better-sqlite3": "^12.8.0",
     "hono": "^4.12.8",
     "openai": "^6.32.0",
     "typescript": "^5.9.3",

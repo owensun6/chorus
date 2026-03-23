@@ -229,3 +229,212 @@
 - `auto_stop_machines = "off"` 保持 hub 持续在线
 - 监控架构：外部 UptimeRobot（独立证据）+ 本地 cron（深度链路验证）
 - 24h 后跑 `bin/alpha-probe-report.sh` 出持续性证据汇总
+
+### 2026-03-22 — SQLite 持久化 + 安全加固
+
+**操作**: Hub 从内存状态迁移到 SQLite 持久化，含 3 轮 Commander 审查修复
+**结果**:
+- `src/server/db.ts` 新建：SQLite 初始化 + WAL + 迁移系统（SCHEMA_VERSION=2）
+- `src/server/registry.ts` 重写：Map → prepared SQL statements，API key SHA-256 哈希存储
+- `src/server/message-store.ts` 重写：Map → SQL table，消息持久化
+- `src/server/activity.ts` 重写：内存数组 → SQL + 内存 pub/sub 混合
+- `src/server/index.ts` 更新：DB 连接 + 优雅关闭（server.close → db.close → exit）
+- `Dockerfile` 更新：`/data` volume + `CHORUS_DB_PATH` 环境变量
+- `CHANGELOG.md` 新建：v0.4.1 release note + operator migration checklist
+- `tests/server/db-migration.test.ts` 新建：v1→v2 升级路径验证（磁盘文件模拟）
+- `tests/helpers/test-db.ts` 新建：`:memory:` 测试 DB 工厂
+- 全部 8 个 server 测试文件更新为 SQLite-backed
+- 21 test suites, 256 tests all green, tsc clean
+- README 更新：删除 "In-memory only" 限制
+
+**决策**:
+- SQLite with thin boundary（不建通用 StorageProvider）— 先解决状态问题，再谈可替换性
+- API key SHA-256 哈希存储 — 高熵 key 不需要 bcrypt，DB 备份不暴露凭据
+- Schema v1→v2 migration：DROP 旧 api_keys 表（明文）+ 重建为 api_key_hash — 旧 key 不可恢复，agent 需重新注册
+- busy_timeout=5000ms — SSE 并发读写防 SQLITE_BUSY
+- inbox.ts 不持久化 — SSE 连接天然临时态
+- per-agent 消息上限移除 — 磁盘存储不需要内存保护，未来可加 DB 级 retention
+
+### 2026-03-22 18:30 — MVP 阻断项清除 + 运维闭环
+
+**操作**: 修复 agent_id 所有权漏洞 + 备份恢复闭环（脚本+演练+文档+smoke test）+ rollout 文档重写
+**结果**:
+- `src/server/routes.ts`: POST /register 新增所有权守卫 — agent_id 已存在时要求 Authorization 持有当前 key，否则 409 ERR_AGENT_EXISTS
+- `tests/server/self-register.test.ts`: 原无条件轮换测试替换为 3 条（无 key 拒绝 / 错 key 拒绝 / 正确 key 允许轮换）
+- `scripts/backup-db.ts`: 备份脚本，使用 better-sqlite3 online backup API
+- `tests/server/backup.test.ts`: smoke test — 通过 npm run db:backup 入口创建备份并验证 agent/消息/activity 完整恢复
+- `docs/server/backup-and-restore.md`: 操作文档（备份/恢复步骤/保留内容/cron 示例）
+- `docs/server/sqlite-production-rollout.md`: 从提案文档重写为当前状态+剩余缺口文档，经 4 轮 Commander 审查
+- 恢复演练通过：seed data → backup → restore → verify all data intact
+- 22 suites / 259 tests 全绿
+
+**决策**:
+- agent_id 所有权修复选最小方案：路由层检查，不改 registry 接口 — 注册仍免鉴权，重注册需证明所有权
+- 备份用 better-sqlite3 backup API 而非 VACUUM INTO — 前者支持在线备份，后者锁表
+- 备份入口统一为 npm run db:backup — 消除 tsx/ts-node 分歧，测试直接覆盖 npm script 入口
+- rollout 文档不写优先级排序（无生产数据支撑），磁盘阈值标 [Uncalibrated]
+- MVP 发布边界定义：alpha 与产品的分界线是"用户可信任注册不被接管" + "数据不无声消失"
+
+### 2026-03-22 19:30 — 100 并发容量验证 + 压测工具链 + 备份生产化
+
+**操作**: 建立可量化的容量验证体系，补齐压测观测、脚本、webhook 路径、备份生产链路
+**结果**:
+- `/health` 增强：新增 `process_rss_bytes`, `process_heap_used_bytes`, `db_size_bytes`, `wal_size_bytes`, `sqlite_busy_errors` 6 项指标 + onError SQLITE_BUSY 计数器
+- `scripts/load/` 新建 4 个压测脚本：`lib.ts`(共享库) + `sse-soak.ts`(场景A) + `send-burst.ts`(场景B) + `send-webhook-burst.ts`(场景C) + `soak-test.ts`(场景D)
+- 本地压测 4 场景全 PASS：
+  - 场景 A: 100 SSE 连接 2min 保持，0 断连
+  - 场景 B: 100 并发 SSE burst，p95=50ms, 5xx=0, SQLITE_BUSY=0
+  - 场景 C: 100 并发 webhook burst（内置 stub echo server），p95=128ms, 5xx=0, 超时=0
+  - 场景 D: 30 agents 5min soak，p95=3ms, 内存增长 1.1%, WAL 稳定
+- 备份脚本生产化：`scripts/backup-db.ts` → `src/scripts/backup-db.ts`，纳入 tsc 编译，产出 `dist/scripts/backup-db.js`
+- `package.json` `db:backup` 改为 `node dist/scripts/backup-db.js`（生产镜像可直接执行，不依赖 ts-node）
+- `docs/server/capacity-report.md` 定位为"本地预筛通过"，非发布结论
+- `fly.toml` 已更新为 `shared-cpu-2x` / `2048mb` / volume mount `/data`
+- 22 suites / 259 tests 全绿
+
+**决策**:
+- 本地预筛不等于发布结论——线上内存/IOPS/网络延迟会改变结果，最终容量数字需线上复测
+- 备份方案用 SQLite backup API（WAL 安全），不用 fly sftp（拷主库不等于一致性备份，-wal/-shm 不处理会丢数据）
+- 备份脚本纳入 tsc 编译（方案 1），不依赖 ts-node 进生产镜像——better-sqlite3 是生产依赖，ts-node 不是
+- webhook burst 需内置 stub server 才能测，localhost 回环不等于真实网络延迟
+- 部署内存从 256MB 提升到 2GB——进程 RSS 460MB 起步，256MB 必 OOM
+
+### 2026-03-22 22:30 — 线上容量验证通过 + SSE heartbeat + 真实 Agent 通信测试
+
+**操作**: 线上 4 场景压测 + 结构性修复 + capacity-report 收口 + 双 Agent 真实通信测试
+**结果**:
+- 线上 4 场景全 PASS：
+  - 场景 A: 100 SSE 连接 30min，0 断连，RSS 漂移 3.6% — 需 heartbeat + hard_limit 修复后才通过
+  - 场景 B: 100 并发 burst，100/100 成功，5xx=0, 429=0, SQLITE_BUSY=0
+  - 场景 C: 100 webhook burst（agchorus.com/webhook-stub），100/100 成功，p95=2044ms（公网边缘）
+  - 场景 D: 30 agents 30min soak，1799 msg，p95=292ms，SSE 0 断连，WAL 3.9MB 稳定
+- 备份验证：soak 后 800KB 一致性备份成功
+- SSE heartbeat：`inbox.ts` 每 20s 发 `:ping\n\n` 注释帧（修复 Fly proxy idle kill）
+- hard_limit：100→150，soft_limit：80→120（给 health/admin 留余量）
+- webhook-stub：`/webhook-stub` 路由 + auth 白名单（场景 C 零外部依赖）
+- 压测脚本健壮化：`withNetworkRetry` 包装 register/connectInbox，health 轮询 try-catch 降级
+- capacity-report.md 全量重写：本地+线上对照，带边界条件的发布结论
+- 限流恢复：`fly secrets unset` 恢复生产值 60/120，fly.toml 为唯一真相源
+- 测试 agents 清理：100 个 loadtest-a* 全部 DELETE
+- 双 Agent 通信测试（小V@微信 + 小X@Telegram）：
+  - 注册成功，hub 确认 message_delivered_sse
+  - 发现 3 个体验问题：(1) agent 不主动开 inbox (2) 收到消息不主动通知人类 (3) 跨语言不翻译
+  - 根因判定：SKILL.md 是被动知识，OpenClaw 缺少 Chorus 桥接插件
+- SKILL.md/SKILL.zh-CN.md 更新：注册+开 inbox 合为一个流程，接收消息必须立即主动告诉人类
+
+**决策**:
+- SSE heartbeat 20s 是最低保活频率——Fly proxy idle timeout 未公开，20s 安全
+- hard_limit 150 = 100 SSE + 50 余量，不能等于 MAX_AGENTS
+- 容量结论必须带边界条件，不可无条件声称"支持 100 并发"
+- webhook-stub 是压测辅助路由，压测完可删（当前保留）
+- 限流策略：fly.toml 是唯一真相源，secrets 仅用于临时覆盖
+- Agent 端体验问题不是 hub 能解决的——需要 OpenClaw 侧写 Chorus 桥接插件
+- SKILL.md 软约束有限，真正的解法是平台级硬桥接（后台 SSE 监听 + 主动推送到人类渠道）
+
+### 2026-03-23 01:00 — chorus-bridge 插件实现 + 运行验收进行中
+
+**操作**: 按 `docs/chorus-bridge-plugin-spec.md` v8 实现 OpenClaw chorus-bridge 插件，经 2 轮 Commander 代码审查 + 运行验收
+**结果**:
+- `~/.openclaw/extensions/chorus-bridge/index.ts` 新建（~760 行）：完整单路径实现
+- `~/.openclaw/extensions/chorus-bridge/package.json` + `openclaw.plugin.json` 新建
+- 跨插件 import 难题解决：jiti + `openclaw/plugin-sdk` alias，probe 3/3 模块 PASS
+- `~/.chorus/config.json` 从 `xiaox@chorus` 切到 `xiaov@openclaw`（找回历史 API key）
+- `plugins.allow` 加入 `chorus-bridge`，`openclaw.plugin.json` 补 `configSchema`
+- gateway restart 成功加载插件：probe OK → catch-up 17 rows → SSE connected agchorus.com
+- 代码审查 2 轮整改：(1) validateSSEPayload 改用共享 ChorusEnvelopeSchema.safeParse (2) discoverWeixinAgent 删除→resolveDeliveryTarget(agentName) (3) probe 补完整函数存在性检查
+- `api.registerHook` → `api.on("gateway_start")` 修复异步 hook 不触发问题
+- Map 同一性已验证：两个 jiti 实例共享同一 getContextToken 函数引用
+- 当前阻塞：contextToken 冷启动——gateway restart 清空进程 Map，需人类先发微信消息刷新后再触发投递
+
+**决策**:
+- jiti 是正确的跨插件 import 方案——native `import()` 无法处理 `.js`→`.ts` ESM 重映射
+- `api.on()` 替代 `api.registerHook()` 用于 async 的 gateway_start hook
+- CHORUS_PROJECT 硬编码为 `/Volumes/XDISK/chorus`（spike 接受，后续收掉）
+- contextToken 冷启动是已知限制（spec P1 blocker），不是代码 bug
+- Commander 手动添加了 `AGENT_CULTURE_MAP` 常量（spike hardcoded receiver culture preferences）
+
+### 2026-03-23 02:00 — chorus-bridge 最终收口
+
+**操作**: 完成 bridge 最终 runtime 验收与文档收口，确认不再存在运行级阻塞项
+**结果**:
+- 文档线 PASS：`docs/chorus-bridge-plugin-spec.md` + `docs/chorus-bridge-acceptance.md` 继续作为实现/验收基线
+- Hub invite gating PASS：`/register` 保留最小 `invite_code` gating，未恢复 ownership guard、`ERR_AGENT_EXISTS` 或 `/webhook-stub`
+- bridge 实现 PASS：`~/.openclaw/extensions/chorus-bridge/index.ts` 载荷中显式加入接收侧语言约束与 `must_adapt`
+- runtime live path PASS：新消息从 `xiaox@chorus` 到 `xiaov@openclaw` 成功送达微信，history 写入 `dir:"inbound"`，seen 更新
+- startup backlog drain PASS：重启后的 Phase 3 `retryPending` 在 token 可用时清空 9 条历史 pending
+- auto-drain path PASS：新消息成功投递后自动触发 `auto-drain scheduled`，`retrying 3 pending`，`retry: 3/3 succeeded`
+- translation gate PASS：微信侧实际收到中文转述，不是英文原样直出
+- 后续会话只剩文档收尾，不再把 bridge 视为运行阻塞项
+
+**决策**:
+- bridge 结论从 `CONDITIONAL` 收束为 `PASS`
+- runtime 验证以真实微信显示、`history`、`seen.json`、`inbox` 和日志五路证据为准
+- 不再重开 contextToken 冷启动、auto-drain 是否生效、英文是否会原样直出的旧争议
+- 后续只做文档同步，不再继续改 bridge 核心实现
+
+### 2026-03-23 18:00 — 术语统一：human → user（受控范围）
+
+**操作**: 跨 20 个英文/通用文件执行 "human" → "user" 术语统一，后根据 Commander 整改清单精确回退
+**结果**:
+- 第一轮：全面替换 human → user（20 文件，~120 处）
+- Commander 整改：建立判定规则，回退过度扩散的改动
+- 最终保留：仅"明确终端用户语境"（your user / its user / the user = agent 服务的那个人）
+- 已回退：human-visible / human-facing / Human-visible 全部恢复（技术/发布术语冻结）
+- 已回退：bridge 层全部注释/日志/prompt 恢复原词（与变量名 humanText 保持一致）
+- 已回退：TRANSPORT.md L123 "agents' users" → "agents' people"
+- 已回退：linkedin "manual corrections" → "human corrections"
+- 已回退：release-0.4.0 "external developer" → "external human developer"
+- 已回退：github-release-package 中的 "user says" / "reported to user" 恢复 human
+
+**决策**:
+- 术语边界不是 human vs machine（物种），而是 user-facing vs chorus-facing（audience / route boundary）
+- human-visible / human-facing / human-readable / human corrections / human intervention → 冻结为技术术语，不做机械替换
+- 快速判定规则：能替换成"这个 agent 的服务对象"且语义不变 → 用 user；否则保留 human
+- bridge 代码变量名（humanText, diagnoseHumanText）→ 未动，等后续单开任务整套重命名
+- 中文对应词：human=终端用户时 → 用户；human=可见/可读/非静默时 → 人可见 / 可见
+
+### 2026-03-23 19:00 — 3号：中文文件术语执行明细
+
+**操作**: 按两轨规则执行 3号 管辖的 7 个中文文件
+**结果**:
+- SKILL.zh-CN.md source: 31 处 "人类"→"用户"（全部为第 1 轨：终端用户）
+- SKILL.zh-CN.md npm template: 28 处（同步 source）
+- PROTOCOL.zh-CN.md ×2: "人类可读"→"便于阅读的"（第 2 轨：可读性）
+- README.md 中文段: 3 处（"告诉用户"/"另一位用户"/"用户看 HTML"）
+- launch-kit 中文段: "人类可见"→"人可见" ×3 + "转告用户" ×1
+- launch-announcement 中文段: "人类可见"→"人可见" ×1
+- 初次误判：PROTOCOL "人类可读"→"用户可读"（收窄语义），已回退为"便于阅读的"
+- 初次误判：launch-kit/announcement "人类可见"→"用户可见"，已回退为"人可见"
+
+### 2026-03-23 05:00–06:10 — 1号：Bridge 运行验证 + Hub store-and-forward + Session isolation 回归
+
+**操作**: Chorus bridge 多轮实测验证，含 Hub 新功能实现 + bridge 架构缺陷发现
+**结果**:
+- Hub store-and-forward 实现完成：offline receiver → HTTP 202 queued → poll retrieval。DB v2→v3 migration（CHECK constraint 加 'queued'）。新增 `recordQueued()` + `messages_queued` stat。268→273 tests, 80.7% coverage
+- xiaox 全套设定文件转英文（SOUL/IDENTITY/AGENTS/TOOLS/USER/HEARTBEAT/MEMORY.md）
+- xiaox 中文记忆/心跳/日记转移到 `_zh-archive/`，替换为空英文版
+- Bridge session isolation 验证（4号修复后）：chorus session key `chorus:xiaox:xiaov@openclaw` 与 human session `agent:xiaox:main` 隔离 PASS
+- User session clean after chorus: Owen "hi" → 纯英文回复，无 `[chorus_reply]` PASS
+- Self-send filter: xiaov 不再处理自己发出的 chorus 消息 PASS
+- Agent context matches config: xiaox `[context]` 日志 culture=en lang=en mustAdapt=true PASS
+- 反向链路 xiaox→xiaov: FAIL — Hub 返回 delivered_sse，bridge SSE listener 收到并存入 inbox，但 processMessage 未执行。根因：gateway jiti 缓存未加载 05:57 版代码（零条 [sse-recv] 日志）
+
+**决策**:
+- 截图解读修正：05:45 Telegram 中文消息 ≠ xiaov 原文泄漏到 Telegram。正确理解：一条是 chorus 入站回复，一条是 xiaov→user 的正常微信内容
+- Session isolation 设计：chorus 入站必须用独立 session key，不能与人类通道共用主会话（防止 reply_format 指令持续污染后续 turn）
+- Hub SSE push 可靠性待查：Hub 标记 delivered_sse 但 bridge client 未消费的场景已出现 2 次（e89196f2, de3a2828）
+
+### 2026-03-23 22:00 — 4号：Receive Chain Observability（收件链路全链路 trace 日志）
+
+**操作**: 针对 xiaox→xiaov 反向链路 FAIL（Hub delivered_sse 但 bridge 无处理日志），为收件链路每个决策点加 trace 级日志
+**结果**:
+- SSE 路径 6 个 trace 点：`[sse-recv] event received` / `validation failed` / `already seen` / `saving to inbox` / `processMessage returned false` / `JSON parse error`
+- catch-up 路径 6 个 trace 点：`[catch-up] row` / `skip receiver` / `already seen` / `validation failed` / `saving to inbox` / `processMessage returned false`
+- `validateSSEPayload` 3 个失败分支：`not an object` / `missing trace_id` / `missing sender_id` / `invalid envelope`
+- `processMessage` 入口 `[process] START` + 7 个 FAIL reason + `[process] SUCCESS`
+- SSE 建连日志增加 `agent_id`（可区分 xiaov 和 xiaox 的 SSE 连接）
+- 全部 91 bridge tests + 29 CLI tests 通过
+- Template synced to package
+
+**决策**:
+- 断点需 live 日志定位：如果下次运行没有 `[sse-recv] event received` → SSE 连接本身有问题；有 recv 但没 START → 被某个过滤器拦截；有 START 但有 FAIL → reason 字段直接告诉哪个 pre-check 挂了

@@ -11,7 +11,7 @@ A step-by-step walkthrough: register an agent, send a message, receive a message
 
 ## Mental Model
 
-A Chorus server relays envelopes between agents. Agents register with the server (announcing their receive endpoint), then send envelopes addressed to other agents. The server looks up the receiver and POSTs the envelope to their endpoint. Envelopes carry the original message plus cultural context — the receiver adapts (not just translates) the message for its human.
+A Chorus server relays envelopes between agents. Agents register with the server (announcing their receive endpoint), then send envelopes addressed to other agents. The server looks up the receiver and POSTs the envelope to their endpoint. Envelopes carry the original message plus cultural context — the receiver adapts (not just translates) the message for its user.
 
 ## Step 1: Start the Server
 

@@ -2,6 +2,8 @@
 
 Chorus is an agent-to-agent communication protocol. An agent loads `SKILL.md` and learns how to send and receive messages across platforms, languages, and cultures.
 
+Autonomous agent-to-agent conversation is allowed, but every autonomous send and every received reply should be relayed to the user through the current channel in a natural way. Do not keep a silent side conversation and summarize it much later.
+
 ## Quick Start
 
 ### 1. Load the Skill
@@ -25,7 +27,7 @@ And delivers it through a Chorus server or directly to the receiver.
 
 ### 3. Receive and adapt
 
-When a message arrives from another agent, your agent validates the envelope, adapts the message for its human (translating language and bridging cultural context as needed), and responds with `{"status": "ok"}`.
+When a message arrives from another agent, your agent validates the envelope, adapts the message for its user (translating language and bridging cultural context as needed), and responds with `{"status": "ok"}`.
 
 ## Connecting to a Server
 
@@ -36,6 +38,8 @@ To connect via a Chorus server (see `TRANSPORT.md`):
 3. **Send** — post your envelope with the receiver's address
 
 Agents can also exchange envelopes directly (P2P) without a server.
+
+If an agent acts autonomously, it still remains human-visible: each turn should be reflected back to the user promptly, with the peer, the message, and the adapted meaning.
 
 ## Files
 
@@ -52,4 +56,5 @@ Agents can also exchange envelopes directly (P2P) without a server.
 - **Transport-agnostic**: the envelope can travel over any channel
 - **Model-agnostic**: any LLM that handles multilingual text works
 - **No personality in the protocol**: how your agent speaks is its own business
+- **Human-visible autonomy**: autonomous conversations are allowed, but every turn should still be relayed naturally to the user
 - **Pre-1.0**: backwards compatibility is not guaranteed until 1.0

@@ -10,6 +10,7 @@ primary_region = "sjc"
   CHORUS_MAX_BODY_BYTES = "65536"
   CHORUS_RATE_LIMIT_PER_MIN = "60"
   CHORUS_RATE_LIMIT_PER_KEY_MIN = "120"
+  CHORUS_DB_PATH = "/data/chorus.db"
 
 [http_service]
   internal_port = 3000
@@ -21,8 +22,8 @@ primary_region = "sjc"
 
   [http_service.concurrency]
     type = "connections"
-    hard_limit = 100
-    soft_limit = 80
+    hard_limit = 150
+    soft_limit = 120
 
 [[http_service.checks]]
   grace_period = "10s"
@@ -31,6 +32,10 @@ primary_region = "sjc"
   path = "/health"
   timeout = "5s"
 
+[mounts]
+  source = "chorus_data"
+  destination = "/data"
+
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = "256mb"
+  size = "shared-cpu-2x"
+  memory = "2048mb"

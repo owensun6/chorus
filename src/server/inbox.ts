@@ -13,10 +13,25 @@ interface InboxManager {
   readonly deliver: (agentId: string, data: Record<string, unknown>) => boolean;
   readonly isConnected: (agentId: string) => boolean;
   readonly getConnectionCount: () => number;
+  readonly shutdown: () => void;
 }
+
+const HEARTBEAT_INTERVAL_MS = 20_000;
+const HEARTBEAT_FRAME = SSE_ENCODER.encode(":ping\n\n");
 
 const createInboxManager = (): InboxManager => {
   const connections = new Map<string, InboxConnection>();
+
+  const heartbeatTimer = setInterval(() => {
+    for (const [agentId, conn] of connections) {
+      try {
+        conn.controller.enqueue(HEARTBEAT_FRAME);
+      } catch {
+        connections.delete(agentId);
+      }
+    }
+  }, HEARTBEAT_INTERVAL_MS);
+  heartbeatTimer.unref();
 
   const connect = (agentId: string, controller: ReadableStreamDefaultController): void => {
     const existing = connections.get(agentId);
@@ -55,7 +70,15 @@ const createInboxManager = (): InboxManager => {
 
   const getConnectionCount = (): number => connections.size;
 
-  return { connect, disconnect, deliver, isConnected, getConnectionCount };
+  const shutdown = (): void => {
+    clearInterval(heartbeatTimer);
+    for (const [, conn] of connections) {
+      try { conn.controller.close(); } catch { /* already closed */ }
+    }
+    connections.clear();
+  };
+
+  return { connect, disconnect, deliver, isConnected, getConnectionCount, shutdown };
 };
 
 export { createInboxManager };

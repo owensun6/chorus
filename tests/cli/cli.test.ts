@@ -6,6 +6,18 @@ import { tmpdir } from "os";
 
 const CLI_PATH = join(__dirname, "../../packages/chorus-skill/cli.mjs");
 
+// Derive bridge file list from CLI source — single source of truth.
+// If cli.mjs changes BRIDGE_REQUIRED_FILES, this test automatically follows.
+const BRIDGE_REQUIRED_FILES: string[] = (() => {
+  const src = readFileSync(CLI_PATH, "utf8");
+  const match = src.match(/const BRIDGE_REQUIRED_FILES\s*=\s*\[([\s\S]*?)\]/);
+  if (!match) throw new Error("Cannot find BRIDGE_REQUIRED_FILES in cli.mjs — test source derivation broken");
+  return match[1]
+    .split(",")
+    .map((s) => s.replace(/["\s]/g, ""))
+    .filter(Boolean);
+})();
+
 const run = (
   args: string[],
   opts: { env?: Record<string, string>; cwd?: string } = {},
@@ -62,7 +74,7 @@ describe("CLI: chorus-skill", () => {
     it("creates skill files in cwd/chorus", () => {
       const { stdout, exitCode } = run(["init", "--target", "local"], { cwd: tmpBase });
       expect(exitCode).toBe(0);
-      expect(stdout).toContain("Files installed");
+      expect(stdout).toContain("Skill installed");
 
       const targetDir = join(tmpBase, "chorus");
       expect(existsSync(join(targetDir, "SKILL.md"))).toBe(true);
@@ -103,11 +115,43 @@ describe("CLI: chorus-skill", () => {
       );
       expect(exitCode).toBe(1);
       expect(stderr).toContain("OpenClaw config not found");
-      expect(stderr).toContain("files were NOT written");
 
       // Verify no orphan files were left behind
       const skillDir = join(fakeHome, ".openclaw", "skills", "chorus");
       expect(existsSync(skillDir)).toBe(false);
+    });
+  });
+
+  describe("init --target openclaw (corrupt config)", () => {
+    const fakeHome = join(tmpdir(), "chorus-cli-corrupt-" + process.pid);
+
+    beforeAll(() => {
+      mkdirSync(join(fakeHome, ".openclaw"), { recursive: true });
+      writeFileSync(join(fakeHome, ".openclaw", "openclaw.json"), "NOT VALID JSON{{{");
+    });
+
+    afterAll(() => {
+      rmSync(fakeHome, { recursive: true, force: true });
+    });
+
+    it("exits 1 and rolls back skill + bridge when openclaw.json is corrupt", () => {
+      const { stderr, exitCode } = run(
+        ["init", "--target", "openclaw"],
+        { env: { HOME: fakeHome } },
+      );
+      expect(exitCode).toBe(1);
+      expect(stderr).toContain("Registration error");
+      expect(stderr).toContain("Rolled back");
+
+      // Verify rollback: no orphan skill or bridge dirs
+      const skillDir = join(fakeHome, ".openclaw", "skills", "chorus");
+      const bridgeDir = join(fakeHome, ".openclaw", "extensions", "chorus-bridge");
+      expect(existsSync(skillDir)).toBe(false);
+      expect(existsSync(bridgeDir)).toBe(false);
+
+      // openclaw.json must be untouched (still corrupt, not overwritten)
+      const content = readFileSync(join(fakeHome, ".openclaw", "openclaw.json"), "utf8");
+      expect(content).toBe("NOT VALID JSON{{{");
     });
   });
 
@@ -124,24 +168,33 @@ describe("CLI: chorus-skill", () => {
       rmSync(fakeHome, { recursive: true, force: true });
     });
 
-    it("succeeds and writes files + registers in openclaw.json", () => {
+    it("succeeds and writes skill + bridge + registers both in openclaw.json", () => {
       const { stdout, exitCode } = run(
         ["init", "--target", "openclaw"],
         { env: { HOME: fakeHome } },
       );
       expect(exitCode).toBe(0);
-      expect(stdout).toContain("Files installed");
-      expect(stdout).toContain("Registered in");
+      expect(stdout).toContain("Skill installed");
+      expect(stdout).toContain("Bridge installed");
+      expect(stdout).toContain("Registered skill + bridge");
 
-      // Verify files exist
+      // Verify skill files exist
       const skillDir = join(fakeHome, ".openclaw", "skills", "chorus");
       expect(existsSync(join(skillDir, "SKILL.md"))).toBe(true);
       expect(existsSync(join(skillDir, "PROTOCOL.md"))).toBe(true);
       expect(existsSync(join(skillDir, "envelope.schema.json"))).toBe(true);
 
+      // Verify complete bridge file set — list derived from cli.mjs, not hand-copied
+      const bridgeDir = join(fakeHome, ".openclaw", "extensions", "chorus-bridge");
+      for (const file of BRIDGE_REQUIRED_FILES) {
+        expect(existsSync(join(bridgeDir, file))).toBe(true);
+      }
+
       // Verify registration in config
       const config = JSON.parse(readFileSync(join(configDir, "openclaw.json"), "utf8"));
       expect(config.skills.entries.chorus.enabled).toBe(true);
+      expect(config.plugins.entries["chorus-bridge"].enabled).toBe(true);
+      expect(config.plugins.allow).toContain("chorus-bridge");
     });
   });
 
@@ -168,7 +221,7 @@ describe("CLI: chorus-skill", () => {
       }
     });
 
-    it("succeeds for a valid openclaw installation", () => {
+    it("succeeds for a valid openclaw installation (skill + bridge)", () => {
       const fakeHome = join(tmpdir(), "chorus-cli-verifyok-" + process.pid);
       const configDir = join(fakeHome, ".openclaw");
       mkdirSync(configDir, { recursive: true });
@@ -189,8 +242,90 @@ describe("CLI: chorus-skill", () => {
         );
         expect(exitCode).toBe(0);
         expect(stdout).toContain("SKILL.md exists");
-        expect(stdout).toContain("chorus registered and enabled");
-        expect(stdout).toContain("Installation verified");
+        expect(stdout).toContain("chorus-bridge complete");
+        expect(stdout).toContain("chorus skill enabled");
+        expect(stdout).toContain("chorus-bridge plugin enabled");
+        expect(stdout).toContain("Files installed");
+      } finally {
+        rmSync(fakeHome, { recursive: true, force: true });
+      }
+    });
+
+    it("fails when bridge directory is missing", () => {
+      const fakeHome = join(tmpdir(), "chorus-cli-vnobridge-" + process.pid);
+      const configDir = join(fakeHome, ".openclaw");
+      mkdirSync(configDir, { recursive: true });
+      writeFileSync(join(configDir, "openclaw.json"), JSON.stringify({ skills: {} }));
+
+      try {
+        // Init to get everything
+        run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+
+        // Delete bridge directory to simulate partial install
+        const bridgeDir = join(fakeHome, ".openclaw", "extensions", "chorus-bridge");
+        rmSync(bridgeDir, { recursive: true });
+
+        // Verify should fail on missing bridge
+        const { stderr, exitCode } = run(
+          ["verify", "--target", "openclaw"],
+          { env: { HOME: fakeHome } },
+        );
+        expect(exitCode).toBe(1);
+        expect(stderr).toContain("chorus-bridge not found");
+      } finally {
+        rmSync(fakeHome, { recursive: true, force: true });
+      }
+    });
+
+    it.each(BRIDGE_REQUIRED_FILES)(
+      "verify fails with full error when bridge file %s is missing",
+      (missingFile) => {
+        const fakeHome = join(tmpdir(), `chorus-cli-vmiss-${missingFile}-${process.pid}`);
+        const configDir = join(fakeHome, ".openclaw");
+        mkdirSync(configDir, { recursive: true });
+        writeFileSync(join(configDir, "openclaw.json"), JSON.stringify({ skills: {} }));
+
+        try {
+          run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+
+          // Delete exactly one bridge file
+          const bridgeDir = join(fakeHome, ".openclaw", "extensions", "chorus-bridge");
+          rmSync(join(bridgeDir, missingFile));
+
+          const { stderr, exitCode } = run(
+            ["verify", "--target", "openclaw"],
+            { env: { HOME: fakeHome } },
+          );
+
+          // Three assertions per missing file — no partial coverage
+          expect(exitCode).toBe(1);
+          expect(stderr).toContain(`chorus-bridge incomplete — missing: ${missingFile}`);
+          expect(stderr).toContain(
+            "npx @chorus-protocol/skill uninstall --target openclaw && npx @chorus-protocol/skill init --target openclaw",
+          );
+        } finally {
+          rmSync(fakeHome, { recursive: true, force: true });
+        }
+      },
+    );
+  });
+
+  describe("init --target openclaw (no openclaw.json → fail fast, no half-install)", () => {
+    it("leaves no skill or bridge files when openclaw.json is absent", () => {
+      const fakeHome = join(tmpdir(), "chorus-cli-failfast-" + process.pid);
+      mkdirSync(fakeHome, { recursive: true });
+
+      try {
+        const { stderr, exitCode } = run(
+          ["init", "--target", "openclaw"],
+          { env: { HOME: fakeHome } },
+        );
+        expect(exitCode).toBe(1);
+        expect(stderr).toContain("OpenClaw config not found");
+
+        // Neither skill nor bridge should exist
+        expect(existsSync(join(fakeHome, ".openclaw", "skills", "chorus"))).toBe(false);
+        expect(existsSync(join(fakeHome, ".openclaw", "extensions", "chorus-bridge"))).toBe(false);
       } finally {
         rmSync(fakeHome, { recursive: true, force: true });
       }
@@ -303,7 +438,7 @@ describe("CLI: chorus-skill", () => {
   });
 
   describe("uninstall --target openclaw", () => {
-    it("removes files and unregisters from openclaw.json", () => {
+    it("removes skill + bridge and unregisters both from openclaw.json", () => {
       const fakeHome = join(tmpdir(), "chorus-cli-uninst-" + process.pid);
       const configDir = join(fakeHome, ".openclaw");
       mkdirSync(configDir, { recursive: true });
@@ -316,7 +451,9 @@ describe("CLI: chorus-skill", () => {
           { env: { HOME: fakeHome } },
         );
         const skillDir = join(fakeHome, ".openclaw", "skills", "chorus");
+        const bridgeDir = join(fakeHome, ".openclaw", "extensions", "chorus-bridge");
         expect(existsSync(skillDir)).toBe(true);
+        expect(existsSync(bridgeDir)).toBe(true);
 
         // Then uninstall
         const { stdout, exitCode } = run(
@@ -326,10 +463,12 @@ describe("CLI: chorus-skill", () => {
         expect(exitCode).toBe(0);
         expect(stdout).toContain("Removed");
         expect(existsSync(skillDir)).toBe(false);
+        expect(existsSync(bridgeDir)).toBe(false);
 
-        // Verify unregistered
+        // Verify both unregistered
         const config = JSON.parse(readFileSync(join(configDir, "openclaw.json"), "utf8"));
         expect(config.skills?.entries?.chorus).toBeUndefined();
+        expect(config.plugins?.entries?.["chorus-bridge"]).toBeUndefined();
       } finally {
         rmSync(fakeHome, { recursive: true, force: true });
       }

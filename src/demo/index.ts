@@ -4,6 +4,7 @@
 import { serve } from "@hono/node-server";
 import { createApp } from "../server/routes";
 import { AgentRegistry } from "../server/registry";
+import { initDb } from "../server/db";
 import { startAgent } from "../agent/index";
 import { createWebServer } from "./web";
 import { execFile } from "child_process";
@@ -51,7 +52,8 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
   const routerUrl = `http://localhost:${routerPort}`;
 
   // Step 1: Start routing server
-  const registry = new AgentRegistry();
+  const db = initDb(":memory:");
+  const registry = new AgentRegistry(db);
   const routerApp = createApp(registry);
   const routerServer = serve({ fetch: routerApp.fetch, port: routerPort });
   log("demo", `Router started on :${routerPort}`);
@@ -156,6 +158,7 @@ const startDemo = async (webPort: number = DEFAULT_CONFIG.webPort): Promise<Demo
 
     webServer.close();
     routerServer.close();
+    db.close();
     log("demo", "All servers closed");
   };
 

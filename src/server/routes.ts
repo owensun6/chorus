@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { randomUUID } from "crypto";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import { AgentRegistry } from "./registry";
+import { AgentRegistry, hashKey } from "./registry";
 import { RegisterAgentBodySchema, SelfRegisterBodySchema, MessagePayloadBodySchema } from "./validation";
 import { successResponse, errorResponse, formatZodErrors } from "../shared/response";
 import { formatSSE, singleSSEStream, SSE_ENCODER } from "../shared/sse";
@@ -56,7 +56,7 @@ const createApp = (
 ): Hono => {
   const app = new Hono();
 
-  // --- Self-Registration (no auth required) ---
+  // --- Self-Registration (no auth required for first-time; owner key required for rotation) ---
 
   app.post("/register", async (c) => {
     const body = await c.req.json().catch(() => null);
@@ -73,14 +73,33 @@ const createApp = (
       return c.json(errorResponse("ERR_VALIDATION", message), 400);
     }
 
-    const { agent_id, agent_card, endpoint } = parsed.data;
-    const result = registry.registerSelf(agent_id, agent_card, endpoint);
+    const { agent_id, agent_card, endpoint, invite_code } = parsed.data;
 
-    if (result === null) {
-      return c.json(
-        errorResponse("ERR_REGISTRY_FULL", "Agent registry is full."),
-        429
-      );
+    // Extract bearer token for ownership-verified rotation
+    const authHeader = c.req.header("Authorization") ?? "";
+    const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : undefined;
+    const currentKeyHash = bearerToken ? hashKey(bearerToken) : undefined;
+
+    const result = registry.registerSelf(agent_id, agent_card, endpoint, invite_code, currentKeyHash);
+
+    if (!result.ok) {
+      if (result.error === "registry_full") {
+        return c.json(errorResponse("ERR_REGISTRY_FULL", "Agent registry is full."), 429);
+      }
+      if (result.error === "agent_id_taken") {
+        return c.json(errorResponse("ERR_AGENT_ID_TAKEN", "agent_id already registered. Provide current API key via Authorization header to rotate."), 409);
+      }
+      if (result.error === "invite_revoked") {
+        return c.json(errorResponse("ERR_INVITE_REVOKED", "Invite code has been revoked."), 403);
+      }
+      if (result.error === "invite_exhausted") {
+        return c.json(errorResponse("ERR_INVITE_EXHAUSTED", "Invite code has reached its usage limit."), 403);
+      }
+      if (result.error === "invite_expired") {
+        return c.json(errorResponse("ERR_INVITE_EXPIRED", "Invite code has expired."), 403);
+      }
+      // invite_required, invite_invalid
+      return c.json(errorResponse("ERR_INVITE_REQUIRED", "Valid invite_code is required for self-registration."), 403);
     }
 
     if (activity) {
@@ -91,11 +110,12 @@ const createApp = (
       });
     }
 
+    const status = result.created ? 201 : 200;
     return c.json(successResponse({
       agent_id: result.registration.agent_id,
       api_key: result.api_key,
       registration: result.registration,
-    }), 201);
+    }), status);
   });
 
   // --- Operator-Managed Registration (auth required) ---
@@ -395,19 +415,24 @@ const createApp = (
       }
     }
 
-    // Priority 2: Webhook forwarding (requires endpoint)
+    // Priority 2: No SSE and no endpoint — queue for poll-based retrieval
     if (!target.endpoint) {
-      registry.recordFailure();
+      if (messageStore) {
+        messageStore.append({ trace_id: traceId, sender_id: envelope.sender_id, receiver_id, envelope, delivered_via: "queued" });
+      }
+      registry.recordQueued();
       if (activity) {
-        activity.append("message_failed", {
+        activity.append("message_queued", {
           trace_id: traceId,
+          sender_id: envelope.sender_id,
           receiver_id,
-          error: "Receiver has no endpoint and no active inbox connection",
+          original_text: envelope.original_text,
+          sender_culture: envelope.sender_culture,
         });
       }
       return c.json(
-        errorResponse("ERR_AGENT_UNREACHABLE", "Receiver has no endpoint and no active inbox connection"),
-        502
+        successResponse({ delivery: "queued", trace_id: traceId }),
+        202
       );
     }
 
@@ -525,8 +550,10 @@ const createApp = (
         status: "ok",
         version: "0.7.0-alpha",
         uptime_seconds: Math.floor(process.uptime()),
+        invite_gating: registry.hasInviteCodes(),
         agents_registered: stats.agents_registered,
         messages_delivered: stats.messages_delivered,
+        messages_queued: stats.messages_queued,
         messages_failed: stats.messages_failed,
         inbox_connections: inbox?.getConnectionCount() ?? 0,
         messages_stored: messageStore?.getStats().total_stored ?? 0,

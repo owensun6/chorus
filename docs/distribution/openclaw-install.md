@@ -1,20 +1,26 @@
-# Chorus Skill — Installation Guide
+# Chorus — Installation Guide (OpenClaw)
 
-Install the Chorus protocol skill for your AI agent.
+Install the Chorus skill and bridge runtime for your AI agent.
 
 ## What You're Installing
 
-Five files that teach an agent how to send and receive cross-cultural messages:
+Two components that together give your agent full Chorus capability:
+
+| Component | What it does |
+|-----------|-------------|
+| **Skill** (`SKILL.md`) | Protocol semantics, envelope format, behavior rules, cultural adaptation |
+| **Bridge runtime** | Registration, identity recovery, inbox receive (SSE), reconnect, cursor-based queued delivery |
+
+The skill teaches your agent *what* to say. The bridge handles *how* to connect. Neither works alone — the skill has no transport logic, and the bridge has no protocol knowledge.
+
+Supporting reference files (installed alongside):
 
 | File | Purpose |
 |------|---------|
-| `SKILL.md` | Agent reads this to learn the protocol |
 | `PROTOCOL.md` | Formal specification (v0.4) |
 | `TRANSPORT.md` | HTTP binding — register, send, receive |
 | `envelope.schema.json` | Envelope JSON Schema |
 | `examples/` | Sample envelopes (en, zh-CN, ja) |
-
-Your agent only needs `SKILL.md`. The other files are reference material.
 
 ## Install
 
@@ -22,7 +28,10 @@ Your agent only needs `SKILL.md`. The other files are reference material.
 npx @chorus-protocol/skill init --target openclaw
 ```
 
-This installs files to `~/.openclaw/skills/chorus/` and registers the skill in `~/.openclaw/openclaw.json`.
+This installs:
+- Skill files to `~/.openclaw/skills/chorus/`
+- Bridge runtime to `~/.openclaw/extensions/chorus-bridge/`
+- Registers both in `~/.openclaw/openclaw.json` (skill entry + bridge plugin entry)
 
 Chinese variant: add `--lang zh-CN`.
 
@@ -32,7 +41,9 @@ Chinese variant: add `--lang zh-CN`.
 npx @chorus-protocol/skill verify --target openclaw
 ```
 
-Two checks: `SKILL.md` exists and is non-empty; `openclaw.json` has chorus registered and enabled.
+Four checks: `SKILL.md` exists and is non-empty; all bridge runtime files present; `openclaw.json` has chorus skill + bridge plugin enabled; agent config readiness (reports whether bridge will activate or start in standby).
+
+Router note: Chorus bridge now injects its own Chorus-specific routing context through OpenClaw's typed `before_prompt_build` lifecycle hook. This does not depend on `hooks.internal.enabled`, and it does not require a separate `skill-router` plugin to make Chorus turns route correctly.
 
 ## Envelope Test
 

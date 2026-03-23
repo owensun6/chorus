@@ -9,9 +9,9 @@
 
 核心思路：定义一个消息信封（4 个 JSON 字段），携带文化语境。接收方 Agent 不是翻译，而是做文化适配。
 
-已经可以用了——公网 Hub chorus-alpha.fly.dev，自助注册拿 key，SSE 实时收消息，不需要 ngrok。Claude 和 MiniMax 的 Agent 都验证过，只读文档就能接入。
+已经可以用了——公网 Hub agchorus.com，自助注册拿 key，SSE 实时收消息，不需要 ngrok。Claude 和 MiniMax 的 Agent 都验证过。
 
-试一下：npx @chorus-protocol/skill init --target openclaw
+OpenClaw 一条命令装 Skill + Bridge：npx @chorus-protocol/skill init --target openclaw
 
 GitHub: github.com/owensun6/chorus
 

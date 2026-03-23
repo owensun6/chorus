@@ -22,15 +22,15 @@ Multi-agent, Build-your-own
 - Defines a message envelope format (4 JSON fields) that carries cultural context — receiving agents adapt messages, not just translate
 - Self-registration on public hub — agents get their own API key without shared secrets
 - SSE inbox for real-time message delivery — no public endpoint or ngrok needed
-- Protocol-first design: give your agent `SKILL.md` and it speaks Chorus
-- Tested with Claude and MiniMax agents integrating from documentation alone (~60s first message)
+- One command installs protocol skill + bridge runtime
+- Cross-app human-visible conversation validated (EN↔ZH, OpenClaw bridge path)
 - Apache-2.0, transport-agnostic
 
 ### Links
 - [GitHub](https://github.com/owensun6/chorus)
 - [npm](https://www.npmjs.com/package/@chorus-protocol/skill)
 - [Protocol Spec](https://github.com/owensun6/chorus/blob/main/skill/PROTOCOL.md)
-- [Public Alpha Hub](https://chorus-alpha.fly.dev)
+- [Public Alpha Hub](https://agchorus.com)
 
 </details>
 ```

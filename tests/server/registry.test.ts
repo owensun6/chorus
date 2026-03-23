@@ -1,6 +1,7 @@
 // Author: be-api-router
 import { AgentRegistry } from "../../src/server/registry";
-import type { AgentRegistration } from "../../src/shared/types";
+import { createTestDb } from "../helpers/test-db";
+import type Database from "better-sqlite3";
 
 describe("AgentRegistry", () => {
   const validCard = {
@@ -12,10 +13,16 @@ describe("AgentRegistry", () => {
   const agentId = "agent-alpha";
   const endpoint = "https://alpha.example.com/a2a";
 
+  let db: Database.Database;
   let registry: AgentRegistry;
 
   beforeEach(() => {
-    registry = new AgentRegistry();
+    db = createTestDb();
+    registry = new AgentRegistry(db);
+  });
+
+  afterEach(() => {
+    db.close();
   });
 
   it("registers a new agent and returns AgentRegistration", () => {
@@ -98,7 +105,7 @@ describe("AgentRegistry", () => {
 
   describe("max agent limit", () => {
     it("returns null when registry is full and agent_id is new", () => {
-      const small = new AgentRegistry(2);
+      const small = new AgentRegistry(db, 2);
       small.register("a1", "https://a1.example.com", validCard);
       small.register("a2", "https://a2.example.com", validCard);
 
@@ -107,7 +114,7 @@ describe("AgentRegistry", () => {
     });
 
     it("allows re-registration of existing agent when registry is full", () => {
-      const small = new AgentRegistry(2);
+      const small = new AgentRegistry(db, 2);
       small.register("a1", "https://a1.example.com", validCard);
       small.register("a2", "https://a2.example.com", validCard);
 
@@ -118,7 +125,7 @@ describe("AgentRegistry", () => {
     });
 
     it("allows registration after removing an agent from a full registry", () => {
-      const small = new AgentRegistry(2);
+      const small = new AgentRegistry(db, 2);
       small.register("a1", "https://a1.example.com", validCard);
       small.register("a2", "https://a2.example.com", validCard);
 
@@ -129,7 +136,7 @@ describe("AgentRegistry", () => {
     });
 
     it("defaults to maxAgents=100", () => {
-      const large = new AgentRegistry();
+      const large = new AgentRegistry(db);
       for (let i = 0; i < 100; i++) {
         const r = large.register(`a${i}`, `https://a${i}.example.com`, validCard);
         expect(r).not.toBeNull();
@@ -145,6 +152,7 @@ describe("AgentRegistry", () => {
       expect(stats).toEqual({
         agents_registered: 0,
         messages_delivered: 0,
+        messages_queued: 0,
         messages_failed: 0,
       });
     });

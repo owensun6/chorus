@@ -1,6 +1,11 @@
 // Author: be-api-router
 import { createApp } from "../../src/server/routes";
 import { AgentRegistry } from "../../src/server/registry";
+import { createActivityStream } from "../../src/server/activity";
+import { createInboxManager } from "../../src/server/inbox";
+import { createMessageStore } from "../../src/server/message-store";
+import { createTestDb } from "../helpers/test-db";
+import type Database from "better-sqlite3";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Json = any;
@@ -49,12 +54,14 @@ const validMessage = {
 };
 
 describe("POST /messages", () => {
+  let db: Database.Database;
   let app: ReturnType<typeof createApp>;
   let registry: AgentRegistry;
   let fetchSpy: jest.MockedFunction<typeof global.fetch>;
 
   beforeEach(() => {
-    registry = new AgentRegistry();
+    db = createTestDb();
+    registry = new AgentRegistry(db);
     registry.register(SENDER_AGENT.id, SENDER_AGENT.endpoint, SENDER_AGENT.card);
     registry.register(RECEIVER_AGENT.id, RECEIVER_AGENT.endpoint, RECEIVER_AGENT.card);
     app = createApp(registry);
@@ -65,6 +72,7 @@ describe("POST /messages", () => {
 
   afterEach(() => {
     fetchMock.mockClear();
+    db.close();
   });
 
   const postMessage = (body: unknown) =>
@@ -186,6 +194,171 @@ describe("POST /messages", () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// Store-and-forward: offline receiver gets queued delivery
+// ---------------------------------------------------------------------------
+
+describe("POST /messages (store-and-forward)", () => {
+  let db: Database.Database;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  afterEach(() => {
+    db.close();
+  });
+
+  const makeApp = () => {
+    const registry = new AgentRegistry(db);
+    const activity = createActivityStream(db);
+    const inbox = createInboxManager();
+    const messageStore = createMessageStore(db);
+    return { registry, activity, inbox, messageStore, app: createApp(registry, undefined, activity, inbox, messageStore) };
+  };
+
+  const registerAgent = async (app: ReturnType<typeof createApp>, agentId: string, card: object) => {
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: agentId, agent_card: card }),
+      headers: { "Content-Type": "application/json" },
+    });
+    const json = (await res.json()) as { data: { api_key: string } };
+    return json.data.api_key;
+  };
+
+  const CARD_EN = { card_version: "0.3", user_culture: "en", supported_languages: ["en"] };
+  const CARD_ZH = { card_version: "0.3", user_culture: "zh-CN", supported_languages: ["zh-CN"] };
+
+  it("queues message when receiver is offline (no SSE, no endpoint)", async () => {
+    const { app } = makeApp();
+    const senderKey = await registerAgent(app, "sender@hub", CARD_EN);
+    await registerAgent(app, "receiver@hub", CARD_ZH);
+
+    const res = await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: { chorus_version: "0.4", sender_id: "sender@hub", original_text: "Are you there?", sender_culture: "en" },
+      }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${senderKey}` },
+    });
+
+    expect(res.status).toBe(202);
+    const json: Json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.data.delivery).toBe("queued");
+    expect(json.data.trace_id).toBeDefined();
+  });
+
+  it("queued message is retrievable via GET /agent/messages", async () => {
+    const { app } = makeApp();
+    const senderKey = await registerAgent(app, "sender@hub", CARD_EN);
+    const receiverKey = await registerAgent(app, "receiver@hub", CARD_ZH);
+
+    // Send while receiver is offline
+    await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: { chorus_version: "0.4", sender_id: "sender@hub", original_text: "Queued hello", sender_culture: "en" },
+      }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${senderKey}` },
+    });
+
+    // Receiver polls
+    const pollRes = await app.request("/agent/messages", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${receiverKey}` },
+    });
+
+    expect(pollRes.status).toBe(200);
+    const json: Json = await pollRes.json();
+    expect(json.data.length).toBe(1);
+    expect(json.data[0].envelope.original_text).toBe("Queued hello");
+    expect(json.data[0].delivered_via).toBe("queued");
+  });
+
+  it("queued message is not re-delivered via SSE when receiver connects later", async () => {
+    const { app, inbox } = makeApp();
+    const senderKey = await registerAgent(app, "sender@hub", CARD_EN);
+    const receiverKey = await registerAgent(app, "receiver@hub", CARD_ZH);
+
+    // Send while offline → queued
+    const queueRes = await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: { chorus_version: "0.4", sender_id: "sender@hub", original_text: "First (queued)", sender_culture: "en" },
+      }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${senderKey}` },
+    });
+    const queuedTraceId = ((await queueRes.json()) as Json).data.trace_id;
+
+    // Receiver connects SSE (simulate by opening inbox)
+    const inboxRes = await app.request("/agent/inbox", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${receiverKey}` },
+    });
+    // Give SSE connection a moment to establish
+    await new Promise((r) => setTimeout(r, 50));
+
+    // Send a NEW message while receiver is online → should be delivered_sse
+    const liveRes = await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: { chorus_version: "0.4", sender_id: "sender@hub", original_text: "Second (live)", sender_culture: "en" },
+      }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${senderKey}` },
+    });
+
+    expect(liveRes.status).toBe(200);
+    const liveJson: Json = await liveRes.json();
+    expect(liveJson.data.delivery).toBe("delivered_sse");
+
+    // Poll: receiver sees both messages — queued + live, no duplicates
+    const pollRes = await app.request("/agent/messages", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${receiverKey}` },
+    });
+    const messages: Json = ((await pollRes.json()) as Json).data;
+    expect(messages.length).toBe(2);
+    expect(messages[0].delivered_via).toBe("queued");
+    expect(messages[0].trace_id).toBe(queuedTraceId);
+    expect(messages[1].delivered_via).toBe("sse");
+
+    // Clean up SSE stream
+    if (inboxRes.body) {
+      try { await inboxRes.body.cancel(); } catch { /* ignore */ }
+    }
+  });
+
+  it("sender also sees queued message in their own history", async () => {
+    const { app } = makeApp();
+    const senderKey = await registerAgent(app, "sender@hub", CARD_EN);
+    await registerAgent(app, "receiver@hub", CARD_ZH);
+
+    await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: { chorus_version: "0.4", sender_id: "sender@hub", original_text: "Check my outbox", sender_culture: "en" },
+      }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${senderKey}` },
+    });
+
+    const pollRes = await app.request("/agent/messages", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${senderKey}` },
+    });
+
+    const json: Json = await pollRes.json();
+    expect(json.data.length).toBe(1);
+    expect(json.data[0].envelope.original_text).toBe("Check my outbox");
+  });
+});
+
 describe("Server entry point (test_case_7)", () => {
   it("exports a valid app from index", async () => {
     const { app } = await import("../../src/server/index");
@@ -224,6 +397,7 @@ const makeMockSSEStream = (events: string): ReadableStream<Uint8Array> => {
 };
 
 describe("POST /messages (streaming)", () => {
+  let db: Database.Database;
   let app: ReturnType<typeof createApp>;
   let registry: AgentRegistry;
   let fetchSpy: jest.MockedFunction<typeof global.fetch>;
@@ -234,7 +408,8 @@ describe("POST /messages (streaming)", () => {
   };
 
   beforeEach(() => {
-    registry = new AgentRegistry();
+    db = createTestDb();
+    registry = new AgentRegistry(db);
     registry.register(SENDER_AGENT.id, SENDER_AGENT.endpoint, SENDER_AGENT.card);
     registry.register(RECEIVER_AGENT.id, RECEIVER_AGENT.endpoint, RECEIVER_AGENT.card);
     app = createApp(registry);
@@ -244,6 +419,7 @@ describe("POST /messages (streaming)", () => {
 
   afterEach(() => {
     fetchMock.mockClear();
+    db.close();
   });
 
   const postMessage = (body: unknown) =>

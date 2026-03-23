@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync, mkdirSync, writeFileSync, existsSync, cpSync } from "fs";
+import { readFileSync, mkdirSync, writeFileSync, existsSync, cpSync, rmSync, readdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { homedir } from "os";
@@ -11,6 +11,10 @@ const pkg = JSON.parse(readFileSync(join(__dirname, "package.json"), "utf8"));
 const LANGS = ["en", "zh-CN"];
 const DEFAULT_LANG = "en";
 const TARGETS = ["local", "openclaw", "claude-user", "claude-project"];
+
+const CHORUS_HOME = join(homedir(), ".chorus");
+const AGENTS_DIR = join(CHORUS_HOME, "agents");
+const CONFIG_PATH = join(CHORUS_HOME, "config.json");
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -25,6 +29,10 @@ function resolveTargetDir(target) {
   if (target === "claude-user") return join(homedir(), ".claude", "skills", "chorus");
   if (target === "claude-project") return join(process.cwd(), ".claude", "skills", "chorus");
   return join(process.cwd(), "chorus");
+}
+
+function resolveBridgeDir() {
+  return join(homedir(), ".openclaw", "extensions", "chorus-bridge");
 }
 
 function copySkillFiles(targetDir, lang) {
@@ -54,9 +62,21 @@ function registerOpenClaw() {
     return false;
   }
   const config = JSON.parse(readFileSync(configPath, "utf8"));
+
+  // Register skill
   if (!config.skills) config.skills = {};
   if (!config.skills.entries) config.skills.entries = {};
   config.skills.entries.chorus = { enabled: true };
+
+  // Register bridge plugin
+  if (!config.plugins) config.plugins = {};
+  if (!config.plugins.entries) config.plugins.entries = {};
+  config.plugins.entries["chorus-bridge"] = { enabled: true };
+  if (!config.plugins.allow) config.plugins.allow = [];
+  if (!config.plugins.allow.includes("chorus-bridge")) {
+    config.plugins.allow.push("chorus-bridge");
+  }
+
   writeFileSync(configPath, JSON.stringify(config, null, 4));
   return true;
 }
@@ -65,12 +85,85 @@ function unregisterOpenClaw() {
   const configPath = join(homedir(), ".openclaw", "openclaw.json");
   if (!existsSync(configPath)) return false;
   const config = JSON.parse(readFileSync(configPath, "utf8"));
+  let changed = false;
+
   if (config.skills?.entries?.chorus) {
     delete config.skills.entries.chorus;
-    writeFileSync(configPath, JSON.stringify(config, null, 4));
-    return true;
+    changed = true;
   }
-  return false;
+  if (config.plugins?.entries?.["chorus-bridge"]) {
+    delete config.plugins.entries["chorus-bridge"];
+    changed = true;
+  }
+  if (Array.isArray(config.plugins?.allow)) {
+    const idx = config.plugins.allow.indexOf("chorus-bridge");
+    if (idx !== -1) {
+      config.plugins.allow.splice(idx, 1);
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    writeFileSync(configPath, JSON.stringify(config, null, 4));
+  }
+  return changed;
+}
+
+const BRIDGE_REQUIRED_FILES = [
+  "index.ts",
+  "guard.ts",
+  "resolve.ts",
+  "relay.ts",
+  "openclaw.plugin.json",
+  "package.json",
+];
+
+function installBridge() {
+  const bridgeDir = resolveBridgeDir();
+  const templateDir = join(__dirname, "templates", "bridge");
+  mkdirSync(bridgeDir, { recursive: true });
+  for (const file of BRIDGE_REQUIRED_FILES) {
+    const src = join(templateDir, file);
+    if (!existsSync(src)) {
+      console.error(`✗ Bridge template missing: ${file}`);
+      process.exit(1);
+    }
+    writeFileSync(join(bridgeDir, file), readFileSync(src));
+  }
+}
+
+function removeBridge() {
+  const bridgeDir = resolveBridgeDir();
+  if (!existsSync(bridgeDir)) return false;
+  rmSync(bridgeDir, { recursive: true });
+  return true;
+}
+
+// Bridge reads agent configs from ~/.chorus/agents/*.json or ~/.chorus/config.json.
+// Returns count of valid configs found.
+function countAgentConfigs() {
+  let count = 0;
+  if (existsSync(AGENTS_DIR)) {
+    const files = readdirSync(AGENTS_DIR).filter((f) => f.endsWith(".json"));
+    for (const file of files) {
+      try {
+        const cfg = JSON.parse(readFileSync(join(AGENTS_DIR, file), "utf8"));
+        if (cfg?.agent_id && cfg?.api_key && cfg?.hub_url) count++;
+      } catch { /* skip malformed */ }
+    }
+  }
+  if (count === 0 && existsSync(CONFIG_PATH)) {
+    try {
+      const cfg = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
+      if (cfg?.agent_id && cfg?.api_key && cfg?.hub_url) count++;
+    } catch { /* skip malformed */ }
+  }
+  return count;
+}
+
+function ensureChorusDirs() {
+  mkdirSync(join(CHORUS_HOME, "history"), { recursive: true });
+  mkdirSync(AGENTS_DIR, { recursive: true });
 }
 
 if (command === "init") {
@@ -94,27 +187,66 @@ if (command === "init") {
     process.exit(1);
   }
 
-  // For openclaw: verify registration is possible BEFORE writing files
   if (target === "openclaw") {
-    const registered = registerOpenClaw();
-    if (!registered) {
-      console.error(`\nAborting — files were NOT written.`);
+    // Pre-flight: verify openclaw.json is readable (but don't write to it yet)
+    const oclawConfigPath = join(homedir(), ".openclaw", "openclaw.json");
+    if (!existsSync(oclawConfigPath)) {
+      console.error(`\nERROR: OpenClaw config not found at ${oclawConfigPath}`);
+      console.error(`\nPossible causes:`);
+      console.error(`  1. OpenClaw is not installed — install it first: https://openclaw.com`);
+      console.error(`  2. OpenClaw config is in a non-standard location`);
+      console.error(`\nTroubleshooting: https://github.com/owensun6/chorus/blob/main/docs/distribution/openclaw-install.md#troubleshooting`);
       process.exit(1);
     }
   }
 
+  // === Phase 1: Write all files (no config mutation yet) ===
+
   copySkillFiles(targetDir, lang);
-
-  // Create ~/.chorus/ local storage directory
-  const chorusHome = join(homedir(), ".chorus");
-  const historyDir = join(chorusHome, "history");
-  mkdirSync(historyDir, { recursive: true });
-
-  console.log(`✓ Files installed to ${targetDir} (${lang})`);
-  console.log(`✓ Local storage initialized at ${chorusHome}`);
+  console.log(`✓ Skill installed to ${targetDir} (${lang})`);
 
   if (target === "openclaw") {
-    console.log(`✓ Registered in ~/.openclaw/openclaw.json`);
+    // Always install bridge — overwrite if already present (upgrade path)
+    const bridgeDir = resolveBridgeDir();
+    const isUpgrade = existsSync(bridgeDir);
+    installBridge();
+    console.log(`✓ Bridge ${isUpgrade ? "updated" : "installed"} at ${bridgeDir}`);
+  }
+
+  // Create ~/.chorus/agents/ and ~/.chorus/history/ so bridge Gate 1 passes
+  ensureChorusDirs();
+  console.log(`✓ Chorus dirs initialized (${CHORUS_HOME})`);
+
+  // === Phase 2: Register in openclaw.json AFTER files are written ===
+  // Rollback boundary: any failure in registerOpenClaw() (return false OR throw)
+  // must clean up files written in Phase 1.
+
+  if (target === "openclaw") {
+    let registered = false;
+    try {
+      registered = registerOpenClaw();
+    } catch (err) {
+      console.error(`\n✗ Registration error: ${err.message}`);
+    }
+    if (!registered) {
+      rmSync(targetDir, { recursive: true, force: true });
+      removeBridge();
+      console.error(`✗ Rolled back skill and bridge files.`);
+      process.exit(1);
+    }
+    console.log(`✓ Registered skill + bridge in ~/.openclaw/openclaw.json`);
+
+    // Report activation readiness
+    const configCount = countAgentConfigs();
+    if (configCount > 0) {
+      console.log(`✓ ${configCount} agent config(s) found — bridge will activate on next OpenClaw start`);
+    } else {
+      console.log(`\n⚠ No agent configs found yet. Bridge is installed but will start in standby mode.`);
+      console.log(`  To activate: register your agent on the hub, then save credentials to:`);
+      console.log(`    ${AGENTS_DIR}/<agent-name>.json`);
+      console.log(`  File format: {"agent_id":"...","api_key":"ca_...","hub_url":"https://agchorus.com"}`);
+    }
+
     console.log(`\nNext: verify installation`);
     console.log(`  npx @chorus-protocol/skill verify --target openclaw`);
   } else {
@@ -142,14 +274,15 @@ if (command === "init") {
     process.exit(1);
   }
 
-  const { rmSync } = await import("fs");
   rmSync(targetDir, { recursive: true });
   console.log(`Removed ${targetDir}`);
 
   if (target === "openclaw") {
+    removeBridge();
+    console.log(`Removed chorus-bridge`);
     const removed = unregisterOpenClaw();
     if (removed) {
-      console.log(`  Unregistered from ~/.openclaw/openclaw.json`);
+      console.log(`Unregistered skill + bridge from ~/.openclaw/openclaw.json`);
     }
   }
 
@@ -229,8 +362,23 @@ if (command === "init") {
     }
     console.log(`✓ SKILL.md exists (${(stat.size / 1024).toFixed(1)} KB)`);
 
-    // Check 2: openclaw.json registration (only for openclaw target)
     if (target === "openclaw") {
+      // Check 2: bridge required files are all present
+      const bridgeDir = resolveBridgeDir();
+      if (!existsSync(bridgeDir)) {
+        console.error(`✗ chorus-bridge not found at ${bridgeDir}`);
+        console.error(`\n  Run: npx @chorus-protocol/skill init --target openclaw`);
+        process.exit(1);
+      }
+      const missingBridge = BRIDGE_REQUIRED_FILES.filter(f => !existsSync(join(bridgeDir, f)));
+      if (missingBridge.length > 0) {
+        console.error(`✗ chorus-bridge incomplete — missing: ${missingBridge.join(", ")}`);
+        console.error(`\n  Run: npx @chorus-protocol/skill uninstall --target openclaw && npx @chorus-protocol/skill init --target openclaw`);
+        process.exit(1);
+      }
+      console.log(`✓ chorus-bridge complete (${BRIDGE_REQUIRED_FILES.length} files)`);
+
+      // Check 3: openclaw.json has skill + bridge registered
       const configPath = join(homedir(), ".openclaw", "openclaw.json");
       if (!existsSync(configPath)) {
         console.error(`✗ openclaw.json not found at ${configPath}`);
@@ -238,14 +386,32 @@ if (command === "init") {
       }
       const config = JSON.parse(readFileSync(configPath, "utf8"));
       if (config.skills?.entries?.chorus?.enabled === true) {
-        console.log(`✓ openclaw.json: chorus registered and enabled`);
+        console.log(`✓ openclaw.json: chorus skill enabled`);
       } else {
-        console.error(`✗ openclaw.json: chorus not registered or not enabled`);
+        console.error(`✗ openclaw.json: chorus skill not registered or not enabled`);
         process.exit(1);
       }
-    }
+      if (config.plugins?.entries?.["chorus-bridge"]?.enabled === true) {
+        console.log(`✓ openclaw.json: chorus-bridge plugin enabled`);
+      } else {
+        console.error(`✗ openclaw.json: chorus-bridge plugin not registered or not enabled`);
+        process.exit(1);
+      }
 
-    console.log(`\n✓ Installation verified.`);
+      // Check 4: agent config readiness (determines bridge activation state)
+      const configCount = countAgentConfigs();
+      if (configCount > 0) {
+        console.log(`✓ ${configCount} agent config(s) found — bridge will activate`);
+        console.log(`\n✓ Installation verified — bridge ready.`);
+      } else {
+        console.log(`⚠ No agent configs found — bridge will start in standby`);
+        console.log(`\n✓ Files installed. Bridge awaiting agent registration.`);
+        console.log(`  Save credentials to: ${AGENTS_DIR}/<agent-name>.json`);
+        console.log(`  Format: {"agent_id":"...","api_key":"ca_...","hub_url":"https://agchorus.com"}`);
+      }
+    } else {
+      console.log(`\n✓ Installation verified.`);
+    }
   }
 } else {
   console.log(`@chorus-protocol/skill v${pkg.version}`);

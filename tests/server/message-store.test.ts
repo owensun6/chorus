@@ -4,6 +4,8 @@ import { AgentRegistry } from "../../src/server/registry";
 import { createApp } from "../../src/server/routes";
 import { createActivityStream } from "../../src/server/activity";
 import { createInboxManager } from "../../src/server/inbox";
+import { createTestDb } from "../helpers/test-db";
+import type Database from "better-sqlite3";
 
 const VALID_CARD = {
   card_version: "0.3" as const,
@@ -12,8 +14,18 @@ const VALID_CARD = {
 };
 
 describe("MessageStore", () => {
+  let db: Database.Database;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  afterEach(() => {
+    db.close();
+  });
+
   it("stores and retrieves messages for receiver", () => {
-    const store = createMessageStore();
+    const store = createMessageStore(db);
     store.append({
       trace_id: "t1",
       sender_id: "a@hub",
@@ -29,7 +41,7 @@ describe("MessageStore", () => {
   });
 
   it("stores for both sender and receiver", () => {
-    const store = createMessageStore();
+    const store = createMessageStore(db);
     store.append({
       trace_id: "t1",
       sender_id: "a@hub",
@@ -43,7 +55,7 @@ describe("MessageStore", () => {
   });
 
   it("supports since filter", () => {
-    const store = createMessageStore();
+    const store = createMessageStore(db);
     store.append({ trace_id: "t1", sender_id: "a@hub", receiver_id: "b@hub", envelope: { chorus_version: "0.4", sender_id: "a@hub", original_text: "1", sender_culture: "en" }, delivered_via: "sse" });
     store.append({ trace_id: "t2", sender_id: "a@hub", receiver_id: "b@hub", envelope: { chorus_version: "0.4", sender_id: "a@hub", original_text: "2", sender_culture: "en" }, delivered_via: "sse" });
     store.append({ trace_id: "t3", sender_id: "a@hub", receiver_id: "b@hub", envelope: { chorus_version: "0.4", sender_id: "a@hub", original_text: "3", sender_culture: "en" }, delivered_via: "sse" });
@@ -53,35 +65,34 @@ describe("MessageStore", () => {
     expect(since1[0].trace_id).toBe("t2");
   });
 
-  it("enforces per-agent max", () => {
-    const store = createMessageStore(3);
-    for (let i = 0; i < 5; i++) {
-      store.append({ trace_id: `t${i}`, sender_id: "a@hub", receiver_id: "b@hub", envelope: { chorus_version: "0.4", sender_id: "a@hub", original_text: `msg${i}`, sender_culture: "en" }, delivered_via: "sse" });
-    }
-
-    const messages = store.listForAgent("b@hub");
-    expect(messages.length).toBe(3);
-    expect(messages[0].trace_id).toBe("t2");
-  });
-
   it("returns empty array for unknown agent", () => {
-    const store = createMessageStore();
+    const store = createMessageStore(db);
     expect(store.listForAgent("nobody@hub")).toEqual([]);
   });
 
   it("tracks stats", () => {
-    const store = createMessageStore();
+    const store = createMessageStore(db);
     store.append({ trace_id: "t1", sender_id: "a@hub", receiver_id: "b@hub", envelope: { chorus_version: "0.4", sender_id: "a@hub", original_text: "hi", sender_culture: "en" }, delivered_via: "sse" });
     expect(store.getStats().total_stored).toBe(1);
   });
 });
 
 describe("GET /agent/messages", () => {
+  let db: Database.Database;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  afterEach(() => {
+    db.close();
+  });
+
   const makeApp = () => {
-    const registry = new AgentRegistry();
-    const activity = createActivityStream();
+    const registry = new AgentRegistry(db);
+    const activity = createActivityStream(db);
     const inbox = createInboxManager();
-    const messageStore = createMessageStore();
+    const messageStore = createMessageStore(db);
     const app = createApp(registry, undefined, activity, inbox, messageStore);
     return { registry, activity, inbox, messageStore, app };
   };
@@ -147,7 +158,7 @@ describe("GET /agent/messages", () => {
   });
 
   it("returns 503 when store not enabled", async () => {
-    const registry = new AgentRegistry();
+    const registry = new AgentRegistry(db);
     const app = createApp(registry);
 
     const res = await app.request("/agent/messages", {

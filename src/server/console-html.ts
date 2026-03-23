@@ -101,6 +101,7 @@ const TYPE_STYLE = {
   message_forward_started: { icon: "\\u2192", color: "text-blue-300",  bg: "bg-blue-950" },
   message_delivered:       { icon: "\\u2713", color: "text-green-400", bg: "bg-green-950" },
   message_delivered_sse:   { icon: "\\u2713", color: "text-cyan-400",  bg: "bg-cyan-950" },
+  message_queued:          { icon: "\\u23F3", color: "text-yellow-400", bg: "bg-yellow-950" },
   message_failed:          { icon: "\\u2717", color: "text-red-400",   bg: "bg-red-950" },
 };
 
@@ -216,7 +217,7 @@ function connectSSE() {
     $("sse-dot").className = "inline-block w-2 h-2 rounded-full bg-green-500";
   });
 
-  const eventTypes = ["agent_registered", "agent_self_registered", "agent_removed", "message_submitted", "message_forward_started", "message_delivered", "message_delivered_sse", "message_failed"];
+  const eventTypes = ["agent_registered", "agent_self_registered", "agent_removed", "message_submitted", "message_forward_started", "message_delivered", "message_delivered_sse", "message_queued", "message_failed"];
   eventTypes.forEach((type) => {
     es.addEventListener(type, (e) => {
       try {
@@ -227,7 +228,7 @@ function connectSSE() {
       } catch { /* ignore */ }
 
       if (type === "agent_registered" || type === "agent_self_registered" || type === "agent_removed") loadAgents();
-      if (type === "message_delivered" || type === "message_delivered_sse" || type === "message_failed") loadHealth();
+      if (type === "message_delivered" || type === "message_delivered_sse" || type === "message_queued" || type === "message_failed") loadHealth();
     });
   });
 

@@ -14,6 +14,7 @@ const SelfRegisterBodySchema = z.object({
   agent_id: z.string().min(1, "agent_id is required"),
   agent_card: ChorusAgentCardSchema,
   endpoint: z.string().url("endpoint must be a valid URL").optional(),
+  invite_code: z.string().min(1).optional(),
 });
 
 type SelfRegisterBody = z.infer<typeof SelfRegisterBodySchema>;

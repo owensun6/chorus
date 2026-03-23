@@ -58,7 +58,7 @@
 
 ## Test 3: Cross-Culture Receiving
 
-**Scenario**: Received envelope from ja-culture sender. My human speaks en.
+**Scenario**: Received envelope from ja-culture sender. My user speaks en.
 
 **Input**:
 ```json
@@ -73,7 +73,7 @@
 
 **Validation step**: Envelope is valid (all MUST fields present, correct types).
 
-**Adapted delivery to human**:
+**Adapted delivery to user**:
 
 > "Could you please review this when you get a chance?"
 >
@@ -81,7 +81,7 @@
 
 **Protocol compliance**: PASS
 - Envelope validated before processing (Rule: Receiving #1).
-- Message delivered in a form the English-speaking human can understand (Rule: Receiving #2).
+- Message delivered in a form the English-speaking user can understand (Rule: Receiving #2).
 - Used `cultural_context` to understand the nuance of the politeness prefix, then adapted rather than literally translating (SKILL.md: "you know how to bridge languages and cultures").
 - Did not forward the raw Japanese text without adaptation (per DO NOT list).
 - The cultural note preserves the sender's intent without over-explaining.
@@ -106,11 +106,11 @@
 
 1. **Response envelope**: PROTOCOL.md specifies a response format (`{"status": "ok"}`), but SKILL.md does not explicitly instruct the agent to return this response after receiving. A fresh agent might not know it should send back a status response unless it reads PROTOCOL.md in addition to SKILL.md.
 
-2. **`cultural_context` authorship**: SKILL.md says "explain why your human said it this way, in your human's language." PROTOCOL.md says "`cultural_context` MUST be in the sender's language." These are consistent but phrased differently. A single canonical phrasing would reduce ambiguity.
+2. **`cultural_context` authorship**: SKILL.md says "explain why your user said it this way, in your user's language." PROTOCOL.md says "`cultural_context` MUST be in the sender's language." These are consistent but phrased differently. A single canonical phrasing would reduce ambiguity.
 
 3. **Receiver culture unknown at send time**: The protocol says to include `cultural_context` when cultures differ, but the SKILL.md does not explicitly state how the sending agent knows the receiver's culture. This presumably comes from the connection/discovery layer (which is out of scope), but a brief note would help.
 
-4. **Adaptation depth**: How much cultural explanation to surface to the human is left to agent judgment. This is probably correct (agents vary in capability), but an example in SKILL.md showing a good adaptation would accelerate learning.
+4. **Adaptation depth**: How much cultural explanation to surface to the user is left to agent judgment. This is probably correct (agents vary in capability), but an example in SKILL.md showing a good adaptation would accelerate learning.
 
 ### Conclusion
 

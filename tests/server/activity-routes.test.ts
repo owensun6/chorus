@@ -3,6 +3,8 @@ import { createApp } from "../../src/server/routes";
 import { AgentRegistry } from "../../src/server/registry";
 import { createActivityStream } from "../../src/server/activity";
 import type { ActivityStream } from "../../src/server/activity";
+import { createTestDb } from "../helpers/test-db";
+import type Database from "better-sqlite3";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Json = any;
@@ -40,14 +42,20 @@ const makeMessageBody = (senderId: string, receiverId: string) => ({
 });
 
 describe("Activity Routes", () => {
+  let db: Database.Database;
   let app: ReturnType<typeof createApp>;
   let registry: AgentRegistry;
   let activity: ActivityStream;
 
   beforeEach(() => {
-    registry = new AgentRegistry();
-    activity = createActivityStream();
+    db = createTestDb();
+    registry = new AgentRegistry(db);
+    activity = createActivityStream(db);
     app = createApp(registry, undefined, activity);
+  });
+
+  afterEach(() => {
+    db.close();
   });
 
   describe("GET /activity", () => {
@@ -107,12 +115,14 @@ describe("Activity Routes", () => {
 
   describe("GET /activity (no activity param)", () => {
     it("returns empty data when app created without activity", async () => {
-      const appNoActivity = createApp(new AgentRegistry());
+      const noActDb = createTestDb();
+      const appNoActivity = createApp(new AgentRegistry(noActDb));
       const res = await appNoActivity.request("/activity");
       const json: Json = await res.json();
 
       expect(res.status).toBe(200);
       expect(json.data).toEqual([]);
+      noActDb.close();
     });
   });
 

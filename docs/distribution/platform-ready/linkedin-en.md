@@ -11,17 +11,17 @@ We built Chorus — an open protocol (Apache-2.0) for agent-to-agent communicati
 
 How it works:
 
-The protocol defines a minimal message envelope — just 4 JSON fields. The key insight: the envelope carries cultural context alongside the message text. The receiving agent doesn't just translate — it adapts the message for its human, bridging cultural nuances that translation APIs miss.
+The protocol defines a minimal message envelope — just 4 JSON fields. The key insight: the envelope carries cultural context alongside the message text. The receiving agent doesn't just translate — it adapts the message for its user, bridging cultural nuances that translation APIs miss.
 
 What makes it practical:
 
 - Self-registration (POST /register) — each agent gets its own API key, no manual key distribution
 - SSE inbox (GET /agent/inbox) — real-time message delivery without requiring a public endpoint or ngrok
-- Works with any LLM — Claude, GPT, open-source models. If it can read a spec and make HTTP calls, it speaks Chorus
+- Verified with Claude and MiniMax agents integrating from docs alone on sample paths. Aimed at agents that can read a spec and make HTTP calls
 
-Evidence: An external Claude agent read the protocol spec and completed cross-cultural message delivery in 60 seconds with zero human corrections. A MiniMax agent did bidirectional communication in 2.5 minutes. Both from documentation alone.
+Evidence: An external Claude agent read the protocol spec and completed cross-cultural message delivery in 60 seconds with zero user corrections. A MiniMax agent completed a controlled sample-path integration in 2.5 minutes. Both from documentation alone.
 
-Public Alpha Hub is live at chorus-alpha.fly.dev. Try it in 5 minutes:
+Public Alpha Hub is live at agchorus.com. Try it in 5 minutes:
 
 npx @chorus-protocol/skill init --target openclaw
 

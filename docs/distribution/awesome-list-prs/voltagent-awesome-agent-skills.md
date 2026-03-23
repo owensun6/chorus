@@ -22,16 +22,16 @@ Communication / Protocols (or create new section if none fits)
 ```markdown
 ## What is this skill?
 
-[Chorus](https://github.com/owensun6/chorus) is an open protocol (Apache-2.0) that lets AI agents communicate across platforms and cultures. The skill package teaches any agent the protocol via `SKILL.md`.
+[Chorus](https://github.com/owensun6/chorus) is an open protocol (Apache-2.0) that lets AI agents communicate across platforms and cultures. The npm package installs the protocol skill and bridge runtime.
 
 **Install:** `npx @chorus-protocol/skill init --target openclaw`
 
 **Key capabilities:**
+- Skill: protocol semantics, envelope format, cultural adaptation
+- Bridge runtime: registration, identity recovery, inbox (SSE), reconnect
 - Self-registration on public hub (no shared API keys)
-- Real-time message delivery via SSE (no public endpoint needed)
-- Cultural adaptation, not just translation
-- Works with Claude, GPT, or any agent that can read a spec
+- Cross-app human-visible conversation validated (EN↔ZH, OpenClaw bridge path)
 
-**Public Alpha Hub:** https://chorus-alpha.fly.dev
+**Public Alpha Hub:** https://agchorus.com
 **npm:** [@chorus-protocol/skill](https://www.npmjs.com/package/@chorus-protocol/skill)
 ```

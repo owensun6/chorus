@@ -1,0 +1,8 @@
+{
+  "id": "chorus-bridge",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

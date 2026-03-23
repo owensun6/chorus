@@ -1,4 +1,5 @@
 // Author: be-domain-modeler
+import type Database from "better-sqlite3";
 
 type ActivityEventType =
   | "agent_registered"
@@ -8,7 +9,8 @@ type ActivityEventType =
   | "message_forward_started"
   | "message_delivered"
   | "message_delivered_sse"
-  | "message_failed";
+  | "message_failed"
+  | "message_queued";
 
 interface ActivityEvent {
   readonly id: number;
@@ -26,28 +28,43 @@ interface ActivityStream {
   readonly unsubscribe: (fn: ActivitySubscriber) => void;
 }
 
-const createActivityStream = (maxEvents: number = 500): ActivityStream => {
-  const buffer: Array<ActivityEvent | undefined> = new Array(maxEvents).fill(undefined);
+const createActivityStream = (db: Database.Database, maxEvents: number = 500): ActivityStream => {
+  // In-memory pub/sub for real-time SSE — not persisted
   const subscribers = new Set<ActivitySubscriber>();
-  let writeIndex = 0;
-  let count = 0;
-  let nextId = 1;
+
+  const stmtInsert = db.prepare(`
+    INSERT INTO activity_events (type, timestamp, data) VALUES (?, ?, ?)
+  `);
+
+  const stmtListAll = db.prepare(`
+    SELECT id, type, timestamp, data FROM activity_events ORDER BY id DESC LIMIT ?
+  `);
+
+  const stmtListSince = db.prepare(`
+    SELECT id, type, timestamp, data FROM activity_events WHERE id > ? ORDER BY id ASC
+  `);
+
+  const stmtTrim = db.prepare(`
+    DELETE FROM activity_events WHERE id <= (
+      SELECT id FROM activity_events ORDER BY id DESC LIMIT 1 OFFSET ?
+    )
+  `);
 
   const append = (type: ActivityEventType, data: Record<string, unknown>): ActivityEvent => {
+    const timestamp = new Date().toISOString();
+    const result = stmtInsert.run(type, timestamp, JSON.stringify(data));
+
     const event: ActivityEvent = Object.freeze({
-      id: nextId,
+      id: Number(result.lastInsertRowid),
       type,
-      timestamp: new Date().toISOString(),
+      timestamp,
       data: Object.freeze({ ...data }),
     });
-    nextId += 1;
 
-    buffer[writeIndex] = event;
-    writeIndex = (writeIndex + 1) % maxEvents;
-    if (count < maxEvents) {
-      count += 1;
-    }
+    // Trim old events beyond maxEvents
+    stmtTrim.run(maxEvents);
 
+    // Notify real-time subscribers (SSE)
     for (const subscriber of subscribers) {
       try {
         subscriber(event);
@@ -60,18 +77,12 @@ const createActivityStream = (maxEvents: number = 500): ActivityStream => {
   };
 
   const list = (since?: number): readonly ActivityEvent[] => {
-    const result: ActivityEvent[] = [];
-    const start = count < maxEvents ? 0 : writeIndex;
-
-    for (let i = 0; i < count; i++) {
-      const idx = (start + i) % maxEvents;
-      const event = buffer[idx];
-      if (event === undefined) continue;
-      if (since !== undefined && event.id <= since) continue;
-      result.push(event);
+    if (since !== undefined) {
+      return (stmtListSince.all(since) as ActivityRow[]).map(rowToEvent);
     }
-
-    return result;
+    // Return recent events in ascending order
+    const rows = (stmtListAll.all(maxEvents) as ActivityRow[]).reverse();
+    return rows.map(rowToEvent);
   };
 
   const subscribe = (fn: ActivitySubscriber): void => {
@@ -84,6 +95,20 @@ const createActivityStream = (maxEvents: number = 500): ActivityStream => {
 
   return { append, list, subscribe, unsubscribe };
 };
+
+interface ActivityRow {
+  readonly id: number;
+  readonly type: string;
+  readonly timestamp: string;
+  readonly data: string;
+}
+
+const rowToEvent = (row: ActivityRow): ActivityEvent => Object.freeze({
+  id: row.id,
+  type: row.type as ActivityEventType,
+  timestamp: row.timestamp,
+  data: Object.freeze(JSON.parse(row.data)),
+});
 
 export { createActivityStream };
 export type { ActivityEvent, ActivityEventType, ActivitySubscriber, ActivityStream };

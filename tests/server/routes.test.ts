@@ -4,6 +4,8 @@ import type { ServerConfig } from "../../src/server/routes";
 import { AgentRegistry } from "../../src/server/registry";
 import { readFileSync } from "fs";
 import { resolve } from "path";
+import { createTestDb } from "../helpers/test-db";
+import type Database from "better-sqlite3";
 
 // Load endpoints.json — same single source of truth the server uses
 const ENDPOINTS_DEF = JSON.parse(
@@ -28,12 +30,18 @@ describe("Agent CRUD Routes", () => {
     },
   };
 
+  let db: Database.Database;
   let app: ReturnType<typeof createApp>;
   let registry: AgentRegistry;
 
   beforeEach(() => {
-    registry = new AgentRegistry();
+    db = createTestDb();
+    registry = new AgentRegistry(db);
     app = createApp(registry);
+  });
+
+  afterEach(() => {
+    db.close();
   });
 
   describe("POST /agents", () => {
@@ -105,7 +113,8 @@ describe("Agent CRUD Routes", () => {
     });
 
     it("returns 429 when registry is full", async () => {
-      const tinyRegistry = new AgentRegistry(1);
+      const tinyDb = createTestDb();
+      const tinyRegistry = new AgentRegistry(tinyDb, 1);
       const tinyApp = createApp(tinyRegistry, { maxAgents: 1, maxBodyBytes: 65536, rateLimitPerMin: 60 });
 
       // Fill the registry
@@ -129,6 +138,7 @@ describe("Agent CRUD Routes", () => {
       const json: Json = await res.json();
       expect(json.success).toBe(false);
       expect(json.error.code).toBe("ERR_REGISTRY_FULL");
+      tinyDb.close();
     });
   });
 
@@ -223,8 +233,9 @@ describe("Agent CRUD Routes", () => {
     });
 
     it("includes server_status, limits, and warnings", async () => {
+      const customDb = createTestDb();
       const customConfig: ServerConfig = { maxAgents: 50, maxBodyBytes: 32768, rateLimitPerMin: 30 };
-      const customApp = createApp(new AgentRegistry(50), customConfig);
+      const customApp = createApp(new AgentRegistry(customDb, 50), customConfig);
 
       const res = await customApp.request("/.well-known/chorus.json", { method: "GET" });
       const json: Json = await res.json();
@@ -240,6 +251,7 @@ describe("Agent CRUD Routes", () => {
         "no identity guarantees",
         "do not send sensitive content",
       ]);
+      customDb.close();
     });
   });
 
@@ -314,6 +326,47 @@ describe("Agent CRUD Routes", () => {
       const json: Json = await res.json();
       expect(json.success).toBe(true);
       expect(json.data.agent_id).toBe(agentId);
+    });
+  });
+
+  describe("Static pages", () => {
+    it("GET /skill returns markdown by default", async () => {
+      const res = await app.request("/skill");
+      expect(res.status).toBe(200);
+      const ct = res.headers.get("Content-Type") ?? "";
+      expect(ct).toContain("text/markdown");
+    });
+
+    it("GET /skill returns HTML when Accept: text/html", async () => {
+      const res = await app.request("/skill", {
+        headers: { Accept: "text/html" },
+      });
+      expect(res.status).toBe(200);
+      const text = await res.text();
+      expect(text).toContain("<!DOCTYPE html>");
+    });
+
+    it("GET /console returns HTML", async () => {
+      const res = await app.request("/console");
+      expect(res.status).toBe(200);
+      const text = await res.text();
+      expect(text).toContain("html");
+    });
+
+    it("GET /arena returns HTML", async () => {
+      const res = await app.request("/arena");
+      expect(res.status).toBe(200);
+      const text = await res.text();
+      expect(text).toContain("html");
+    });
+  });
+
+  describe("Health endpoint", () => {
+    it("GET /health includes messages_queued stat", async () => {
+      const res = await app.request("/health");
+      expect(res.status).toBe(200);
+      const json: Json = await res.json();
+      expect(json.data).toHaveProperty("messages_queued");
     });
   });
 });

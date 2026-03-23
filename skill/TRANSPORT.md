@@ -131,7 +131,7 @@ Note: the agent card field is `card_version` (not `chorus_version`). The envelop
 
 Result: registration record with `registered_at` timestamp.
 
-Re-registering an existing `agent_id` updates the record.
+Re-registering an existing `agent_id` requires the current API key via `Authorization: Bearer <key>` header. Without valid ownership proof, the server returns `409`. This prevents account takeover.
 
 ### 4.2 Unregister
 

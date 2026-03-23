@@ -1,11 +1,11 @@
-// Author: be-domain-modeler
+// Author: be-api-router
 import Database from "better-sqlite3";
 import { initDb } from "../../src/server/db";
 import { mkdtempSync, rmSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 
-describe("Schema Migration (v1 → v4)", () => {
+describe("Schema Migration (v1 → v5)", () => {
   const tmpDirs: string[] = [];
 
   const createTmpDbPath = (): string => {
@@ -91,13 +91,18 @@ describe("Schema Migration (v1 → v4)", () => {
     const agent = db.prepare("SELECT agent_id FROM agents WHERE agent_id = ?").get("old@hub");
     expect(agent).toBeDefined();
 
-    // Schema version is now 4
+    // Schema version is now 5
     const ver = db.prepare("SELECT version FROM schema_version").get() as { version: number };
-    expect(ver.version).toBe(4);
+    expect(ver.version).toBe(5);
 
     // invite_codes table exists (v4 migration)
     const inviteCols = db.pragma("table_info(invite_codes)") as Array<{ name: string }>;
     expect(inviteCols.map((c) => c.name)).toContain("code_hash");
+
+    // idempotency_keys table exists (v5 migration)
+    const idempCols = db.pragma("table_info(idempotency_keys)") as Array<{ name: string }>;
+    expect(idempCols.map((c) => c.name)).toContain("key");
+    expect(idempCols.map((c) => c.name)).toContain("payload_hash");
 
     // messages table accepts 'queued' in delivered_via (v3 migration)
     db.prepare("INSERT INTO messages (trace_id, sender_id, receiver_id, envelope, delivered_via, timestamp) VALUES ('t1', 'a@hub', 'b@hub', '{}', 'queued', '2026-01-01')").run();
@@ -107,11 +112,11 @@ describe("Schema Migration (v1 → v4)", () => {
     db.close();
   });
 
-  it("fresh database starts at version 4 with api_key_hash, queued support, and invite_codes", () => {
+  it("fresh database starts at version 5 with api_key_hash, queued support, invite_codes, and idempotency_keys", () => {
     const db = initDb(":memory:");
 
     const ver = db.prepare("SELECT version FROM schema_version").get() as { version: number };
-    expect(ver.version).toBe(4);
+    expect(ver.version).toBe(5);
 
     const cols = db.pragma("table_info(api_keys)") as Array<{ name: string }>;
     const colNames = cols.map((c) => c.name);
@@ -121,6 +126,12 @@ describe("Schema Migration (v1 → v4)", () => {
     const inviteCols = db.pragma("table_info(invite_codes)") as Array<{ name: string }>;
     expect(inviteCols.map((c) => c.name)).toContain("code_hash");
     expect(inviteCols.map((c) => c.name)).toContain("use_count");
+
+    // idempotency_keys table exists (v5 migration)
+    const idempCols = db.pragma("table_info(idempotency_keys)") as Array<{ name: string }>;
+    expect(idempCols.map((c) => c.name)).toContain("key");
+    expect(idempCols.map((c) => c.name)).toContain("payload_hash");
+    expect(idempCols.map((c) => c.name)).toContain("trace_id");
 
     db.close();
   });

@@ -1,8 +1,8 @@
-// Author: be-domain-modeler
+// Author: be-api-router
 import Database from "better-sqlite3";
 import { createHash } from "crypto";
 
-const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 5;
 
 const MIGRATIONS: readonly string[] = [
   // Version 1: initial schema (plaintext api_key — superseded by v2)
@@ -93,6 +93,17 @@ const MIGRATIONS: readonly string[] = [
     max_uses   INTEGER,
     use_count  INTEGER NOT NULL DEFAULT 0,
     revoked    INTEGER NOT NULL DEFAULT 0
+  );
+  `,
+
+  // Version 5: idempotency keys for POST /messages replay safety
+  `
+  CREATE TABLE IF NOT EXISTS idempotency_keys (
+    key          TEXT PRIMARY KEY,
+    payload_hash TEXT NOT NULL,
+    trace_id     TEXT,
+    response     TEXT,
+    created_at   TEXT NOT NULL
   );
   `,
 ];

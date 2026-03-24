@@ -38,6 +38,20 @@ describe("ChorusEnvelope v0.4", () => {
     expect(() => ChorusEnvelopeSchema.parse(invalid)).toThrow();
   });
 
+  test("test_sender_id_max_length: 128-char sender_id passes, 129-char fails", () => {
+    // 62 + '@' + 65 = 128 chars — at the limit
+    const id128 = "a".repeat(62) + "@" + "b".repeat(65);
+    expect(id128.length).toBe(128);
+    const valid = { ...validEnvelope, sender_id: id128 };
+    expect(() => ChorusEnvelopeSchema.parse(valid)).not.toThrow();
+
+    // 63 + '@' + 65 = 129 chars — one over the limit
+    const id129 = "a".repeat(63) + "@" + "b".repeat(65);
+    expect(id129.length).toBe(129);
+    const invalid = { ...validEnvelope, sender_id: id129 };
+    expect(() => ChorusEnvelopeSchema.parse(invalid)).toThrow();
+  });
+
   test("test_case_3: cultural_context too short is rejected", () => {
     const invalid = { ...validEnvelope, cultural_context: "short" };
     expect(() => ChorusEnvelopeSchema.parse(invalid)).toThrow();

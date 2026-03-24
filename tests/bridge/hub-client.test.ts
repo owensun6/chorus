@@ -113,6 +113,11 @@ describe('parseHistoryResponse', () => {
     expect(result[0].trace_id).toBe('t-1');
     expect(result[1].trace_id).toBe('t-2');
   });
+
+  it('test_malformed_history_throws: malformed item throws HubClientError (fail-closed)', () => {
+    const data = [{ invalid: 'structure', no_trace_id: true }];
+    expect(() => parseHistoryResponse(data)).toThrow(HubClientError);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -179,6 +184,23 @@ describe('HubClient.submitRelay', () => {
 
     await expect(
       client.submitRelay('key', 'remote@hub', envelope, 'KEY-2'),
+    ).rejects.toThrow(HubClientError);
+  });
+
+  it('test_malformed_relay_throws: malformed relay response throws HubClientError (fail-closed)', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ success: true, data: { wrong_field: 'x' } }), { status: 200 }),
+    );
+
+    const envelope = {
+      chorus_version: '0.4' as const,
+      sender_id: 'local@hub',
+      original_text: 'relay',
+      sender_culture: 'en',
+    };
+
+    await expect(
+      client.submitRelay('key', 'remote@hub', envelope, 'KEY-3'),
     ).rejects.toThrow(HubClientError);
   });
 });

@@ -10,6 +10,10 @@ import type {
 
 const SCHEMA_VERSION = '2.0' as const;
 
+// Pruning caps — [未校准] defaults, calibrate based on production observation.
+const INBOUND_FACTS_MAX = 500;
+const RELAY_EVIDENCE_MAX = 500;
+
 /**
  * Creates an empty BridgeDurableState for a given agent.
  */
@@ -61,11 +65,73 @@ export class DurableStateManager {
     try {
       const state = this.load();
       const next = await fn(state);
-      this.save(next);
-      return next;
+      const pruned = this.pruneState(next);
+      this.save(pruned);
+      return pruned;
     } finally {
       resolve();
     }
+  }
+
+  /**
+   * Prune finalized inbound facts when over cap.
+   * Prunable: terminal_disposition != null OR (delivery_evidence != null AND cursor_advanced).
+   * Invariant: retryable facts (no terminal, no confirmed delivery) are NEVER evicted.
+   * If prunable count < deficit, state may remain over cap.
+   */
+  private pruneInboundFacts(state: BridgeDurableState): BridgeDurableState {
+    const entries = Object.entries(state.inbound_facts);
+    if (entries.length <= INBOUND_FACTS_MAX) return state;
+
+    const prunable = entries.filter(([, f]) =>
+      f.terminal_disposition !== null ||
+      (f.delivery_evidence !== null && f.cursor_advanced),
+    );
+    if (prunable.length === 0) return state;
+
+    const deficit = entries.length - INBOUND_FACTS_MAX;
+    const evictKeys = new Set(
+      [...prunable]
+        .sort((a, b) => a[1].observed_at.localeCompare(b[1].observed_at))
+        .slice(0, deficit)
+        .map(([k]) => k),
+    );
+
+    return {
+      ...state,
+      inbound_facts: Object.fromEntries(entries.filter(([k]) => !evictKeys.has(k))),
+    };
+  }
+
+  /**
+   * Prune confirmed relay evidence when over cap.
+   * Prunable: confirmed == true only.
+   * Invariant: unconfirmed relays are NEVER evicted.
+   * If prunable count < deficit, state may remain over cap.
+   */
+  private pruneRelayEvidence(state: BridgeDurableState): BridgeDurableState {
+    const entries = Object.entries(state.relay_evidence);
+    if (entries.length <= RELAY_EVIDENCE_MAX) return state;
+
+    const prunable = entries.filter(([, r]) => r.confirmed);
+    if (prunable.length === 0) return state;
+
+    const deficit = entries.length - RELAY_EVIDENCE_MAX;
+    const evictKeys = new Set(
+      [...prunable]
+        .sort((a, b) => (a[1].submitted_at ?? '').localeCompare(b[1].submitted_at ?? ''))
+        .slice(0, deficit)
+        .map(([k]) => k),
+    );
+
+    return {
+      ...state,
+      relay_evidence: Object.fromEntries(entries.filter(([k]) => !evictKeys.has(k))),
+    };
+  }
+
+  private pruneState(state: BridgeDurableState): BridgeDurableState {
+    return this.pruneRelayEvidence(this.pruneInboundFacts(state));
   }
 
   private createDeferred(): { promise: Promise<void>; resolve: () => void } {

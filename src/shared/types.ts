@@ -13,6 +13,10 @@ const bcp47String = z
 
 const SENDER_ID_REGEX = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+$/;
 
+// Maximum character length for all identity strings (sender_id, agent_id, receiver_id).
+// [未校准] default — calibrate based on production observation.
+const ID_MAX_LENGTH = 128;
+
 // --- ChorusEnvelope v0.4 ---
 
 const ChorusEnvelopeSchema = z
@@ -20,6 +24,7 @@ const ChorusEnvelopeSchema = z
     chorus_version: z.literal("0.4"),
     sender_id: z
       .string()
+      .max(ID_MAX_LENGTH, `sender_id must not exceed ${ID_MAX_LENGTH} characters`)
       .regex(SENDER_ID_REGEX, "sender_id must be name@host format"),
     original_text: z
       .string()
@@ -74,6 +79,7 @@ interface AgentRegistration {
 export {
   BCP47_REGEX,
   SENDER_ID_REGEX,
+  ID_MAX_LENGTH,
   bcp47String,
   ChorusEnvelopeSchema,
   ChorusAgentCardSchema,

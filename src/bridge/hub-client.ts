@@ -1,5 +1,6 @@
 // Author: be-domain-modeler
-import type { ChorusEnvelope } from '../shared/types';
+import { z } from 'zod';
+import { ChorusEnvelopeSchema, type ChorusEnvelope } from '../shared/types';
 import type { ISO8601 } from './types';
 
 /**
@@ -44,7 +45,39 @@ export class HubClientError extends Error {
   }
 }
 
-const REQUIRED_SSE_FIELDS = ['trace_id', 'sender_id', 'envelope', 'timestamp'] as const;
+// SSE single-event schema — parse failure → onError + drop event (stream continues)
+const HubSSEEventSchema = z.object({
+  trace_id: z.string().min(1),
+  sender_id: z.string().min(1),
+  envelope: ChorusEnvelopeSchema,
+  timestamp: z.string().min(1),
+});
+
+// History message item schema — parse failure → throw HubClientError (fail closed)
+// envelope uses z.record because Hub stores it verbatim (may predate current schema version)
+const HubHistoryMessageSchema = z.object({
+  trace_id: z.string().min(1),
+  sender_id: z.string().min(1),
+  receiver_id: z.string().min(1),
+  envelope: z.record(z.string(), z.unknown()),
+  delivered_via: z.string(),
+  timestamp: z.string().min(1),
+});
+
+// History response wrapper schema — parse failure → throw HubClientError
+const HubHistoryWrapperSchema = z.object({
+  success: z.literal(true),
+  data: z.array(z.unknown()),
+});
+
+// Relay response schema — parse failure → throw HubClientError (fail closed)
+const HubRelayResponseSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    trace_id: z.string().min(1),
+    delivery: z.string().min(1),
+  }),
+});
 
 const BACKOFF_BASE_MS = 1000;
 const BACKOFF_CAP_MS = 30000;
@@ -59,48 +92,55 @@ export const computeBackoff = (attempt: number): number => {
 
 /**
  * Parse a raw SSE data payload into a HubSSEEvent.
- * Returns null if any required field is missing (Hub contract violation).
+ * Returns null on any parse failure — SSE stream continues (single-event boundary).
  */
 export const parseSSEEvent = (
   rawData: string,
   onError: (msg: string) => void,
 ): HubSSEEvent | null => {
+  let parsed: unknown;
   try {
-    const parsed = JSON.parse(rawData) as Record<string, unknown>;
-
-    for (const field of REQUIRED_SSE_FIELDS) {
-      if (parsed[field] === undefined || parsed[field] === null) {
-        onError(`Hub contract violation: SSE event missing required field "${field}"`);
-        return null;
-      }
-    }
-
-    return Object.freeze({
-      trace_id: parsed.trace_id as string,
-      sender_id: parsed.sender_id as string,
-      envelope: parsed.envelope as ChorusEnvelope,
-      hub_timestamp: parsed.timestamp as ISO8601,
-    });
+    parsed = JSON.parse(rawData);
   } catch {
-    onError(`Hub contract violation: SSE event is not valid JSON`);
+    onError('Hub contract violation: SSE event is not valid JSON');
     return null;
   }
+
+  const result = HubSSEEventSchema.safeParse(parsed);
+  if (!result.success) {
+    onError(`Hub contract violation: SSE event schema mismatch: ${result.error.message}`);
+    return null;
+  }
+
+  return Object.freeze({
+    trace_id: result.data.trace_id,
+    sender_id: result.data.sender_id,
+    envelope: result.data.envelope,
+    hub_timestamp: result.data.timestamp,
+  });
 };
 
 /**
- * Parse Hub history response into typed messages.
+ * Parse Hub history response items into typed messages.
+ * Throws HubClientError on schema mismatch — history boundary is fail-closed.
  */
 export const parseHistoryResponse = (
-  data: readonly Record<string, unknown>[],
+  data: readonly unknown[],
 ): readonly HubHistoryMessage[] =>
-  Object.freeze(data.map((msg) => Object.freeze({
-    trace_id: msg.trace_id as string,
-    sender_id: msg.sender_id as string,
-    receiver_id: msg.receiver_id as string,
-    envelope: msg.envelope as ChorusEnvelope,
-    delivered_via: msg.delivered_via as string,
-    timestamp: msg.timestamp as ISO8601,
-  })));
+  Object.freeze(data.map((msg) => {
+    const result = HubHistoryMessageSchema.safeParse(msg);
+    if (!result.success) {
+      throw new HubClientError('Hub contract violation: malformed history response');
+    }
+    return Object.freeze({
+      trace_id: result.data.trace_id,
+      sender_id: result.data.sender_id,
+      receiver_id: result.data.receiver_id,
+      envelope: result.data.envelope as unknown as ChorusEnvelope,
+      delivered_via: result.data.delivered_via,
+      timestamp: result.data.timestamp,
+    });
+  }));
 
 /**
  * Hub Client — manages SSE subscription, history fetch, and relay submission.
@@ -290,12 +330,12 @@ export class HubClient {
       );
     }
 
-    const body = await res.json() as { success: boolean; data: Record<string, unknown>[] };
-    if (!body.success) {
-      throw new HubClientError('History fetch returned success=false');
+    const wrapResult = HubHistoryWrapperSchema.safeParse(await res.json());
+    if (!wrapResult.success) {
+      throw new HubClientError('Hub contract violation: malformed history response');
     }
 
-    return parseHistoryResponse(body.data);
+    return parseHistoryResponse(wrapResult.data.data);
   }
 
   /**
@@ -325,14 +365,14 @@ export class HubClient {
       );
     }
 
-    const body = await res.json() as { success: boolean; data: { trace_id: string; delivery: string } };
-    if (!body.success) {
-      throw new HubClientError('Relay submission returned success=false');
+    const relayResult = HubRelayResponseSchema.safeParse(await res.json());
+    if (!relayResult.success) {
+      throw new HubClientError('Hub contract violation: malformed relay response');
     }
 
     return Object.freeze({
-      trace_id: body.data.trace_id,
-      delivery: body.data.delivery,
+      trace_id: relayResult.data.data.trace_id,
+      delivery: relayResult.data.data.delivery,
     });
   }
 }

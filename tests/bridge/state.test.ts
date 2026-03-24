@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { DurableStateManager } from '../../src/bridge/state';
 import { computeRouteKey } from '../../src/bridge/route-key';
-import type { BridgeDurableState } from '../../src/bridge/types';
+import type { BridgeDurableState, InboundFact, RelayRecord } from '../../src/bridge/types';
 
 describe('DurableStateManager', () => {
   const createTempDir = (): string => {
@@ -414,6 +414,121 @@ describe('DurableStateManager', () => {
         cleanupDir(tempDir);
       }
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pruning invariants (T-03)
+// ---------------------------------------------------------------------------
+
+describe('DurableStateManager pruning', () => {
+  const createTempDir = (): string =>
+    fs.mkdtempSync(path.join(os.tmpdir(), 'bridge-prune-test-'));
+  const cleanupDir = (dir: string): void =>
+    fs.rmSync(dir, { recursive: true, force: true });
+
+  const retryableFact = {
+    route_key: 'a:b',
+    observed_at: '2026-03-24T10:00:00Z',
+    hub_timestamp: '2026-03-24T09:59:00Z',
+    dedupe_result: null as null,
+    delivery_evidence: null,
+    terminal_disposition: null,
+    cursor_advanced: false,
+  };
+
+  const finalizedFact = (timestamp: string) => ({
+    route_key: 'a:b',
+    observed_at: timestamp,
+    hub_timestamp: timestamp,
+    dedupe_result: 'new' as const,
+    delivery_evidence: null,
+    terminal_disposition: { reason: 'duplicate' as const, decided_at: timestamp },
+    cursor_advanced: false,
+  });
+
+  const unconfirmedRelay = {
+    inbound_trace_id: null,
+    route_key: 'a:b',
+    reply_text: 'hi',
+    bound_turn_number: 1,
+    idempotency_key: 'idem-u',
+    submitted_at: null,
+    hub_trace_id: null,
+    confirmed: false,
+  };
+
+  const confirmedRelay = (ts: string) => ({
+    inbound_trace_id: null,
+    route_key: 'a:b',
+    reply_text: 'hi',
+    bound_turn_number: 1,
+    idempotency_key: `idem-${ts}`,
+    submitted_at: ts,
+    hub_trace_id: 'hub-trace',
+    confirmed: true,
+  });
+
+  it('test_prune_preserves_retryable_fact: retryable inbound fact survives pruning', async () => {
+    const tempDir = createTempDir();
+    try {
+      const manager = new DurableStateManager(tempDir, 'agent-prune');
+      // Build 501 inbound_facts: 500 finalized + 1 retryable
+      const facts: Record<string, InboundFact> = {};
+      for (let i = 0; i < 500; i++) {
+        facts[`finalized-${i}`] = finalizedFact(`2026-01-01T${String(i).padStart(5, '0')}Z`);
+      }
+      facts['retryable-keep'] = retryableFact;
+      const state: BridgeDurableState = { ...manager.load(), inbound_facts: facts };
+      manager.save(state);
+
+      const result = await manager.mutate((s) => s);
+
+      expect(result.inbound_facts['retryable-keep']).toBeDefined();
+    } finally {
+      cleanupDir(tempDir);
+    }
+  });
+
+  it('test_prune_preserves_unconfirmed_relay: unconfirmed relay record survives pruning', async () => {
+    const tempDir = createTempDir();
+    try {
+      const manager = new DurableStateManager(tempDir, 'agent-prune');
+      // Build 501 relay_evidence: 500 confirmed + 1 unconfirmed
+      const relays: Record<string, RelayRecord> = {};
+      for (let i = 0; i < 500; i++) {
+        relays[`confirmed-${i}`] = confirmedRelay(`2026-01-${String(i + 1).padStart(2, '0')}T00:00:00Z`);
+      }
+      relays['unconfirmed-keep'] = unconfirmedRelay;
+      const state: BridgeDurableState = { ...manager.load(), relay_evidence: relays };
+      manager.save(state);
+
+      const result = await manager.mutate((s) => s);
+
+      expect(result.relay_evidence['unconfirmed-keep']).toBeDefined();
+    } finally {
+      cleanupDir(tempDir);
+    }
+  });
+
+  it('test_prune_stays_over_cap_when_no_prunable: state may exceed cap if all records are retryable', async () => {
+    const tempDir = createTempDir();
+    try {
+      const manager = new DurableStateManager(tempDir, 'agent-prune');
+      // Build 502 retryable inbound_facts — none prunable
+      const facts: Record<string, InboundFact> = {};
+      for (let i = 0; i < 502; i++) {
+        facts[`retryable-${i}`] = retryableFact;
+      }
+      const state: BridgeDurableState = { ...manager.load(), inbound_facts: facts };
+      manager.save(state);
+
+      const result = await manager.mutate((s) => s);
+
+      expect(Object.keys(result.inbound_facts)).toHaveLength(502);
+    } finally {
+      cleanupDir(tempDir);
+    }
   });
 });
 

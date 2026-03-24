@@ -11,6 +11,7 @@ import { AgentRegistry } from "./registry";
 import { createActivityStream } from "./activity";
 import { createInboxManager } from "./inbox";
 import { createMessageStore } from "./message-store";
+import { createIdempotencyStore } from "./idempotency";
 import { initDb, seedInviteCodes } from "./db";
 import { log, logError } from "../shared/log";
 import { mkdirSync } from "fs";
@@ -44,11 +45,12 @@ const registry = new AgentRegistry(db, MAX_AGENTS);
 const activity = createActivityStream(db);
 const inbox = createInboxManager();
 const messageStore = createMessageStore(db);
+const idempotencyStore = createIdempotencyStore(db);
 const app = createApp(registry, {
   maxAgents: MAX_AGENTS,
   maxBodyBytes: MAX_BODY_BYTES,
   rateLimitPerMin: RATE_LIMIT_PER_MIN,
-}, activity, inbox, messageStore);
+}, activity, inbox, messageStore, idempotencyStore);
 
 if (require.main === module) {
   const apiKeysRaw = process.env["CHORUS_API_KEYS"];

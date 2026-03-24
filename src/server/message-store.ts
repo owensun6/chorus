@@ -13,8 +13,8 @@ interface StoredMessage {
 }
 
 interface MessageStore {
-  readonly append: (msg: Omit<StoredMessage, "id" | "timestamp">) => StoredMessage;
-  readonly listForAgent: (agentId: string, since?: number) => readonly StoredMessage[];
+  readonly append: (msg: Omit<StoredMessage, "id" | "timestamp"> & { readonly timestamp?: string }) => StoredMessage;
+  readonly listForAgent: (agentId: string, since?: string) => readonly StoredMessage[];
   readonly getStats: () => { total_stored: number };
 }
 
@@ -28,20 +28,20 @@ const createMessageStore = (db: Database.Database): MessageStore => {
     SELECT id, trace_id, sender_id, receiver_id, envelope, delivered_via, timestamp
     FROM messages
     WHERE receiver_id = ? OR sender_id = ?
-    ORDER BY id ASC
+    ORDER BY timestamp ASC, trace_id ASC
   `);
 
   const stmtListSince = db.prepare(`
     SELECT id, trace_id, sender_id, receiver_id, envelope, delivered_via, timestamp
     FROM messages
-    WHERE (receiver_id = ? OR sender_id = ?) AND id > ?
-    ORDER BY id ASC
+    WHERE (receiver_id = ? OR sender_id = ?) AND timestamp >= ?
+    ORDER BY timestamp ASC, trace_id ASC
   `);
 
   const stmtCount = db.prepare("SELECT COUNT(*) as count FROM messages");
 
-  const append = (msg: Omit<StoredMessage, "id" | "timestamp">): StoredMessage => {
-    const timestamp = new Date().toISOString();
+  const append = (msg: Omit<StoredMessage, "id" | "timestamp"> & { readonly timestamp?: string }): StoredMessage => {
+    const timestamp = msg.timestamp ?? new Date().toISOString();
     const result = stmtInsert.run({
       trace_id: msg.trace_id,
       sender_id: msg.sender_id,
@@ -58,7 +58,7 @@ const createMessageStore = (db: Database.Database): MessageStore => {
     };
   };
 
-  const listForAgent = (agentId: string, since?: number): readonly StoredMessage[] => {
+  const listForAgent = (agentId: string, since?: string): readonly StoredMessage[] => {
     const rows = since === undefined
       ? stmtListAll.all(agentId, agentId) as MessageRow[]
       : stmtListSince.all(agentId, agentId, since) as MessageRow[];

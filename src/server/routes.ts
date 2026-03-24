@@ -421,42 +421,42 @@ const createApp = (
 
     const TIMEOUT_MS = 120_000;
     const traceId = randomUUID();
+    const hubTimestamp = new Date().toISOString();
 
     if (activity) {
       activity.append("message_submitted", {
         trace_id: traceId,
         sender_id: envelope.sender_id,
         receiver_id,
-        original_text: envelope.original_text,
-        sender_culture: envelope.sender_culture,
       });
     }
 
     // Priority 1: SSE inbox delivery
     if (inbox?.isConnected(receiver_id)) {
-      const sseTimestamp = new Date().toISOString();
       const delivered = inbox.deliver(receiver_id, {
         trace_id: traceId,
         sender_id: envelope.sender_id,
         envelope,
-        timestamp: sseTimestamp,
+        timestamp: hubTimestamp,
       });
 
       if (delivered) {
         registry.recordDelivery();
-        messageStore?.append({ trace_id: traceId, sender_id: envelope.sender_id, receiver_id, envelope, delivered_via: "sse" });
+        messageStore?.append({ trace_id: traceId, sender_id: envelope.sender_id, receiver_id, envelope, delivered_via: "sse", timestamp: hubTimestamp });
         if (activity) {
           activity.append("message_delivered_sse", {
             trace_id: traceId,
             sender_id: envelope.sender_id,
             receiver_id,
-            original_text: envelope.original_text,
-            sender_culture: envelope.sender_culture,
           });
         }
         const sseResponse = successResponse({ delivery: "delivered_sse", trace_id: traceId });
         if (idempotencyKey && idempotencyStore) {
-          try { idempotencyStore.store(idempotencyKey, computePayloadHash(body), traceId, { status: 200, body: sseResponse }); } catch { /* best-effort */ }
+          try {
+            idempotencyStore.store(idempotencyKey, computePayloadHash(body), traceId, { status: 200, body: sseResponse });
+          } catch {
+            return c.json(errorResponse("ERR_IDEMPOTENCY_PERSIST_FAILED", "Message delivered but idempotency record could not be persisted"), 503);
+          }
         }
         return c.json(sseResponse, 200);
       }
@@ -465,7 +465,7 @@ const createApp = (
     // Priority 2: No SSE and no endpoint — queue for poll-based retrieval
     if (!target.endpoint) {
       if (messageStore) {
-        messageStore.append({ trace_id: traceId, sender_id: envelope.sender_id, receiver_id, envelope, delivered_via: "queued" });
+        messageStore.append({ trace_id: traceId, sender_id: envelope.sender_id, receiver_id, envelope, delivered_via: "queued", timestamp: hubTimestamp });
       }
       registry.recordQueued();
       if (activity) {
@@ -473,13 +473,15 @@ const createApp = (
           trace_id: traceId,
           sender_id: envelope.sender_id,
           receiver_id,
-          original_text: envelope.original_text,
-          sender_culture: envelope.sender_culture,
         });
       }
       const queuedResponse = successResponse({ delivery: "queued", trace_id: traceId });
       if (idempotencyKey && idempotencyStore) {
-        try { idempotencyStore.store(idempotencyKey, computePayloadHash(body), traceId, { status: 202, body: queuedResponse }); } catch { /* best-effort */ }
+        try {
+          idempotencyStore.store(idempotencyKey, computePayloadHash(body), traceId, { status: 202, body: queuedResponse });
+        } catch {
+          return c.json(errorResponse("ERR_IDEMPOTENCY_PERSIST_FAILED", "Message queued but idempotency record could not be persisted"), 503);
+        }
       }
       return c.json(queuedResponse, 202);
     }
@@ -534,20 +536,22 @@ const createApp = (
 
       const targetBody = await targetRes.json();
       registry.recordDelivery();
-      messageStore?.append({ trace_id: traceId, sender_id: envelope.sender_id, receiver_id, envelope, delivered_via: "webhook" });
+      messageStore?.append({ trace_id: traceId, sender_id: envelope.sender_id, receiver_id, envelope, delivered_via: "webhook", timestamp: hubTimestamp });
       if (activity) {
         activity.append("message_delivered", {
           trace_id: traceId,
           sender_id: envelope.sender_id,
           receiver_id,
-          original_text: envelope.original_text,
-          sender_culture: envelope.sender_culture,
           status: targetRes.status,
         });
       }
       const webhookResponse = successResponse({ delivery: "delivered", receiver_response: targetBody });
       if (idempotencyKey && idempotencyStore) {
-        try { idempotencyStore.store(idempotencyKey, computePayloadHash(body), traceId, { status: 200, body: webhookResponse }); } catch { /* best-effort */ }
+        try {
+          idempotencyStore.store(idempotencyKey, computePayloadHash(body), traceId, { status: 200, body: webhookResponse });
+        } catch {
+          return c.json(errorResponse("ERR_IDEMPOTENCY_PERSIST_FAILED", "Message delivered but idempotency record could not be persisted"), 503);
+        }
       }
       return c.json(webhookResponse, 200);
     } catch (err: unknown) {

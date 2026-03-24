@@ -13,7 +13,7 @@ interface StoredMessage {
 }
 
 interface MessageStore {
-  readonly append: (msg: Omit<StoredMessage, "id" | "timestamp">) => StoredMessage;
+  readonly append: (msg: Omit<StoredMessage, "id" | "timestamp"> & { readonly timestamp?: string }) => StoredMessage;
   readonly listForAgent: (agentId: string, since?: string) => readonly StoredMessage[];
   readonly getStats: () => { total_stored: number };
 }
@@ -40,8 +40,8 @@ const createMessageStore = (db: Database.Database): MessageStore => {
 
   const stmtCount = db.prepare("SELECT COUNT(*) as count FROM messages");
 
-  const append = (msg: Omit<StoredMessage, "id" | "timestamp">): StoredMessage => {
-    const timestamp = new Date().toISOString();
+  const append = (msg: Omit<StoredMessage, "id" | "timestamp"> & { readonly timestamp?: string }): StoredMessage => {
+    const timestamp = msg.timestamp ?? new Date().toISOString();
     const result = stmtInsert.run({
       trace_id: msg.trace_id,
       sender_id: msg.sender_id,

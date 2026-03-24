@@ -36,12 +36,42 @@ export class DurableStateManager {
   private readonly agentId: string;
   private readonly filePath: string;
   private readonly tmpPath: string;
+  private writeLock: Promise<void> = Promise.resolve();
 
   constructor(stateDir: string, agentId: string) {
     this.stateDir = stateDir;
     this.agentId = agentId;
     this.filePath = path.join(stateDir, `${agentId}.json`);
     this.tmpPath = this.filePath + '.tmp';
+  }
+
+  /**
+   * Atomic read-modify-write protected by a process-wide async mutex.
+   * The mutator receives the current state and returns the new state to persist.
+   * Concurrent calls are serialized — no cross-route interleaving.
+   */
+  async mutate(
+    fn: (state: BridgeDurableState) => Promise<BridgeDurableState> | BridgeDurableState,
+  ): Promise<BridgeDurableState> {
+    const prev = this.writeLock;
+    const { promise, resolve } = this.createDeferred();
+    this.writeLock = promise;
+
+    await prev;
+    try {
+      const state = this.load();
+      const next = await fn(state);
+      this.save(next);
+      return next;
+    } finally {
+      resolve();
+    }
+  }
+
+  private createDeferred(): { promise: Promise<void>; resolve: () => void } {
+    const holder: { resolve: () => void } = { resolve: () => {} };
+    const promise = new Promise<void>((r) => { holder.resolve = r; });
+    return { promise, resolve: holder.resolve };
   }
 
   /**

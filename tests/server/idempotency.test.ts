@@ -306,6 +306,73 @@ describe("POST /messages Idempotency-Key validation", () => {
     expect(json.success).toBe(false);
   });
 
+  it("returns 503 when idempotency store fails on successful queued path (test_persist_fail_closed)", async () => {
+    const { app, idempotencyStore } = makeApp(db);
+    await registerAgent(app, "sender@hub", CARD_EN);
+    await registerAgent(app, "receiver@hub", CARD_ZH);
+
+    // Sabotage store() to throw on persist — check() still works (returns "new")
+    const originalStore = idempotencyStore.store;
+    (idempotencyStore as any).store = () => { throw new Error("disk full"); };
+
+    const res = await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: makeEnvelope("Persist should fail closed"),
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "KEY-PERSIST-FAIL-001",
+      },
+    });
+
+    expect(res.status).toBe(503);
+    const json: Json = await res.json();
+    expect(json.success).toBe(false);
+    expect(json.error.code).toBe("ERR_IDEMPOTENCY_PERSIST_FAILED");
+
+    // Restore
+    (idempotencyStore as any).store = originalStore;
+  });
+
+  it("returns 503 when idempotency store fails on successful SSE path (test_persist_fail_closed_sse)", async () => {
+    const { app, idempotencyStore, inbox } = makeApp(db);
+    await registerAgent(app, "sender@hub", CARD_EN);
+    await registerAgent(app, "receiver@hub", CARD_ZH);
+
+    // Connect receiver to SSE
+    const mockController = {
+      enqueue: () => {},
+      close: () => {},
+    } as unknown as ReadableStreamDefaultController;
+    inbox.connect("receiver@hub", mockController);
+
+    // Sabotage store() to throw on persist
+    const originalStore = idempotencyStore.store;
+    (idempotencyStore as any).store = () => { throw new Error("disk full"); };
+
+    const res = await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: makeEnvelope("SSE persist should fail closed"),
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "KEY-PERSIST-FAIL-SSE-001",
+      },
+    });
+
+    expect(res.status).toBe(503);
+    const json: Json = await res.json();
+    expect(json.success).toBe(false);
+    expect(json.error.code).toBe("ERR_IDEMPOTENCY_PERSIST_FAILED");
+
+    // Restore
+    (idempotencyStore as any).store = originalStore;
+  });
+
   it("accepts Idempotency-Key of exactly 256 characters", async () => {
     const { app } = makeApp(db);
     await registerAgent(app, "sender@hub", CARD_EN);

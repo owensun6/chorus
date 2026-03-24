@@ -646,6 +646,48 @@ describe("T-01: SSE timestamp + inclusive history", () => {
     expect(messages[2].trace_id).toBe("zzz-trace");
   });
 
+  it("test_timestamp_consistency: SSE timestamp matches stored message timestamp for same trace_id", async () => {
+    const { app, inbox, messageStore } = makeApp();
+    const senderKey = await registerAgent(app, "sender@hub", CARD_EN);
+    const receiverKey = await registerAgent(app, "receiver@hub", CARD_ZH);
+
+    // Capture SSE payload via mock controller
+    const enqueued: Uint8Array[] = [];
+    const mockController = {
+      enqueue: (chunk: Uint8Array) => { enqueued.push(chunk); },
+      close: () => {},
+    } as unknown as ReadableStreamDefaultController;
+    inbox.connect("receiver@hub", mockController);
+
+    // Send message via SSE path
+    const sendRes = await app.request("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        receiver_id: "receiver@hub",
+        envelope: { chorus_version: "0.4", sender_id: "sender@hub", original_text: "Timestamp consistency", sender_culture: "en" },
+      }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${senderKey}` },
+    });
+
+    expect(sendRes.status).toBe(200);
+    const sendJson: Json = await sendRes.json();
+    const traceId = sendJson.data.trace_id;
+
+    // Extract SSE timestamp
+    const decoder = new TextDecoder();
+    const sseText = enqueued.map((chunk) => decoder.decode(chunk)).join("");
+    const events = parseSSEEvents(sseText);
+    const messageData = JSON.parse(events.filter((e) => e.event === "message")[0].data);
+    const sseTimestamp = messageData.timestamp;
+
+    // Extract stored message timestamp
+    const stored = messageStore.listForAgent("receiver@hub");
+    const match = stored.find((m) => m.trace_id === traceId);
+
+    expect(match).toBeDefined();
+    expect(match!.timestamp).toBe(sseTimestamp);
+  });
+
   it("test_since_iso8601_validation: malformed since param returns 400", async () => {
     const { app } = makeApp();
     const receiverKey = await registerAgent(app, "receiver@hub", CARD_ZH);

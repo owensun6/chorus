@@ -14,6 +14,19 @@ const SCHEMA_VERSION = '2.0' as const;
 const INBOUND_FACTS_MAX = 500;
 const RELAY_EVIDENCE_MAX = 500;
 
+const compareCursorPosition = (
+  aTimestamp: string,
+  aTraceId: string,
+  bTimestamp: string,
+  bTraceId: string,
+): number => {
+  if (aTimestamp < bTimestamp) return -1;
+  if (aTimestamp > bTimestamp) return 1;
+  if (aTraceId < bTraceId) return -1;
+  if (aTraceId > bTraceId) return 1;
+  return 0;
+};
+
 /**
  * Creates an empty BridgeDurableState for a given agent.
  */
@@ -177,6 +190,16 @@ export class DurableStateManager {
     traceId: string,
     hubTimestamp: string
   ): BridgeDurableState {
+    const currentTimestamp = state.cursor.last_completed_timestamp;
+    const currentTraceId = state.cursor.last_completed_trace_id;
+    if (
+      currentTimestamp !== null &&
+      currentTraceId !== null &&
+      compareCursorPosition(hubTimestamp, traceId, currentTimestamp, currentTraceId) < 0
+    ) {
+      return state;
+    }
+
     return {
       ...state,
       cursor: {

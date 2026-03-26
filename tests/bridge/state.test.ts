@@ -219,6 +219,22 @@ describe('DurableStateManager', () => {
         cleanupDir(tempDir);
       }
     });
+
+    it('should not move cursor backwards when an older message finishes after a newer one', () => {
+      const tempDir = createTempDir();
+      try {
+        const manager = new DurableStateManager(tempDir, 'agent-a');
+        const state = manager.load();
+
+        const newest = manager.advanceCursor(state, 'trace-new', '2026-03-24T15:00:00Z');
+        const regressed = manager.advanceCursor(newest, 'trace-old', '2026-03-24T14:59:59Z');
+
+        expect(regressed.cursor.last_completed_trace_id).toBe('trace-new');
+        expect(regressed.cursor.last_completed_timestamp).toBe('2026-03-24T15:00:00Z');
+      } finally {
+        cleanupDir(tempDir);
+      }
+    });
   });
 
   describe('error handling', () => {

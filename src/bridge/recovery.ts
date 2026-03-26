@@ -72,12 +72,13 @@ const delay = (ms: number): Promise<void> =>
  * Sequence from System_Design.md §5:
  * 1. Load state
  * 2. Advance orphaned cursors
- * 3. Fetch Hub history (with retry+backoff) — needed for step 4
- * 4. Resume incomplete inbound facts from last completed step
- * 5. Retry incomplete relays
- * 6. Process new Hub messages through inbound pipeline
- * 7. Connect SSE
- * 8. Acquire host handles
+ * 3. Snapshot recovery boundary after cursor repair
+ * 4. Fetch Hub history (with retry+backoff)
+ * 5. Acquire host handles
+ * 6. Connect SSE
+ * 7. Resume incomplete inbound facts from last completed step
+ * 8. Retry incomplete relays
+ * 9. Process new Hub messages through inbound pipeline
  */
 export class RecoveryEngine {
   private readonly config: RecoveryConfig;
@@ -112,20 +113,18 @@ export class RecoveryEngine {
     // Step 2: Advance orphaned cursors
     await this.advanceOrphanedCursors(state, stateManager);
 
-    // Step 3: Fetch Hub history with retry+backoff (required before SSE)
+    // Step 3: Snapshot the recovery boundary after cursor repair.
     const stateAfterCursors = stateManager.load();
+    const recoveryCursorTimestamp = stateAfterCursors.cursor.last_completed_timestamp;
+    const recoveryCursorTraceId = stateAfterCursors.cursor.last_completed_trace_id;
+
+    // Step 4: Fetch Hub history with retry+backoff.
     const history = await this.fetchHistoryWithRetry(hubClient, stateAfterCursors);
 
-    // Step 4: Resume incomplete inbound facts using Hub history envelopes
-    await this.resumeIncompleteInbound(stateManager, inboundPipeline, history);
+    // Step 5: Acquire host handles before live inbox starts flowing.
+    await hostAdapter.acquireHandles();
 
-    // Step 5: Retry incomplete relays
-    await this.retryRelays(stateManager, outboundPipeline, hubClient);
-
-    // Step 6: Process new Hub messages (beyond cursor) through pipeline
-    await this.processNewMessages(stateManager, inboundPipeline, history);
-
-    // Step 7: Connect SSE (only after catchup succeeds)
+    // Step 6: Connect SSE before catchup processing so live delivery is not blocked by backlog.
     hubClient.connectSSE(
       this.config.agentId,
       this.config.apiKey,
@@ -133,8 +132,20 @@ export class RecoveryEngine {
       this.onError,
     );
 
-    // Step 8: Acquire host handles
-    await hostAdapter.acquireHandles();
+    // Step 7: Resume incomplete inbound facts using Hub history envelopes
+    await this.resumeIncompleteInbound(stateManager, inboundPipeline, history);
+
+    // Step 8: Retry incomplete relays
+    await this.retryRelays(stateManager, outboundPipeline, hubClient);
+
+    // Step 9: Process history beyond the recovery boundary through pipeline.
+    await this.processNewMessages(
+      stateManager,
+      inboundPipeline,
+      history,
+      recoveryCursorTimestamp,
+      recoveryCursorTraceId,
+    );
 
     return stateManager.load();
   }
@@ -161,7 +172,7 @@ export class RecoveryEngine {
   }
 
   /**
-   * Step 3: Fetch Hub history with exponential backoff retry.
+   * Step 4: Fetch Hub history with exponential backoff retry.
    * MUST succeed before SSE can connect — fail-closed if all retries exhausted.
    */
   private async fetchHistoryWithRetry(
@@ -187,7 +198,7 @@ export class RecoveryEngine {
   }
 
   /**
-   * Step 4: Resume incomplete inbound facts from their last completed step.
+   * Step 7: Resume incomplete inbound facts from their last completed step.
    * Uses Hub history to supply the original envelope for re-delivery.
    */
   private async resumeIncompleteInbound(
@@ -219,7 +230,7 @@ export class RecoveryEngine {
   }
 
   /**
-   * Step 5: Retry incomplete relays (bound-not-submitted or submitted-not-confirmed).
+   * Step 8: Retry incomplete relays (bound-not-submitted or submitted-not-confirmed).
    */
   private async retryRelays(
     stateManager: DurableStateManager,
@@ -243,20 +254,21 @@ export class RecoveryEngine {
   }
 
   /**
-   * Step 6: Process new messages from Hub history (beyond current cursor).
+   * Step 9: Process history messages beyond the recovery boundary.
    */
   private async processNewMessages(
     stateManager: DurableStateManager,
     inboundPipeline: InboundPipeline,
     history: readonly HubHistoryMessage[],
+    recoveryCursorTimestamp: string | null,
+    recoveryCursorTraceId: string | null,
   ): Promise<void> {
     const state = stateManager.load();
-    const { last_completed_timestamp, last_completed_trace_id } = state.cursor;
 
     const newMessages = filterBeyondCursor(
       history,
-      last_completed_timestamp,
-      last_completed_trace_id,
+      recoveryCursorTimestamp,
+      recoveryCursorTraceId,
     ).filter((msg) => msg.receiver_id === this.config.agentId);
 
     for (const msg of newMessages) {

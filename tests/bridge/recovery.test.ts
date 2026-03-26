@@ -13,7 +13,7 @@ import type {
 } from '../../src/bridge/types';
 import { InboundPipeline } from '../../src/bridge/inbound';
 import { OutboundPipeline } from '../../src/bridge/outbound';
-import type { HubClient, HubHistoryMessage } from '../../src/bridge/hub-client';
+import type { HubClient, HubHistoryMessage, HubSSEEvent, SSECallback } from '../../src/bridge/hub-client';
 
 const makeTempDir = (): string =>
   fs.mkdtempSync(path.join(os.tmpdir(), 'recovery-test-'));
@@ -372,28 +372,21 @@ describe('RecoveryEngine', () => {
   // test_recovery_order
   // ---------------------------------------------------------------------------
 
-  it('test_recovery_order: inbound resume before Hub catchup processing before SSE connect', async () => {
+  it('test_recovery_order: fetch history before live SSE connect, and live SSE connects before catchup processing', async () => {
     const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
-
-    // Seed orphaned cursor
-    const orphanedFact: InboundFact = {
-      route_key: ROUTE_KEY,
-      observed_at: '2026-03-24T11:00:00.000Z',
-      hub_timestamp: '2026-03-24T11:00:00.000Z',
-      envelope_projection: makeProjection(),
-      dedupe_result: 'new',
-      delivery_evidence: { delivered_at: '2026-03-24T11:00:01.000Z', method: 'test', ref: null },
-      terminal_disposition: null,
-      cursor_advanced: false,
-    };
-    stateManager.save(stateManager.setInboundFact(stateManager.load(), 'order-trace', orphanedFact));
-
     const callOrder: string[] = [];
     const hostAdapter = makeHostAdapter({
+      deliverInbound: jest.fn().mockImplementation(async () => {
+        callOrder.push('deliverInbound');
+        return { status: 'confirmed', method: 'test', ref: 'history-ref', timestamp: new Date().toISOString() };
+      }),
       acquireHandles: jest.fn().mockImplementation(async () => { callOrder.push('acquireHandles'); }),
     });
     const hubClient = {
-      fetchHistory: jest.fn().mockImplementation(async () => { callOrder.push('fetchHistory'); return []; }),
+      fetchHistory: jest.fn().mockImplementation(async () => {
+        callOrder.push('fetchHistory');
+        return [makeHubMsg('history-trace', '2026-03-24T12:00:00.000Z', 'History catchup')];
+      }),
       submitRelay: jest.fn().mockResolvedValue({ trace_id: 't', delivery: 'd' }),
       connectSSE: jest.fn().mockImplementation(() => { callOrder.push('connectSSE'); }),
       disconnect: jest.fn(),
@@ -409,10 +402,9 @@ describe('RecoveryEngine', () => {
     );
 
     expect(callOrder.indexOf('fetchHistory')).toBeLessThan(callOrder.indexOf('connectSSE'));
-    expect(callOrder.indexOf('connectSSE')).toBeLessThan(callOrder.indexOf('acquireHandles'));
-
-    // Orphaned cursor was advanced
-    expect(stateManager.load().inbound_facts['order-trace'].cursor_advanced).toBe(true);
+    expect(callOrder.indexOf('acquireHandles')).toBeLessThan(callOrder.indexOf('connectSSE'));
+    expect(callOrder.indexOf('connectSSE')).toBeLessThan(callOrder.indexOf('deliverInbound'));
+    expect(stateManager.load().inbound_facts['history-trace'].cursor_advanced).toBe(true);
   });
 
   // ---------------------------------------------------------------------------
@@ -592,5 +584,73 @@ describe('RecoveryEngine', () => {
     const finalState = stateManager.load();
     expect(finalState.inbound_facts['self-outbound-trace']).toBeUndefined();
     expect(hostAdapter.deliverInbound).not.toHaveBeenCalled();
+  });
+
+  it('does not let an early live SSE event cause older catchup history to be skipped', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const hostAdapter = makeHostAdapter({
+      deliverInbound: jest.fn().mockResolvedValue({
+        status: 'confirmed',
+        method: 'test',
+        ref: 'ref-1',
+        timestamp: '2026-03-24T12:05:01.000Z',
+      } as DeliveryReceipt),
+    });
+    const liveProcessing: Promise<void>[] = [];
+    const liveEvent: HubSSEEvent = {
+      trace_id: 'live-trace',
+      sender_id: 'live@hub',
+      envelope: {
+        chorus_version: '0.4',
+        sender_id: 'live@hub',
+        original_text: 'Live first',
+        sender_culture: 'en',
+      } as any,
+      hub_timestamp: '2026-03-24T12:05:00.000Z',
+    };
+    const hubClient = {
+      fetchHistory: jest.fn().mockResolvedValue([
+        makeHubMsgFor('history-trace', '2026-03-24T12:00:00.000Z', {
+          receiver_id: AGENT_ID,
+          sender_id: 'history@hub',
+          envelope: {
+            chorus_version: '0.4',
+            sender_id: 'history@hub',
+            original_text: 'Older backlog',
+            sender_culture: 'en',
+          } as any,
+        }),
+      ]),
+      submitRelay: jest.fn().mockResolvedValue({ trace_id: 'hub-t-1', delivery: 'delivered' }),
+      connectSSE: jest.fn().mockImplementation((
+        _agentId: string,
+        _apiKey: string,
+        onEvent: SSECallback,
+      ) => {
+        liveProcessing.push(Promise.resolve().then(() => onEvent(liveEvent)));
+      }),
+      disconnect: jest.fn(),
+    } as unknown as HubClient;
+    const inbound = new InboundPipeline(stateManager, hostAdapter, CONFIG);
+    const outbound = new OutboundPipeline(stateManager, CONFIG);
+    const engine = new RecoveryEngine(REC_CONFIG);
+
+    await engine.recover(
+      stateManager,
+      inbound,
+      outbound,
+      hubClient,
+      hostAdapter,
+      (event) => {
+        liveProcessing.push(inbound.processMessage(event));
+      },
+    );
+    await Promise.all(liveProcessing);
+
+    const finalState = stateManager.load();
+    expect(finalState.inbound_facts['history-trace']).toBeDefined();
+    expect(finalState.inbound_facts['live-trace']).toBeDefined();
+    expect(finalState.cursor.last_completed_trace_id).toBe('live-trace');
+    expect(finalState.cursor.last_completed_timestamp).toBe('2026-03-24T12:05:00.000Z');
   });
 });

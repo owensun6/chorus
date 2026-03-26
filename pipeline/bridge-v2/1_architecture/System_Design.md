@@ -47,6 +47,18 @@ Bridge v2 is a local process that sits between Chorus Hub (remote) and a host ru
 | Recovery Engine | On startup, loads durable state, computes resume position, and replays incomplete operations. |
 | Host Adapter | Abstracts the host runtime behind a delivery + reply-detection contract so Bridge stays host-agnostic. |
 
+### Control-Flow Ownership (single source)
+
+| Responsibility | Owner |
+|----------------|-------|
+| Hub ingress during startup/catchup | `RecoveryEngine` orchestrates; `HubClient` fetches/connects; `InboundPipeline` validates/processes |
+| Host-visible inbound delivery | `HostAdapter.deliverInbound()` |
+| Local conversation anchor resolution | `HostAdapter.resolveLocalAnchor()` |
+| Chorus-facing reply detection | `HostAdapter.onReplyDetected()` |
+| Relay binding + Hub submission | `OutboundPipeline` |
+
+No other component may claim these responsibilities in parallel. In particular, Host Adapter does NOT own Hub ingress, and Recovery Engine does NOT fabricate `local_anchor_id`.
+
 ## 2. Truth Source Table (Freeze Gate #1)
 
 | State Class | Single Authority | Storage Layer | Bridge Ownership |
@@ -98,7 +110,7 @@ sequenceDiagram
     Note over IP,DSM: Step 1: bridge_observed
     IP->>IP: validate envelope schema
     IP->>IP: compute route_key = {agent_id}:{sender_id}
-    IP->>DSM: write inbound_fact(trace_id, route_key, hub_timestamp, observed_at)
+    IP->>DSM: write inbound_fact(trace_id, route_key, hub_timestamp, observed_at, envelope_projection)
 
     Note over IP,DSM: Step 2: dedupe_decided
     IP->>DSM: read inbound_facts for trace_id
@@ -198,45 +210,53 @@ sequenceDiagram
     participant DSM as Durable State Manager
     participant HC as Hub Client
     participant IP as Inbound Pipeline
+    participant OP as Outbound Pipeline
     participant HA as Host Adapter
 
     RE->>DSM: load durable state
     RE->>RE: read cursor.(last_completed_timestamp, last_completed_trace_id)
 
-    Note over RE: Scan incomplete inbound_facts
-    RE->>RE: find facts where cursor_advanced = false
+    Note over RE,DSM: Step 2: advance orphaned cursors
+    RE->>RE: find facts with evidence and cursor_advanced = false
+    RE->>DSM: advance cursor for each orphaned fact
 
-    loop each incomplete fact
-        alt has delivery_evidence, missing cursor_advanced
-            RE->>DSM: advance cursor (safe: delivery already confirmed)
-        else dedupe_result = "new", no delivery_evidence
-            RE->>IP: re-attempt local delivery
-        else no dedupe_result
-            RE->>IP: re-observe and re-dedupe
-        end
-    end
-
-    Note over RE: Scan incomplete relay_evidence
-    RE->>RE: find relays where confirmed = false
-
-    loop each incomplete relay
-        alt submitted but not confirmed
-            RE->>HC: retry relay submission with same Idempotency-Key
-        else bound but not submitted
-            RE->>HC: reconstruct envelope from durable state; submit relay
-        end
-    end
-
-    Note over RE: Catchup from Hub
+    Note over RE,HC: Step 3: fetch Hub history
     RE->>HC: GET /agent/messages?since={cursor.last_completed_timestamp}
     HC-->>RE: messages at/after cursor timestamp
+
+    Note over RE,IP: Step 4: resume incomplete inbound
+    RE->>RE: index history by trace_id
+    RE->>IP: re-process incomplete facts found in history
+
+    Note over RE,OP: Step 5: retry incomplete relays
+    RE->>RE: find relays where confirmed = false
+    RE->>OP: resubmit bound relays with same idempotency_key
+
+    Note over RE,IP: Step 6: process new messages
     RE->>RE: discard boundary items <= composite cursor
     RE->>IP: process each surviving message through inbound pipeline
 
-    Note over RE: Establish live connection
+    Note over RE,HC: Step 7: establish live connection
     RE->>HC: connect SSE /agent/inbox
+
+    Note over RE,HA: Step 8: acquire host handles
     RE->>HA: acquire host delivery handles
 ```
+
+### Startup Contract (normative order)
+
+The startup sequence is authoritative only in this order:
+
+1. `load` durable state
+2. `advance orphaned cursors`
+3. `fetch history` (with retry/backoff)
+4. `resume incomplete inbound`
+5. `retry incomplete relays`
+6. `process new messages`
+7. `connect SSE`
+8. `acquire handles`
+
+No task spec or implementation may collapse, reorder, or omit these steps. In particular, `advance orphaned cursors`, `resume incomplete inbound`, and `process new messages` are not optional substeps inside a generic "catchup".
 
 ### Recovery Invariants
 

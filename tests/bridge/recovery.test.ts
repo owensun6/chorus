@@ -50,6 +50,33 @@ const makeHubMsg = (traceId: string, timestamp: string, text: string = 'Hello'):
   timestamp,
 });
 
+const makeHubMsgFor = (
+  traceId: string,
+  timestamp: string,
+  overrides: Partial<HubHistoryMessage> = {},
+): HubHistoryMessage => ({
+  trace_id: traceId,
+  sender_id: 'remote@hub',
+  receiver_id: AGENT_ID,
+  envelope: {
+    chorus_version: '0.4',
+    sender_id: 'remote@hub',
+    original_text: 'Hello',
+    sender_culture: 'en',
+  } as any,
+  delivered_via: 'sse',
+  timestamp,
+  ...overrides,
+});
+
+const makeProjection = (text: string = 'Hello') => ({
+  original_text: text,
+  sender_culture: 'en',
+  cultural_context: null,
+  conversation_id: null,
+  turn_number: 1,
+});
+
 const seedContinuity = (stateManager: DurableStateManager): void => {
   const state = stateManager.load();
   const entry: ContinuityEntry = {
@@ -123,6 +150,7 @@ describe('RecoveryEngine', () => {
       route_key: 'local@hub:other@hub',
       observed_at: '2026-03-24T10:59:00.000Z',
       hub_timestamp: '2026-03-24T10:59:00.000Z',
+      envelope_projection: makeProjection(),
       dedupe_result: 'new',
       delivery_evidence: { delivered_at: '2026-03-24T10:59:01.000Z', method: 'test', ref: null },
       terminal_disposition: null,
@@ -132,6 +160,7 @@ describe('RecoveryEngine', () => {
       route_key: ROUTE_KEY,
       observed_at: '2026-03-24T11:00:00.000Z',
       hub_timestamp: '2026-03-24T11:00:00.000Z',
+      envelope_projection: makeProjection('Retry me'),
       dedupe_result: 'new',
       delivery_evidence: null,
       terminal_disposition: null,
@@ -174,6 +203,7 @@ describe('RecoveryEngine', () => {
       route_key: ROUTE_KEY,
       observed_at: '2026-03-24T11:00:00.000Z',
       hub_timestamp: '2026-03-24T11:00:00.000Z',
+      envelope_projection: makeProjection(),
       dedupe_result: 'new',
       delivery_evidence: { delivered_at: '2026-03-24T11:00:01.000Z', method: 'test', ref: null },
       terminal_disposition: null,
@@ -206,6 +236,7 @@ describe('RecoveryEngine', () => {
       route_key: ROUTE_KEY,
       observed_at: '2026-03-24T11:00:00.000Z',
       hub_timestamp: '2026-03-24T11:00:00.000Z',
+      envelope_projection: makeProjection(),
       dedupe_result: 'new',
       delivery_evidence: null,
       terminal_disposition: { reason: 'delivery_failed_permanent', decided_at: '2026-03-24T11:00:01.000Z' },
@@ -349,6 +380,7 @@ describe('RecoveryEngine', () => {
       route_key: ROUTE_KEY,
       observed_at: '2026-03-24T11:00:00.000Z',
       hub_timestamp: '2026-03-24T11:00:00.000Z',
+      envelope_projection: makeProjection(),
       dedupe_result: 'new',
       delivery_evidence: { delivered_at: '2026-03-24T11:00:01.000Z', method: 'test', ref: null },
       terminal_disposition: null,
@@ -468,6 +500,7 @@ describe('RecoveryEngine', () => {
       route_key: ROUTE_KEY,
       observed_at: '2026-03-24T11:00:00.000Z',
       hub_timestamp: '2026-03-24T11:00:00.000Z',
+      envelope_projection: makeProjection(),
       dedupe_result: 'new',
       delivery_evidence: null,
       terminal_disposition: null,
@@ -490,5 +523,74 @@ describe('RecoveryEngine', () => {
     expect(errors.some((e) => e.includes('missing-trace') && e.includes('not found'))).toBe(true);
     // Fact remains incomplete
     expect(stateManager.load().inbound_facts['missing-trace'].cursor_advanced).toBe(false);
+  });
+
+  it('processes only history messages addressed to the local agent during catchup', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const hostAdapter = makeHostAdapter();
+    const hubClient = makeHubClient([
+      makeHubMsgFor('local-trace', '2026-03-24T12:00:00.000Z', {
+        receiver_id: AGENT_ID,
+        sender_id: 'remote@hub',
+        envelope: {
+          chorus_version: '0.4',
+          sender_id: 'remote@hub',
+          original_text: 'For local',
+          sender_culture: 'en',
+        } as any,
+      }),
+      makeHubMsgFor('other-trace', '2026-03-24T12:00:01.000Z', {
+        receiver_id: 'other@hub',
+        sender_id: 'remote@hub',
+        envelope: {
+          chorus_version: '0.4',
+          sender_id: 'remote@hub',
+          original_text: 'For somebody else',
+          sender_culture: 'en',
+        } as any,
+      }),
+    ]);
+    const engine = new RecoveryEngine(REC_CONFIG);
+
+    await engine.recover(
+      stateManager,
+      new InboundPipeline(stateManager, hostAdapter, CONFIG),
+      new OutboundPipeline(stateManager, CONFIG),
+      hubClient, hostAdapter, () => {},
+    );
+
+    const finalState = stateManager.load();
+    expect(finalState.inbound_facts['local-trace']).toBeDefined();
+    expect(finalState.inbound_facts['other-trace']).toBeUndefined();
+    expect(hostAdapter.deliverInbound).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not replay the current agent outbound history back into inbound on restart', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const hostAdapter = makeHostAdapter();
+    const hubClient = makeHubClient([
+      makeHubMsgFor('self-outbound-trace', '2026-03-24T12:00:00.000Z', {
+        receiver_id: 'remote@hub',
+        sender_id: AGENT_ID,
+        envelope: {
+          chorus_version: '0.4',
+          sender_id: AGENT_ID,
+          original_text: 'Outbound from local agent',
+          sender_culture: 'zh-CN',
+        } as any,
+      }),
+    ]);
+    const engine = new RecoveryEngine(REC_CONFIG);
+
+    await engine.recover(
+      stateManager,
+      new InboundPipeline(stateManager, hostAdapter, CONFIG),
+      new OutboundPipeline(stateManager, CONFIG),
+      hubClient, hostAdapter, () => {},
+    );
+
+    const finalState = stateManager.load();
+    expect(finalState.inbound_facts['self-outbound-trace']).toBeUndefined();
+    expect(hostAdapter.deliverInbound).not.toHaveBeenCalled();
   });
 });

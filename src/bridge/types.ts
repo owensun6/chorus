@@ -23,6 +23,19 @@ export interface TerminalDisposition {
 }
 
 /**
+ * Immutable Bridge-side projection of the inbound Chorus envelope.
+ * Stored at observe time so recovery and router readback do not depend on
+ * transcripts or host runtime residue.
+ */
+export interface InboundEnvelopeProjection {
+  readonly original_text: string;
+  readonly sender_culture: string;
+  readonly cultural_context: string | null;
+  readonly conversation_id: string | null;
+  readonly turn_number: number;
+}
+
+/**
  * Records every inbound message's journey through the pipeline.
  * Field transitions are monotonic: null -> value, false -> true.
  */
@@ -30,6 +43,7 @@ export interface InboundFact {
   readonly route_key: string;
   readonly observed_at: ISO8601;
   readonly hub_timestamp: ISO8601;
+  readonly envelope_projection: InboundEnvelopeProjection;
   readonly dedupe_result: 'new' | 'duplicate' | null;
   readonly delivery_evidence: DeliveryEvidence | null;
   readonly terminal_disposition: TerminalDisposition | null;
@@ -87,6 +101,11 @@ export interface BridgeDurableState {
 
 /**
  * Receipt returned by Host Adapter after delivery attempt.
+ *
+ * Contract note:
+ * - `unverifiable` is terminal for Bridge retry semantics. It means the host
+ *   may have delivered successfully, but Bridge cannot prove cancellation or
+ *   absence of a late send, so Bridge must not re-deliver the same fact.
  */
 export interface DeliveryReceipt {
   readonly status: 'confirmed' | 'unverifiable' | 'failed';

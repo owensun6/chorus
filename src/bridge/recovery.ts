@@ -196,7 +196,8 @@ export class RecoveryEngine {
     history: readonly HubHistoryMessage[],
   ): Promise<void> {
     const state = stateManager.load();
-    const historyIndex = new Map(history.map((msg) => [msg.trace_id, msg]));
+    const localHistory = history.filter((msg) => msg.receiver_id === this.config.agentId);
+    const historyIndex = new Map(localHistory.map((msg) => [msg.trace_id, msg]));
 
     for (const [traceId, fact] of Object.entries(state.inbound_facts)) {
       if (fact.cursor_advanced) continue;
@@ -256,7 +257,7 @@ export class RecoveryEngine {
       history,
       last_completed_timestamp,
       last_completed_trace_id,
-    );
+    ).filter((msg) => msg.receiver_id === this.config.agentId);
 
     for (const msg of newMessages) {
       // Skip messages already in inbound_facts (handled in step 4)

@@ -2,10 +2,16 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+jest.mock('../../src/shared/log', () => ({
+  log: jest.fn(),
+  logError: jest.fn(),
+  extractErrorMessage: (err: unknown) => err instanceof Error ? err.message : String(err),
+}));
 import { InboundPipeline } from '../../src/bridge/inbound';
 import { DurableStateManager } from '../../src/bridge/state';
 import type { HostAdapter, DeliveryReceipt, BridgeDurableState } from '../../src/bridge/types';
 import type { HubSSEEvent } from '../../src/bridge/hub-client';
+import { log } from '../../src/shared/log';
 
 const makeTempDir = (): string => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'inbound-test-'));
@@ -51,9 +57,15 @@ const CONFIG = { localAgentId: AGENT_ID, localCulture: 'zh-CN' };
 
 describe('InboundPipeline', () => {
   let tmpDir: string;
+  const mockedLog = jest.mocked(log);
 
   beforeEach(() => { tmpDir = makeTempDir(); });
-  afterEach(() => { fs.rmSync(tmpDir, { recursive: true, force: true }); });
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
 
   it('test_new_message: full pipeline creates fact, records delivery, advances cursor', async () => {
     const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
@@ -191,6 +203,30 @@ describe('InboundPipeline', () => {
     expect(fact.cursor_advanced).toBe(true);
   });
 
+  it('test_delivery_unverifiable_emits_observable_signal: unverifiable delivery writes structured signal without original_text', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const hostAdapter = makeHostAdapter({
+      deliverInbound: jest.fn().mockResolvedValue({
+        status: 'unverifiable',
+        method: 'fire-and-forget',
+        ref: null,
+        timestamp: '2026-03-24T12:00:01.000Z',
+      } as DeliveryReceipt),
+    });
+    const pipeline = new InboundPipeline(stateManager, hostAdapter, CONFIG);
+
+    await pipeline.processMessage(makeEvent({ trace_id: 'signal-trace' }));
+    expect(mockedLog).toHaveBeenCalledWith(
+      'bridge:delivery',
+      expect.stringContaining('"event":"delivery_unverifiable"'),
+    );
+    const [, payload] = mockedLog.mock.calls.at(-1)!;
+    expect(String(payload)).toContain('"trace_id":"signal-trace"');
+    expect(String(payload)).toContain('"route_key":"local@hub:remote@hub"');
+    expect(String(payload)).toContain('"terminal_disposition":"delivery_unverifiable"');
+    expect(String(payload)).not.toContain('original_text');
+  });
+
   // ---------------------------------------------------------------------------
   // test_local_anchor_id_persisted
   // ---------------------------------------------------------------------------
@@ -215,6 +251,98 @@ describe('InboundPipeline', () => {
 
     const state2 = stateManager.load();
     expect(state2.continuity[routeKey].local_anchor_id).toBe('anchor-resolved');
+  });
+
+  it('test_continuity_bootstrap_persisted_before_delivery: first inbound writes continuity before host delivery', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const hostAdapter = makeHostAdapter({
+      deliverInbound: jest.fn().mockImplementation(async () => {
+        const stateDuringDelivery = stateManager.load();
+        const continuity = stateDuringDelivery.continuity['local@hub:remote@hub'];
+        expect(continuity).toBeDefined();
+        expect(continuity.local_anchor_id).toBe('anchor-before-delivery');
+        expect(continuity.conversation_id).toBe('conv-bootstrap');
+        expect(continuity.last_inbound_turn).toBe(7);
+        return {
+          status: 'confirmed',
+          method: 'test',
+          ref: 'ref-1',
+          timestamp: '2026-03-24T12:00:01.000Z',
+        } as DeliveryReceipt;
+      }),
+      resolveLocalAnchor: jest.fn().mockResolvedValue('anchor-before-delivery'),
+    });
+    const pipeline = new InboundPipeline(stateManager, hostAdapter, CONFIG);
+
+    await pipeline.processMessage(makeEvent({
+      trace_id: 'bootstrap-trace',
+      envelope: {
+        chorus_version: '0.4',
+        sender_id: 'remote@hub',
+        original_text: 'Hello',
+        sender_culture: 'en',
+        conversation_id: 'conv-bootstrap',
+        turn_number: 7,
+      },
+    }));
+
+    const finalState = stateManager.load();
+    expect(finalState.continuity['local@hub:remote@hub'].local_anchor_id).toBe('anchor-before-delivery');
+    expect(finalState.continuity['local@hub:remote@hub'].conversation_id).toBe('conv-bootstrap');
+    expect(finalState.continuity['local@hub:remote@hub'].last_inbound_turn).toBe(7);
+  });
+
+  it('test_continuity_update_rules: adopts conversation_id only from null and uses max inbound turn', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const hostAdapter = makeHostAdapter();
+    const pipeline = new InboundPipeline(stateManager, hostAdapter, CONFIG);
+
+    await pipeline.processMessage(makeEvent({
+      trace_id: 'turn-1',
+      envelope: {
+        chorus_version: '0.4',
+        sender_id: 'remote@hub',
+        original_text: 'first',
+        sender_culture: 'en',
+        turn_number: 3,
+      },
+    }));
+
+    let state = stateManager.load();
+    expect(state.continuity['local@hub:remote@hub'].conversation_id).toBeNull();
+    expect(state.continuity['local@hub:remote@hub'].last_inbound_turn).toBe(3);
+
+    await pipeline.processMessage(makeEvent({
+      trace_id: 'turn-2',
+      envelope: {
+        chorus_version: '0.4',
+        sender_id: 'remote@hub',
+        original_text: 'second',
+        sender_culture: 'en',
+        conversation_id: 'conv-late',
+        turn_number: 2,
+      },
+    }));
+
+    state = stateManager.load();
+    expect(state.continuity['local@hub:remote@hub'].conversation_id).toBe('conv-late');
+    expect(state.continuity['local@hub:remote@hub'].last_inbound_turn).toBe(3);
+
+    await pipeline.processMessage(makeEvent({
+      trace_id: 'turn-3',
+      envelope: {
+        chorus_version: '0.4',
+        sender_id: 'remote@hub',
+        original_text: 'third',
+        sender_culture: 'en',
+        conversation_id: 'conv-overwrite-attempt',
+        turn_number: 9,
+      },
+    }));
+
+    state = stateManager.load();
+    expect(state.continuity['local@hub:remote@hub'].conversation_id).toBe('conv-late');
+    expect(state.continuity['local@hub:remote@hub'].last_inbound_turn).toBe(9);
   });
 
   // ---------------------------------------------------------------------------
@@ -311,6 +439,14 @@ describe('InboundPipeline', () => {
     expect(fact.cursor_advanced).toBe(true);
     expect(state.cursor.last_completed_trace_id).toBe('timeout-trace');
     expect(errors.some((e) => e.includes('unverifiable'))).toBe(true);
+    expect(mockedLog).toHaveBeenCalledWith(
+      'bridge:delivery',
+      expect.stringContaining('"event":"delivery_unverifiable"'),
+    );
+    const [, payload] = mockedLog.mock.calls.at(-1)!;
+    expect(String(payload)).toContain('"trace_id":"timeout-trace"');
+    expect(String(payload)).toContain('"route_key":"local@hub:remote@hub"');
+    expect(String(payload)).toContain('"terminal_disposition":"delivery_unverifiable"');
   });
 
   it('test_timeout_no_duplicate_delivery: recovery does NOT re-deliver after timeout', async () => {

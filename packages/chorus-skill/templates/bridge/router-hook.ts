@@ -40,6 +40,9 @@ type ActiveChorusPeer = {
   readonly peerLabel?: string | null;
   readonly conversationId?: string | null;
   readonly updatedAt?: string;
+  readonly routeKey?: string;
+  readonly lastInboundSummary?: string | null;
+  readonly lastOutboundReply?: string | null;
 };
 
 function contentToText(content: unknown): string {
@@ -86,17 +89,129 @@ function isContinuationRequest(text: string): boolean {
   return /继续跟(?:她|他|小x|xiaox)聊|继续和(?:她|他|小x|xiaox)聊|reply to her|reply to him|send (?:a )?message to her|send (?:a )?message to him|talk to her|talk to him|keep talking to her|keep talking to him|poke her|poke him/i.test(text);
 }
 
+function trimWrappedQuotes(text: string): string {
+  return text
+    .replace(/^[\s"'`“”‘’]+/, "")
+    .replace(/[\s"'`“”‘’]+$/, "")
+    .trim();
+}
+
+function stripContinuationDirectives(text: string): string {
+  let next = text.trim();
+  const directivePatterns = [
+    /\s*(?:只回复[她他]|只回[她他]|只对[她他]说|只发给[她他])[\s，,。.!！?？]*$/i,
+    /\s*(?:不要解释|不要说明|别解释|别说明|不要补充|别补充)[\s，,。.!！?？]*$/i,
+    /\s*(?:just reply to (?:her|him)|reply only to (?:her|him)|and nothing else|without explanation|don't explain|do not explain)[\s,.;:!?]*$/i,
+  ];
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const pattern of directivePatterns) {
+      const updated = next.replace(pattern, "").trim();
+      if (updated !== next) {
+        next = updated;
+        changed = true;
+      }
+    }
+  }
+  return trimWrappedQuotes(next);
+}
+
+function cutContinuationAtDirectiveBoundary(text: string): string {
+  const directiveStarts = [
+    /只回复[她他]/i,
+    /只回[她他]/i,
+    /只对[她他]说/i,
+    /只发给[她他]/i,
+    /不要解释/i,
+    /不要说明/i,
+    /别解释/i,
+    /别说明/i,
+    /不要补充/i,
+    /别补充/i,
+    /不要调用(?:任何)?工具/i,
+    /不要用工具/i,
+    /不要手工发送/i,
+    /不要确认已发送/i,
+    /不要确认发送/i,
+    /不要确认/i,
+    /不要说(?:发过去了|sent|done)/i,
+    /你的最终回复必须/i,
+    /最终回复必须/i,
+    /just reply to (?:her|him)/i,
+    /reply only to (?:her|him)/i,
+    /without explanation/i,
+    /don'?t explain/i,
+    /do not explain/i,
+    /don'?t call (?:any )?tools?/i,
+    /do not call (?:any )?tools?/i,
+    /don'?t manually send/i,
+    /do not manually send/i,
+    /don'?t confirm sent/i,
+    /do not confirm sent/i,
+    /your final assistant text must/i,
+    /your final reply must/i,
+  ];
+
+  let boundary = text.length;
+  for (const pattern of directiveStarts) {
+    const match = pattern.exec(text);
+    if (match && typeof match.index === "number" && match.index < boundary) {
+      boundary = match.index;
+    }
+  }
+
+  const sliced = boundary < text.length ? text.slice(0, boundary) : text;
+  return sliced.replace(/[\s，,；;:：]+$/, "").trim();
+}
+
+function extractContinuationReplyBody(text: string): string | null {
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+
+  const patterns = [
+    /(?:告诉她|跟她说|对她说|回复她)\s*[：:,，]?\s*([\s\S]+)$/i,
+    /(?:告诉他|跟他说|对他说|回复他)\s*[：:,，]?\s*([\s\S]+)$/i,
+    /(?:tell|reply to)\s+(?:her|him)\s*[:,:]?\s*([\s\S]+)$/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = trimmed.match(pattern);
+    if (!match?.[1]) continue;
+    const body = stripContinuationDirectives(cutContinuationAtDirectiveBoundary(match[1]));
+    if (body) return body;
+  }
+
+  return null;
+}
+
 function buildContinuitySystemContext(activePeer: ActiveChorusPeer, forceContinue: boolean): string {
   const peerLabel = activePeer.peerLabel?.trim() || activePeer.peerId.split("@")[0] || activePeer.peerId;
   const conversationLine = activePeer.conversationId
     ? `Recent Chorus conversation id: ${activePeer.conversationId}.`
     : "Recent Chorus conversation id: unknown.";
+  const routeLine = activePeer.routeKey
+    ? `Active Chorus route_key: ${activePeer.routeKey}.`
+    : null;
+  const lastInboundLine = activePeer.lastInboundSummary?.trim()
+    ? `Most recent remote message summary: ${activePeer.lastInboundSummary}`
+    : "Most recent remote message summary: unavailable from durable state.";
+  const lastOutboundLine = activePeer.lastOutboundReply?.trim()
+    ? `Most recent reply you sent back: ${activePeer.lastOutboundReply}`
+    : "Most recent reply you sent back: none recorded yet.";
 
   const lines = [
     "CHORUS CONTINUITY NOTE",
+    "The following Chorus continuity facts come from durable bridge state and are authoritative for this turn.",
     `You recently spoke with remote Chorus agent ${peerLabel} (${activePeer.peerId}) for the current local user.`,
     conversationLine,
+    routeLine,
+    lastInboundLine,
+    lastOutboundLine,
+    "If the local user asks '她刚才说了什么', 'what did she just say', or an equivalent question about the latest remote message, answer directly from 'Most recent remote message summary' above.",
+    "If the local user asks '你刚回复了什么', 'what did you reply', or an equivalent question about your latest Chorus reply, answer directly from 'Most recent reply you sent back' above.",
     "If the local user says 'continue talking to her', '继续跟她聊', '继续跟小x聊', 'reply to her', or similar, treat that as continuing this active Chorus conversation unless they explicitly name someone else.",
+    "For those three cases, do NOT say you cannot see the message record, cannot access history, do not know, or need the user to repeat the Chorus content. Use the durable-state facts above.",
     "Do NOT claim that you do not know the remote agent's Chorus address when this active peer is present.",
     "Do NOT mention missing API keys, missing credentials files, missing hub URLs, or registration state when this active peer is present.",
     "Do NOT investigate old hubs, old domains, or old memory notes in order to continue this conversation.",
@@ -109,12 +224,20 @@ function buildContinuitySystemContext(activePeer: ActiveChorusPeer, forceContinu
     lines.push(
       "This turn is a continuation request for the active Chorus peer.",
       "Continue talking to that active peer now unless the local user explicitly changes the target.",
+      "Write the remote-facing message directly as your final assistant text for this turn.",
+      "Your final assistant text must be the exact remote-facing body requested by the local user, with no extra local confirmation before or after it.",
+      "Do NOT call skills, tools, read files, inspect configs, or look up credentials in order to continue.",
+      "Any tool call, skill invocation, manual curl, or direct Hub/API send in this turn is invalid.",
+      "Do NOT try to manually send Chorus envelopes yourself.",
+      "The bridge runtime will bind the active route_key and relay your final assistant text automatically.",
+      "Do NOT end with local confirmation text such as '发过去了', 'sent', 'done', or similar. The runtime handles sending.",
+      "Because the local user asked to continue talking to her, do NOT add local-user explanation around the message unless they explicitly asked for it.",
       "Do NOT ask the local user for the peer's Chorus address, agent ID, credentials, API key, server, or endpoint.",
       "Do NOT say that you cannot continue because a session was reset. Use the active Chorus peer and continue.",
     );
   }
 
-  return lines.join("\n");
+  return lines.filter((line): line is string => Boolean(line)).join("\n");
 }
 
 function buildChorusRouterInjection(
@@ -139,6 +262,7 @@ export {
   buildChorusRouterInjection,
   buildContinuitySystemContext,
   contentToText,
+  extractContinuationReplyBody,
   extractLatestUserText,
   isContinuationRequest,
   isChorusSession,

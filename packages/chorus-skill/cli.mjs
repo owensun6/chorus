@@ -111,9 +111,11 @@ function unregisterOpenClaw() {
 
 const BRIDGE_REQUIRED_FILES = [
   "index.ts",
+  "runtime-v2.ts",
   "guard.ts",
   "resolve.ts",
   "relay.ts",
+  "router-hook.ts",
   "openclaw.plugin.json",
   "package.json",
 ];

@@ -127,6 +127,13 @@ inbound_facts[trace_id] {
   route_key:       string
   observed_at:     ISO8601          // Bridge-local observation time (diagnostics only)
   hub_timestamp:   ISO8601          // Hub-assigned timestamp (used for cursor + catchup)
+  envelope_projection: {
+    original_text:     string
+    sender_culture:    string
+    cultural_context:  string | null
+    conversation_id:   string | null
+    turn_number:       number       // normalized to 1 when omitted by the inbound envelope
+  }
 
   dedupe_result:   "new" | "duplicate" | null
     // null = observed but not yet deduped
@@ -146,7 +153,7 @@ inbound_facts[trace_id] {
 }
 ```
 
-Records every inbound message's journey through the five-step pipeline. Field transitions are monotonic: `null -> value`, `false -> true`, or immutable value preservation. Bridge never clears a field or rewrites it to a conflicting value.
+Records every inbound message's journey through the five-step pipeline. `envelope_projection` is the Bridge-owned durable projection of the inbound Chorus envelope needed for recovery, continuity readback, and router derivation. It is written at `bridge_observed` time and then treated as immutable. Field transitions are monotonic: `null -> value`, `false -> true`, or immutable value preservation. Bridge never clears a field or rewrites it to a conflicting value.
 
 ### 1.4 RelayRecord
 
@@ -199,6 +206,41 @@ route_key = "{local_agent_id}:{remote_peer_id}"
 | Restart-safe | Both components are persistent identifiers in agent config |
 | Direction-aware | Each side has its own Bridge with its own route_key |
 | Transcript-independent | Does not depend on message content, prompt residue, or session state |
+
+### 2.1 Main-Session Router Derivation
+
+When the host main session asks to continue or summarize a Chorus exchange, Bridge derives that continuity from durable state only.
+
+**Active route selection**:
+
+1. Host runtime identifies the current local conversation anchor.
+2. Bridge filters `continuity` to entries whose `local_anchor_id` equals that current anchor.
+3. No matching entry → no Chorus continuity injection.
+4. One matching entry → that entry is the active route.
+5. Multiple matching entries → choose the entry with the greatest `updated_at`; break ties by lexicographically ascending `route_key`.
+
+**Derived read model for the active route**:
+
+- `last inbound fact` = newest `inbound_facts[trace_id]` for the active `route_key` with `dedupe_result = "new"`, ordered by `(hub_timestamp, trace_id)`
+- `last inbound text` = `last inbound fact.envelope_projection.original_text`
+- `last inbound summary` = runtime projection derived from `last inbound text`; Bridge MAY truncate for prompt budget, but MUST NOT read transcript files or session history to compute it
+- `last outbound reply` = `relay_evidence[outbound_id].reply_text` from the record with the greatest `bound_turn_number` for the active `route_key`
+
+This section intentionally defines derivation rules, not an extra durable summary field. Router readback must come from `continuity + inbound_facts + relay_evidence`, not from `active-peer.json`, transcript scans, or prompt residue.
+
+### 2.2 v1 -> v2 Migration Constraint
+
+During one-time cutover, old side files may be read only as import inputs. They are not authoritative after import.
+
+The migrator MAY import only:
+
+- `remote_peer_id`
+- `conversation_id` when explicitly present
+- `last_inbound_turn` / `last_outbound_turn` only from explicit, non-ambiguous persisted evidence
+
+The migrator MUST NOT import `local_anchor_id` from v1 side files. v1 does not persist a stable authoritative anchor. For every imported `route_key`, the migrator MUST call `HostAdapter.resolveLocalAnchor(route_key)` and persist that result into `continuity[route_key].local_anchor_id`.
+
+If `resolveLocalAnchor(route_key)` fails, the migrator MUST NOT fabricate an anchor or guess from transcripts. That route remains unmigrated until the host can resolve it.
 
 ### What route_key anchors
 
@@ -363,14 +405,15 @@ envelope metadata (included when non-null, omitted when null — not part of bin
 
 ```
 1. Load durable state from disk
-2. Scan inbound_facts: resume each incomplete fact from its last completed step
-3. Scan relay_evidence: retry each incomplete relay from its last completed step
-4. Query Hub: GET /agent/messages?since={cursor.last_completed_timestamp} (inclusive boundary)
-5. For each returned message:
+2. Advance orphaned cursors for facts that already have delivery_evidence or terminal_disposition
+3. Query Hub: GET /agent/messages?since={cursor.last_completed_timestamp} (inclusive boundary, with retry/backoff)
+4. Resume incomplete inbound_facts from Hub history by trace_id
+5. Scan relay_evidence: retry each incomplete relay from its last completed step
+6. For each returned message beyond cursor:
    - discard it if `(hub_timestamp, trace_id) <= (cursor.last_completed_timestamp, cursor.last_completed_trace_id)`
    - otherwise send it through the inbound pipeline; dedupe still applies for any surviving re-observation
-6. Establish live SSE connection
-7. Acquire host runtime delivery handles via Host Adapter
+7. Establish live SSE connection
+8. Acquire host runtime delivery handles via Host Adapter
 ```
 
 ### Forbidden Recovery Behaviors
@@ -380,6 +423,7 @@ envelope metadata (included when non-null, omitted when null — not part of bin
 - Advancing cursor because transport looked successful before crash
 - Reading .jsonl history files as truth source
 - Reconstructing continuity from active-peer.json or equivalent
+- Reusing v1 side files as runtime authority after migration
 
 ### Observability: `delivery_unverifiable` Monitoring
 

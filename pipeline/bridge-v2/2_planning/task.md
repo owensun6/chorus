@@ -19,7 +19,7 @@
 
 ## [Phase 3] Recovery + Host Verification
 
-- [ ] T-07 `[Assignee: be-domain-modeler]`: Recovery engine — startup scan of incomplete inbound_facts + relay_evidence; Hub catchup with inclusive boundary + client-side composite filter; connect SSE after recovery in `src/bridge/recovery.ts` (Blocker: T-04, T-05, T-06)
+- [ ] T-07 `[Assignee: be-domain-modeler]`: Recovery engine — `load -> advance orphaned cursors -> fetch history (retry/backoff) -> resume incomplete inbound -> retry incomplete relays -> process new messages -> connect SSE -> acquire handles` in `src/bridge/recovery.ts` (Blocker: T-04, T-05, T-06)
 - [ ] T-08 `[Assignee: be-ai-integrator]`: A-B2 verification — assess OpenClaw delivery confirmation (A-B2-01) and reply attribution (A-B2-02) capabilities; output verification report (Blocker: T-03)
 
 ## [Phase 4] Host Adapter (depends on verification)

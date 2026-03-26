@@ -1,5 +1,6 @@
 // Author: be-domain-modeler
 import { ChorusEnvelopeSchema } from '../shared/types';
+import { log } from '../shared/log';
 import { computeRouteKey } from './route-key';
 import { DurableStateManager } from './state';
 import type {
@@ -14,8 +15,6 @@ import type { HubSSEEvent } from './hub-client';
 
 interface DeliveryOutcome {
   readonly receipt: DeliveryReceipt;
-  readonly continuity: ContinuityEntry;
-  readonly turnNumber: number;
 }
 
 /**
@@ -110,10 +109,11 @@ export class InboundPipeline {
 
     if (dedupeResult._dedupe_duplicate) return;
 
-    // Phase 2: adapt + deliver (async I/O, then persist inside mutate lock)
-    // We pass the dedupeResult snapshot to adaptAndDeliver for continuity/fact reads,
-    // but the final save re-reads latest state inside mutate() to merge concurrent writes.
-    const deliveryOutcome = await this.adaptAndDeliverOutcome(dedupeResult, event, routeKey);
+    // Phase 2: continuity bootstrap/update must persist BEFORE first delivery attempt.
+    const continuity = await this.bootstrapContinuity(dedupeResult, event, routeKey);
+
+    // Phase 3: adapt + deliver (async I/O, then persist outcome inside mutate lock)
+    const deliveryOutcome = await this.adaptAndDeliverOutcome(continuity, event, routeKey);
 
     if (deliveryOutcome) {
       await this.stateManager.mutate((freshState) =>
@@ -140,6 +140,13 @@ export class InboundPipeline {
       route_key: routeKey,
       observed_at: now,
       hub_timestamp: event.hub_timestamp,
+      envelope_projection: {
+        original_text: event.envelope.original_text,
+        sender_culture: event.envelope.sender_culture,
+        cultural_context: event.envelope.cultural_context ?? null,
+        conversation_id: event.envelope.conversation_id ?? null,
+        turn_number: event.envelope.turn_number ?? 1,
+      },
       dedupe_result: null,
       delivery_evidence: null,
       terminal_disposition: null,
@@ -185,16 +192,53 @@ export class InboundPipeline {
    * No state mutation here — outcome is applied inside mutate() by the caller.
    * Returns null on transient failure (fact stays retryable).
    */
-  private async adaptAndDeliverOutcome(
+  private async bootstrapContinuity(
     stateSnapshot: BridgeDurableState,
     event: HubSSEEvent,
     routeKey: string,
-  ): Promise<DeliveryOutcome | null> {
-    const rawContinuity = this.ensureContinuity(stateSnapshot, routeKey, event);
+  ): Promise<ContinuityEntry> {
+    const existing = this.stateManager.getContinuity(stateSnapshot, routeKey);
+    const localAnchorId = existing?.local_anchor_id && existing.local_anchor_id.length > 0
+      ? existing.local_anchor_id
+      : await this.hostAdapter.resolveLocalAnchor(routeKey);
+    const now = new Date().toISOString();
+    const normalizedTurn = this.normalizeInboundTurn(event);
+    const next: ContinuityEntry = existing
+      ? {
+        ...existing,
+        local_anchor_id: localAnchorId,
+        conversation_id: existing.conversation_id ?? event.envelope.conversation_id ?? null,
+        last_inbound_turn: Math.max(existing.last_inbound_turn, normalizedTurn),
+        updated_at: now,
+      }
+      : {
+        remote_peer_id: event.sender_id,
+        local_anchor_id: localAnchorId,
+        conversation_id: event.envelope.conversation_id ?? null,
+        last_inbound_turn: normalizedTurn,
+        last_outbound_turn: 0,
+        created_at: now,
+        updated_at: now,
+      };
 
-    const continuity = rawContinuity.local_anchor_id
-      ? rawContinuity
-      : { ...rawContinuity, local_anchor_id: await this.hostAdapter.resolveLocalAnchor(routeKey) };
+    await this.stateManager.mutate((state) =>
+      this.stateManager.setContinuity(state, routeKey, next),
+    );
+
+    return next;
+  }
+
+  /**
+   * Perform async I/O (adapt + deliver) and return the outcome data.
+   * No state mutation here — outcome is applied inside mutate() by the caller.
+   * Returns null on transient failure (fact stays retryable).
+   */
+  private async adaptAndDeliverOutcome(
+    continuity: ContinuityEntry,
+    event: HubSSEEvent,
+    routeKey: string,
+  ): Promise<DeliveryOutcome | null> {
+    const inboundTurn = this.normalizeInboundTurn(event);
 
     const adaptedContent = await this.hostAdapter.adaptContent({
       original_text: event.envelope.original_text,
@@ -202,8 +246,6 @@ export class InboundPipeline {
       receiver_culture: this.config.localCulture,
       cultural_context: event.envelope.cultural_context ?? null,
     });
-
-    const turnNumber = continuity.last_inbound_turn + 1;
 
     const timeoutMs = this.config.deliverTimeoutMs ?? DEFAULT_DELIVER_TIMEOUT_MS;
     const TIMEOUT_SENTINEL = Symbol('delivery_timeout');
@@ -218,7 +260,7 @@ export class InboundPipeline {
           sender_culture: event.envelope.sender_culture,
           cultural_context: event.envelope.cultural_context ?? null,
           conversation_id: continuity.conversation_id,
-          turn_number: turnNumber,
+          turn_number: inboundTurn,
           trace_id: event.trace_id,
         },
       });
@@ -241,16 +283,13 @@ export class InboundPipeline {
           ref: null,
           timestamp: new Date().toISOString(),
         };
-        return { receipt: timeoutReceipt, continuity, turnNumber };
+        return { receipt: timeoutReceipt };
       }
 
-      return { receipt: result, continuity, turnNumber };
+      return { receipt: result };
     } catch (err) {
       // Host threw before or during delivery — true transient failure, safe to retry
       this.onError(`Transient delivery failure for trace_id=${event.trace_id}: ${String(err)}`);
-      await this.stateManager.mutate((s) =>
-        this.stateManager.setContinuity(s, routeKey, continuity),
-      );
       return null;
     }
   }
@@ -269,11 +308,8 @@ export class InboundPipeline {
     const fact = state.inbound_facts[traceId];
     if (!fact) return state;
 
-    const { receipt, continuity, turnNumber } = outcome;
+    const { receipt } = outcome;
     const now = new Date().toISOString();
-
-    // Always persist continuity (including resolved local_anchor_id)
-    const stateWithContinuity = this.stateManager.setContinuity(state, routeKey, continuity);
 
     if (receipt.status === 'confirmed') {
       const updatedFact: InboundFact = {
@@ -285,14 +321,8 @@ export class InboundPipeline {
         },
         cursor_advanced: true,
       };
-      const updatedContinuity: ContinuityEntry = {
-        ...continuity,
-        last_inbound_turn: turnNumber,
-        updated_at: now,
-      };
-      const s1 = this.stateManager.setInboundFact(stateWithContinuity, traceId, updatedFact);
-      const s2 = this.stateManager.setContinuity(s1, routeKey, updatedContinuity);
-      return this.stateManager.advanceCursor(s2, traceId, hubTimestamp);
+      const s1 = this.stateManager.setInboundFact(state, traceId, updatedFact);
+      return this.stateManager.advanceCursor(s1, traceId, hubTimestamp);
     }
 
     if (receipt.status === 'failed') {
@@ -301,38 +331,31 @@ export class InboundPipeline {
         terminal_disposition: { reason: 'delivery_failed_permanent', decided_at: now },
         cursor_advanced: true,
       };
-      const s1 = this.stateManager.setInboundFact(stateWithContinuity, traceId, updatedFact);
+      const s1 = this.stateManager.setInboundFact(state, traceId, updatedFact);
       return this.stateManager.advanceCursor(s1, traceId, hubTimestamp);
     }
 
     // status === 'unverifiable'
+    log('bridge:delivery', JSON.stringify({
+      event: 'delivery_unverifiable',
+      trace_id: traceId,
+      route_key: routeKey,
+      method: receipt.method,
+      terminal_disposition: 'delivery_unverifiable',
+      timestamp: now,
+    }));
     const updatedFact: InboundFact = {
       ...fact,
       terminal_disposition: { reason: 'delivery_unverifiable', decided_at: now },
       cursor_advanced: true,
     };
-    const s1 = this.stateManager.setInboundFact(stateWithContinuity, traceId, updatedFact);
+    const s1 = this.stateManager.setInboundFact(state, traceId, updatedFact);
     return this.stateManager.advanceCursor(s1, traceId, hubTimestamp);
   }
 
-  private ensureContinuity(
-    state: BridgeDurableState,
-    routeKey: string,
+  private normalizeInboundTurn(
     event: HubSSEEvent,
-  ): ContinuityEntry {
-    const existing = this.stateManager.getContinuity(state, routeKey);
-    if (existing) {
-      return existing;
-    }
-    const now = new Date().toISOString();
-    return {
-      remote_peer_id: event.sender_id,
-      local_anchor_id: '',
-      conversation_id: event.envelope.conversation_id ?? null,
-      last_inbound_turn: 0,
-      last_outbound_turn: 0,
-      created_at: now,
-      updated_at: now,
-    };
+  ): number {
+    return event.envelope.turn_number ?? 1;
   }
 }

@@ -7,6 +7,14 @@ import { computeRouteKey } from '../../src/bridge/route-key';
 import type { BridgeDurableState, InboundFact, RelayRecord } from '../../src/bridge/types';
 
 describe('DurableStateManager', () => {
+  const inboundProjection = {
+    original_text: 'hello',
+    sender_culture: 'en',
+    cultural_context: null,
+    conversation_id: null,
+    turn_number: 1,
+  } as const;
+
   const createTempDir = (): string => {
     return fs.mkdtempSync(path.join(os.tmpdir(), 'bridge-state-test-'));
   };
@@ -49,6 +57,7 @@ describe('DurableStateManager', () => {
               route_key: 'xiaov@openclaw:xiaox@chorus',
               observed_at: '2026-03-24T10:00:00Z',
               hub_timestamp: '2026-03-24T09:59:59Z',
+              envelope_projection: inboundProjection,
               dedupe_result: 'new',
               delivery_evidence: null,
               terminal_disposition: null,
@@ -93,6 +102,7 @@ describe('DurableStateManager', () => {
               route_key: 'agent-a:agent-b',
               observed_at: '2026-03-24T11:00:00Z',
               hub_timestamp: '2026-03-24T10:59:00Z',
+              envelope_projection: inboundProjection,
               dedupe_result: 'new',
               delivery_evidence: {
                 delivered_at: '2026-03-24T11:01:00Z',
@@ -259,6 +269,7 @@ describe('DurableStateManager', () => {
               route_key: 'agent-a:agent-b',
               observed_at: '2026-03-24T10:00:00Z',
               hub_timestamp: '2026-03-24T09:59:00Z',
+              envelope_projection: inboundProjection,
               dedupe_result: null,
               delivery_evidence: null,
               terminal_disposition: null,
@@ -288,6 +299,7 @@ describe('DurableStateManager', () => {
           route_key: 'agent-a:agent-b',
           observed_at: '2026-03-24T10:00:00Z',
           hub_timestamp: '2026-03-24T09:59:00Z',
+          envelope_projection: inboundProjection,
           dedupe_result: null as 'new' | 'duplicate' | null,
           delivery_evidence: null,
           terminal_disposition: null,
@@ -431,6 +443,13 @@ describe('DurableStateManager pruning', () => {
     route_key: 'a:b',
     observed_at: '2026-03-24T10:00:00Z',
     hub_timestamp: '2026-03-24T09:59:00Z',
+    envelope_projection: {
+      original_text: 'retryable',
+      sender_culture: 'en',
+      cultural_context: null,
+      conversation_id: null,
+      turn_number: 1,
+    },
     dedupe_result: null as null,
     delivery_evidence: null,
     terminal_disposition: null,
@@ -441,6 +460,13 @@ describe('DurableStateManager pruning', () => {
     route_key: 'a:b',
     observed_at: timestamp,
     hub_timestamp: timestamp,
+    envelope_projection: {
+      original_text: 'finalized',
+      sender_culture: 'en',
+      cultural_context: null,
+      conversation_id: null,
+      turn_number: 1,
+    },
     dedupe_result: 'new' as const,
     delivery_evidence: null,
     terminal_disposition: { reason: 'duplicate' as const, decided_at: timestamp },

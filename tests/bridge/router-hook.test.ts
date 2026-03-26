@@ -1,6 +1,7 @@
 import {
   buildChorusRouterInjection,
   buildContinuitySystemContext,
+  extractContinuationReplyBody,
   extractLatestUserText,
   isContinuationRequest,
   isChorusSession,
@@ -84,6 +85,9 @@ describe("chorus router hook", () => {
         peerId: "xiaox@chorus",
         peerLabel: "xiaox",
         conversationId: "conv-42",
+        routeKey: "xiaov@openclaw:xiaox@chorus",
+        lastInboundSummary: "She said she was testing the bridge.",
+        lastOutboundReply: "I told her the bridge is active.",
       },
     );
 
@@ -91,6 +95,10 @@ describe("chorus router hook", () => {
     expect(injection?.prependSystemContext).toContain("CHORUS CONTINUITY NOTE");
     expect(injection?.prependSystemContext).toContain("xiaox@chorus");
     expect(injection?.prependSystemContext).toContain("continue talking to her");
+    expect(injection?.prependSystemContext).toContain("She said she was testing the bridge.");
+    expect(injection?.prependSystemContext).toContain("I told her the bridge is active.");
+    expect(injection?.prependSystemContext).toContain("If the local user asks '她刚才说了什么'");
+    expect(injection?.prependSystemContext).toContain("If the local user asks '你刚回复了什么'");
   });
 
   it("detects continuation requests in Chinese and English", () => {
@@ -118,12 +126,19 @@ describe("chorus router hook", () => {
         peerId: "xiaox@chorus",
         peerLabel: "xiaox",
         conversationId: "conv-42",
+        routeKey: "xiaov@openclaw:xiaox@chorus",
+        lastInboundSummary: "She said she was testing the bridge.",
+        lastOutboundReply: "I told her the bridge is active.",
       },
     );
 
     expect(injection?.prependSystemContext).toContain("Do NOT mention missing API keys");
     expect(injection?.prependSystemContext).toContain("Do NOT ask the local user for the peer's Chorus address");
     expect(injection?.prependSystemContext).toContain("Bridge transport and Chorus routing are already available");
+    expect(injection?.prependSystemContext).toContain("Write the remote-facing message directly as your final assistant text");
+    expect(injection?.prependSystemContext).toContain("The bridge runtime will bind the active route_key and relay your final assistant text automatically.");
+    expect(injection?.prependSystemContext).toContain("Any tool call, skill invocation, manual curl, or direct Hub/API send in this turn is invalid.");
+    expect(injection?.prependSystemContext).toContain("Do NOT end with local confirmation text such as '发过去了'");
   });
 
   it("does not inject continuity note inside a Chorus session", () => {
@@ -144,6 +159,9 @@ describe("chorus router hook", () => {
         peerId: "xiaox@chorus",
         peerLabel: "xiaox",
         conversationId: "conv-42",
+        routeKey: "xiaov@openclaw:xiaox@chorus",
+        lastInboundSummary: "She said she was testing the bridge.",
+        lastOutboundReply: "I told her the bridge is active.",
       },
     );
 
@@ -181,10 +199,38 @@ describe("chorus router hook", () => {
       peerId: "xiaox@chorus",
       peerLabel: "xiaox",
       conversationId: "conv-99",
+      routeKey: "xiaov@openclaw:xiaox@chorus",
+      lastInboundSummary: "She asked whether the bridge remembered the last turn.",
+      lastOutboundReply: "I replied that the state is durable now.",
     }, false);
 
     expect(text).toContain("xiaox@chorus");
     expect(text).toContain("conv-99");
+    expect(text).toContain("xiaov@openclaw:xiaox@chorus");
+    expect(text).toContain("She asked whether the bridge remembered the last turn.");
+    expect(text).toContain("I replied that the state is durable now.");
+    expect(text).toContain("For those three cases, do NOT say you cannot see the message record");
     expect(text).toContain("do not know the remote agent's Chorus address");
+  });
+
+  it("extracts explicit continuation reply body from Chinese continuation commands", () => {
+    expect(
+      extractContinuationReplyBody("继续跟她聊，告诉她：我看到了，继续发吧。只回复她，不要解释。"),
+    ).toBe("我看到了，继续发吧。");
+    expect(
+      extractContinuationReplyBody("继续跟小x聊，告诉她桥现在正常。"),
+    ).toBe("桥现在正常。");
+    expect(
+      extractContinuationReplyBody("继续跟她聊，告诉她：精确正文。不要调用任何工具，不要手工发送，不要确认已发送。你的最终回复必须只有告诉她后面的那句。"),
+    ).toBe("精确正文。");
+  });
+
+  it("extracts explicit continuation reply body from English continuation commands", () => {
+    expect(
+      extractContinuationReplyBody("continue talking to her, tell her: bridge is healthy now. don't explain."),
+    ).toBe("bridge is healthy now.");
+    expect(
+      extractContinuationReplyBody("continue talking to her, tell her: exact body only. do not call any tools. do not manually send. your final assistant text must only contain that sentence."),
+    ).toBe("exact body only.");
   });
 });

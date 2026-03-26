@@ -19,14 +19,15 @@
 ## Output
 
 - `src/bridge/recovery.ts`: RecoveryEngine class
-  - `recover(stateManager, inboundPipeline, outboundPipeline, hubClient)`:
+  - `recover(stateManager, inboundPipeline, outboundPipeline, hubClient, hostAdapter, onSSEEvent)`:
     1. Load durable state
-    2. Scan inbound_facts: resume each incomplete fact from last completed step
-    3. Scan relay_evidence: retry each incomplete relay
-    4. Fetch Hub history since cursor (inclusive), discard items `<= (cursor.timestamp, cursor.trace_id)`
-    5. Process remaining through inbound pipeline
-    6. Connect SSE
-    7. Acquire host handles
+    2. Advance orphaned cursors for facts with delivery/disposition evidence but `cursor_advanced=false`
+    3. Fetch Hub history since cursor (inclusive, with retry/backoff)
+    4. Resume incomplete inbound facts from Hub history by `trace_id`
+    5. Retry incomplete relays
+    6. Discard history items `<= (cursor.timestamp, cursor.trace_id)` and process remaining new Hub messages through inbound pipeline
+    7. Connect SSE
+    8. Acquire host handles
 - Tests
 
 ## Acceptance Criteria (BDD)
@@ -59,7 +60,7 @@
 - test_retry_unsubmitted_relay: bound relay → submit with same idempotency_key
 - test_boundary_filter: same-timestamp messages at cursor → correct items discarded/kept
 - test_fresh_start: no state file → full catchup from Hub
-- test_recovery_order: inbound resume before Hub catchup before SSE connect
+- test_recovery_order: `advance orphaned cursors -> fetch history -> resume incomplete inbound -> retry relays -> process new messages -> SSE connect -> acquire handles`
 
 ## Structural Constraints
 
@@ -67,9 +68,12 @@
 - error_handling: Hub unreachable during catchup → retry with backoff, do not proceed to SSE without catchup
 - input_validation: N/A (internal engine, inputs are durable state + Hub responses validated by HubClient)
 - auth_boundary: N/A (uses HubClient which handles auth)
+- interface_alignment: `recover(...)` signature in this spec MUST match the implementation entrypoint exactly, including `hostAdapter` and `onSSEEvent`
+- startup_order: implementation MUST match System_Design.md §5 and Data_Models.md §6 exactly; do not collapse intermediate steps into a generic "catchup"
 
 ## Prohibitions
 
 - Do not read .jsonl files, transcript files, or active-peer.json (v1 patterns)
 - Do not assume SSE connections or delivery handles survive restart
 - Do not advance cursor speculatively
+- Do not reorder or skip recovery steps defined in the architecture docs

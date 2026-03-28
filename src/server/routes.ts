@@ -15,6 +15,7 @@ import type { MessageStore } from "./message-store";
 import type { IdempotencyStore } from "./idempotency";
 import type { AgentSessionStore } from "./agent-session";
 import { SESSION_TTL_MS } from "./agent-session";
+import { checkEndpointUrl, resolveAndCheckEndpoint } from "./endpoint-policy";
 import { CONSOLE_HTML } from "./console-html";
 import { ARENA_HTML } from "./arena-html";
 
@@ -81,6 +82,15 @@ const createApp = (
 
     const { agent_id, agent_card, endpoint, invite_code } = parsed.data;
 
+    // SSRF protection: validate endpoint URL before registration
+    if (endpoint) {
+      const requireHttps = process.env["NODE_ENV"] === "production";
+      const epCheck = checkEndpointUrl(endpoint, requireHttps);
+      if (!epCheck.allowed) {
+        return c.json(errorResponse("ERR_ENDPOINT_BLOCKED", epCheck.reason ?? "Endpoint not allowed"), 400);
+      }
+    }
+
     // Extract bearer token for ownership-verified rotation
     const authHeader = c.req.header("Authorization") ?? "";
     const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : undefined;
@@ -142,6 +152,14 @@ const createApp = (
     }
 
     const { agent_id, endpoint, agent_card } = parsed.data;
+
+    // SSRF protection: validate endpoint URL before registration
+    const requireHttps = process.env["NODE_ENV"] === "production";
+    const epCheck = checkEndpointUrl(endpoint, requireHttps);
+    if (!epCheck.allowed) {
+      return c.json(errorResponse("ERR_ENDPOINT_BLOCKED", epCheck.reason ?? "Endpoint not allowed"), 400);
+    }
+
     const existed = registry.get(agent_id) !== undefined;
     const registration = registry.register(agent_id, endpoint, agent_card);
 
@@ -530,6 +548,17 @@ const createApp = (
         }
       }
       return c.json(queuedResponse, 202);
+    }
+
+    // SSRF re-check: resolve hostname and block private IPs before delivery
+    const requireHttps = process.env["NODE_ENV"] === "production";
+    const deliveryCheck = await resolveAndCheckEndpoint(target.endpoint, requireHttps);
+    if (!deliveryCheck.allowed) {
+      registry.recordFailure();
+      return c.json(
+        errorResponse("ERR_ENDPOINT_BLOCKED", "Receiver endpoint blocked by security policy"),
+        502
+      );
     }
 
     if (stream) {

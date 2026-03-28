@@ -370,3 +370,78 @@ describe("Agent CRUD Routes", () => {
     });
   });
 });
+
+// ---------------------------------------------------------------------------
+// C-04: SSRF protection — endpoint validation at registration
+// ---------------------------------------------------------------------------
+
+describe("Endpoint SSRF Protection", () => {
+  const validCard = { card_version: "0.3", user_culture: "en", supported_languages: ["en"] };
+
+  const blockedEndpoints = [
+    "http://127.0.0.1:8080/receive",
+    "http://localhost:8080/receive",
+    "http://10.0.0.1:8080/receive",
+    "http://172.16.0.1:8080/receive",
+    "http://192.168.1.1:8080/receive",
+    "http://169.254.169.254/latest/meta-data/",
+    "http://0.0.0.0:8080/receive",
+  ];
+
+  blockedEndpoints.forEach((endpoint) => {
+    it(`POST /register rejects private endpoint: ${endpoint}`, async () => {
+      const db = createTestDb();
+      const registry = new AgentRegistry(db);
+      const app = createApp(registry);
+
+      const res = await app.request("/register", {
+        method: "POST",
+        body: JSON.stringify({
+          agent_id: "ssrf@hub",
+          agent_card: validCard,
+          endpoint,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      expect(res.status).toBe(400);
+      const json: Json = await res.json();
+      expect(json.error.code).toBe("ERR_ENDPOINT_BLOCKED");
+    });
+  });
+
+  it("POST /register allows public endpoint", async () => {
+    const db = createTestDb();
+    const registry = new AgentRegistry(db);
+    const app = createApp(registry);
+
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({
+        agent_id: "public@hub",
+        agent_card: validCard,
+        endpoint: "https://example.com/receive",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(201);
+  });
+
+  it("POST /register allows registration without endpoint", async () => {
+    const db = createTestDb();
+    const registry = new AgentRegistry(db);
+    const app = createApp(registry);
+
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({
+        agent_id: "no-ep@hub",
+        agent_card: validCard,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(201);
+  });
+});

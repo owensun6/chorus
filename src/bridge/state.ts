@@ -14,7 +14,7 @@ const SCHEMA_VERSION = '2.0' as const;
 const INBOUND_FACTS_MAX = 500;
 const RELAY_EVIDENCE_MAX = 500;
 
-const compareCursorPosition = (
+export const compareCursorPosition = (
   aTimestamp: string,
   aTraceId: string,
   bTimestamp: string,

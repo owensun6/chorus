@@ -1,4 +1,4 @@
-// Author: codex
+// Author: be-domain-modeler
 import type { BridgeDurableState, DeliveryEvidence, TerminalDisposition } from './types';
 
 export interface LiveAcceptanceStateEvidence {
@@ -36,32 +36,24 @@ export const extractStateEvidence = (
     return null;
   }
 
-  let relayRecordId: string | null = null;
-  let relayTraceId: string | null = null;
-  let relayConfirmed = false;
   const routeKey = inboundFact.route_key;
 
-  for (const [recordId, record] of Object.entries(state.relay_evidence)) {
-    if (record.inbound_trace_id !== inboundTraceId) {
-      continue;
-    }
+  const relayMatch = Object.entries(state.relay_evidence)
+    .filter(([, r]) => r.inbound_trace_id === inboundTraceId && r.route_key === routeKey)
+    .reduce<{ relayRecordId: string | null; relayTraceId: string | null; relayConfirmed: boolean }>(
+      (best, [recordId, record]) => {
+        if (record.confirmed) {
+          return { relayRecordId: recordId, relayTraceId: record.hub_trace_id, relayConfirmed: true };
+        }
+        if (best.relayRecordId === null) {
+          return { relayRecordId: recordId, relayTraceId: record.hub_trace_id, relayConfirmed: false };
+        }
+        return best;
+      },
+      { relayRecordId: null, relayTraceId: null, relayConfirmed: false },
+    );
 
-    if (record.route_key !== routeKey) {
-      continue;
-    }
-
-    if (record.confirmed) {
-      relayRecordId = recordId;
-      relayTraceId = record.hub_trace_id;
-      relayConfirmed = true;
-      break;
-    }
-
-    if (relayRecordId === null) {
-      relayRecordId = recordId;
-      relayTraceId = record.hub_trace_id;
-    }
-  }
+  const { relayRecordId, relayTraceId, relayConfirmed } = relayMatch;
 
   return {
     inboundTraceId,
@@ -81,30 +73,24 @@ export const extractLogEvidence = (
   routeKey: string,
   relayTraceId: string | null,
 ): LiveAcceptanceLogEvidence => {
-  let deliveryLogFound = false;
-  let deliveryMethod: string | null = null;
-  let relayLogFound = false;
+  const lines = logText.split(/\r?\n/);
 
-  for (const line of logText.split(/\r?\n/)) {
-    if (!deliveryLogFound && line.includes(BRIDGE_DELIVERY_MARKER)) {
-      const payload = parseDeliveryPayload(line);
-      if (payload && payload.trace_id === inboundTraceId && payload.route_key === routeKey) {
-        deliveryLogFound = true;
-        deliveryMethod = payload.method ?? null;
-      }
-    }
+  const deliveryLine = lines.find((line) => {
+    if (!line.includes(BRIDGE_DELIVERY_MARKER)) return false;
+    const payload = parseDeliveryPayload(line);
+    return payload !== null && payload.trace_id === inboundTraceId && payload.route_key === routeKey;
+  });
 
-    if (!relayLogFound && relayTraceId && line.includes(RELAY_OK_MARKER)) {
-      const relayMatch = line.match(/outbound relay OK: trace_id=(\S+) route_key=(\S+)/);
-      if (relayMatch && relayMatch[1] === relayTraceId && relayMatch[2] === routeKey) {
-        relayLogFound = true;
-      }
-    }
+  const deliveryLogFound = deliveryLine !== undefined;
+  const deliveryMethod = deliveryLogFound
+    ? (parseDeliveryPayload(deliveryLine!)?.method ?? null)
+    : null;
 
-    if (deliveryLogFound && (relayLogFound || relayTraceId === null)) {
-      break;
-    }
-  }
+  const relayLogFound = relayTraceId !== null && lines.some((line) => {
+    if (!line.includes(RELAY_OK_MARKER)) return false;
+    const m = line.match(/outbound relay OK: trace_id=(\S+) route_key=(\S+)/);
+    return m !== null && m[1] === relayTraceId && m[2] === routeKey;
+  });
 
   return {
     deliveryLogFound,

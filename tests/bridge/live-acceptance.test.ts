@@ -1,4 +1,4 @@
-// Author: codex
+// Author: be-domain-modeler
 import { extractLogEvidence, extractStateEvidence } from '../../src/bridge/live-acceptance';
 import type { BridgeDurableState } from '../../src/bridge/types';
 

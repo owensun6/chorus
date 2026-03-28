@@ -1,4 +1,4 @@
-<!-- Author: Codex -->
+<!-- Author: Lead -->
 
 # Release-Now Verdict — 2026-03-28
 

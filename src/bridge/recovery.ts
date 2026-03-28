@@ -1,5 +1,5 @@
 // Author: be-domain-modeler
-import { DurableStateManager } from './state';
+import { DurableStateManager, compareCursorPosition } from './state';
 import { computeBackoff } from './hub-client';
 import type {
   BridgeDurableState,
@@ -17,21 +17,6 @@ export interface RecoveryConfig {
 }
 
 const DEFAULT_MAX_RETRIES = 5;
-
-/**
- * Compare two (timestamp, trace_id) tuples in total order.
- * Returns negative if a < b, 0 if equal, positive if a > b.
- */
-const compareCursorPosition = (
-  aTimestamp: string, aTraceId: string,
-  bTimestamp: string, bTraceId: string,
-): number => {
-  if (aTimestamp < bTimestamp) return -1;
-  if (aTimestamp > bTimestamp) return 1;
-  if (aTraceId < bTraceId) return -1;
-  if (aTraceId > bTraceId) return 1;
-  return 0;
-};
 
 /**
  * Filter Hub history messages, discarding items at or before cursor position.

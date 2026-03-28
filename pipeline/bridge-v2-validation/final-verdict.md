@@ -1,4 +1,4 @@
-<!-- Author: Codex -->
+<!-- Author: Lead -->
 
 # Final Verdict
 

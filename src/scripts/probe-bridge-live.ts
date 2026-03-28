@@ -1,4 +1,4 @@
-// Author: codex
+// Author: be-domain-modeler
 import * as fs from 'node:fs';
 import * as https from 'node:https';
 import * as os from 'node:os';
@@ -113,52 +113,37 @@ const waitForStateAndLogs = async (
   readonly log: ReturnType<typeof extractLogEvidence>;
 }> => {
   const deadline = Date.now() + options.timeoutMs;
-  let lastProblem = 'state fact missing';
 
-  while (Date.now() <= deadline) {
-    const state = loadStateEvidence(options.stateFile, inboundTraceId);
-    if (!state) {
-      lastProblem = `state missing trace_id=${inboundTraceId}`;
-      await sleep(DEFAULT_POLL_INTERVAL_MS);
-      continue;
-    }
-
-    if (!state.cursorAdvanced) {
-      lastProblem = `state cursor not advanced trace_id=${inboundTraceId}`;
-      await sleep(DEFAULT_POLL_INTERVAL_MS);
-      continue;
-    }
-
-    if (!state.deliveryEvidence && !state.terminalDisposition) {
-      lastProblem = `state terminal evidence missing trace_id=${inboundTraceId}`;
-      await sleep(DEFAULT_POLL_INTERVAL_MS);
-      continue;
-    }
-
-    if (!state.relayConfirmed || !state.relayTraceId) {
-      lastProblem = `state relay evidence missing trace_id=${inboundTraceId}`;
-      await sleep(DEFAULT_POLL_INTERVAL_MS);
-      continue;
-    }
-
+  const pollOnce = (state: LiveAcceptanceStateEvidence | null): string | null => {
+    if (!state) return `state missing trace_id=${inboundTraceId}`;
+    if (!state.cursorAdvanced) return `state cursor not advanced trace_id=${inboundTraceId}`;
+    if (!state.deliveryEvidence && !state.terminalDisposition) return `state terminal evidence missing trace_id=${inboundTraceId}`;
+    if (!state.relayConfirmed || !state.relayTraceId) return `state relay evidence missing trace_id=${inboundTraceId}`;
     const logText = safeReadFile(options.gatewayLog);
     const logEvidence = extractLogEvidence(logText, inboundTraceId, state.routeKey, state.relayTraceId);
-    if (!logEvidence.deliveryLogFound) {
-      lastProblem = `gateway log missing delivery trace_id=${inboundTraceId}`;
-      await sleep(DEFAULT_POLL_INTERVAL_MS);
-      continue;
+    if (!logEvidence.deliveryLogFound) return `gateway log missing delivery trace_id=${inboundTraceId}`;
+    if (!logEvidence.relayLogFound) return `gateway log missing relay trace_id=${state.relayTraceId}`;
+    return null; // all checks passed
+  };
+
+  const pollLoop = async (): Promise<{
+    readonly state: LiveAcceptanceStateEvidence;
+    readonly log: ReturnType<typeof extractLogEvidence>;
+  }> => {
+    const problem = pollOnce(loadStateEvidence(options.stateFile, inboundTraceId));
+    if (problem === null) {
+      const state = loadStateEvidence(options.stateFile, inboundTraceId)!;
+      const logText = safeReadFile(options.gatewayLog);
+      return { state, log: extractLogEvidence(logText, inboundTraceId, state.routeKey, state.relayTraceId) };
     }
-
-    if (!logEvidence.relayLogFound) {
-      lastProblem = `gateway log missing relay trace_id=${state.relayTraceId}`;
-      await sleep(DEFAULT_POLL_INTERVAL_MS);
-      continue;
+    if (Date.now() > deadline) {
+      throw new Error(`FAIL gate=bridge receiver=${options.receiverId} trace_id=${inboundTraceId} reason=${problem}`);
     }
+    await sleep(DEFAULT_POLL_INTERVAL_MS);
+    return pollLoop();
+  };
 
-    return { state, log: logEvidence };
-  }
-
-  throw new Error(`FAIL gate=bridge receiver=${options.receiverId} trace_id=${inboundTraceId} reason=${lastProblem}`);
+  return pollLoop();
 };
 
 const loadStateEvidence = (
@@ -203,10 +188,11 @@ const postJson = async <T>(
         ...headers,
       },
     }, (response) => {
-      let raw = '';
+      const chunks: string[] = [];
       response.setEncoding('utf8');
-      response.on('data', (chunk) => { raw += chunk; });
+      response.on('data', (chunk) => { chunks.push(chunk); });
       response.on('end', () => {
+        const raw = chunks.join('');
         if (!raw) {
           reject(new Error(`Empty response from ${url}`));
           return;

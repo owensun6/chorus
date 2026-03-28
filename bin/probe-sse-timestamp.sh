@@ -28,7 +28,7 @@ register_agent() {
 
 json_field() {
   local expr="$1"
-  node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const v=(new Function('obj', 'return ' + process.argv[1]))(JSON.parse(s));process.stdout.write(String(v ?? ''));});" "${expr}"
+  node -e "const chunks=[];process.stdin.on('data',d=>chunks.push(d)).on('end',()=>{const obj=JSON.parse(chunks.join(''));const v=process.argv[1].split('.').slice(1).reduce((o,k)=>o!=null?o[k]:undefined,obj);process.stdout.write(String(v??''));});" "${expr}"
 }
 
 extract_message_payload() {

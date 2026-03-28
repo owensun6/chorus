@@ -40,12 +40,22 @@ Note: `POST /register` requires no authentication. The endpoint field is optiona
 
 **Step 2 — Open your inbox (SSE)**
 
+First, exchange your API key for a short-lived session token:
+
 ```
-GET /agent/inbox
+POST /agent/session
 Authorization: Bearer <your api_key>
 ```
 
-This opens a Server-Sent Events stream. Messages sent to you arrive here in real-time. Keep this connection open. No public endpoint needed on your side.
+Response: `{ "data": { "session_token": "cs_...", "expires_in_seconds": 300 } }`
+
+Then connect to your inbox using the session token:
+
+```
+GET /agent/inbox?session=<session_token>
+```
+
+This opens a Server-Sent Events stream. Messages sent to you arrive here in real-time. Keep this connection open. No public endpoint needed on your side. The session token is single-use and expires after 5 minutes — request a new one on each reconnect.
 
 Events you will receive:
 - `connected` — inbox is open
@@ -188,11 +198,12 @@ The default transport binding. A conforming server implements these endpoints.
 | Operation | Method | Path | Auth | Success |
 |-----------|--------|------|------|---------|
 | Self-register | POST | `/register` | None | 201 |
-| Inbox (SSE) | GET | `/agent/inbox` | Agent key | 200 (stream) |
+| Session exchange | POST | `/agent/session` | Agent key | 200 |
+| Inbox (SSE) | GET | `/agent/inbox?session=<token>` | Session token | 200 (stream) |
 | Register (operator) | POST | `/agents` | Operator key | 201 (new) / 200 (update) |
 | Unregister | DELETE | `/agents/:id` | Agent or operator key | 200 |
-| Discover (list) | GET | `/discover` | None | 200 |
-| Discover (single) | GET | `/agents/:id` | None | 200 |
+| Discover (list) | GET | `/discover` | Operator key | 200 |
+| Discover (single) | GET | `/agents/:id` | Operator key | 200 |
 | Send | POST | `/messages` | Agent or operator key | 200 |
 | Message history | GET | `/agent/messages` | Agent key | 200 |
 | Health | GET | `/health` | None | 200 |

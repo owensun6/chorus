@@ -16,15 +16,23 @@ const makeClient = (hubUrl: string, config?: ConstructorParameters<typeof HubCli
   trackedClients.push(client);
   return client;
 };
+const flushMicrotasks = async (turns: number = 6): Promise<void> => {
+  for (let i = 0; i < turns; i += 1) {
+    await Promise.resolve();
+  }
+};
 
 afterAll(() => {
   global.fetch = originalFetch;
 });
 
-afterEach(() => {
+afterEach(async () => {
   for (const client of trackedClients.splice(0)) {
     client.disconnect();
   }
+  await flushMicrotasks();
+  jest.clearAllTimers();
+  jest.useRealTimers();
   fetchMock.mockClear();
 });
 
@@ -259,6 +267,26 @@ describe('HubClient.fetchHistory', () => {
       timeoutClient.fetchHistory('api-key'),
     ).rejects.toThrow('timed out');
   }, 5000);
+
+  it('rethrows non-timeout fetch failures', async () => {
+    const client = makeClient('https://hub.example.com');
+    fetchMock.mockRejectedValueOnce(new Error('network down'));
+
+    await expect(
+      client.fetchHistory('api-key'),
+    ).rejects.toThrow('network down');
+  });
+
+  it('throws HubClientError when history wrapper is malformed', async () => {
+    const client = makeClient('https://hub.example.com');
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ success: false, data: [] }), { status: 200 }),
+    );
+
+    await expect(
+      client.fetchHistory('api-key'),
+    ).rejects.toThrow(HubClientError);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -304,8 +332,27 @@ const makeSSEStream = (frames: string): ReadableStream<Uint8Array> => {
   });
 };
 
+/** Mock both session exchange (POST /agent/session) and SSE connect (GET /agent/inbox?session=...) */
+const mockSessionAndSSE = (ssePayload: string, sessionToken: string = 'cs_test_session'): void => {
+  // First call: POST /agent/session
+  fetchMock.mockResolvedValueOnce(
+    new Response(JSON.stringify({ success: true, data: { session_token: sessionToken, expires_in_seconds: 300 } }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  );
+  // Second call: GET /agent/inbox?session=...
+  fetchMock.mockResolvedValueOnce(
+    new Response(makeSSEStream(ssePayload), {
+      status: 200,
+      headers: { 'Content-Type': 'text/event-stream' },
+    }),
+  );
+};
+
 describe('HubClient.connectSSE', () => {
   it('test_connectSSE_delivers_valid_events: parses message events and calls onEvent', async () => {
+    jest.useFakeTimers();
     const ssePayload =
       `event: connected\ndata: {"agent_id":"a@h"}\n\n` +
       `event: message\ndata: ${JSON.stringify({
@@ -315,12 +362,7 @@ describe('HubClient.connectSSE', () => {
         timestamp: '2026-03-24T12:00:00.000Z',
       })}\n\n`;
 
-    fetchMock.mockResolvedValueOnce(
-      new Response(makeSSEStream(ssePayload), {
-        status: 200,
-        headers: { 'Content-Type': 'text/event-stream' },
-      }),
-    );
+    mockSessionAndSSE(ssePayload);
 
     const client = makeClient('https://hub.example.com');
     const received: Array<{ trace_id: string; hub_timestamp: string }> = [];
@@ -329,9 +371,9 @@ describe('HubClient.connectSSE', () => {
       received.push({ trace_id: event.trace_id, hub_timestamp: event.hub_timestamp });
     });
 
-    // Wait for stream consumption
-    await new Promise((r) => setTimeout(r, 50));
+    await flushMicrotasks();
     client.disconnect();
+    await flushMicrotasks();
 
     expect(received).toHaveLength(1);
     expect(received[0].trace_id).toBe('t-1');
@@ -339,6 +381,7 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('test_connectSSE_discards_invalid_events: missing timestamp logs error, SSE continues', async () => {
+    jest.useFakeTimers();
     const ssePayload =
       `event: message\ndata: ${JSON.stringify({
         trace_id: 't-bad',
@@ -353,12 +396,7 @@ describe('HubClient.connectSSE', () => {
         timestamp: '2026-03-24T13:00:00.000Z',
       })}\n\n`;
 
-    fetchMock.mockResolvedValueOnce(
-      new Response(makeSSEStream(ssePayload), {
-        status: 200,
-        headers: { 'Content-Type': 'text/event-stream' },
-      }),
-    );
+    mockSessionAndSSE(ssePayload);
 
     const client = makeClient('https://hub.example.com');
     const received: string[] = [];
@@ -368,8 +406,9 @@ describe('HubClient.connectSSE', () => {
       received.push(event.trace_id);
     }, (msg) => { errors.push(msg); });
 
-    await new Promise((r) => setTimeout(r, 50));
+    await flushMicrotasks();
     client.disconnect();
+    await flushMicrotasks();
 
     // Invalid event discarded, valid one received
     expect(received).toEqual(['t-good']);
@@ -377,41 +416,170 @@ describe('HubClient.connectSSE', () => {
     expect(errors[0]).toContain('timestamp');
   });
 
+  it('skips SSE blocks without data lines or message event types', async () => {
+    jest.useFakeTimers();
+    const ssePayload =
+      `event: message\n\n` +
+      `data: ${JSON.stringify({
+        trace_id: 'missing-event-line',
+        sender_id: 'alice@hub',
+        envelope: { chorus_version: '0.4', sender_id: 'alice@hub', original_text: 'skip', sender_culture: 'en' },
+        timestamp: '2026-03-24T13:00:00.000Z',
+      })}\n\n` +
+      `event: ping\ndata: ${JSON.stringify({
+        trace_id: 'ping-event',
+        sender_id: 'alice@hub',
+        envelope: { chorus_version: '0.4', sender_id: 'alice@hub', original_text: 'skip', sender_culture: 'en' },
+        timestamp: '2026-03-24T13:00:01.000Z',
+      })}\n\n` +
+      `event: message\ndata: ${JSON.stringify({
+        trace_id: 't-good',
+        sender_id: 'alice@hub',
+        envelope: { chorus_version: '0.4', sender_id: 'alice@hub', original_text: 'ok', sender_culture: 'en' },
+        timestamp: '2026-03-24T13:00:02.000Z',
+      })}\n\n`;
+
+    mockSessionAndSSE(ssePayload);
+
+    const client = makeClient('https://hub.example.com');
+    const received: string[] = [];
+
+    client.connectSSE('agent-a', 'key-1', (event) => {
+      received.push(event.trace_id);
+    });
+
+    await flushMicrotasks();
+    client.disconnect();
+    await flushMicrotasks();
+
+    expect(received).toEqual(['t-good']);
+  });
+
+  it('retries after SSE HTTP failure', async () => {
+    jest.useFakeTimers();
+    // Attempt 1: session OK, SSE fails
+    fetchMock
+      .mockResolvedValueOnce(new Response(JSON.stringify({ success: true, data: { session_token: 'cs_1', expires_in_seconds: 300 } }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+      .mockResolvedValueOnce(new Response('unavailable', { status: 503 }));
+    // Attempt 2: session OK, SSE OK
+    fetchMock
+      .mockResolvedValueOnce(new Response(JSON.stringify({ success: true, data: { session_token: 'cs_2', expires_in_seconds: 300 } }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+      .mockResolvedValueOnce(new Response(makeSSEStream(''), { status: 200, headers: { 'Content-Type': 'text/event-stream' } }));
+
+    const client = makeClient('https://hub.example.com');
+    const errors: string[] = [];
+
+    client.connectSSE('agent-a', 'key-1', () => {}, (msg) => { errors.push(msg); });
+
+    await flushMicrotasks(20);
+    expect(fetchMock).toHaveBeenCalledTimes(2); // session + SSE (503)
+    expect(errors.length).toBeGreaterThan(0);
+
+    await jest.advanceTimersByTimeAsync(2000);
+    await flushMicrotasks(20);
+    expect(fetchMock).toHaveBeenCalledTimes(4); // retry: session + SSE
+    client.disconnect();
+    await flushMicrotasks();
+  });
+
+  it('does not reconnect when the stream ends after an explicit disconnect', async () => {
+    jest.useFakeTimers();
+    const ssePayload =
+      `event: message\ndata: ${JSON.stringify({
+        trace_id: 't-1',
+        sender_id: 'alice@hub',
+        envelope: { chorus_version: '0.4', sender_id: 'alice@hub', original_text: 'hi', sender_culture: 'en' },
+        timestamp: '2026-03-24T12:00:00.000Z',
+      })}\n\n`;
+
+    mockSessionAndSSE(ssePayload);
+
+    const client = makeClient('https://hub.example.com');
+    let disconnected = false;
+
+    client.connectSSE('agent-a', 'key-1', () => {
+      if (!disconnected) {
+        disconnected = true;
+        client.disconnect();
+      }
+    });
+
+    await flushMicrotasks(10);
+
+    const callsAfterDisconnect = fetchMock.mock.calls.length;
+    await jest.advanceTimersByTimeAsync(10000);
+    await flushMicrotasks(10);
+
+    // After disconnect, no additional fetch calls should happen (no reconnect)
+    expect(fetchMock.mock.calls.length).toBe(callsAfterDisconnect);
+  });
+
+  it('suppresses reconnect and error logging on intentional abort', async () => {
+    jest.useFakeTimers();
+    // Session exchange succeeds, SSE hangs until abort
+    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ success: true, data: { session_token: 'cs_abort', expires_in_seconds: 300 } }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    fetchMock.mockImplementationOnce((...args: Parameters<typeof fetch>) => {
+      const init = args[1];
+      return new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => {
+          reject(new DOMException('aborted', 'AbortError'));
+        });
+      });
+    });
+
+    const client = makeClient('https://hub.example.com');
+    const errors: string[] = [];
+    client.connectSSE('agent-a', 'key-1', () => {}, (msg) => { errors.push(msg); });
+
+    await flushMicrotasks();
+    client.disconnect();
+    await Promise.resolve();
+    await Promise.resolve();
+    await jest.runOnlyPendingTimersAsync();
+
+    expect(errors).toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(2); // session + aborted SSE
+  });
+
   it('test_disconnect_stops_reconnection: disconnect prevents further fetch calls', async () => {
-    // First fetch fails → triggers reconnect
+    jest.useFakeTimers();
+    // Session exchange fails → triggers reconnect
     fetchMock.mockRejectedValueOnce(new Error('network down'));
 
     const client = makeClient('https://hub.example.com');
     client.connectSSE('agent-a', 'key-1', () => {});
 
-    // Wait briefly, then disconnect before reconnect timer fires
-    await new Promise((r) => setTimeout(r, 50));
+    await flushMicrotasks();
     client.disconnect();
 
     const callsBefore = fetchMock.mock.calls.length;
 
-    // Wait longer than backoff(0)=1s to confirm no reconnect
-    await new Promise((r) => setTimeout(r, 1200));
+    await jest.advanceTimersByTimeAsync(2000);
+    await flushMicrotasks();
 
     expect(fetchMock.mock.calls.length).toBe(callsBefore);
   });
 
-  it('test_connectSSE_url_format: uses token query param for SSE', async () => {
-    fetchMock.mockResolvedValueOnce(
-      new Response(makeSSEStream(''), {
-        status: 200,
-        headers: { 'Content-Type': 'text/event-stream' },
-      }),
-    );
+  it('test_connectSSE_url_format: uses session handshake (not api key in URL)', async () => {
+    jest.useFakeTimers();
+    mockSessionAndSSE('', 'cs_my_session_token');
 
     const client = makeClient('https://hub.example.com');
     client.connectSSE('agent-a', 'my-api-key', () => {});
 
-    await new Promise((r) => setTimeout(r, 20));
+    await flushMicrotasks();
     client.disconnect();
+    await flushMicrotasks();
 
-    const [url] = fetchMock.mock.calls[0];
-    expect(url).toContain('/agent/inbox');
-    expect(url).toContain('token=my-api-key');
+    // First call: POST /agent/session with API key in Authorization header
+    const [sessionUrl, sessionOpts] = fetchMock.mock.calls[0];
+    expect(sessionUrl).toContain('/agent/session');
+    expect((sessionOpts as RequestInit).headers).toEqual(expect.objectContaining({ Authorization: 'Bearer my-api-key' }));
+
+    // Second call: GET /agent/inbox?session=... (no API key in URL)
+    const [sseUrl] = fetchMock.mock.calls[1];
+    expect(sseUrl).toContain('/agent/inbox?session=cs_my_session_token');
+    expect(sseUrl).not.toContain('token=');
+    expect(sseUrl).not.toContain('my-api-key');
   });
 });

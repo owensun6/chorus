@@ -56,7 +56,16 @@ receiver_json="$(register_agent "${RECEIVER_ID}")"
 sender_key="$(printf '%s' "${sender_json}" | json_field "obj.data.api_key")"
 receiver_key="$(printf '%s' "${receiver_json}" | json_field "obj.data.api_key")"
 
-curl -NsS "${BASE}/agent/inbox?token=${receiver_key}" > "${SSE_FILE}" &
+# Exchange receiver API key for session token
+session_json="$(curl -sS -X POST "${BASE}/agent/session" -H "Authorization: Bearer ${receiver_key}")"
+session_token="$(printf '%s' "${session_json}" | json_field "obj.data.session_token")"
+if [ -z "${session_token}" ] || [ "${session_token}" = "undefined" ]; then
+  echo "FAIL reason=session_exchange_failed domain=${DOMAIN}"
+  echo "${session_json}"
+  exit 1
+fi
+
+curl -NsS "${BASE}/agent/inbox?session=${session_token}" > "${SSE_FILE}" &
 CURL_PID=$!
 
 sleep 1

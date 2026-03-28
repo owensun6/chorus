@@ -264,7 +264,13 @@ function connectInbox(side) {
   $("sse-dot-" + side).className = "inline-block w-2 h-2 rounded-full bg-yellow-500 pulse";
   $("sse-label-" + side).textContent = "connecting...";
 
-  const es = new EventSource("/agent/inbox?token=" + encodeURIComponent(agent.key));
+  // Exchange API key for session token, then connect SSE
+  fetch("/agent/session", { method: "POST", headers: { "Authorization": "Bearer " + agent.key } })
+    .then(r => r.json())
+    .then(j => {
+      const sessionToken = j.data && j.data.session_token;
+      if (!sessionToken) { addInboxItem(side, "system", "Session exchange failed", "red"); return; }
+      const es = new EventSource("/agent/inbox?session=" + encodeURIComponent(sessionToken));
 
   es.addEventListener("connected", () => {
     $("sse-dot-" + side).className = "inline-block w-2 h-2 rounded-full bg-green-500";
@@ -299,6 +305,9 @@ function connectInbox(side) {
   };
 
   agent.sse = es;
+    }).catch(() => {
+      addInboxItem(side, "system", "Session exchange network error", "red");
+    });
 }
 
 // --- Send Message ---

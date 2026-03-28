@@ -153,6 +153,13 @@ export type SSECallback = (event: HubSSEEvent) => void;
 const DEFAULT_FETCH_TIMEOUT_MS = 30_000;
 const DEFAULT_RELAY_TIMEOUT_MS = 60_000;
 
+const unrefTimer = <T extends ReturnType<typeof setTimeout>>(timer: T): T => {
+  if (typeof timer === 'object' && timer !== null && 'unref' in timer) {
+    timer.unref();
+  }
+  return timer;
+};
+
 /**
  * Fetch with AbortController timeout. Throws on timeout.
  */
@@ -162,7 +169,7 @@ const fetchWithTimeout = async (
   timeoutMs: number,
 ): Promise<Response> => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const timer = unrefTimer(setTimeout(() => controller.abort(), timeoutMs));
   try {
     return await fetch(url, { ...init, signal: controller.signal });
   } catch (err) {
@@ -225,6 +232,29 @@ export class HubClient {
     }
   }
 
+  /**
+   * Exchange API key for short-lived session token via POST /agent/session.
+   */
+  private async acquireSessionToken(apiKey: string): Promise<string> {
+    const res = await fetchWithTimeout(
+      `${this.hubUrl}/agent/session`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}` },
+      },
+      this.fetchTimeoutMs,
+    );
+    if (!res.ok) {
+      throw new HubClientError(`Session exchange failed: HTTP ${res.status}`, res.status);
+    }
+    const body = await res.json() as { data?: { session_token?: string } };
+    const token = body?.data?.session_token;
+    if (!token) {
+      throw new HubClientError('Session exchange returned no token', null);
+    }
+    return token;
+  }
+
   private startSSE(
     apiKey: string,
     onEvent: SSECallback,
@@ -234,15 +264,19 @@ export class HubClient {
     const controller = new AbortController();
     this.sseAbort = controller;
 
-    const url = `${this.hubUrl}/agent/inbox?token=${encodeURIComponent(apiKey)}`;
-
-    fetch(url, {
-      headers: { Accept: 'text/event-stream' },
-      signal: controller.signal,
-    })
+    // Step 1: exchange API key for session token, then connect SSE
+    this.acquireSessionToken(apiKey)
+      .then((sessionToken) => {
+        if (controller.signal.aborted) return; // disconnected during exchange
+        const url = `${this.hubUrl}/agent/inbox?session=${encodeURIComponent(sessionToken)}`;
+        return fetch(url, {
+          headers: { Accept: 'text/event-stream' },
+          signal: controller.signal,
+        });
+      })
       .then((res) => {
-        if (!res.ok || !res.body) {
-          throw new HubClientError(`SSE connect failed: HTTP ${res.status}`, res.status);
+        if (!res || !res.ok || !res.body) {
+          throw new HubClientError(`SSE connect failed: HTTP ${res?.status ?? 'no response'}`, res?.status ?? null);
         }
         return this.consumeStream(res.body, onEvent, onError);
       })
@@ -268,10 +302,10 @@ export class HubClient {
     attempt: number,
   ): void {
     const delay = computeBackoff(attempt);
-    this.reconnectTimer = setTimeout(() => {
+    this.reconnectTimer = unrefTimer(setTimeout(() => {
       this.reconnectTimer = null;
       this.startSSE(apiKey, onEvent, onError, attempt);
-    }, delay);
+    }, delay));
   }
 
   private async consumeStream(

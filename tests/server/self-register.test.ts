@@ -5,6 +5,7 @@ import { createApp } from "../../src/server/routes";
 import { createActivityStream } from "../../src/server/activity";
 import { createInboxManager } from "../../src/server/inbox";
 import { createMessageStore } from "../../src/server/message-store";
+import { createAgentSessionStore } from "../../src/server/agent-session";
 import { createTestDb } from "../helpers/test-db";
 import type Database from "better-sqlite3";
 
@@ -713,5 +714,147 @@ describe("Invite Code Gating (POST /register)", () => {
     // use_count must still be 1 — rotation does not consume invite capacity
     const row2 = db.prepare("SELECT use_count FROM invite_codes WHERE code_hash = ?").get(hashCode("alpha-001")) as { use_count: number };
     expect(row2.use_count).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// C-02: Session token for SSE inbox
+// ---------------------------------------------------------------------------
+
+describe("POST /agent/session", () => {
+  const makeSessionApp = () => {
+    const db = createTestDb();
+    const registry = new AgentRegistry(db);
+    const activity = createActivityStream(db);
+    const inbox = createInboxManager();
+    const sessionStore = createAgentSessionStore();
+    const app = createApp(registry, undefined, activity, inbox, undefined, undefined, sessionStore);
+    return { db, registry, app, sessionStore };
+  };
+
+  const registerAgent = async (app: ReturnType<typeof createApp>, agentId: string) => {
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: agentId, agent_card: VALID_CARD }),
+      headers: { "Content-Type": "application/json" },
+    });
+    return ((await res.json()) as { data: { api_key: string } }).data.api_key;
+  };
+
+  it("exchanges valid API key for session token", async () => {
+    const { app } = makeSessionApp();
+    const apiKey = await registerAgent(app, "sess@hub");
+
+    const res = await app.request("/agent/session", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+    expect(res.status).toBe(200);
+
+    const json: Json = await res.json();
+    expect(json.data.session_token).toMatch(/^cs_/);
+    expect(json.data.expires_in_seconds).toBe(300);
+  });
+
+  it("rejects request without Authorization", async () => {
+    const { app } = makeSessionApp();
+
+    const res = await app.request("/agent/session", { method: "POST" });
+    expect(res.status).toBe(401);
+  });
+
+  it("rejects request with invalid API key", async () => {
+    const { app } = makeSessionApp();
+
+    const res = await app.request("/agent/session", {
+      method: "POST",
+      headers: { Authorization: "Bearer bad-key" },
+    });
+    expect(res.status).toBe(401);
+  });
+});
+
+describe("GET /agent/inbox with session token", () => {
+  const makeSessionApp = () => {
+    const db = createTestDb();
+    const registry = new AgentRegistry(db);
+    const activity = createActivityStream(db);
+    const inbox = createInboxManager();
+    const sessionStore = createAgentSessionStore();
+    const app = createApp(registry, undefined, activity, inbox, undefined, undefined, sessionStore);
+    return { db, registry, app, sessionStore };
+  };
+
+  const registerAgent = async (app: ReturnType<typeof createApp>, agentId: string) => {
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: agentId, agent_card: VALID_CARD }),
+      headers: { "Content-Type": "application/json" },
+    });
+    return ((await res.json()) as { data: { api_key: string } }).data.api_key;
+  };
+
+  it("connects SSE with valid session token", async () => {
+    const { app } = makeSessionApp();
+    const apiKey = await registerAgent(app, "sess-sse@hub");
+
+    // Exchange for session
+    const sessRes = await app.request("/agent/session", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+    const sessJson: Json = await sessRes.json();
+    const sessionToken = sessJson.data.session_token;
+
+    // Connect SSE with session token
+    const res = await app.request(`/agent/inbox?session=${sessionToken}`, {
+      method: "GET",
+    });
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Content-Type")).toBe("text/event-stream");
+
+    const reader = res.body!.getReader();
+    const { value } = await reader.read();
+    const text = new TextDecoder().decode(value);
+    reader.cancel();
+    expect(text).toContain("event: connected");
+    expect(text).toContain("sess-sse@hub");
+  });
+
+  it("rejects replay of used session token", async () => {
+    const { app } = makeSessionApp();
+    const apiKey = await registerAgent(app, "replay@hub");
+
+    const sessRes = await app.request("/agent/session", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+    const sessionToken = ((await sessRes.json()) as Json).data.session_token;
+
+    // First use — should succeed
+    const res1 = await app.request(`/agent/inbox?session=${sessionToken}`, { method: "GET" });
+    expect(res1.status).toBe(200);
+    res1.body?.cancel();
+
+    // Second use — should fail (single-use)
+    const res2 = await app.request(`/agent/inbox?session=${sessionToken}`, { method: "GET" });
+    expect(res2.status).toBe(401);
+  });
+
+  it("rejects deprecated ?token= query param", async () => {
+    const { app } = makeSessionApp();
+    const apiKey = await registerAgent(app, "legacy@hub");
+
+    const res = await app.request(`/agent/inbox?token=${apiKey}`, { method: "GET" });
+    expect(res.status).toBe(400);
+    const json: Json = await res.json();
+    expect(json.error.code).toBe("ERR_DEPRECATED");
+  });
+
+  it("rejects invalid session token", async () => {
+    const { app } = makeSessionApp();
+
+    const res = await app.request("/agent/inbox?session=cs_invalid", { method: "GET" });
+    expect(res.status).toBe(401);
   });
 });

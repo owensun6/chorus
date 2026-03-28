@@ -13,6 +13,8 @@ import type { ActivityStream } from "./activity";
 import type { InboxManager } from "./inbox";
 import type { MessageStore } from "./message-store";
 import type { IdempotencyStore } from "./idempotency";
+import type { AgentSessionStore } from "./agent-session";
+import { SESSION_TTL_MS } from "./agent-session";
 import { CONSOLE_HTML } from "./console-html";
 import { ARENA_HTML } from "./arena-html";
 
@@ -56,6 +58,7 @@ const createApp = (
   inbox?: InboxManager,
   messageStore?: MessageStore,
   idempotencyStore?: IdempotencyStore,
+  sessionStore?: AgentSessionStore,
 ): Hono => {
   const app = new Hono();
 
@@ -162,27 +165,70 @@ const createApp = (
     return c.json(successResponse(registration), status);
   });
 
-  // --- Agent Inbox (SSE, per-agent key auth) ---
+  // --- Agent Session (exchange API key for short-lived SSE session token) ---
+
+  app.post("/agent/session", (c) => {
+    if (!sessionStore) {
+      return c.json(errorResponse("ERR_NOT_AVAILABLE", "Session store not enabled"), 503);
+    }
+
+    const auth = c.req.header("Authorization");
+    if (!auth || !auth.startsWith("Bearer ")) {
+      return c.json(errorResponse("ERR_UNAUTHORIZED", "Missing or invalid Authorization header"), 401);
+    }
+
+    const apiKey = auth.slice(7);
+    const agentId = registry.getAgentIdByKey(apiKey);
+    if (!agentId) {
+      return c.json(errorResponse("ERR_UNAUTHORIZED", "Invalid API key"), 401);
+    }
+
+    const sessionToken = sessionStore.create(agentId, SESSION_TTL_MS);
+    return c.json(successResponse({
+      session_token: sessionToken,
+      expires_in_seconds: SESSION_TTL_MS / 1000,
+    }), 200);
+  });
+
+  // --- Agent Inbox (SSE, session-token auth) ---
 
   app.get("/agent/inbox", (c) => {
     if (!inbox) {
       return c.json(errorResponse("ERR_NOT_AVAILABLE", "Inbox not enabled"), 503);
     }
 
-    // Support both Authorization header and ?token= query param (EventSource can't set headers)
+    // Accept Authorization header or ?session= query param (for EventSource which can't set headers)
+    // ?token=<api_key> is DEPRECATED and REJECTED — use POST /agent/session to get a session token
     const auth = c.req.header("Authorization");
-    const queryToken = c.req.query("token");
-    const token = auth?.startsWith("Bearer ") ? auth.slice(7) : queryToken ?? "";
+    const sessionParam = c.req.query("session");
+    const legacyToken = c.req.query("token");
+
+    if (legacyToken) {
+      return c.json(
+        errorResponse("ERR_DEPRECATED", "?token= is deprecated. Use POST /agent/session to get a session token, then connect with ?session="),
+        400
+      );
+    }
+
+    const bearerToken = auth?.startsWith("Bearer ") ? auth.slice(7) : undefined;
+    const token = bearerToken ?? sessionParam ?? "";
     if (!token) {
       return c.json(
-        errorResponse("ERR_UNAUTHORIZED", "Missing Authorization header or token query param"),
+        errorResponse("ERR_UNAUTHORIZED", "Missing Authorization header or ?session= query param"),
         401
       );
     }
 
-    const agentId = registry.getAgentIdByKey(token);
+    // Try session token first, then fall back to API key via Authorization header
+    let agentId: string | undefined;
+    if (sessionParam && sessionStore) {
+      agentId = sessionStore.validate(sessionParam) ?? undefined;
+    } else if (bearerToken) {
+      agentId = registry.getAgentIdByKey(bearerToken);
+    }
+
     if (!agentId) {
-      return c.json(errorResponse("ERR_UNAUTHORIZED", "Invalid agent key"), 401);
+      return c.json(errorResponse("ERR_UNAUTHORIZED", "Invalid or expired session token"), 401);
     }
 
     const stream = new ReadableStream({

@@ -82,8 +82,19 @@ if (require.main === module) {
       : `Self-registration open at POST /register (no invite codes in DB)`);
   });
 
+  // Idempotency key cleanup: purge records older than 24 hours, every hour
+  const IDEM_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+  const IDEM_CLEANUP_INTERVAL_MS = 60 * 60 * 1000;
+  const idempotencyCleanupTimer = setInterval(() => {
+    const deleted = idempotencyStore.cleanup(IDEM_MAX_AGE_MS);
+    if (deleted > 0) {
+      log("router", `Idempotency cleanup: purged ${deleted} expired keys`);
+    }
+  }, IDEM_CLEANUP_INTERVAL_MS);
+
   const shutdown = () => {
     log("router", "Shutting down...");
+    clearInterval(idempotencyCleanupTimer);
     server.close(() => {
       db.close();
       log("router", "Database closed. Exiting.");

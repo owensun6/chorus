@@ -23,6 +23,7 @@ interface IdempotencyCheck {
 interface IdempotencyStore {
   readonly check: (key: string, payloadHash: string) => IdempotencyCheck;
   readonly store: (key: string, payloadHash: string, traceId: string, response: StoredResponse) => void;
+  readonly cleanup: (maxAgeMs: number) => number;
 }
 
 const computePayloadHash = (body: unknown): string =>
@@ -35,6 +36,10 @@ const createIdempotencyStore = (db: Database.Database): IdempotencyStore => {
 
   const stmtInsert = db.prepare(
     "INSERT INTO idempotency_keys (key, payload_hash, trace_id, response, created_at) VALUES (?, ?, ?, ?, ?)",
+  );
+
+  const stmtCleanup = db.prepare(
+    "DELETE FROM idempotency_keys WHERE created_at < ?",
   );
 
   const check = (key: string, payloadHash: string): IdempotencyCheck => {
@@ -52,7 +57,13 @@ const createIdempotencyStore = (db: Database.Database): IdempotencyStore => {
     stmtInsert.run(key, payloadHash, traceId, JSON.stringify(response), new Date().toISOString());
   };
 
-  return { check, store };
+  const cleanup = (maxAgeMs: number): number => {
+    const cutoff = new Date(Date.now() - maxAgeMs).toISOString();
+    const result = stmtCleanup.run(cutoff);
+    return result.changes;
+  };
+
+  return { check, store, cleanup };
 };
 
 export { createIdempotencyStore, computePayloadHash };

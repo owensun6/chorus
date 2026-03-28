@@ -396,3 +396,34 @@ describe("POST /messages Idempotency-Key validation", () => {
     expect(res.status).toBe(202);
   });
 });
+
+// ---------------------------------------------------------------------------
+// test_cleanup: cleanup purges expired keys
+// ---------------------------------------------------------------------------
+
+describe("Idempotency cleanup", () => {
+  it("purges keys older than maxAgeMs and keeps recent ones", () => {
+    const db = createTestDb();
+    const store = createIdempotencyStore(db);
+
+    // Insert a key with a timestamp 25 hours ago
+    const oldTimestamp = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
+    db.prepare(
+      "INSERT INTO idempotency_keys (key, payload_hash, trace_id, response, created_at) VALUES (?, ?, ?, ?, ?)",
+    ).run("old-key", "hash1", "trace-old", "{}", oldTimestamp);
+
+    // Insert a recent key via the store
+    store.store("new-key", "hash2", "trace-new", { status: 200, body: {} });
+
+    // Cleanup with 24-hour max age
+    const deleted = store.cleanup(24 * 60 * 60 * 1000);
+    expect(deleted).toBe(1);
+
+    // Old key gone, new key remains
+    const oldCheck = store.check("old-key", "hash1");
+    expect(oldCheck.kind).toBe("new"); // gone
+
+    const newCheck = store.check("new-key", "hash2");
+    expect(newCheck.kind).toBe("replay"); // still there
+  });
+});

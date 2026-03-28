@@ -42,17 +42,17 @@ These do not change the authoritative release verdict, but define the security a
 
 ### Security (from `security-audit-2026-03-28.md`)
 
-| Priority | ID | Finding |
-|----------|----|---------|
-| CRITICAL | C-01 | GET auth bypass — `/activity`, `/events`, `/console`, `/arena` unauthenticated |
-| CRITICAL | C-02 | API key exposed in SSE query parameter |
-| CRITICAL | C-03 | `.passthrough()` + no `original_text` max length |
-| CRITICAL | C-04 | SSRF — endpoint registration does not block private IPs |
-| CRITICAL | C-05 | Idempotency keys never cleaned up (unbounded disk growth) |
-| HIGH | H-01 | Rate limit bypass via X-Forwarded-For spoofing |
-| HIGH | H-02 | SSE buffer unbounded (OOM vector) |
-| HIGH | H-06 | Shell injection in `alpha-smoke.sh` |
-| HIGH | H-08 | `agent_id` format not enforced at registration |
+| Priority | ID | Finding | Current Status |
+|----------|----|---------|----------------|
+| CRITICAL | C-01 | GET auth bypass — `/activity`, `/events`, `/console`, `/arena` unauthenticated | Closed in `46641e7` |
+| CRITICAL | C-02 | API key exposed in SSE query parameter | Closed in `48e9041` + `809f2c3` |
+| CRITICAL | C-03 | `.passthrough()` + no `original_text` max length | Closed in `1ff7398` + `3b8fea0` |
+| CRITICAL | C-04 | SSRF — endpoint registration does not block private IPs | Closed in `58e64f6` + `87bf322` |
+| CRITICAL | C-05 | Idempotency keys never cleaned up (unbounded disk growth) | Closed in `647d620` |
+| HIGH | H-01 | Rate limit bypass via X-Forwarded-For spoofing | Closed in `7eeea85` |
+| HIGH | H-02 | SSE buffer unbounded (OOM vector) | Closed in `59e7dd7` |
+| HIGH | H-06 | Shell injection in `alpha-smoke.sh` | Closed in `de7d6af` |
+| HIGH | H-08 | `agent_id` format not enforced at registration | Closed in `7a45f1a` |
 
 ### Test / CI
 
@@ -60,6 +60,8 @@ These do not change the authoritative release verdict, but define the security a
 |------|--------|---------|
 | Branch coverage | Previously 74.8% (`security-audit-2026-03-28.md:256`); now 80.03% after test additions | PASS |
 | Jest clean exit | Previously had `did-not-exit` warning; now exits cleanly | PASS |
+| TypeScript | `npx tsc --noEmit` | PASS |
+| Full test suite | `npx jest --runInBand --coverage=false` | PASS (`36 suites / 507 tests`) |
 
 ### Remaining from security audit
 
@@ -75,7 +77,7 @@ There is no simple "do N things and ship" conclusion. The correct sequence:
 2. **R-2 is constrained by host reality** — upgrade requires host adapter capability evolution or Commander redefining acceptable delivery truth
 3. **R-3 upgrade path is undefined** — not pre-judged as host-only constraint
 4. After all 3 are resolved, reopen verdict from clean validation state per `manual-acceptance:63-68`, updating both authoritative documents in sync
-5. Reopening the authoritative verdict is necessary but not sufficient; actual alpha launch still requires Layer 2 security hardening (5 CRITICAL) and QA gates (branch coverage 80%) to pass
+5. Reopening the authoritative verdict is necessary but not sufficient; Layer 2 critical/high hardening is now closed and QA gates are green, but the authoritative verdict still cannot be reopened until `R-1`, `R-2`, and `R-3` are resolved from a clean validation state
 
 ---
 

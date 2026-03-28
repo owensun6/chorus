@@ -82,10 +82,10 @@ const createApp = (
 
     const { agent_id, agent_card, endpoint, invite_code } = parsed.data;
 
-    // SSRF protection: validate endpoint URL before registration
+    // SSRF protection: resolve hostname and block private IPs at registration time
     if (endpoint) {
       const requireHttps = process.env["NODE_ENV"] === "production";
-      const epCheck = checkEndpointUrl(endpoint, requireHttps);
+      const epCheck = await resolveAndCheckEndpoint(endpoint, requireHttps);
       if (!epCheck.allowed) {
         return c.json(errorResponse("ERR_ENDPOINT_BLOCKED", epCheck.reason ?? "Endpoint not allowed"), 400);
       }
@@ -153,9 +153,9 @@ const createApp = (
 
     const { agent_id, endpoint, agent_card } = parsed.data;
 
-    // SSRF protection: validate endpoint URL before registration
+    // SSRF protection: resolve hostname and block private IPs at registration time
     const requireHttps = process.env["NODE_ENV"] === "production";
-    const epCheck = checkEndpointUrl(endpoint, requireHttps);
+    const epCheck = await resolveAndCheckEndpoint(endpoint, requireHttps);
     if (!epCheck.allowed) {
       return c.json(errorResponse("ERR_ENDPOINT_BLOCKED", epCheck.reason ?? "Endpoint not allowed"), 400);
     }

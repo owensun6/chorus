@@ -6,6 +6,7 @@ import { readFileSync } from "fs";
 import { resolve } from "path";
 import { createTestDb } from "../helpers/test-db";
 import type Database from "better-sqlite3";
+import * as endpointPolicy from "../../src/server/endpoint-policy";
 
 // Load endpoints.json — same single source of truth the server uses
 const ENDPOINTS_DEF = JSON.parse(
@@ -443,5 +444,82 @@ describe("Endpoint SSRF Protection", () => {
     });
 
     expect(res.status).toBe(201);
+  });
+
+  it("POST /register rejects hostname that resolves to private IP (DNS rebinding)", async () => {
+    // Mock resolveAndCheckEndpoint to simulate DNS resolving to 127.0.0.1
+    const spy = jest.spyOn(endpointPolicy, "resolveAndCheckEndpoint")
+      .mockResolvedValueOnce({ allowed: false, reason: "Hostname evil.example resolves to blocked IP 127.0.0.1" });
+
+    const db = createTestDb();
+    const registry = new AgentRegistry(db);
+    const app = createApp(registry);
+
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({
+        agent_id: "rebind@hub",
+        agent_card: validCard,
+        endpoint: "https://evil.example/receive",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(400);
+    const json: Json = await res.json();
+    expect(json.error.code).toBe("ERR_ENDPOINT_BLOCKED");
+    expect(json.error.message).toContain("127.0.0.1");
+
+    spy.mockRestore();
+  });
+
+  it("POST /register rejects hostname resolving to 10.x private range", async () => {
+    const spy = jest.spyOn(endpointPolicy, "resolveAndCheckEndpoint")
+      .mockResolvedValueOnce({ allowed: false, reason: "Hostname internal.corp resolves to blocked IP 10.0.0.5" });
+
+    const db = createTestDb();
+    const registry = new AgentRegistry(db);
+    const app = createApp(registry);
+
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({
+        agent_id: "internal@hub",
+        agent_card: validCard,
+        endpoint: "https://internal.corp/receive",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(400);
+    const json: Json = await res.json();
+    expect(json.error.code).toBe("ERR_ENDPOINT_BLOCKED");
+
+    spy.mockRestore();
+  });
+
+  it("POST /register rejects hostname resolving to link-local (169.254.x)", async () => {
+    const spy = jest.spyOn(endpointPolicy, "resolveAndCheckEndpoint")
+      .mockResolvedValueOnce({ allowed: false, reason: "Hostname metadata.local resolves to blocked IP 169.254.169.254" });
+
+    const db = createTestDb();
+    const registry = new AgentRegistry(db);
+    const app = createApp(registry);
+
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({
+        agent_id: "metadata@hub",
+        agent_card: validCard,
+        endpoint: "https://metadata.local/receive",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(400);
+    const json: Json = await res.json();
+    expect(json.error.code).toBe("ERR_ENDPOINT_BLOCKED");
+
+    spy.mockRestore();
   });
 });

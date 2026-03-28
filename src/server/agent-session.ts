@@ -18,6 +18,8 @@ const createAgentSessionStore = (): AgentSessionStore => {
   const sessions = new Map<string, SessionRecord>();
 
   const create = (agentId: string, ttlMs: number): string => {
+    // Opportunistic cleanup: purge expired sessions on each create
+    cleanup();
     const token = `cs_${randomUUID().replace(/-/g, "")}`;
     sessions.set(token, {
       token,

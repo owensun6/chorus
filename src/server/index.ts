@@ -94,9 +94,16 @@ if (require.main === module) {
     }
   }, IDEM_CLEANUP_INTERVAL_MS);
 
+  // Session token cleanup: purge expired tokens every 5 minutes
+  const SESSION_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
+  const sessionCleanupTimer = setInterval(() => {
+    sessionStore.cleanup();
+  }, SESSION_CLEANUP_INTERVAL_MS);
+
   const shutdown = () => {
     log("router", "Shutting down...");
     clearInterval(idempotencyCleanupTimer);
+    clearInterval(sessionCleanupTimer);
     server.close(() => {
       db.close();
       log("router", "Database closed. Exiting.");

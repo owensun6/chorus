@@ -13,17 +13,7 @@ Decide whether Chorus can be released **now**, and whether the current live inte
 - live `GET https://agchorus.com/health` on `2026-03-27T17:18:28.820Z` returned `"invite_gating": false`
 - live anonymous `POST https://agchorus.com/register` on `2026-03-27T17:19:56.150Z` returned `201`
 - [`README.md`](/Volumes/XDISK/chorus/README.md)
-
-## Context Log
-
-- [`memory-bank/progress.md`](/Volumes/XDISK/chorus/memory-bank/progress.md)
-- [`docs/handoff-2026-03-23-bridge-state.md`](/Volumes/XDISK/chorus/docs/handoff-2026-03-23-bridge-state.md)
-
-Fresh verification run on 2026-03-28:
-
-- `npx tsc --noEmit` -> PASS
-- `npx jest --runInBand --coverage=false tests/bridge/outbound.test.ts tests/bridge/runtime-v2.test.ts` -> `20/20` PASS
-- `npx jest --runInBand --coverage=false tests/bridge` -> `122/122` PASS
+- frozen supporting commits: `1a6423d`, `35b16d3`
 
 ## Verdict
 
@@ -31,12 +21,13 @@ Fresh verification run on 2026-03-28:
 
 Why:
 
-- the previous "invite-only alpha" claim is false against the live system:
-  - `/health` says `invite_gating = false`
-  - anonymous `/register` succeeds with `201`
-- the frozen Bridge v2 validation package is still [`CONDITIONAL`](/Volumes/XDISK/chorus/pipeline/bridge-v2-validation/final-verdict.md), not unconditional `PASS`
-- the same-route proof is real, but it is still based on repo changes that have not yet been frozen into a commit
-- plain Jest still emits a heuristic "did not exit" warning on some bridge-suite combinations, but explicit `--detectOpenHandles` does not identify a concrete non-stdio handle; release gating should rely on explicit handle detection, not stderr string matching
+- the release-truth corrections are now closed:
+  - live gate truth is documented as `public alpha + self-registration currently enabled`
+  - same-route serialization is frozen in commit `35b16d3`
+  - release-gate enforcement is frozen in commit `1a6423d`
+- the remaining blocking set is inherited from the frozen Bridge v2 technical verdict in [`final-verdict.md`](/Volumes/XDISK/chorus/pipeline/bridge-v2-validation/final-verdict.md)
+
+This document does not reopen, restate, or override that technical verdict. It inherits it.
 
 ## Decision
 
@@ -48,9 +39,9 @@ Not approved now:
 
 Approved now:
 
-- release-ready change set preparation
-- gate-truth correction across docs
-- freezing the same-route fix into a reproducible commit
+- public-alpha truth-aligned documentation
+- release-gate enforcement via explicit `--detectOpenHandles`
+- committed same-route serialization proof
 
 ## Live Gate Truth
 
@@ -69,7 +60,9 @@ What is not true right now:
 
 Do these first:
 
-1. commit the current same-route fix and remove the unsubmitted-state ambiguity
-2. unify release truth so authoritative docs say `public alpha + self-registration` unless invite gating is turned back on
-3. unify the bridge verdict language so `CONDITIONAL` and `PASS` are no longer both presented as final truth
-4. freeze the release gate on explicit handle detection (`--detectOpenHandles`) instead of grepping Jest's heuristic warning text
+1. if you want to reopen the verdict, do it from a clean, explicitly-scoped validation state rather than this mixed workspace
+2. fix the live direct SSE timestamp contract so new inbound events can be accepted on the direct path, not only via restart/catch-up replay
+3. upgrade acceptance truth from downgraded semantics:
+   - `delivery_unverifiable acceptable` -> stronger delivery truth
+   - `session-level acceptable` -> stronger reply attribution truth
+4. then rewrite [`final-verdict.md`](/Volumes/XDISK/chorus/pipeline/bridge-v2-validation/final-verdict.md) and this document together so both authoritative verdicts name the same blocker set

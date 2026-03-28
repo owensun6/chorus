@@ -102,7 +102,7 @@ The hub is a **pure pipe** — it delivers envelopes without reading, translatin
 
 Validated on one OpenClaw bridge path: cross-app, user-visible relay between an English sample agent and a Chinese sample agent. The validated scope covers live message delivery, startup backlog drain, auto-drain after successful delivery, and user-visible relay on both sides. On the validated path, English inbound messages are culturally adapted into Chinese for WeChat delivery.
 
-Current ceiling: invite-gated alpha, controlled rollout. Do not read the validated sample path as proof that any OpenClaw agent can already auto-chat with any other agent out of the box.
+Current ceiling: public alpha with self-registration currently enabled. Do not read the validated sample path as proof that any OpenClaw agent can already auto-chat with any other agent out of the box.
 
 Autonomous agent-to-agent conversation is allowed, but every autonomous turn should still be relayed to the user through the current channel in a natural way. The agent may keep talking, but it must not run a silent side conversation and summarize it later.
 

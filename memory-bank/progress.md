@@ -424,6 +424,25 @@
 - Session isolation 设计：chorus 入站必须用独立 session key，不能与人类通道共用主会话（防止 reply_format 指令持续污染后续 turn）
 - Hub SSE push 可靠性待查：Hub 标记 delivered_sse 但 bridge client 未消费的场景已出现 2 次（e89196f2, de3a2828）
 
+### 2026-03-26 — Insights 报告分析 + Scope Guard 物理防线 + CLAUDE.md 行为红线
+
+**操作**: 基于 Claude Code Insights 使用分析报告，翻译中文版，评估建议，落地范围锁定防线
+**结果**:
+- Insights 报告翻译为中文版 → `~/.claude/usage-data/report-cn.html`
+- CLAUDE.md 新增 `## 行为红线 (Behavioral Guardrails)` 6 条规则（防止无故停止循环、盲目应用反馈、基于部分上下文假设范围、提交不完整文档、编造功能、跳过历史记忆）
+- Scope Guard 三层物理防线落地：
+  - L1: `.claude/hooks/scope-guard.sh` — UserPromptSubmit 钩子，新任务时注入范围检查提醒
+  - L2: `.claude/hooks/edit-scope-check.sh` — PreToolUse 钩子（预留，当前放行模式）
+  - L3: `.claude/settings.json` — 钩子配置注册
+- Insights 建议评估：Custom Skills（已有 Fusion 覆盖，无增量）、Hooks（TypeScript 类型检查有价值但示例错配）、Headless Mode（简单定期审计适合）、并行文档管线（非开发类文档未套 swarm）、TDD 循环（已有 fusion-tdd 完全覆盖）、范围锁定（最有价值，已落地）
+
+**决策**:
+- 范围锁定是 39 次"方向错误"的根因对策，选择 UserPromptSubmit 注入式提醒（轻量）而非 defaultMode:plan（太重）
+- 参考 GitHub 最佳实践：zulip/zulip（understand→propose→implement→verify）、CodySwannGT/lisa（三层防御）、dagster-io/dagster（ExitPlanMode 拦截）
+- 不用 defaultMode:plan 的原因：Commander 工作模式经常需要 Claude 直接执行，强制 plan mode 拖慢节奏
+
+---
+
 ### 2026-03-23 22:00 — 4号：Receive Chain Observability（收件链路全链路 trace 日志）
 
 **操作**: 针对 xiaox→xiaov 反向链路 FAIL（Hub delivered_sse 但 bridge 无处理日志），为收件链路每个决策点加 trace 级日志
@@ -438,3 +457,75 @@
 
 **决策**:
 - 断点需 live 日志定位：如果下次运行没有 `[sse-recv] event received` → SSE 连接本身有问题；有 recv 但没 START → 被某个过滤器拦截；有 START 但有 FAIL → reason 字段直接告诉哪个 pre-check 挂了
+
+### 2026-03-27 — 同 route 严格顺序证明（进行中，未冻结）
+
+**操作**: 为 backlog 阶段后的下一优先级任务补做 same-route strict-order live proof；先修实现缺口，再跑 repo 回归和真实样本
+**结果**:
+- 先发现实现缺口：架构要求同一 `route_key` 的 outbound `reply_bound -> relay_submitted -> relay_confirmed` 串行，但 runtime-v2 实际是分别调用 `bindReply()` / `submitRelay()` / `confirmRelay()`，没有 route 级原子路径
+- repo 侧新增 route 级原子出口：`src/bridge/outbound.ts` 增加 `RouteLock` 和 `OutboundPipeline.relayReply()`，将三步合并到一个受 `route_key` 锁保护的方法
+- template 侧收敛调用点：`packages/chorus-skill/templates/bridge/runtime-v2.ts` 两个 reply relay 路径都改为调用 `relayReply()`
+- 测试补强：`tests/bridge/outbound.test.ts` 新增 same-route 并发回归；`tests/bridge/runtime-v2.test.ts` 同步 fake pipeline
+- repo 验证通过：
+  - `npx tsc --noEmit`
+  - `npx jest --runInBand --coverage=false tests/bridge/outbound.test.ts tests/bridge/runtime-v2.test.ts`
+  - `npx jest --runInBand --coverage=false tests/bridge` → `122/122` 通过，但仍打印既有 Jest open-handle 告警
+- 为了让 live runtime 真正走新原子路径，本机安装态 `~/.openclaw/extensions/chorus-bridge/runtime-v2.ts` 也同步改为调用 `relayReply()`，随后执行 `openclaw gateway restart`
+- same-route live proof 已拿到真实样本：单个 sender `same-route-probe-1774532711053@chorus` 向 `xiaoyin@chorus` 连发两个同 `conversation_id` 消息，Hub 两次都返回 `delivered_sse`
+- 真实样本三证闭环：
+  - inbound traces: `ec748774-b6f8-408f-a519-d959484594ff` / `4cf9c5a5-f61b-46a4-a2ea-99cf3a52ef23`
+  - relay traces: `072767b9-9acd-4f23-abbc-ca1f764362b3` / `8ba1be3c-b67b-4220-b748-cff2c7985e0c`
+  - same route continuity: `last_inbound_turn=2` / `last_outbound_turn=2`
+  - state 落点：`/Users/owenmacmini/.chorus/state/xiaoyin/xiaoyin@chorus.json:54` / `:160` / `:179` / `:251` / `:261`
+  - gateway 日志落点：`/Users/owenmacmini/.openclaw/logs/gateway.log:2439` / `:2440` / `:2448` / `:2449` / `:2450` / `:2451`
+- 当前 repo 工作树仍未冻结：`src/bridge/outbound.ts`、`packages/chorus-skill/templates/bridge/runtime-v2.ts`、`tests/bridge/outbound.test.ts`、`tests/bridge/runtime-v2.test.ts` 处于未提交状态
+
+**决策**:
+- 同 route 顺序证明不能建立在“多步 relay API 由 runtime 分散调用”的实现上；必须先把 runtime 收敛到 route 级原子出口
+- live proof 必须对准真实运行态；仅修改 repo template 不足以证明本机 OpenClaw extension 已使用新路径
+- 当前只保存“same-route 严格顺序真实样本已取得、repo 修复未提交”的记忆，不提前冻结为正式阶段结论
+
+### 2026-03-28 — same-route 证明冻结 + 人工验收判定
+
+**操作**: 将 same-route strict-order 真实样本转成正式证据，并对“现在能不能发”做人工验收判定
+**结果**:
+- same-route 证据冻结完成：[`pipeline/bridge-v2-validation/evidence/S-03-13-same-route-strict-order.md`](/Volumes/XDISK/chorus/pipeline/bridge-v2-validation/evidence/S-03-13-same-route-strict-order.md)
+- 证据链闭环：repo 改动 + 本机 state + gateway log 三路一致，确认同一 `route_key` 上两次 reply relay 以 `bound_turn_number=1 -> 2` 严格顺序落地
+- 当日 repo 验证通过：
+  - `npx tsc --noEmit`
+  - `npx jest --runInBand --coverage=false tests/bridge/outbound.test.ts tests/bridge/runtime-v2.test.ts` → `20/20` PASS
+  - `npx jest --runInBand --coverage=false tests/bridge` → `122/122` PASS
+- 现存残留：Jest 仍打印既有 open-handle 告警；当前判定为测试清洁度问题，不是 same-route 证明失败
+- 人工验收文档落地：[`pipeline/4_delivery/manual-acceptance-2026-03-28.md`](/Volumes/XDISK/chorus/pipeline/4_delivery/manual-acceptance-2026-03-28.md)
+
+**决策**:
+- 现在批准的发布面：invite-only alpha internet release
+- 现在不批准的发布面：正式广域公开发布 / 任何超出 "invite-gated alpha" 的对外承诺
+- Bridge v2 历史验证包仍以 [`CONDITIONAL`](/Volumes/XDISK/chorus/pipeline/bridge-v2-validation/final-verdict.md) 为冻结结论；2026-03-23 那条“收束为 PASS”的记忆只代表当时运行阻塞项已清，不再视为更高优先级的最终口径
+
+### 2026-03-28（修正）— release-now 判定回撤到 FAIL
+
+**操作**: 核对 live gate truth，纠正先前把发布面写成 “invite-only alpha” 的错误判定
+**结果**:
+- live `/health` 实测：`https://agchorus.com/health` 在 `2026-03-27T17:18:28.820Z` 返回 `"invite_gating": false`
+- live 匿名自注册实测：`POST https://agchorus.com/register` 在 `2026-03-27T17:19:56.150Z` 返回 `201`
+- 结论修正：当前互联网表面是真实 `public alpha + self-registration enabled`，不是 `invite-only alpha`
+- 发布判定文档已改为 [`pipeline/4_delivery/manual-acceptance-2026-03-28.md`](/Volumes/XDISK/chorus/pipeline/4_delivery/manual-acceptance-2026-03-28.md) = `FAIL`
+- 新增 gate 脚本：[`bin/release-gate.sh`](/Volumes/XDISK/chorus/bin/release-gate.sh)
+
+**决策**:
+- 不批准任何建立在 “invite-only alpha 已通过” 前提上的发布动作
+- 当前批准的唯一下一步：整理 release-ready 变更，先修 gate truth，再谈发布
+
+### 2026-03-28（续）— Jest 门禁从 heuristic warning 改为 explicit handle detection
+
+**操作**: 追查 bridge test 的 "Jest did not exit one second after the test run has completed" 告警，缩到最小组合后改 release gate 判定方式
+**结果**:
+- 缩小范围：`tests/bridge/outbound.test.ts`、`tests/bridge/runtime-v2.test.ts` 单跑干净；脏退出出现在含 `hub-client` / `inbound` 的组合
+- `--detectOpenHandles` 对最小脏组合和 `tests/bridge` 全量均未输出具体非标准句柄
+- 用 `node -r ./tmp/inspect-active-handles.js ...` 观察到的活句柄只有 stdio `Socket`
+- [`bin/release-gate.sh`](/Volumes/XDISK/chorus/bin/release-gate.sh) 不再 grep Jest 的 heuristic warning，而改为 `npx jest --runInBand --coverage=false --detectOpenHandles tests/bridge`
+
+**决策**:
+- release gate 以 explicit handle detection 为准，不再把 Jest 的模糊提示语当成硬失败条件
+- 当前真实剩余阻塞收敛为：same-route 修复尚未冻结成提交 + Bridge v2 总体验证包仍是 `CONDITIONAL`

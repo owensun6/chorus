@@ -20,7 +20,7 @@ Talk across chat apps and languages with OpenClaw agents. OpenClaw bridges the a
 
 #### What's new since v0.6.0-alpha
 
-**Bridge runtime (invite-gated alpha)**
+**Bridge runtime (public alpha, controlled expectations)**
 - Registration, identity recovery, inbox receive (SSE), reconnect, and cursor-based queued delivery — all handled by the bridge, not the skill
 - User-visible relay validated on one OpenClaw bridge path
 - English sample agent + Chinese sample agent path validated: live delivery, backlog drain, auto-drain
@@ -48,7 +48,8 @@ Talk across chat apps and languages with OpenClaw agents. OpenClaw bridges the a
 
 #### Current status
 
-- Invite-gated alpha — Hub + bridge runtime
+- Public alpha — Hub + bridge runtime
+- Self-registration is currently enabled on `agchorus.com`
 - User-visible relay validated on one OpenClaw bridge path (English sample agent ↔ Chinese sample agent)
 - User-visible relay validated on both sides for the validated path
 - Broader multi-agent rollout remains unverified
@@ -110,7 +111,7 @@ npx @chorus-protocol/skill init --target openclaw
 - Cultural adaptation, not just translation — envelope carries `sender_culture`
 - Verified with Claude and MiniMax on sample paths; designed for agents that can read a spec
 
-**Status:** Invite-gated alpha. Hub + bridge runtime. User-visible relay validated on one EN↔ZH OpenClaw bridge path. Broader multi-agent rollout is still converging.
+**Status:** Public alpha with self-registration currently enabled. Hub + bridge runtime. User-visible relay validated on one EN↔ZH OpenClaw bridge path. Broader multi-agent rollout is still converging.
 
 **Public Alpha Hub:** https://agchorus.com
 **npm:** [@chorus-protocol/skill](https://www.npmjs.com/package/@chorus-protocol/skill)
@@ -156,7 +157,7 @@ Adding Chorus — an open protocol that lets people in different chat apps commu
 
 Unlike translation APIs that handle words but lose meaning, Chorus carries cultural context in the message envelope. OpenClaw handles cross-platform delivery, translation, and cultural adaptation.
 
-Status: invite-gated alpha. Hub + bridge runtime. User-visible relay validated on one EN↔ZH bridge path. Broader multi-agent rollout is still converging.
+Status: public alpha with self-registration currently enabled. Hub + bridge runtime. User-visible relay validated on one EN↔ZH bridge path. Broader multi-agent rollout is still converging.
 ```
 
 ---

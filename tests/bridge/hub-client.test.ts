@@ -10,12 +10,21 @@ import {
 const originalFetch = global.fetch;
 const fetchMock = jest.fn() as jest.MockedFunction<typeof global.fetch>;
 global.fetch = fetchMock;
+const trackedClients: HubClient[] = [];
+const makeClient = (hubUrl: string, config?: ConstructorParameters<typeof HubClient>[1]): HubClient => {
+  const client = new HubClient(hubUrl, config);
+  trackedClients.push(client);
+  return client;
+};
 
 afterAll(() => {
   global.fetch = originalFetch;
 });
 
 afterEach(() => {
+  for (const client of trackedClients.splice(0)) {
+    client.disconnect();
+  }
   fetchMock.mockClear();
 });
 
@@ -141,9 +150,8 @@ describe('computeBackoff', () => {
 // ---------------------------------------------------------------------------
 
 describe('HubClient.submitRelay', () => {
-  const client = new HubClient('https://hub.example.com');
-
   it('test_relay_idempotency_header: includes Idempotency-Key header in POST', async () => {
+    const client = makeClient('https://hub.example.com');
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({
         success: true,
@@ -171,6 +179,7 @@ describe('HubClient.submitRelay', () => {
   });
 
   it('throws HubClientError on non-2xx response', async () => {
+    const client = makeClient('https://hub.example.com');
     fetchMock.mockResolvedValueOnce(
       new Response('Server Error', { status: 500 }),
     );
@@ -188,6 +197,7 @@ describe('HubClient.submitRelay', () => {
   });
 
   it('test_malformed_relay_throws: malformed relay response throws HubClientError (fail-closed)', async () => {
+    const client = makeClient('https://hub.example.com');
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ success: true, data: { wrong_field: 'x' } }), { status: 200 }),
     );
@@ -210,9 +220,8 @@ describe('HubClient.submitRelay', () => {
 // ---------------------------------------------------------------------------
 
 describe('HubClient.fetchHistory', () => {
-  const client = new HubClient('https://hub.example.com');
-
   it('sends since param as query string', async () => {
+    const client = makeClient('https://hub.example.com');
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ success: true, data: [] }), { status: 200 }),
     );
@@ -224,6 +233,7 @@ describe('HubClient.fetchHistory', () => {
   });
 
   it('throws HubClientError on failure', async () => {
+    const client = makeClient('https://hub.example.com');
     fetchMock.mockResolvedValueOnce(
       new Response('Unauthorized', { status: 401 }),
     );
@@ -243,7 +253,7 @@ describe('HubClient.fetchHistory', () => {
       });
     });
 
-    const timeoutClient = new HubClient('https://hub.example.com', { fetchTimeoutMs: 100 });
+    const timeoutClient = makeClient('https://hub.example.com', { fetchTimeoutMs: 100 });
 
     await expect(
       timeoutClient.fetchHistory('api-key'),
@@ -266,7 +276,7 @@ describe('HubClient.submitRelay timeout', () => {
       });
     });
 
-    const timeoutClient = new HubClient('https://hub.example.com', { relayTimeoutMs: 100 });
+    const timeoutClient = makeClient('https://hub.example.com', { relayTimeoutMs: 100 });
     const envelope = {
       chorus_version: '0.4' as const,
       sender_id: 'local@hub',
@@ -312,7 +322,7 @@ describe('HubClient.connectSSE', () => {
       }),
     );
 
-    const client = new HubClient('https://hub.example.com');
+    const client = makeClient('https://hub.example.com');
     const received: Array<{ trace_id: string; hub_timestamp: string }> = [];
 
     client.connectSSE('agent-a', 'key-1', (event) => {
@@ -350,7 +360,7 @@ describe('HubClient.connectSSE', () => {
       }),
     );
 
-    const client = new HubClient('https://hub.example.com');
+    const client = makeClient('https://hub.example.com');
     const received: string[] = [];
     const errors: string[] = [];
 
@@ -371,7 +381,7 @@ describe('HubClient.connectSSE', () => {
     // First fetch fails → triggers reconnect
     fetchMock.mockRejectedValueOnce(new Error('network down'));
 
-    const client = new HubClient('https://hub.example.com');
+    const client = makeClient('https://hub.example.com');
     client.connectSSE('agent-a', 'key-1', () => {});
 
     // Wait briefly, then disconnect before reconnect timer fires
@@ -394,7 +404,7 @@ describe('HubClient.connectSSE', () => {
       }),
     );
 
-    const client = new HubClient('https://hub.example.com');
+    const client = makeClient('https://hub.example.com');
     client.connectSSE('agent-a', 'my-api-key', () => {});
 
     await new Promise((r) => setTimeout(r, 20));

@@ -427,8 +427,6 @@ describe('InboundPipeline', () => {
     await jest.advanceTimersByTimeAsync(150);
     await processing;
 
-    jest.useRealTimers();
-
     const state = stateManager.load();
     const fact = state.inbound_facts['timeout-trace'];
 
@@ -471,8 +469,6 @@ describe('InboundPipeline', () => {
     const p1 = pipeline.processMessage(makeEvent({ trace_id: 'no-dup-trace' }));
     await jest.advanceTimersByTimeAsync(150);
     await p1;
-
-    jest.useRealTimers();
 
     const stateAfterTimeout = stateManager.load();
     expect(stateAfterTimeout.inbound_facts['no-dup-trace'].terminal_disposition!.reason).toBe('delivery_unverifiable');

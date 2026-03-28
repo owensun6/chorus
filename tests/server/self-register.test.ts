@@ -186,6 +186,67 @@ describe("Self-Registration (POST /register)", () => {
   });
 });
 
+describe("Self-Registration Agent ID Format Enforcement", () => {
+  let db: Database.Database;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  afterEach(() => {
+    db.close();
+  });
+
+  const makeApp = () => {
+    const registry = new AgentRegistry(db);
+    const activity = createActivityStream(db);
+    const inbox = createInboxManager();
+    return { app: createApp(registry, undefined, activity, inbox) };
+  };
+
+  it("rejects agent_id without @ separator", async () => {
+    const { app } = makeApp();
+
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: "nohostpart", agent_card: VALID_CARD }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(400);
+    const json = (await res.json()) as Json;
+    expect(json.success).toBe(false);
+  });
+
+  it("rejects agent_id with empty name before @", async () => {
+    const { app } = makeApp();
+
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: "@noname", agent_card: VALID_CARD }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(400);
+    const json = (await res.json()) as Json;
+    expect(json.success).toBe(false);
+  });
+
+  it("accepts valid name@host agent_id", async () => {
+    const { app } = makeApp();
+
+    const res = await app.request("/register", {
+      method: "POST",
+      body: JSON.stringify({ agent_id: "valid@host.example", agent_card: VALID_CARD }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(201);
+    const json = (await res.json()) as Json;
+    expect(json.success).toBe(true);
+  });
+});
+
 describe("Self-Registered Agent Key Auth", () => {
   it("self-registered agent can send messages with their key", async () => {
     const db = createTestDb();

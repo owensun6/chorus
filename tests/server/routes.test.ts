@@ -373,6 +373,75 @@ describe("Agent CRUD Routes", () => {
 });
 
 // ---------------------------------------------------------------------------
+// H-08: agent_id format enforcement (name@host)
+// ---------------------------------------------------------------------------
+
+describe("Agent ID Format Enforcement (POST /agents)", () => {
+  const validCard = { card_version: "0.3", user_culture: "en", supported_languages: ["en"] };
+
+  let db: ReturnType<typeof createTestDb>;
+  let app: ReturnType<typeof createApp>;
+
+  beforeEach(() => {
+    db = createTestDb();
+    const registry = new AgentRegistry(db);
+    app = createApp(registry);
+  });
+
+  afterEach(() => {
+    db.close();
+  });
+
+  it("rejects agent_id without @ separator", async () => {
+    const res = await app.request("/agents", {
+      method: "POST",
+      body: JSON.stringify({
+        agent_id: "nohostpart",
+        endpoint: "https://example.com/receive",
+        agent_card: validCard,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(400);
+    const json: Json = await res.json();
+    expect(json.success).toBe(false);
+  });
+
+  it("rejects agent_id with empty name before @", async () => {
+    const res = await app.request("/agents", {
+      method: "POST",
+      body: JSON.stringify({
+        agent_id: "@noname",
+        endpoint: "https://example.com/receive",
+        agent_card: validCard,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(400);
+    const json: Json = await res.json();
+    expect(json.success).toBe(false);
+  });
+
+  it("accepts valid name@host agent_id", async () => {
+    const res = await app.request("/agents", {
+      method: "POST",
+      body: JSON.stringify({
+        agent_id: "valid@host.example",
+        endpoint: "https://example.com/receive",
+        agent_card: validCard,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(201);
+    const json: Json = await res.json();
+    expect(json.success).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // C-04: SSRF protection — endpoint validation at registration
 // ---------------------------------------------------------------------------
 

@@ -1,9 +1,9 @@
 // Author: be-api-router
 import { z } from "zod";
-import { ChorusAgentCardSchema, ChorusEnvelopeSchema, ID_MAX_LENGTH } from "../shared/types";
+import { ChorusAgentCardSchema, ChorusEnvelopeSchema, ID_MAX_LENGTH, SENDER_ID_REGEX } from "../shared/types";
 
 const RegisterAgentBodySchema = z.object({
-  agent_id: z.string().min(1, "agent_id is required").max(ID_MAX_LENGTH),
+  agent_id: z.string().min(1, "agent_id is required").max(ID_MAX_LENGTH).regex(SENDER_ID_REGEX, "agent_id must be name@host format"),
   endpoint: z.string().url("endpoint must be a valid URL"),
   agent_card: ChorusAgentCardSchema,
 });
@@ -11,7 +11,7 @@ const RegisterAgentBodySchema = z.object({
 type RegisterAgentBody = z.infer<typeof RegisterAgentBodySchema>;
 
 const SelfRegisterBodySchema = z.object({
-  agent_id: z.string().min(1, "agent_id is required").max(ID_MAX_LENGTH),
+  agent_id: z.string().min(1, "agent_id is required").max(ID_MAX_LENGTH).regex(SENDER_ID_REGEX, "agent_id must be name@host format"),
   agent_card: ChorusAgentCardSchema,
   endpoint: z.string().url("endpoint must be a valid URL").optional(),
   invite_code: z.string().min(1).optional(),

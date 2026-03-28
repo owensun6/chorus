@@ -10,6 +10,11 @@ PASS=0
 FAIL=0
 RESULTS=()
 
+json_field() {
+  local expr="$1"
+  node -e "const chunks=[];process.stdin.on('data',d=>chunks.push(d)).on('end',()=>{const obj=JSON.parse(chunks.join(''));const v=process.argv[1].split('.').slice(1).reduce((o,k)=>o!=null?o[k]:undefined,obj);process.stdout.write(String(v??''));});" "${expr}"
+}
+
 check() {
   local name="$1" expected_status="$2" expected_field="$3" expected_value="$4"
   shift 4
@@ -21,7 +26,7 @@ check() {
 
   local actual_value=""
   if [ -n "$expected_field" ]; then
-    actual_value=$(echo "$body" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d$(echo "$expected_field"))" 2>/dev/null || echo "PARSE_ERROR")
+    actual_value=$(echo "$body" | json_field "$expected_field" 2>/dev/null || echo "PARSE_ERROR")
   fi
 
   if [ "$http_code" != "$expected_status" ]; then
@@ -45,19 +50,19 @@ echo "================================================================"
 
 # --- Happy path ---
 
-check "H1 health" "200" "['data']['status']" "ok" \
+check "H1 health" "200" "obj.data.status" "ok" \
   "https://${DOMAIN}/health"
 
-check "H2 well-known" "200" "['server_status']" "alpha" \
+check "H2 well-known" "200" "obj.server_status" "alpha" \
   "https://${DOMAIN}/.well-known/chorus.json"
 
-check "H3 register agent" "201" "['data']['agent_id']" "smoke-a@test" \
+check "H3 register agent" "201" "obj.data.agent_id" "smoke-a@test" \
   -X POST "https://${DOMAIN}/agents" \
   -H "Authorization: Bearer ${KEY}" \
   -H "Content-Type: application/json" \
   -d '{"agent_id":"smoke-a@test","endpoint":"https://httpbin.org/post","agent_card":{"card_version":"0.3","user_culture":"en-US","supported_languages":["en"]}}'
 
-check "H4 discover" "200" "['success']" "True" \
+check "H4 discover" "200" "obj.success" "true" \
   "https://${DOMAIN}/agents"
 
 # Register sender for message test
@@ -66,7 +71,7 @@ curl -s -X POST "https://${DOMAIN}/agents" \
   -H "Content-Type: application/json" \
   -d '{"agent_id":"smoke-b@test","endpoint":"https://httpbin.org/post","agent_card":{"card_version":"0.3","user_culture":"zh-CN","supported_languages":["zh"]}}' > /dev/null
 
-check "H5 send message" "200" "['data']['delivery']" "delivered" \
+check "H5 send message" "200" "obj.data.delivery" "delivered" \
   -X POST "https://${DOMAIN}/messages" \
   -H "Authorization: Bearer ${KEY}" \
   -H "Content-Type: application/json" \
@@ -74,36 +79,36 @@ check "H5 send message" "200" "['data']['delivery']" "delivered" \
 
 # --- Negative path ---
 
-check "N1 no auth" "401" "['error']['code']" "ERR_UNAUTHORIZED" \
+check "N1 no auth" "401" "obj.error.code" "ERR_UNAUTHORIZED" \
   -X POST "https://${DOMAIN}/agents" \
   -H "Content-Type: application/json" \
   -d '{}'
 
-check "N2 bad key" "401" "['error']['code']" "ERR_UNAUTHORIZED" \
+check "N2 bad key" "401" "obj.error.code" "ERR_UNAUTHORIZED" \
   -X POST "https://${DOMAIN}/agents" \
   -H "Authorization: Bearer fake-key-xxxx" \
   -H "Content-Type: application/json" \
   -d '{}'
 
-check "N3 bad schema" "400" "['error']['code']" "ERR_VALIDATION" \
+check "N3 bad schema" "400" "obj.error.code" "ERR_VALIDATION" \
   -X POST "https://${DOMAIN}/agents" \
   -H "Authorization: Bearer ${KEY}" \
   -H "Content-Type: application/json" \
   -d '{"agent_id":"x"}'
 
-check "N4 bad json" "400" "['error']['code']" "ERR_VALIDATION" \
+check "N4 bad json" "400" "obj.error.code" "ERR_VALIDATION" \
   -X POST "https://${DOMAIN}/agents" \
   -H "Authorization: Bearer ${KEY}" \
   -H "Content-Type: application/json" \
   -d 'not json'
 
-check "N5 unknown receiver" "404" "['error']['code']" "ERR_AGENT_NOT_FOUND" \
+check "N5 unknown receiver" "404" "obj.error.code" "ERR_AGENT_NOT_FOUND" \
   -X POST "https://${DOMAIN}/messages" \
   -H "Authorization: Bearer ${KEY}" \
   -H "Content-Type: application/json" \
   -d '{"receiver_id":"ghost@nowhere","envelope":{"chorus_version":"0.4","sender_id":"smoke-b@test","original_text":"x","sender_culture":"en-US"}}'
 
-check "N6 bad envelope" "400" "['error']['code']" "ERR_VALIDATION" \
+check "N6 bad envelope" "400" "obj.error.code" "ERR_VALIDATION" \
   -X POST "https://${DOMAIN}/messages" \
   -H "Authorization: Bearer ${KEY}" \
   -H "Content-Type: application/json" \
@@ -115,7 +120,7 @@ curl -s -X POST "https://${DOMAIN}/agents" \
   -H "Content-Type: application/json" \
   -d '{"agent_id":"broken@test","endpoint":"https://httpbin.org/status/500","agent_card":{"card_version":"0.3","user_culture":"en-US","supported_languages":["en"]}}' > /dev/null
 
-check "N7 receiver 5xx" "502" "['error']['code']" "ERR_AGENT_UNREACHABLE" \
+check "N7 receiver 5xx" "502" "obj.error.code" "ERR_AGENT_UNREACHABLE" \
   -X POST "https://${DOMAIN}/messages" \
   -H "Authorization: Bearer ${KEY}" \
   -H "Content-Type: application/json" \
@@ -123,7 +128,7 @@ check "N7 receiver 5xx" "502" "['error']['code']" "ERR_AGENT_UNREACHABLE" \
 
 # --- Idempotency ---
 
-check "I1 re-register (idempotent, 200)" "200" "['data']['agent_id']" "smoke-a@test" \
+check "I1 re-register (idempotent, 200)" "200" "obj.data.agent_id" "smoke-a@test" \
   -X POST "https://${DOMAIN}/agents" \
   -H "Authorization: Bearer ${KEY}" \
   -H "Content-Type: application/json" \
@@ -131,7 +136,7 @@ check "I1 re-register (idempotent, 200)" "200" "['data']['agent_id']" "smoke-a@t
 
 # --- Counters ---
 
-check "C1 health counters" "200" "['success']" "True" \
+check "C1 health counters" "200" "obj.success" "true" \
   "https://${DOMAIN}/health"
 
 # --- Report ---

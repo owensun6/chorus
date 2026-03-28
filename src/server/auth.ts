@@ -4,6 +4,17 @@ import { errorResponse } from "../shared/response";
 
 type KeyValidator = (token: string) => boolean;
 
+// GET endpoints that are intentionally public (no auth required).
+// All other GET endpoints require valid Authorization header.
+const PUBLIC_GET_PATHS: ReadonlySet<string> = new Set([
+  "/health",
+  "/skill",
+  "/.well-known/chorus.json",
+  // /agent/inbox and /agent/messages do their own token auth internally
+  "/agent/inbox",
+  "/agent/messages",
+]);
+
 const createAuthMiddleware = (
   staticKeys: ReadonlySet<string>,
   dynamicValidator?: KeyValidator,
@@ -12,7 +23,7 @@ const createAuthMiddleware = (
   return async (c: Context, next: Next) => {
     if (exemptPaths?.has(c.req.path)) return next();
 
-    if (c.req.method === "GET") return next();
+    if (c.req.method === "GET" && PUBLIC_GET_PATHS.has(c.req.path)) return next();
 
     const auth = c.req.header("Authorization");
     if (!auth || !auth.startsWith("Bearer ")) {

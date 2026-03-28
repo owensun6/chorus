@@ -20,9 +20,30 @@ const buildApp = (): Hono => {
 describe("Auth Middleware", () => {
   const app = buildApp();
 
-  describe("GET requests (public)", () => {
-    it("allows GET without Authorization header", async () => {
+  describe("GET requests", () => {
+    it("allows GET to public allowlisted paths without auth", async () => {
+      const publicApp = new Hono();
+      publicApp.use("*", createAuthMiddleware(API_KEYS));
+      publicApp.get("/health", (c) => c.json({ ok: true }));
+      publicApp.get("/skill", (c) => c.json({ ok: true }));
+
+      const healthRes = await publicApp.request("/health", { method: "GET" });
+      expect(healthRes.status).toBe(200);
+
+      const skillRes = await publicApp.request("/skill", { method: "GET" });
+      expect(skillRes.status).toBe(200);
+    });
+
+    it("rejects GET to non-allowlisted paths without auth", async () => {
       const res = await app.request("/public", { method: "GET" });
+      expect(res.status).toBe(401);
+    });
+
+    it("allows GET to non-allowlisted paths with valid auth", async () => {
+      const res = await app.request("/public", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${API_KEY}` },
+      });
       expect(res.status).toBe(200);
       const json: Json = await res.json();
       expect(json.ok).toBe(true);
@@ -99,6 +120,20 @@ describe("Auth Middleware", () => {
         headers: { Authorization: "Bearer key-b" },
       });
       expect(resB.status).toBe(200);
+    });
+  });
+
+  describe("exempt paths", () => {
+    it("allows non-GET requests on exempt paths without Authorization", async () => {
+      const exemptApp = new Hono();
+      exemptApp.use("*", createAuthMiddleware(API_KEYS, undefined, new Set(["/health"])));
+      exemptApp.post("/health", (c) => c.json({ ok: true }));
+
+      const res = await exemptApp.request("/health", { method: "POST" });
+
+      expect(res.status).toBe(200);
+      const json: Json = await res.json();
+      expect(json.ok).toBe(true);
     });
   });
 });

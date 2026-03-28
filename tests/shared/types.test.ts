@@ -62,10 +62,10 @@ describe("ChorusEnvelope v0.4", () => {
     expect(() => ChorusEnvelopeSchema.parse(invalid)).toThrow();
   });
 
-  test("allows additional properties (passthrough)", () => {
+  test("rejects unknown properties (strict)", () => {
     const extended = { ...validEnvelope, future_field: "hello" };
-    const result = ChorusEnvelopeSchema.parse(extended);
-    expect((result as Record<string, unknown>).future_field).toBe("hello");
+    const result = ChorusEnvelopeSchema.safeParse(extended);
+    expect(result.success).toBe(false);
   });
 
   test("parse returns new object (immutability)", () => {

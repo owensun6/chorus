@@ -28,13 +28,14 @@ const ChorusEnvelopeSchema = z
       .regex(SENDER_ID_REGEX, "sender_id must be name@host format"),
     original_text: z
       .string()
-      .min(1, "original_text must not be empty"),
+      .min(1, "original_text must not be empty")
+      .max(10000, "original_text must not exceed 10,000 characters"),
     sender_culture: bcp47String,
     cultural_context: z.string().min(10).max(500).optional(),
     conversation_id: z.string().max(64).optional(),
     turn_number: z.number().int().min(1).optional(),
   })
-  .passthrough();
+  .strict();
 
 type ChorusEnvelope = z.infer<typeof ChorusEnvelopeSchema>;
 
@@ -63,7 +64,7 @@ const ChorusAgentCardSchema = z
       .array(bcp47String)
       .min(1, "At least one language required"),
   })
-  .passthrough();
+  .strict();
 
 type ChorusAgentCard = z.infer<typeof ChorusAgentCardSchema>;
 

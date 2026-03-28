@@ -77,8 +77,8 @@ describe("Rate Limit Middleware", () => {
     });
   });
 
-  describe("IP limit enforcement", () => {
-    it("returns 429 when IP limit is exceeded", async () => {
+  describe("anonymous bucket enforcement (IP spoofing prevention)", () => {
+    it("returns 429 when anonymous bucket limit is exceeded", async () => {
       const app = buildApp(2, 100);
 
       const res1 = await makeGetRequest(app);
@@ -95,22 +95,48 @@ describe("Rate Limit Middleware", () => {
       expect(json.metadata.timestamp).toBeDefined();
     });
 
-    it("tracks IPs independently", async () => {
-      const app = buildApp(1, 100);
+    it("different x-forwarded-for values share the same rate limit bucket", async () => {
+      const app = buildApp(2, 100);
 
-      const resA = await makeGetRequest(app, "10.0.0.1");
-      const resB = await makeGetRequest(app, "10.0.0.2");
-      expect(resA.status).toBe(200);
-      expect(resB.status).toBe(200);
+      // Two requests with different spoofed IPs still share the anonymous bucket
+      const res1 = await makeGetRequest(app, "10.0.0.1");
+      const res2 = await makeGetRequest(app, "10.0.0.2");
+      expect(res1.status).toBe(200);
+      expect(res2.status).toBe(200);
 
-      const resA2 = await makeGetRequest(app, "10.0.0.1");
-      expect(resA2.status).toBe(429);
-
-      const resB2 = await makeGetRequest(app, "10.0.0.2");
-      expect(resB2.status).toBe(429);
+      // Third request with yet another IP is still blocked
+      const res3 = await makeGetRequest(app, "10.0.0.3");
+      expect(res3.status).toBe(429);
     });
 
-    it("applies IP limit to POST requests too", async () => {
+    it("different cf-connecting-ip values share the same rate limit bucket", async () => {
+      const app = buildApp(1, 100);
+
+      const res1 = await app.request("/data", {
+        method: "GET",
+        headers: { "cf-connecting-ip": "9.9.9.9" },
+      });
+      expect(res1.status).toBe(200);
+
+      // Different cf-connecting-ip still shares the anonymous bucket
+      const res2 = await app.request("/data", {
+        method: "GET",
+        headers: { "cf-connecting-ip": "8.8.8.8" },
+      });
+      expect(res2.status).toBe(429);
+    });
+
+    it("requests with no IP headers share the same anonymous bucket", async () => {
+      const app = buildApp(1, 100);
+
+      const res1 = await app.request("/data", { method: "GET" });
+      expect(res1.status).toBe(200);
+
+      const res2 = await app.request("/data", { method: "GET" });
+      expect(res2.status).toBe(429);
+    });
+
+    it("applies anonymous bucket limit to POST requests too", async () => {
       const app = buildApp(1, 100);
 
       const res1 = await makePostRequest(app);
@@ -164,17 +190,17 @@ describe("Rate Limit Middleware", () => {
   });
 
   describe("GET vs POST/DELETE behavior", () => {
-    it("GET is rate-limited by IP only, not key", async () => {
+    it("GET is rate-limited by anonymous bucket only, not key", async () => {
       const app = buildApp(100, 1);
 
-      // Multiple GETs from same IP pass (IP limit is 100)
+      // Multiple GETs pass (anonymous bucket limit is 100)
       const res1 = await makeGetRequest(app);
       const res2 = await makeGetRequest(app);
       expect(res1.status).toBe(200);
       expect(res2.status).toBe(200);
     });
 
-    it("POST is rate-limited by both IP and key", async () => {
+    it("POST is rate-limited by both anonymous bucket and key", async () => {
       const app = buildApp(100, 1);
 
       // First POST passes both checks
@@ -186,58 +212,13 @@ describe("Rate Limit Middleware", () => {
       expect(res2.status).toBe(429);
     });
 
-    it("DELETE is rate-limited by both IP and key", async () => {
+    it("DELETE is rate-limited by both anonymous bucket and key", async () => {
       const app = buildApp(100, 1);
 
       const res1 = await makeDeleteRequest(app, "10.0.0.1", "del-key");
       expect(res1.status).toBe(200);
 
       const res2 = await makeDeleteRequest(app, "10.0.0.2", "del-key");
-      expect(res2.status).toBe(429);
-    });
-  });
-
-  describe("IP extraction", () => {
-    it("uses x-forwarded-for first entry when multiple IPs present", async () => {
-      const app = buildApp(1, 100);
-
-      const res1 = await app.request("/data", {
-        method: "GET",
-        headers: { "x-forwarded-for": "5.5.5.5, 6.6.6.6" },
-      });
-      expect(res1.status).toBe(200);
-
-      // Same first IP should be rate-limited
-      const res2 = await app.request("/data", {
-        method: "GET",
-        headers: { "x-forwarded-for": "5.5.5.5, 7.7.7.7" },
-      });
-      expect(res2.status).toBe(429);
-    });
-
-    it("falls back to cf-connecting-ip when x-forwarded-for is absent", async () => {
-      const app = buildApp(1, 100);
-
-      const res1 = await app.request("/data", {
-        method: "GET",
-        headers: { "cf-connecting-ip": "9.9.9.9" },
-      });
-      expect(res1.status).toBe(200);
-
-      const res2 = await app.request("/data", {
-        method: "GET",
-        headers: { "cf-connecting-ip": "9.9.9.9" },
-      });
-      expect(res2.status).toBe(429);
-    });
-
-    it("uses 'unknown' when no IP headers present", async () => {
-      const app = buildApp(1, 100);
-
-      const res1 = await app.request("/data", { method: "GET" });
-      expect(res1.status).toBe(200);
-
-      const res2 = await app.request("/data", { method: "GET" });
       expect(res2.status).toBe(429);
     });
   });
@@ -277,16 +258,6 @@ describe("Rate Limit Middleware", () => {
     });
 
     it("resets counters when window rolls over", async () => {
-      const app = buildApp(1, 100);
-
-      const res1 = await makeGetRequest(app);
-      expect(res1.status).toBe(200);
-
-      // Exhaust the limit
-      const res2 = await makeGetRequest(app);
-      expect(res2.status).toBe(429);
-
-      // Directly manipulate the store to simulate window rollover
       const middleware = createRateLimitMiddleware(1, 100);
       const testApp = new Hono();
       testApp.use("*", middleware);
@@ -295,18 +266,16 @@ describe("Rate Limit Middleware", () => {
       // First request in this window
       const r1 = await testApp.request("/data", {
         method: "GET",
-        headers: { "x-forwarded-for": "50.50.50.50" },
       });
       expect(r1.status).toBe(200);
 
       // Set the stored entry to an old window to simulate time passing
       const oldWindow = Math.floor(Date.now() / 60_000) * 60_000 - 60_000;
-      middleware._store.ipCounters.set("50.50.50.50", { count: 1, windowStart: oldWindow });
+      middleware._store.ipCounters.set("anonymous", { count: 1, windowStart: oldWindow });
 
-      // Now the same IP should be allowed again (new window)
+      // Now the same anonymous bucket should be allowed again (new window)
       const r2 = await testApp.request("/data", {
         method: "GET",
-        headers: { "x-forwarded-for": "50.50.50.50" },
       });
       expect(r2.status).toBe(200);
 
@@ -321,11 +290,10 @@ describe("Rate Limit Middleware", () => {
       app.use("*", middleware);
       app.get("/data", (c) => c.json({ ok: true }));
 
-      // Should allow 60 requests without hitting IP limit
-      const promises = Array.from({ length: 60 }, (_, i) =>
+      // Should allow 60 requests without hitting anonymous bucket limit
+      const promises = Array.from({ length: 60 }, () =>
         app.request("/data", {
           method: "GET",
-          headers: { "x-forwarded-for": "99.99.99.99" },
         }),
       );
       const results = await Promise.all(promises);
@@ -334,7 +302,6 @@ describe("Rate Limit Middleware", () => {
       // 61st should be blocked
       const blocked = await app.request("/data", {
         method: "GET",
-        headers: { "x-forwarded-for": "99.99.99.99" },
       });
       expect(blocked.status).toBe(429);
 
@@ -343,10 +310,10 @@ describe("Rate Limit Middleware", () => {
   });
 
   describe("POST without Authorization header", () => {
-    it("still applies IP limit but skips key limit", async () => {
+    it("still applies anonymous bucket limit but skips key limit", async () => {
       const app = buildApp(2, 1);
 
-      // POST without auth header - only IP limit applies
+      // POST without auth header - only anonymous bucket limit applies
       const res1 = await app.request("/data", {
         method: "POST",
         headers: { "x-forwarded-for": "20.20.20.20" },
@@ -358,7 +325,7 @@ describe("Rate Limit Middleware", () => {
       expect(res1.status).toBe(200);
       expect(res2.status).toBe(200);
 
-      // Third request hits IP limit
+      // Third request hits anonymous bucket limit
       const res3 = await app.request("/data", {
         method: "POST",
         headers: { "x-forwarded-for": "20.20.20.20" },

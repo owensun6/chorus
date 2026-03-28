@@ -15,10 +15,11 @@ interface RateLimitStore {
 const WINDOW_MS = 60_000;
 const CLEANUP_INTERVAL_MS = 60_000;
 
-const extractIp = (c: Context): string =>
-  c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ??
-  c.req.header("cf-connecting-ip") ??
-  "unknown";
+// Security: proxy headers (x-forwarded-for, cf-connecting-ip) are trivially
+// spoofable. Attackers can rotate header values to get fresh rate-limit buckets.
+// All unauthenticated requests share one "anonymous" bucket; authenticated
+// requests are already keyed per API key.
+const extractIp = (_c: Context): string => "anonymous";
 
 const extractApiKey = (c: Context): string | null => {
   const auth = c.req.header("Authorization");

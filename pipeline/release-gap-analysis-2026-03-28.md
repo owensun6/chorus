@@ -19,7 +19,7 @@ These are inherited from the frozen technical verdict. All 3 must be resolved be
 
 | # | Blocker | Authority | Current Status |
 |---|---------|-----------|----------------|
-| **R-1** | **Direct SSE timestamp contract** — `final-verdict.md` claims direct SSE path is contract-broken for new inbound events (no `timestamp`). This is a live boundary claim, not a repo-code claim. | `final-verdict.md:18-22` | Repo fixed (`routes.ts:440`, commit `90c59b4` @ 2026-03-24). Live `agchorus.com` still on `0.7.0-alpha` — not yet revalidated on deployed version. |
+| **R-1** | **Direct SSE timestamp contract** — `final-verdict.md` claims direct SSE path is contract-broken for new inbound events (no `timestamp`). This is a live boundary claim, not a repo-code claim. | `final-verdict.md:18-22` | Repo fixed (commit `90c59b4`). **Local verified PASS** (`evidence/R-01-sse-timestamp-local.md`). Live `agchorus.com` still on `0.7.0-alpha` — not yet revalidated on deployed version. |
 | **R-2** | **Delivery acceptance at downgraded semantics** — frozen as `unverifiable acceptable`, needs upgrade to stronger delivery truth. Currently constrained by verified host reality (`V-01-01` WeChat = NO, `V-01-02` Telegram = NO); upgrade requires host adapter capability evolution or Commander redefining acceptable delivery truth | `final-verdict.md:11-12`, `manual-acceptance:65-66` | Not upgraded |
 | **R-3** | **Reply attribution at downgraded semantics** — frozen as `session-level acceptable`, needs upgrade to stronger reply attribution truth. Upgrade path undefined; not pre-judged as host-only constraint | `final-verdict.md:13-14`, `manual-acceptance:66-67` | Not upgraded |
 

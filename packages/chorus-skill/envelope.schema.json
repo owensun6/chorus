@@ -5,7 +5,7 @@
   "description": "Chorus Protocol v0.4 — Agent-to-agent communication envelope",
   "type": "object",
   "required": ["chorus_version", "sender_id", "original_text", "sender_culture"],
-  "additionalProperties": true,
+  "additionalProperties": false,
   "properties": {
     "chorus_version": {
       "type": "string",
@@ -20,6 +20,7 @@
     "original_text": {
       "type": "string",
       "minLength": 1,
+      "maxLength": 10000,
       "description": "The original message"
     },
     "sender_culture": {

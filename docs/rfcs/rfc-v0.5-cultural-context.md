@@ -77,7 +77,7 @@ The protocol itself already concedes the point: SKILL.md says "omit cultural_con
 | TRANSPORT.md Section 9 | Lists A2A wrapping and SSE streaming | Add: "Cultural Hints (MAY)" extension |
 | SKILL.md Sending | Step 2: full paragraph | Remove step. Add brief mention in Reference: "Extension: cultural hints" |
 | Schema | In core schema | Remove from core; create `cultural-hints.schema.json` or document inline in extension |
-| Code | No change | No change (`additionalProperties: true` means the field still passes validation) |
+| Code | No change | No change (v0.4 schema is `additionalProperties: false` as of security hardening C-03; unknown fields are now rejected at validation) |
 
 New extension definition (in TRANSPORT.md Section 9 or standalone):
 
@@ -130,7 +130,7 @@ to improve adaptation quality. Receivers MUST NOT require it.
 - Breaks existing implementations that generate/consume the field (though EXP-01 is the only known external use)
 - Larger code diff
 
-**Migration**: v0.5 core semantics would ignore `cultural_context`. Legacy senders may still include it on the wire — the schema permits additional fields (`additionalProperties: true`), so existing envelopes remain wire-valid. However, compliant v0.5 receivers would treat the field as semantically irrelevant: no obligation to read, parse, or act on it.
+**Migration**: v0.5 core semantics would ignore `cultural_context`. Note: as of security hardening C-03, v0.4 schema uses `additionalProperties: false` — unknown fields are rejected at validation. `cultural_context` is a known optional field so it remains wire-valid, but truly unknown fields (not listed in the schema) will be rejected. Legacy senders including only known fields are unaffected.
 
 ---
 

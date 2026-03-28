@@ -81,6 +81,7 @@ const HubRelayResponseSchema = z.object({
 
 const BACKOFF_BASE_MS = 1000;
 const BACKOFF_CAP_MS = 30000;
+const MAX_SSE_BUFFER_SIZE = 64_000; // 64 KB per incomplete SSE frame
 
 /**
  * Compute backoff delay with exponential growth and cap.
@@ -323,6 +324,12 @@ export class HubClient {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
+
+        if (buffer.length > MAX_SSE_BUFFER_SIZE) {
+          onError(`SSE frame exceeds ${MAX_SSE_BUFFER_SIZE} bytes, terminating stream`);
+          break;
+        }
+
         const blocks = buffer.split('\n\n');
         buffer = blocks.pop() ?? '';
 

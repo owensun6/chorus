@@ -560,6 +560,50 @@ describe('HubClient.connectSSE', () => {
     expect(fetchMock.mock.calls.length).toBe(callsBefore);
   });
 
+  it('test_sse_buffer_overflow: oversized frame without delimiters triggers onError and terminates', async () => {
+    jest.useFakeTimers();
+    const oversizedPayload = 'data: ' + 'x'.repeat(65_000); // >64KB, no \n\n delimiter
+
+    const encoder = new TextEncoder();
+    const oversizedStream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(encoder.encode(oversizedPayload));
+        controller.close();
+      },
+    });
+
+    // Mock session exchange
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ success: true, data: { session_token: 'cs_overflow', expires_in_seconds: 300 } }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    // Mock SSE response with oversized payload
+    fetchMock.mockResolvedValueOnce(
+      new Response(oversizedStream, {
+        status: 200,
+        headers: { 'Content-Type': 'text/event-stream' },
+      }),
+    );
+
+    const client = makeClient('https://hub.example.com');
+    const errors: string[] = [];
+    const received: string[] = [];
+
+    client.connectSSE('agent-a', 'key-1', (event) => {
+      received.push(event.trace_id);
+    }, (msg) => { errors.push(msg); });
+
+    await flushMicrotasks(10);
+    client.disconnect();
+    await flushMicrotasks();
+
+    expect(received).toHaveLength(0);
+    expect(errors.length).toBeGreaterThanOrEqual(1);
+    expect(errors.some((e) => e.includes('exceeds'))).toBe(true);
+  });
+
   it('test_connectSSE_url_format: uses session handshake (not api key in URL)', async () => {
     jest.useFakeTimers();
     mockSessionAndSSE('', 'cs_my_session_token');

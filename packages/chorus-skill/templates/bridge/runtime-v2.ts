@@ -1207,17 +1207,13 @@ async function onGatewayStart(log: Logger): Promise<void> {
     hostAdapter.onReplyDetected((params) => {
       void (async () => {
         try {
-          const outboundId = outboundPipeline.bindReply(
+          const result = await outboundPipeline.relayReply(
             params.route_key,
             params.reply_text,
             params.inbound_trace_id,
-          );
-          const result = await outboundPipeline.submitRelay(
-            outboundId,
             hubClient,
             ctx.config.api_key,
           );
-          await outboundPipeline.confirmRelay(outboundId, result.trace_id);
           log.info(`${TAG} outbound relay OK: trace_id=${result.trace_id} route_key=${params.route_key}`);
         } catch (err) {
           log.error(`${TAG} outbound relay error (${ctx.name}): ${String(err)}`);
@@ -1341,17 +1337,13 @@ export default function register(api: any): void {
 
     void (async () => {
       try {
-        const outboundId = runtime.outboundPipeline.bindReply(
+        const result = await runtime.outboundPipeline.relayReply(
           cachedTurn.routeKey,
           replyText,
           null,
-        );
-        const result = await runtime.outboundPipeline.submitRelay(
-          outboundId,
           runtime.hubClient,
           runtime.config.api_key,
         );
-        await runtime.outboundPipeline.confirmRelay(outboundId, result.trace_id);
         api.logger.info(
           `${TAG} main-session continuation relay OK: trace_id=${result.trace_id} route_key=${cachedTurn.routeKey} remote_peer=${cachedTurn.peerId}`,
         );

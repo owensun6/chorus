@@ -15,6 +15,29 @@ export interface OutboundConfig {
   readonly localCulture: string;
 }
 
+class RouteLock {
+  private readonly locks = new Map<string, Promise<void>>();
+
+  async acquire(routeKey: string): Promise<() => void> {
+    const current = this.locks.get(routeKey) ?? Promise.resolve();
+    const { promise, resolve } = this.createDeferred();
+    this.locks.set(routeKey, promise);
+    await current;
+    return () => {
+      resolve();
+      if (this.locks.get(routeKey) === promise) {
+        this.locks.delete(routeKey);
+      }
+    };
+  }
+
+  private createDeferred(): { promise: Promise<void>; resolve: () => void } {
+    const holder: { resolve: () => void } = { resolve: () => {} };
+    const promise = new Promise<void>((r) => { holder.resolve = r; });
+    return { promise, resolve: holder.resolve };
+  }
+}
+
 /**
  * Outbound pipeline: reply binding → relay submission → confirmation.
  *
@@ -23,6 +46,7 @@ export interface OutboundConfig {
 export class OutboundPipeline {
   private readonly stateManager: DurableStateManager;
   private readonly config: OutboundConfig;
+  private readonly routeLock = new RouteLock();
 
   constructor(
     stateManager: DurableStateManager,
@@ -30,6 +54,28 @@ export class OutboundPipeline {
   ) {
     this.stateManager = stateManager;
     this.config = config;
+  }
+
+  /**
+   * Route-scoped happy path: bind reply, submit relay, confirm relay.
+   * Prevents duplicate bound_turn_number allocation when same-route replies overlap.
+   */
+  async relayReply(
+    routeKey: string,
+    replyText: string,
+    inboundTraceId: string | null,
+    hubClient: HubClient,
+    apiKey: string,
+  ): Promise<RelayResult> {
+    const release = await this.routeLock.acquire(routeKey);
+    try {
+      const outboundId = this.bindReply(routeKey, replyText, inboundTraceId);
+      const result = await this.submitRelay(outboundId, hubClient, apiKey);
+      await this.confirmRelay(outboundId, result.trace_id);
+      return result;
+    } finally {
+      release();
+    }
   }
 
   /**

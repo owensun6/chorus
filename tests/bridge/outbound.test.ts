@@ -195,4 +195,41 @@ describe('OutboundPipeline', () => {
     expect(record.hub_trace_id).toBeNull();
     expect(record.confirmed).toBe(false);
   });
+
+  it('relayReply serializes same-route replies so bound_turn_number stays unique and ordered', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    seedContinuity(stateManager);
+    const pipeline = new OutboundPipeline(stateManager, CONFIG);
+    let submitCount = 0;
+    const hub = {
+      submitRelay: jest.fn().mockImplementation(async (
+        _apiKey: string,
+        _receiverId: string,
+        _envelope: Record<string, unknown>,
+      ) => {
+        submitCount += 1;
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        return { trace_id: `hub-t-${submitCount}`, delivery: 'delivered_sse' };
+      }),
+      fetchHistory: jest.fn().mockResolvedValue([]),
+      disconnect: jest.fn(),
+    } as unknown as HubClient;
+
+    await Promise.all([
+      pipeline.relayReply(ROUTE_KEY, 'Reply one', 'in-1', hub, 'api-key'),
+      pipeline.relayReply(ROUTE_KEY, 'Reply two', 'in-2', hub, 'api-key'),
+    ]);
+
+    const firstEnvelope = (hub.submitRelay as jest.Mock).mock.calls[0][2];
+    const secondEnvelope = (hub.submitRelay as jest.Mock).mock.calls[1][2];
+    expect(firstEnvelope.turn_number).toBe(3);
+    expect(secondEnvelope.turn_number).toBe(4);
+
+    const state = stateManager.load();
+    const boundTurns = Object.values(state.relay_evidence)
+      .map((record) => record.bound_turn_number)
+      .sort((a, b) => a - b);
+    expect(boundTurns).toEqual([3, 4]);
+    expect(state.continuity[ROUTE_KEY].last_outbound_turn).toBe(4);
+  });
 });

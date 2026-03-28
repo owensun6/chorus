@@ -247,6 +247,7 @@ describe("runtime-v2 plugin entry", () => {
 
     const recover = recoverMock ?? jest.fn().mockResolvedValue({});
     const outboundInstances: Array<{
+      relayReply: jest.Mock;
       bindReply: jest.Mock;
       submitRelay: jest.Mock;
       confirmRelay: jest.Mock;
@@ -270,6 +271,18 @@ describe("runtime-v2 plugin entry", () => {
       bindReply = jest.fn().mockReturnValue("out-1");
       submitRelay = jest.fn().mockResolvedValue({ trace_id: "hub-trace-1" });
       confirmRelay = jest.fn().mockResolvedValue(undefined);
+      relayReply = jest.fn().mockImplementation(async (
+        routeKey: string,
+        replyText: string,
+        inboundTraceId: string | null,
+        hubClient: unknown,
+        apiKey: string,
+      ) => {
+        const outboundId = this.bindReply(routeKey, replyText, inboundTraceId);
+        const result = await this.submitRelay(outboundId, hubClient, apiKey);
+        await this.confirmRelay(outboundId, result.trace_id);
+        return result;
+      });
       constructor(_stateManager: unknown, _config: unknown) {
         outboundInstances.push(this);
       }

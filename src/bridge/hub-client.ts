@@ -265,7 +265,7 @@ export class HubClient {
     const controller = new AbortController();
     this.sseAbort = controller;
 
-    // Step 1: exchange API key for session token, then connect SSE
+    // Try session exchange first; fall back to direct Bearer auth if Hub returns 404
     this.acquireSessionToken(apiKey)
       .then((sessionToken) => {
         if (controller.signal.aborted) return; // disconnected during exchange
@@ -274,6 +274,17 @@ export class HubClient {
           headers: { Accept: 'text/event-stream' },
           signal: controller.signal,
         });
+      })
+      .catch((err: unknown) => {
+        // Fall back to direct Bearer auth if session endpoint not available (404)
+        if (err instanceof HubClientError && err.statusCode === 404) {
+          if (controller.signal.aborted) return;
+          return fetch(`${this.hubUrl}/agent/inbox`, {
+            headers: { Authorization: `Bearer ${apiKey}`, Accept: 'text/event-stream' },
+            signal: controller.signal,
+          });
+        }
+        throw err;
       })
       .then((res) => {
         if (!res || !res.ok || !res.body) {

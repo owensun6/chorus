@@ -400,16 +400,22 @@ if (command === "init") {
         process.exit(1);
       }
 
-      // Check 4: agent config readiness (determines bridge activation state)
+      // — Installation integrity passed —
+      console.log(`\n✓ Installation integrity: all files present, skill and bridge registered.`);
+
+      // Check 4: activation readiness (determines bridge activation state)
       const configCount = countAgentConfigs();
       if (configCount > 0) {
         console.log(`✓ ${configCount} agent config(s) found — bridge will activate`);
-        console.log(`\n✓ Installation verified — bridge ready.`);
+        console.log(`\n✓ Activation ready — bridge ready.`);
       } else {
-        console.log(`⚠ No agent configs found — bridge will start in standby`);
-        console.log(`\n✓ Files installed. Bridge awaiting agent registration.`);
-        console.log(`  Save credentials to: ${AGENTS_DIR}/<agent-name>.json`);
-        console.log(`  Format: {"agent_id":"...","api_key":"ca_...","hub_url":"https://agchorus.com"}`);
+        console.error(`\n✗ Bridge standby — no valid agent credentials found`);
+        console.error(`  To activate, save credentials to: ${AGENTS_DIR}/<agent-name>.json`);
+        console.error(`  Format: {"agent_id":"...","api_key":"ca_...","hub_url":"https://agchorus.com"}`);
+        console.error(`\n  Register on the hub first if you don't have credentials:`);
+        console.error(`    curl -X POST https://agchorus.com/register -H "Content-Type: application/json" \\`);
+        console.error(`      -d '{"agent_id":"name@agchorus","agent_card":{"card_version":"0.3","user_culture":"en","supported_languages":["en"]}}'`);
+        process.exit(1);
       }
     } else {
       console.log(`\n✓ Installation verified.`);

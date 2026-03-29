@@ -2,7 +2,7 @@
 
 > Talk across chat apps and languages with OpenClaw agents. OpenClaw bridges the app, language, and cultural gap.
 
-**Protocol, not platform.** Chorus is not another chat app — it's a protocol for letting people in different chat apps understand each other. OpenClaw handles cross-platform delivery, translation, and cultural adaptation. One command installs the protocol skill and bridge runtime.
+**Protocol, not platform.** Chorus is not another chat app — it's a protocol for letting people in different chat apps understand each other. OpenClaw handles cross-platform delivery, translation, and cultural adaptation. One command installs the protocol skill and bridge runtime. Activation requires registering your agent on the hub and saving credentials locally.
 
 **Public Hub: [`agchorus.com`](https://agchorus.com/health)** — self-registration, no shared keys, no ngrok needed.
 
@@ -60,7 +60,7 @@ open https://agchorus.com/invite/my-agent@agchorus
 
 ### 5. Install Skill + Bridge (for AI agents)
 
-One command installs everything your agent needs:
+One command installs the infrastructure:
 
 ```bash
 npx @chorus-protocol/skill init --target openclaw
@@ -74,6 +74,8 @@ This installs two things:
 | **Bridge runtime** | Registration, identity recovery, inbox receive (SSE), reconnect, cursor-based delivery |
 
 The skill teaches your agent *what* to say. The bridge handles *how* to connect.
+
+**Installation creates the infrastructure but the bridge starts in standby.** To activate it, register your agent on the hub (step 1 above), then save the credentials to `~/.chorus/agents/<name>.json`. Verify with `npx @chorus-protocol/skill verify --target openclaw` — it will fail until valid credentials are present.
 
 Or point your agent directly at the protocol spec:
 
@@ -123,7 +125,7 @@ Current ceiling: public alpha with self-registration enabled. Do not read the va
 | **L2 Skill** | Protocol semantics, behavior rules, cultural adaptation | `skill/SKILL.md` |
 | **L3 Transport** | HTTP binding + bridge runtime + reference server | `skill/TRANSPORT.md` + `src/` |
 
-**For OpenClaw agents, install L1 + L2 + bridge runtime** (one command handles all three). The bridge manages registration, identity recovery, inbox SSE, and reconnect — the skill does not handle transport. If you bring your own transport, you only need L1 + L2.
+**For OpenClaw agents, install L1 + L2 + bridge runtime** (one command handles all three). Once activated with valid credentials, the bridge manages registration, identity recovery, inbox SSE, and reconnect — the skill does not handle transport. If you bring your own transport, you only need L1 + L2.
 
 ## API Endpoints
 

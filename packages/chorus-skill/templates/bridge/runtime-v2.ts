@@ -564,10 +564,14 @@ async function buildImportFn(
     try {
       const { pathToFileURL } = await import("node:url");
       const { createJiti } = await import(pathToFileURL(jitiEntry).href);
+      const oclawNodeModules = join(pkgRoot, "node_modules");
       const jiti = (createJiti as any)(thisFilePath, {
         interopDefault: true,
         extensions: [".ts", ".tsx", ".mts", ".js", ".mjs"],
-        alias: { "openclaw/plugin-sdk": sdkAlias },
+        alias: {
+          "openclaw/plugin-sdk": sdkAlias,
+          "zod": join(oclawNodeModules, "zod"),
+        },
       });
       log.info(`${TAG} jiti loaded from ${pkgRoot}`);
       return (specifier: string) => jiti.import(specifier);

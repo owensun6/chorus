@@ -60,9 +60,11 @@ describe('bridge live acceptance evidence', () => {
     const evidence = extractStateEvidence(makeState(), 'inbound-trace');
 
     expect(evidence).not.toBeNull();
+    expect(evidence!.inboundTraceId).toBe('inbound-trace');
     expect(evidence!.routeKey).toBe('xiaoyin@chorus:probe@chorus');
     expect(evidence!.cursorAdvanced).toBe(true);
     expect(evidence!.terminalDisposition?.reason).toBe('delivery_unverifiable');
+    expect(evidence!.relayRecordId).toBe('relay_1');
     expect(evidence!.relayTraceId).toBe('relay-trace');
     expect(evidence!.relayConfirmed).toBe(true);
   });

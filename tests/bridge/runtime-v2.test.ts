@@ -976,4 +976,284 @@ describe("runtime-v2 plugin entry", () => {
       null,
     );
   });
+
+  const buildTelegramDeliveryHarness = () => {
+    let capturedDeliver: ((payload: { text?: string }) => Promise<void>) | null = null;
+    let capturedOnError: ((err: unknown) => void) | null = null;
+
+    const fakeApi = {
+      config: {},
+      runtime: {
+        channel: {
+          routing: {
+            resolveAgentRoute: jest.fn().mockReturnValue({ agentId: "agent:xiaox:main" }),
+          },
+          session: {
+            resolveStorePath: jest.fn().mockReturnValue(path.join(fakeHome, "session-store.json")),
+            recordInboundSession: jest.fn().mockResolvedValue(undefined),
+          },
+          reply: {
+            finalizeInboundContext: jest.fn((ctx: unknown) => ctx),
+            resolveHumanDelayConfig: jest.fn().mockReturnValue({}),
+            createReplyDispatcherWithTyping: jest.fn((params: { deliver: (payload: { text?: string }) => Promise<void>; onError: (err: unknown) => void }) => {
+              capturedDeliver = params.deliver;
+              capturedOnError = params.onError;
+              return {
+                dispatcher: {},
+                replyOptions: {},
+                markDispatchIdle: jest.fn(),
+              };
+            }),
+            withReplyDispatcher: jest.fn(async ({ run }: { run: () => Promise<void> }) => {
+              try {
+                await run();
+              } catch (err) {
+                capturedOnError?.(err);
+              }
+            }),
+            dispatchReplyFromConfig: jest.fn(async () => {
+              await capturedDeliver?.({ text: "本地用户可见\n[chorus_reply]\n远端回复" });
+            }),
+          },
+        },
+      },
+      logger: {
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
+    };
+    return fakeApi;
+  };
+
+  const deliverInboundParams = {
+    route_key: "xiaox@chorus:xiaov@openclaw",
+    local_anchor_id: "agent:xiaox:main",
+    adapted_content: "Telegram delivery test message",
+    metadata: {
+      sender_id: "xiaov@openclaw",
+      sender_culture: "zh-CN",
+      cultural_context: null,
+      conversation_id: "conv-tg-test",
+      turn_number: 1,
+      trace_id: "trace-tg-ack",
+    },
+  };
+
+  it("Telegram delivery returns confirmed with message_id ref when API returns server ack", async () => {
+    seedTelegramRuntime("xiaox");
+    fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results"), { recursive: true });
+
+    jest.doMock("node:os", () => ({
+      ...jest.requireActual("node:os"),
+      homedir: () => fakeHome,
+    }));
+
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, result: { message_id: 98765 } }),
+      text: async () => "",
+    });
+    (globalThis as any).fetch = fetchMock;
+
+    const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
+
+    const fakeApi = buildTelegramDeliveryHarness();
+    const adapter = new OpenClawHostAdapter(
+      {
+        config: {
+          agent_id: "xiaox@chorus",
+          api_key: "test-key",
+          hub_url: "https://hub.example",
+          culture: "zh-CN",
+          preferred_language: "zh-CN",
+        },
+        name: "xiaox",
+        stateDir: path.join(fakeHome, ".chorus", "state", "xiaox"),
+      },
+      fakeApi as never,
+      fakeApi.logger,
+      null,
+    );
+
+    const receipt = await adapter.deliverInbound(deliverInboundParams);
+
+    expect(receipt.status).toBe("confirmed");
+    expect(receipt.method).toBe("telegram_server_ack");
+    expect(receipt.ref).toBe("98765");
+
+    const deliveryFile = path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results", "trace-tg-ack.json");
+    const deliveryRecord = JSON.parse(fs.readFileSync(deliveryFile, "utf-8"));
+    expect(deliveryRecord.status).toBe("confirmed");
+    expect(deliveryRecord.terminal_disposition).toBe("delivery_confirmed");
+
+    expect(fakeApi.logger.info).toHaveBeenCalledWith(
+      expect.stringContaining("delivery_confirmed"),
+    );
+    expect(fakeApi.logger.info).toHaveBeenCalledWith(
+      expect.stringContaining("98765"),
+    );
+
+    delete (globalThis as any).fetch;
+  });
+
+  it("Telegram 400 fallback resend returns confirmed with message_id ref", async () => {
+    seedTelegramRuntime("xiaox");
+    fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results"), { recursive: true });
+
+    jest.doMock("node:os", () => ({
+      ...jest.requireActual("node:os"),
+      homedir: () => fakeHome,
+    }));
+
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({ ok: false }),
+        text: async () => "Bad Request",
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ ok: true, result: { message_id: 55555 } }),
+        text: async () => "",
+      });
+    (globalThis as any).fetch = fetchMock;
+
+    const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
+
+    const fakeApi = buildTelegramDeliveryHarness();
+    const adapter = new OpenClawHostAdapter(
+      {
+        config: {
+          agent_id: "xiaox@chorus",
+          api_key: "test-key",
+          hub_url: "https://hub.example",
+          culture: "zh-CN",
+          preferred_language: "zh-CN",
+        },
+        name: "xiaox",
+        stateDir: path.join(fakeHome, ".chorus", "state", "xiaox"),
+      },
+      fakeApi as never,
+      fakeApi.logger,
+      null,
+    );
+
+    const receipt = await adapter.deliverInbound(deliverInboundParams);
+
+    expect(receipt.status).toBe("confirmed");
+    expect(receipt.method).toBe("telegram_server_ack");
+    expect(receipt.ref).toBe("55555");
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    delete (globalThis as any).fetch;
+  });
+
+  it("Telegram delivery falls back to unverifiable when API response lacks message_id", async () => {
+    seedTelegramRuntime("xiaox");
+    fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results"), { recursive: true });
+
+    jest.doMock("node:os", () => ({
+      ...jest.requireActual("node:os"),
+      homedir: () => fakeHome,
+    }));
+
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, result: {} }),
+      text: async () => "",
+    });
+    (globalThis as any).fetch = fetchMock;
+
+    const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
+
+    const fakeApi = buildTelegramDeliveryHarness();
+    const adapter = new OpenClawHostAdapter(
+      {
+        config: {
+          agent_id: "xiaox@chorus",
+          api_key: "test-key",
+          hub_url: "https://hub.example",
+          culture: "zh-CN",
+          preferred_language: "zh-CN",
+        },
+        name: "xiaox",
+        stateDir: path.join(fakeHome, ".chorus", "state", "xiaox"),
+      },
+      fakeApi as never,
+      fakeApi.logger,
+      null,
+    );
+
+    const receipt = await adapter.deliverInbound(deliverInboundParams);
+
+    expect(receipt.status).toBe("unverifiable");
+    expect(receipt.method).toBe("telegram_api_accepted");
+    expect(receipt.ref).toBeNull();
+
+    const deliveryFile = path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results", "trace-tg-ack.json");
+    const deliveryRecord = JSON.parse(fs.readFileSync(deliveryFile, "utf-8"));
+    expect(deliveryRecord.status).toBe("unverifiable");
+    expect(deliveryRecord.terminal_disposition).toBe("delivery_unverifiable");
+
+    delete (globalThis as any).fetch;
+  });
+
+  it("Telegram delivery timeout produces unverifiable receipt, not confirmed", async () => {
+    seedTelegramRuntime("xiaox");
+    fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results"), { recursive: true });
+    fs.mkdirSync(path.join(fakeHome, ".chorus", "debug"), { recursive: true });
+    fs.writeFileSync(
+      path.join(fakeHome, ".chorus", "debug", "host-timeout.json"),
+      JSON.stringify({
+        enabled: true,
+        agent: "xiaox",
+        channel: "telegram",
+        trace_id: "trace-tg-ack",
+        mode: "hang_before_send",
+        timeout_ms: 50,
+      }),
+      "utf-8",
+    );
+
+    jest.doMock("node:os", () => ({
+      ...jest.requireActual("node:os"),
+      homedir: () => fakeHome,
+    }));
+
+    const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
+
+    const fakeApi = buildTelegramDeliveryHarness();
+    const adapter = new OpenClawHostAdapter(
+      {
+        config: {
+          agent_id: "xiaox@chorus",
+          api_key: "test-key",
+          hub_url: "https://hub.example",
+          culture: "zh-CN",
+          preferred_language: "zh-CN",
+        },
+        name: "xiaox",
+        stateDir: path.join(fakeHome, ".chorus", "state", "xiaox"),
+      },
+      fakeApi as never,
+      fakeApi.logger,
+      null,
+    );
+
+    const receipt = await adapter.deliverInbound(deliverInboundParams);
+
+    expect(receipt.status).toBe("unverifiable");
+    expect(receipt.method).toBe("timeout");
+    expect(receipt.ref).toBeNull();
+
+    const deliveryFile = path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results", "trace-tg-ack.json");
+    const deliveryRecord = JSON.parse(fs.readFileSync(deliveryFile, "utf-8"));
+    expect(deliveryRecord.status).toBe("unverifiable");
+  });
 });

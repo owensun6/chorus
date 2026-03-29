@@ -453,11 +453,21 @@ function loadAgentConfigs(log: Logger): ChorusConfig[] {
   return configs;
 }
 
+function parseTelegramMessageId(body: unknown): number | null {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return null;
+  const root = body as Record<string, unknown>;
+  if (root.ok !== true) return null;
+  const result = root.result;
+  if (!result || typeof result !== "object" || Array.isArray(result)) return null;
+  const messageId = (result as Record<string, unknown>).message_id;
+  return typeof messageId === "number" ? messageId : null;
+}
+
 async function sendTelegramMessage(
   botToken: string,
   chatId: string,
   text: string,
-): Promise<void> {
+): Promise<number | null> {
   const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -465,15 +475,18 @@ async function sendTelegramMessage(
   });
   if (!res.ok) {
     if (res.status === 400) {
-      await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      const fallbackRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chat_id: chatId, text }),
       });
-      return;
+      const fallbackBody = await fallbackRes.json().catch(() => null);
+      return parseTelegramMessageId(fallbackBody);
     }
     throw new Error(`Telegram API ${res.status}: ${await res.text()}`);
   }
+  const body = await res.json().catch(() => null);
+  return parseTelegramMessageId(body);
 }
 
 function resolveTelegramBotToken(accountId: string): string | null {
@@ -716,6 +729,40 @@ function recordUnverifiableDelivery(
     channel: params.channel,
     method: params.method,
     terminal_disposition: "delivery_unverifiable",
+    timestamp: recordedAt,
+  })}`);
+}
+
+function recordConfirmedDelivery(
+  ctx: AgentRuntimeContext,
+  log: Logger,
+  params: {
+    traceId: string;
+    peer: string;
+    channel: string;
+    method: string;
+    ref: string;
+  },
+): void {
+  const recordedAt = new Date().toISOString();
+  const result: DeliveryResultRecord = {
+    trace_id: params.traceId,
+    peer: params.peer,
+    status: "confirmed",
+    method: params.method,
+    channel: params.channel,
+    terminal_disposition: "delivery_confirmed",
+    recorded_at: recordedAt,
+  };
+  saveDeliveryResult(ctx, params.traceId, result);
+  log.info(`${TAG} [bridge:delivery] ${JSON.stringify({
+    event: "delivery_confirmed",
+    trace_id: params.traceId,
+    peer: params.peer,
+    channel: params.channel,
+    method: params.method,
+    ref: params.ref,
+    terminal_disposition: "delivery_confirmed",
     timestamp: recordedAt,
   })}`);
 }
@@ -1043,8 +1090,8 @@ If you have nothing to say back to the remote agent, simply omit [chorus_reply] 
                   throw new Error(`Injected transient delivery failure before send trace_id=${params.metadata.trace_id}`);
                 }
                 try {
-                  await sendTelegramMessage(telegramBotToken!, chatId, userText);
-                  return { kind: "ok" as const };
+                  const messageId = await sendTelegramMessage(telegramBotToken!, chatId, userText);
+                  return { kind: "ok" as const, messageId };
                 } catch (error) {
                   return { kind: "error" as const, error };
                 }
@@ -1068,18 +1115,37 @@ If you have nothing to say back to the remote agent, simply omit [chorus_reply] 
             } else if (sendOutcome.kind === "error") {
               throw sendOutcome.error;
             } else {
-              recordUnverifiableDelivery(this.ctx, this.log, {
-                traceId: params.metadata.trace_id,
-                peer: params.metadata.sender_id,
-                channel: target.channel,
-                method: "telegram_api_accepted",
-              });
-              deliveryReceipt = {
-                status: "unverifiable",
-                method: "telegram_api_accepted",
-                ref: null,
-                timestamp,
-              };
+              const tgRef = sendOutcome.messageId !== null && sendOutcome.messageId !== undefined
+                ? String(sendOutcome.messageId)
+                : null;
+              if (tgRef !== null) {
+                recordConfirmedDelivery(this.ctx, this.log, {
+                  traceId: params.metadata.trace_id,
+                  peer: params.metadata.sender_id,
+                  channel: target.channel,
+                  method: "telegram_server_ack",
+                  ref: tgRef,
+                });
+                deliveryReceipt = {
+                  status: "confirmed",
+                  method: "telegram_server_ack",
+                  ref: tgRef,
+                  timestamp,
+                };
+              } else {
+                recordUnverifiableDelivery(this.ctx, this.log, {
+                  traceId: params.metadata.trace_id,
+                  peer: params.metadata.sender_id,
+                  channel: target.channel,
+                  method: "telegram_api_accepted",
+                });
+                deliveryReceipt = {
+                  status: "unverifiable",
+                  method: "telegram_api_accepted",
+                  ref: null,
+                  timestamp,
+                };
+              }
             }
           }
 

@@ -1286,4 +1286,167 @@ describe("runtime-v2 plugin entry", () => {
     const deliveryRecord = JSON.parse(fs.readFileSync(deliveryFile, "utf-8"));
     expect(deliveryRecord.status).toBe("unverifiable");
   });
+
+  // --- Credential loading and activation watcher tests ---
+
+  const seedWorkspaceCredential = (overrides?: Record<string, unknown>): void => {
+    const dir = path.join(fakeHome, ".openclaw", "workspace");
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(
+      path.join(dir, "chorus-credentials.json"),
+      JSON.stringify({
+        agent_id: "workspace-agent@chorus",
+        api_key: "ws-key",
+        hub_url: "https://hub.workspace.example",
+        ...overrides,
+      }),
+      "utf-8",
+    );
+  };
+
+  const seedLegacyConfig = (): void => {
+    fs.mkdirSync(path.join(fakeHome, ".chorus"), { recursive: true });
+    fs.writeFileSync(
+      path.join(fakeHome, ".chorus", "config.json"),
+      JSON.stringify({
+        agent_id: "legacy-agent@chorus",
+        api_key: "legacy-key",
+        hub_url: "https://hub.legacy.example",
+      }),
+      "utf-8",
+    );
+  };
+
+  it("gateway_start loads workspace credentials from ~/.openclaw/workspace/chorus-credentials.json", async () => {
+    seedWorkspaceCredential();
+    const { recover } = installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+    await gatewayStart?.();
+
+    expect(recover).toHaveBeenCalledTimes(1);
+    expect(api.logger.info).toHaveBeenCalledWith(
+      expect.stringContaining("activated: workspace-agent@chorus from workspace/chorus-credentials.json"),
+    );
+  });
+
+  it("gateway_start loads configs from ~/.chorus/agents/ (backward compat)", async () => {
+    seedAgentConfig();
+    const { recover } = installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+    await gatewayStart?.();
+
+    expect(recover).toHaveBeenCalledTimes(1);
+    expect(api.logger.info).toHaveBeenCalledWith(
+      expect.stringContaining("activated: xiaov@openclaw from agents/xiaov.json"),
+    );
+  });
+
+  it("gateway_start loads legacy config.json when no other sources exist", async () => {
+    seedLegacyConfig();
+    const { recover } = installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+    await gatewayStart?.();
+
+    expect(recover).toHaveBeenCalledTimes(1);
+    expect(api.logger.info).toHaveBeenCalledWith(
+      expect.stringContaining("activated: legacy-agent@chorus from config.json"),
+    );
+  });
+
+  it("gateway_start loads workspace first then agents dir (priority order, both used)", async () => {
+    seedWorkspaceCredential();
+    seedAgentConfig();
+    const { recover } = installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+    await gatewayStart?.();
+
+    // Both configs loaded, workspace first + agents dir second = 2 agents
+    expect(recover).toHaveBeenCalledTimes(2);
+
+    const infoLogs = (api.logger.info as jest.Mock).mock.calls.map((c: unknown[]) => String(c[0]));
+    const workspaceIdx = infoLogs.findIndex((m) =>
+      m.includes("activated: workspace-agent@chorus from workspace/chorus-credentials.json"),
+    );
+    const agentsIdx = infoLogs.findIndex((m) =>
+      m.includes("activated: xiaov@openclaw from agents/xiaov.json"),
+    );
+    expect(workspaceIdx).toBeGreaterThanOrEqual(0);
+    expect(agentsIdx).toBeGreaterThanOrEqual(0);
+    expect(workspaceIdx).toBeLessThan(agentsIdx);
+  });
+
+  it("gateway_start skips malformed workspace credential with appropriate log", async () => {
+    seedWorkspaceCredential({ api_key: "" }); // invalid: empty api_key
+    const { recover } = installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+    await gatewayStart?.();
+
+    // No valid configs -> watcher starts, recover not called
+    expect(recover).not.toHaveBeenCalled();
+    expect(api.logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining("malformed config skipped: workspace/chorus-credentials.json"),
+    );
+  });
+
+  it("gateway_start watches for activation when no credentials exist and activates when credentials appear", async () => {
+    // Start with no credentials at all
+    installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+
+    jest.useFakeTimers();
+    try {
+      await gatewayStart?.();
+
+      // Should log "watching for activation"
+      expect(api.logger.info).toHaveBeenCalledWith(
+        expect.stringContaining("no credentials found, watching for activation..."),
+      );
+
+      // Now write a credential file while watcher is running
+      seedWorkspaceCredential();
+
+      // Advance past the 5s poll interval
+      await jest.advanceTimersByTimeAsync(5_000);
+
+      // Should detect and activate
+      expect(api.logger.info).toHaveBeenCalledWith(
+        expect.stringContaining("credentials detected, activating..."),
+      );
+      expect(api.logger.info).toHaveBeenCalledWith(
+        expect.stringContaining("activated: workspace-agent@chorus from workspace/chorus-credentials.json"),
+      );
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });

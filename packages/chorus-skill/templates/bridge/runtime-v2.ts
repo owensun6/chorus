@@ -32,6 +32,7 @@ const CHORUS_DIR = join(homedir(), ".chorus");
 const AGENTS_DIR = join(CHORUS_DIR, "agents");
 const CONFIG_PATH = join(CHORUS_DIR, "config.json");
 const OPENCLAW_DIR = join(homedir(), ".openclaw");
+const WORKSPACE_CRED_PATH = join(OPENCLAW_DIR, "workspace", "chorus-credentials.json");
 const WEIXIN_SRC = join(OPENCLAW_DIR, "extensions", "openclaw-weixin", "src");
 const WEIXIN_DIR = join(OPENCLAW_DIR, "extensions", "openclaw-weixin");
 const DEBUG_DIR = join(CHORUS_DIR, "debug");
@@ -174,6 +175,7 @@ type ContinuationTurnContext = {
 };
 
 let pluginApi: PluginApi | null = null;
+let activationWatcherInterval: ReturnType<typeof setInterval> | null = null;
 const liveRuntimeByAgentName = new Map<string, {
   readonly outboundPipeline: any;
   readonly hubClient: any;
@@ -428,25 +430,48 @@ function normalizeHookAgentName(agentId: string | undefined): string | null {
   return trimmed.split("@")[0] || null;
 }
 
+function isValidConfig(cfg: unknown): cfg is ChorusConfig {
+  if (!cfg || typeof cfg !== "object") return false;
+  const rec = cfg as Record<string, unknown>;
+  return typeof rec.agent_id === "string" && rec.agent_id.length > 0
+    && typeof rec.api_key === "string" && rec.api_key.length > 0
+    && typeof rec.hub_url === "string" && rec.hub_url.length > 0;
+}
+
 function loadAgentConfigs(log: Logger): ChorusConfig[] {
   const configs: ChorusConfig[] = [];
 
+  // 1. OpenClaw workspace credentials (highest priority)
+  if (existsSync(WORKSPACE_CRED_PATH)) {
+    const cfg = readJSON(WORKSPACE_CRED_PATH);
+    if (isValidConfig(cfg)) {
+      configs.push(cfg);
+      log.info(`${TAG} activated: ${cfg.agent_id} from workspace/chorus-credentials.json`);
+    } else {
+      log.warn(`${TAG} malformed config skipped: workspace/chorus-credentials.json (missing required fields)`);
+    }
+  }
+
+  // 2. Multi-agent dir
   if (existsSync(AGENTS_DIR)) {
     const files = readdirSync(AGENTS_DIR).filter((file) => file.endsWith(".json"));
     for (const file of files) {
-      const cfg = readJSON(join(AGENTS_DIR, file)) as ChorusConfig | null;
-      if (cfg?.agent_id && cfg?.api_key && cfg?.hub_url) {
+      const cfg = readJSON(join(AGENTS_DIR, file));
+      if (isValidConfig(cfg)) {
         configs.push(cfg);
-        log.info(`${TAG} loaded agent config: ${cfg.agent_id} from agents/${file}`);
+        log.info(`${TAG} activated: ${cfg.agent_id} from agents/${file}`);
+      } else {
+        log.warn(`${TAG} malformed config skipped: agents/${file} (missing required fields)`);
       }
     }
   }
 
+  // 3. Legacy single config (only if nothing found above)
   if (configs.length === 0) {
-    const cfg = readJSON(CONFIG_PATH) as ChorusConfig | null;
-    if (cfg?.agent_id && cfg?.api_key && cfg?.hub_url) {
+    const cfg = readJSON(CONFIG_PATH);
+    if (isValidConfig(cfg)) {
       configs.push(cfg);
-      log.info(`${TAG} loaded legacy single config: ${cfg.agent_id}`);
+      log.info(`${TAG} activated: ${cfg.agent_id} from config.json`);
     }
   }
 
@@ -1202,14 +1227,27 @@ If you have nothing to say back to the remote agent, simply omit [chorus_reply] 
   }
 }
 
-async function onGatewayStart(log: Logger): Promise<void> {
-  liveRuntimeByAgentName.clear();
-  const configs = loadAgentConfigs(log);
-  if (configs.length === 0) {
-    log.warn(`${TAG} no valid agent configs found, bridge disabled`);
-    return;
+function startActivationWatcher(log: Logger): void {
+  if (activationWatcherInterval !== null) return;
+  log.info(`${TAG} no credentials found, watching for activation...`);
+  const POLL_INTERVAL_MS = 5_000;
+  activationWatcherInterval = setInterval(() => {
+    const configs = loadAgentConfigs(log);
+    if (configs.length > 0) {
+      if (activationWatcherInterval !== null) {
+        clearInterval(activationWatcherInterval);
+        activationWatcherInterval = null;
+      }
+      log.info(`${TAG} credentials detected, activating...`);
+      void activateBridge(configs, log);
+    }
+  }, POLL_INTERVAL_MS);
+  if (typeof activationWatcherInterval === "object" && activationWatcherInterval !== null && "unref" in activationWatcherInterval) {
+    activationWatcherInterval.unref();
   }
+}
 
+async function activateBridge(configs: readonly ChorusConfig[], log: Logger): Promise<void> {
   const modules = await loadRuntimeModules(log);
   if (!modules) {
     log.error(`${TAG} V2 runtime unavailable, bridge disabled`);
@@ -1316,10 +1354,21 @@ async function onGatewayStart(log: Logger): Promise<void> {
   }
 }
 
-export default function register(api: any): void {
-  if (!existsSync(AGENTS_DIR) && !existsSync(CONFIG_PATH)) {
-    api.logger.warn(`${TAG} no agent configs found (checked ${AGENTS_DIR} and ${CONFIG_PATH}), bridge disabled`);
+async function onGatewayStart(log: Logger): Promise<void> {
+  liveRuntimeByAgentName.clear();
+  const configs = loadAgentConfigs(log);
+  if (configs.length === 0) {
+    startActivationWatcher(log);
     return;
+  }
+
+  await activateBridge(configs, log);
+}
+
+export default function register(api: any): void {
+  if (!existsSync(AGENTS_DIR) && !existsSync(CONFIG_PATH) && !existsSync(WORKSPACE_CRED_PATH)) {
+    // No credential paths exist yet; hooks will still be registered
+    // so that gateway_start can poll for late-arriving credentials.
   }
 
   pluginApi = api;

@@ -27,7 +27,19 @@ import {
   isContinuationRequest,
 } from "./router-hook";
 
-const CHORUS_PROJECT = "/Volumes/XDISK/chorus";
+// Dev-only fallback: detected dynamically, never used as primary path.
+// Primary module loading uses bundled runtime/ directory alongside this file.
+const CHORUS_PROJECT_DEV = (() => {
+  // Check common dev repo locations; returns null in production installs
+  const candidates = [
+    join(homedir(), "chorus"),
+    "/Volumes/XDISK/chorus",
+  ];
+  for (const c of candidates) {
+    if (existsSync(join(c, "src", "bridge", "state.ts"))) return c;
+  }
+  return null;
+})();
 const CHORUS_DIR = join(homedir(), ".chorus");
 const AGENTS_DIR = join(CHORUS_DIR, "agents");
 const CONFIG_PATH = join(CHORUS_DIR, "config.json");
@@ -520,9 +532,25 @@ function resolveTelegramBotToken(accountId: string): string | null {
   return raw?.channels?.telegram?.accounts?.[accountId]?.botToken ?? null;
 }
 
+function resolveRuntimeDir(): string {
+  // Primary: bundled runtime/ directory alongside this file (npm-installed path)
+  const extensionDir = join(homedir(), ".openclaw", "extensions", "chorus-bridge");
+  const bundledDir = join(extensionDir, "runtime");
+  if (existsSync(join(bundledDir, "state.ts"))) return bundledDir;
+
+  // Dev fallback: source repo if detected
+  if (CHORUS_PROJECT_DEV) return join(CHORUS_PROJECT_DEV, "src", "bridge");
+
+  // Last resort: assume bundled runtime dir even if not yet verified
+  return bundledDir;
+}
+
 async function buildImportFn(
   log: Logger,
 ): Promise<(specifier: string) => Promise<any>> {
+  const thisFilePath = join(
+    homedir(), ".openclaw", "extensions", "chorus-bridge", "runtime-v2.ts",
+  );
   const candidates = [
     join(homedir(), ".npm-global", "lib", "node_modules", "openclaw"),
     join("/", "usr", "local", "lib", "node_modules", "openclaw"),
@@ -536,14 +564,7 @@ async function buildImportFn(
     try {
       const { pathToFileURL } = await import("node:url");
       const { createJiti } = await import(pathToFileURL(jitiEntry).href);
-      const jiti = (createJiti as any)(join(
-        CHORUS_PROJECT,
-        "packages",
-        "chorus-skill",
-        "templates",
-        "bridge",
-        "runtime-v2.ts",
-      ), {
+      const jiti = (createJiti as any)(thisFilePath, {
         interopDefault: true,
         extensions: [".ts", ".tsx", ".mts", ".js", ".mjs"],
         alias: { "openclaw/plugin-sdk": sdkAlias },
@@ -557,14 +578,7 @@ async function buildImportFn(
 
   // @ts-expect-error runtime optional dependency resolved from OpenClaw or process context
   const { createJiti } = await import("jiti");
-  const jiti = (createJiti as any)(join(
-    CHORUS_PROJECT,
-    "packages",
-    "chorus-skill",
-    "templates",
-    "bridge",
-    "runtime-v2.ts",
-  ), {
+  const jiti = (createJiti as any)(thisFilePath, {
     interopDefault: true,
     extensions: [".ts", ".tsx", ".mts", ".js", ".mjs"],
   });
@@ -612,12 +626,14 @@ async function probeWeixinDeps(log: Logger): Promise<{
 async function loadRuntimeModules(log: Logger): Promise<RuntimeModules | null> {
   try {
     const importFn = await buildImportFn(log);
+    const runtimeDir = resolveRuntimeDir();
+    log.info(`${TAG} loading runtime modules from ${runtimeDir}`);
     const [stateMod, inboundMod, outboundMod, recoveryMod, hubClientMod] = await Promise.all([
-      importFn(join(CHORUS_PROJECT, "src", "bridge", "state.ts")),
-      importFn(join(CHORUS_PROJECT, "src", "bridge", "inbound.ts")),
-      importFn(join(CHORUS_PROJECT, "src", "bridge", "outbound.ts")),
-      importFn(join(CHORUS_PROJECT, "src", "bridge", "recovery.ts")),
-      importFn(join(CHORUS_PROJECT, "src", "bridge", "hub-client.ts")),
+      importFn(join(runtimeDir, "state.ts")),
+      importFn(join(runtimeDir, "inbound.ts")),
+      importFn(join(runtimeDir, "outbound.ts")),
+      importFn(join(runtimeDir, "recovery.ts")),
+      importFn(join(runtimeDir, "hub-client.ts")),
     ]);
     return {
       DurableStateManager: stateMod.DurableStateManager,

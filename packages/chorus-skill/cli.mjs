@@ -119,6 +119,15 @@ const BRIDGE_REQUIRED_FILES = [
   "router-hook.ts",
   "openclaw.plugin.json",
   "package.json",
+  "runtime/types.ts",
+  "runtime/route-key.ts",
+  "runtime/shared-types.ts",
+  "runtime/shared-log.ts",
+  "runtime/state.ts",
+  "runtime/hub-client.ts",
+  "runtime/inbound.ts",
+  "runtime/outbound.ts",
+  "runtime/recovery.ts",
 ];
 
 function installBridge() {
@@ -131,7 +140,9 @@ function installBridge() {
       console.error(`✗ Bridge template missing: ${file}`);
       process.exit(1);
     }
-    writeFileSync(join(bridgeDir, file), readFileSync(src));
+    const dest = join(bridgeDir, file);
+    mkdirSync(dirname(dest), { recursive: true });
+    writeFileSync(dest, readFileSync(src));
   }
 }
 

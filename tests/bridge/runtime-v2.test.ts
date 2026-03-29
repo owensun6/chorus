@@ -19,6 +19,13 @@ describe("runtime-v2 plugin entry", () => {
     fs.rmSync(fakeHome, { recursive: true, force: true });
   });
 
+  const seedBundledRuntime = (): void => {
+    const runtimeDir = path.join(fakeHome, ".openclaw", "extensions", "chorus-bridge", "runtime");
+    fs.mkdirSync(runtimeDir, { recursive: true });
+    // Write a minimal state.ts so resolveRuntimeDir detects the bundled path
+    fs.writeFileSync(path.join(runtimeDir, "state.ts"), "// stub", "utf-8");
+  };
+
   const seedAgentConfig = (): void => {
     fs.mkdirSync(path.join(fakeHome, ".chorus", "agents"), { recursive: true });
     fs.writeFileSync(
@@ -239,6 +246,9 @@ describe("runtime-v2 plugin entry", () => {
   };
 
   const installMocks = (recoverMock?: jest.Mock) => {
+    // Seed bundled runtime directory so resolveRuntimeDir() finds it
+    seedBundledRuntime();
+
     jest.doMock("node:fs", () => {
       const realFs = jest.requireActual("node:fs") as typeof fs;
       return {
@@ -322,19 +332,20 @@ describe("runtime-v2 plugin entry", () => {
     jest.doMock("jiti", () => ({
       createJiti: () => ({
         import: async (specifier: string) => {
-          if (specifier.endsWith("/src/bridge/state.ts")) {
+          // Match both bundled runtime/ paths and dev src/bridge/ paths
+          if (specifier.endsWith("/state.ts")) {
             return { DurableStateManager: FakeDurableStateManager };
           }
-          if (specifier.endsWith("/src/bridge/inbound.ts")) {
+          if (specifier.endsWith("/inbound.ts")) {
             return { InboundPipeline: FakeInboundPipeline };
           }
-          if (specifier.endsWith("/src/bridge/outbound.ts")) {
+          if (specifier.endsWith("/outbound.ts")) {
             return { OutboundPipeline: FakeOutboundPipeline };
           }
-          if (specifier.endsWith("/src/bridge/recovery.ts")) {
+          if (specifier.endsWith("/recovery.ts")) {
             return { RecoveryEngine: FakeRecoveryEngine };
           }
-          if (specifier.endsWith("/src/bridge/hub-client.ts")) {
+          if (specifier.endsWith("/hub-client.ts")) {
             return { HubClient: FakeHubClient };
           }
           throw new Error(`unexpected import: ${specifier}`);
@@ -1448,5 +1459,25 @@ describe("runtime-v2 plugin entry", () => {
     } finally {
       jest.useRealTimers();
     }
+  });
+
+  it("gateway_start activates using bundled runtime when no source repo exists", async () => {
+    seedAgentConfig();
+    seedBundledRuntime();
+    const { recover } = installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+    await gatewayStart?.();
+
+    // Recovery engine should have been called (modules loaded successfully)
+    expect(recover).toHaveBeenCalledTimes(1);
+    // Should log loading from runtime directory (bundled path)
+    expect(api.logger.info).toHaveBeenCalledWith(
+      expect.stringContaining("loading runtime modules from"),
+    );
   });
 });

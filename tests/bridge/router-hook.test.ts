@@ -1,6 +1,7 @@
 import {
   buildChorusRouterInjection,
   buildContinuitySystemContext,
+  contentToText,
   extractContinuationReplyBody,
   extractLatestUserText,
   isContinuationRequest,
@@ -9,6 +10,16 @@ import {
 } from "../../packages/chorus-skill/templates/bridge/router-hook";
 
 describe("chorus router hook", () => {
+  it("contentToText joins text parts and ignores non-text entries", () => {
+    expect(contentToText([
+      { type: "text", text: "line one" },
+      { type: "image", image_url: "ignored" },
+      "line two",
+      null,
+    ])).toBe("line one\nline two");
+    expect(contentToText({ nope: true })).toBe("");
+  });
+
   it("extracts the latest user text from message blocks", () => {
     const text = extractLatestUserText({
       messages: [
@@ -37,6 +48,22 @@ describe("chorus router hook", () => {
     });
 
     expect(injection).toBeDefined();
+  });
+
+  it("extractLatestUserText reads nested message.role/message.content and skips empty user entries", () => {
+    const text = extractLatestUserText({
+      prompt: "fallback prompt",
+      messages: [
+        {
+          message: { role: "user", content: [{ type: "text", text: "   " }] },
+        },
+        {
+          message: { role: "user", content: [{ type: "text", text: "nested latest user text" }] },
+        },
+      ],
+    });
+
+    expect(text).toBe("nested latest user text");
   });
 
   it("injects router context for chorus turns", () => {
@@ -168,6 +195,21 @@ describe("chorus router hook", () => {
     expect(injection).toBeUndefined();
   });
 
+  it("does not inject continuity note for normal local turns when no active peer exists", () => {
+    const injection = buildChorusRouterInjection(
+      {
+        messages: [{ role: "user", content: "normal local turn" }],
+      },
+      {
+        agentId: "xiaov@openclaw",
+        sessionKey: "agent:xiaov:main",
+      },
+      null,
+    );
+
+    expect(injection).toBeUndefined();
+  });
+
   it("only matches the latest user turn", () => {
     const injection = buildChorusRouterInjection({
       messages: [
@@ -213,6 +255,24 @@ describe("chorus router hook", () => {
     expect(text).toContain("do not know the remote agent's Chorus address");
   });
 
+  it("builds continuity note with fallback peer label and force-continue instructions", () => {
+    const text = buildContinuitySystemContext({
+      peerId: "peer-42@chorus",
+      peerLabel: "   ",
+      conversationId: null,
+      routeKey: undefined,
+      lastInboundSummary: null,
+      lastOutboundReply: null,
+    }, true);
+
+    expect(text).toContain("peer-42");
+    expect(text).toContain("Recent Chorus conversation id: unknown.");
+    expect(text).toContain("Most recent remote message summary: unavailable from durable state.");
+    expect(text).toContain("Most recent reply you sent back: none recorded yet.");
+    expect(text).toContain("This turn is a continuation request for the active Chorus peer.");
+    expect(text).toContain("Do NOT try to manually send Chorus envelopes yourself.");
+  });
+
   it("extracts explicit continuation reply body from Chinese continuation commands", () => {
     expect(
       extractContinuationReplyBody("继续跟她聊，告诉她：我看到了，继续发吧。只回复她，不要解释。"),
@@ -232,5 +292,12 @@ describe("chorus router hook", () => {
     expect(
       extractContinuationReplyBody("continue talking to her, tell her: exact body only. do not call any tools. do not manually send. your final assistant text must only contain that sentence."),
     ).toBe("exact body only.");
+  });
+
+  it("extractContinuationReplyBody trims wrapped quotes and returns null when no directive exists", () => {
+    expect(
+      extractContinuationReplyBody('继续跟她聊，告诉她："保持在线。" 只回复她'),
+    ).toBe("保持在线。");
+    expect(extractContinuationReplyBody("normal local question")).toBeNull();
   });
 });

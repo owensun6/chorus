@@ -382,7 +382,7 @@ describe('InboundPipeline', () => {
     const hostAdapter = makeHostAdapter({
       deliverInbound: jest.fn().mockImplementation(async () => {
         // Simulate async delivery taking some time
-        await new Promise((r) => setTimeout(r, 30));
+        await Promise.resolve();
         return { status: 'confirmed', method: 'test', ref: 'r', timestamp: new Date().toISOString() };
       }),
     });
@@ -413,18 +413,21 @@ describe('InboundPipeline', () => {
   it('test_delivery_timeout: hung deliverInbound becomes unverifiable, NOT retryable (prevents duplicate delivery)', async () => {
     jest.useFakeTimers();
     const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const deliveryDeferred: { resolve: (value: DeliveryReceipt) => void } = { resolve: () => {} };
     const hostAdapter = makeHostAdapter({
-      deliverInbound: jest.fn().mockImplementation(() => new Promise(() => {})),
+      deliverInbound: jest.fn().mockImplementation(() => new Promise<DeliveryReceipt>((resolve) => {
+        deliveryDeferred.resolve = resolve;
+      })),
     });
     const errors: string[] = [];
     const pipeline = new InboundPipeline(
       stateManager, hostAdapter,
-      { localAgentId: AGENT_ID, localCulture: 'zh-CN', deliverTimeoutMs: 100 },
+      { localAgentId: AGENT_ID, localCulture: 'zh-CN', deliverTimeoutMs: 5 },
       (msg) => errors.push(msg),
     );
 
     const processing = pipeline.processMessage(makeEvent({ trace_id: 'timeout-trace' }));
-    await jest.advanceTimersByTimeAsync(150);
+    await jest.advanceTimersByTimeAsync(10);
     await processing;
 
     const state = stateManager.load();
@@ -445,34 +448,53 @@ describe('InboundPipeline', () => {
     expect(String(payload)).toContain('"trace_id":"timeout-trace"');
     expect(String(payload)).toContain('"route_key":"local@hub:remote@hub"');
     expect(String(payload)).toContain('"terminal_disposition":"delivery_unverifiable"');
+
+    deliveryDeferred.resolve({
+      status: 'confirmed',
+      method: 'test',
+      ref: null,
+      timestamp: new Date().toISOString(),
+    });
+    await Promise.resolve();
   });
 
   it('test_timeout_no_duplicate_delivery: recovery does NOT re-deliver after timeout', async () => {
     jest.useFakeTimers();
     const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
     const deliverCalls: string[] = [];
+    const deliveryDeferred: { resolve: (value: DeliveryReceipt) => void } = { resolve: () => {} };
     const hostAdapter = makeHostAdapter({
       deliverInbound: jest.fn().mockImplementation(async (params: { metadata: { trace_id: string } }) => {
         deliverCalls.push(params.metadata.trace_id);
         if (deliverCalls.length === 1) {
-          return new Promise(() => {});
+          return new Promise<DeliveryReceipt>((resolve) => {
+            deliveryDeferred.resolve = resolve;
+          });
         }
         return { status: 'confirmed', method: 'test', ref: null, timestamp: new Date().toISOString() };
       }),
     });
     const pipeline = new InboundPipeline(
       stateManager, hostAdapter,
-      { localAgentId: AGENT_ID, localCulture: 'zh-CN', deliverTimeoutMs: 100 },
+      { localAgentId: AGENT_ID, localCulture: 'zh-CN', deliverTimeoutMs: 5 },
     );
 
     // First attempt: times out → unverifiable
     const p1 = pipeline.processMessage(makeEvent({ trace_id: 'no-dup-trace' }));
-    await jest.advanceTimersByTimeAsync(150);
+    await jest.advanceTimersByTimeAsync(10);
     await p1;
 
     const stateAfterTimeout = stateManager.load();
     expect(stateAfterTimeout.inbound_facts['no-dup-trace'].terminal_disposition!.reason).toBe('delivery_unverifiable');
     expect(stateAfterTimeout.inbound_facts['no-dup-trace'].cursor_advanced).toBe(true);
+
+    deliveryDeferred.resolve({
+      status: 'confirmed',
+      method: 'test',
+      ref: null,
+      timestamp: new Date().toISOString(),
+    });
+    await Promise.resolve();
 
     // Second attempt: same trace_id — pipeline dedupes, does NOT re-deliver
     await pipeline.processMessage(makeEvent({ trace_id: 'no-dup-trace' }));
@@ -512,7 +534,7 @@ describe('InboundPipeline', () => {
     const hostAdapter = makeHostAdapter({
       deliverInbound: jest.fn().mockImplementation(async (params: { metadata: { trace_id: string } }) => {
         callOrder.push(`start:${params.metadata.trace_id}`);
-        await new Promise((r) => setTimeout(r, 20));
+        await Promise.resolve();
         callOrder.push(`end:${params.metadata.trace_id}`);
         return { status: 'confirmed', method: 'test', ref: null, timestamp: new Date().toISOString() };
       }),
@@ -530,5 +552,64 @@ describe('InboundPipeline', () => {
     expect(callOrder[1]).toBe('end:c-1');
     expect(callOrder[2]).toBe('start:c-2');
     expect(callOrder[3]).toBe('end:c-2');
+  });
+
+  it('rejects invalid envelopes before any state mutation or delivery', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const hostAdapter = makeHostAdapter();
+    const errors: string[] = [];
+    const pipeline = new InboundPipeline(stateManager, hostAdapter, CONFIG, (msg) => errors.push(msg));
+
+    await pipeline.processMessage(makeEvent({
+      trace_id: 'bad-envelope',
+      envelope: {
+        chorus_version: '9.9',
+        sender_id: 'remote@hub',
+        original_text: 'Hello',
+        sender_culture: 'en',
+      } as any,
+    }));
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('Envelope validation failed');
+    expect(stateManager.load().inbound_facts['bad-envelope']).toBeUndefined();
+    expect(hostAdapter.deliverInbound).not.toHaveBeenCalled();
+  });
+
+  it('dedupe returns non-duplicate when no fact exists for the trace', () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const pipeline = new InboundPipeline(stateManager, makeHostAdapter(), CONFIG);
+    const state = stateManager.load();
+
+    const result = (pipeline as any).dedupe(state, 'missing-trace') as {
+      isDuplicate: boolean;
+      state: BridgeDurableState;
+    };
+
+    expect(result.isDuplicate).toBe(false);
+    expect(result.state).toBe(state);
+  });
+
+  it('applyDeliveryOutcome returns state unchanged when fact is already absent', () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const pipeline = new InboundPipeline(stateManager, makeHostAdapter(), CONFIG);
+    const state = stateManager.load();
+
+    const result = (pipeline as any).applyDeliveryOutcome(
+      state,
+      'missing-trace',
+      {
+        receipt: {
+          status: 'confirmed',
+          method: 'test',
+          ref: null,
+          timestamp: '2026-03-24T12:00:01.000Z',
+        },
+      },
+      'local@hub:remote@hub',
+      '2026-03-24T12:00:00.000Z',
+    ) as BridgeDurableState;
+
+    expect(result).toBe(state);
   });
 });

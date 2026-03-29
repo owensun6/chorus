@@ -196,6 +196,68 @@ describe('OutboundPipeline', () => {
     expect(record.confirmed).toBe(false);
   });
 
+  it('rejects bindReply when continuity is missing', () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    const pipeline = new OutboundPipeline(stateManager, CONFIG);
+
+    expect(() => pipeline.bindReply(ROUTE_KEY, 'Reply', null)).toThrow(`No continuity entry for route_key="${ROUTE_KEY}"`);
+  });
+
+  it('rejects submitRelay when relay evidence is missing', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    seedContinuity(stateManager);
+    const pipeline = new OutboundPipeline(stateManager, CONFIG);
+
+    await expect(
+      pipeline.submitRelay('missing-outbound', mockHubClient(), 'api-key'),
+    ).rejects.toThrow('No relay_evidence');
+  });
+
+  it('rejects submitRelay when continuity disappears before submission', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    seedContinuity(stateManager);
+    const pipeline = new OutboundPipeline(stateManager, CONFIG);
+    const outboundId = pipeline.bindReply(ROUTE_KEY, 'Reply', null);
+
+    const state = stateManager.load();
+    const withoutContinuity: BridgeDurableState = {
+      ...state,
+      continuity: {},
+    };
+    stateManager.save(withoutContinuity);
+
+    await expect(
+      pipeline.submitRelay(outboundId, mockHubClient(), 'api-key'),
+    ).rejects.toThrow(`No continuity for route_key="${ROUTE_KEY}"`);
+  });
+
+  it('rejects confirmRelay when relay evidence is missing', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    seedContinuity(stateManager);
+    const pipeline = new OutboundPipeline(stateManager, CONFIG);
+
+    await expect(
+      pipeline.confirmRelay('missing-outbound', 'hub-trace'),
+    ).rejects.toThrow('No relay_evidence');
+  });
+
+  it('rejects confirmRelay when continuity disappears before confirmation', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    seedContinuity(stateManager);
+    const pipeline = new OutboundPipeline(stateManager, CONFIG);
+    const outboundId = pipeline.bindReply(ROUTE_KEY, 'Reply', null);
+
+    const state = stateManager.load();
+    stateManager.save({
+      ...state,
+      continuity: {},
+    });
+
+    await expect(
+      pipeline.confirmRelay(outboundId, 'hub-trace'),
+    ).rejects.toThrow(`No continuity for route_key="${ROUTE_KEY}"`);
+  });
+
   it('relayReply serializes same-route replies so bound_turn_number stays unique and ordered', async () => {
     const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
     seedContinuity(stateManager);

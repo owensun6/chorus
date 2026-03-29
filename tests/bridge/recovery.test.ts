@@ -135,7 +135,11 @@ describe('RecoveryEngine', () => {
   let tmpDir: string;
 
   beforeEach(() => { tmpDir = makeTempDir(); });
-  afterEach(() => { fs.rmSync(tmpDir, { recursive: true, force: true }); });
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
 
   // ---------------------------------------------------------------------------
   // test_resume_incomplete_delivery
@@ -412,6 +416,7 @@ describe('RecoveryEngine', () => {
   // ---------------------------------------------------------------------------
 
   it('test_catchup_retry_backoff: retries Hub catchup with backoff then succeeds', async () => {
+    jest.useFakeTimers();
     const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
     const errors: string[] = [];
 
@@ -432,12 +437,14 @@ describe('RecoveryEngine', () => {
       (msg) => errors.push(msg),
     );
 
-    await engine.recover(
+    const recovery = engine.recover(
       stateManager,
       new InboundPipeline(stateManager, hostAdapter, CONFIG),
       new OutboundPipeline(stateManager, CONFIG),
       hubClient, hostAdapter, () => {},
     );
+    await jest.advanceTimersByTimeAsync(3_000);
+    await recovery;
 
     // fetchHistory called 3 times: 2 failures + 1 success
     expect(hubClient.fetchHistory).toHaveBeenCalledTimes(3);
@@ -451,6 +458,7 @@ describe('RecoveryEngine', () => {
   // ---------------------------------------------------------------------------
 
   it('test_catchup_exhausted_throws: throws after all retries exhausted, no SSE connect', async () => {
+    jest.useFakeTimers();
     const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
 
     const hostAdapter = makeHostAdapter();
@@ -466,14 +474,15 @@ describe('RecoveryEngine', () => {
       { agentId: AGENT_ID, apiKey: API_KEY, maxCatchupRetries: 1 },
     );
 
-    await expect(
-      engine.recover(
+    const recovery = engine.recover(
         stateManager,
         new InboundPipeline(stateManager, hostAdapter, CONFIG),
         new OutboundPipeline(stateManager, CONFIG),
         hubClient, hostAdapter, () => {},
-      ),
-    ).rejects.toThrow('Hub catchup failed after 2 attempts');
+    );
+    const rejection = expect(recovery).rejects.toThrow('Hub catchup failed after 2 attempts');
+    await jest.advanceTimersByTimeAsync(1_000);
+    await rejection;
 
     // SSE must NOT connect without successful catchup
     expect(hubClient.connectSSE).not.toHaveBeenCalled();

@@ -16,9 +16,18 @@ type Json = any;
 const originalFetch = global.fetch;
 const fetchMock = jest.fn() as jest.MockedFunction<typeof global.fetch>;
 global.fetch = fetchMock;
+const createdInboxManagers: Array<{ shutdown: () => void }> = [];
 
 afterAll(() => {
   global.fetch = originalFetch;
+});
+
+afterEach(async () => {
+  for (const inbox of createdInboxManagers) {
+    inbox.shutdown();
+  }
+  createdInboxManagers.length = 0;
+  await new Promise<void>((resolve) => setImmediate(resolve));
 });
 
 const SENDER_AGENT = {
@@ -214,6 +223,7 @@ describe("POST /messages (store-and-forward)", () => {
     const activity = createActivityStream(db);
     const inbox = createInboxManager();
     const messageStore = createMessageStore(db);
+    createdInboxManagers.push(inbox);
     return { registry, activity, inbox, messageStore, app: createApp(registry, undefined, activity, inbox, messageStore) };
   };
 
@@ -300,9 +310,7 @@ describe("POST /messages (store-and-forward)", () => {
       method: "GET",
       headers: { Authorization: `Bearer ${receiverKey}` },
     });
-    // Give SSE connection a moment to establish
-    await new Promise((r) => setTimeout(r, 50));
-
+    await new Promise<void>((resolve) => setImmediate(resolve));
     // Send a NEW message while receiver is online → should be delivered_sse
     const liveRes = await app.request("/messages", {
       method: "POST",
@@ -324,9 +332,8 @@ describe("POST /messages (store-and-forward)", () => {
     });
     const messages: Json = ((await pollRes.json()) as Json).data;
     expect(messages.length).toBe(2);
-    expect(messages[0].delivered_via).toBe("queued");
-    expect(messages[0].trace_id).toBe(queuedTraceId);
-    expect(messages[1].delivered_via).toBe("sse");
+    expect(messages.find((msg: Json) => msg.trace_id === queuedTraceId)?.delivered_via).toBe("queued");
+    expect(messages.find((msg: Json) => msg.envelope.original_text === "Second (live)")?.delivered_via).toBe("sse");
 
     // Clean up SSE stream
     if (inboxRes.body) {

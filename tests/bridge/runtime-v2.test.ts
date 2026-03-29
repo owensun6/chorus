@@ -4,6 +4,7 @@ import * as path from "path";
 
 const makeTempHome = (): string =>
   fs.mkdtempSync(path.join(os.tmpdir(), "chorus-runtime-v2-"));
+const originalExistsSync = fs.existsSync.bind(fs);
 
 describe("runtime-v2 plugin entry", () => {
   let fakeHome: string;
@@ -16,8 +17,6 @@ describe("runtime-v2 plugin entry", () => {
 
   afterEach(() => {
     fs.rmSync(fakeHome, { recursive: true, force: true });
-    jest.dontMock("node:os");
-    jest.dontMock("jiti");
   });
 
   const seedAgentConfig = (): void => {
@@ -240,6 +239,23 @@ describe("runtime-v2 plugin entry", () => {
   };
 
   const installMocks = (recoverMock?: jest.Mock) => {
+    jest.doMock("node:fs", () => {
+      const realFs = jest.requireActual("node:fs") as typeof fs;
+      return {
+        ...realFs,
+        existsSync: (target: fs.PathLike) => {
+          const p = String(target);
+          if (
+            p.includes("/node_modules/openclaw/node_modules/jiti/lib/jiti.mjs") ||
+            p.includes("/dist/plugin-sdk/root-alias.cjs")
+          ) {
+            return false;
+          }
+          return originalExistsSync(target);
+        },
+      };
+    });
+
     jest.doMock("node:os", () => ({
       ...jest.requireActual("node:os"),
       homedir: () => fakeHome,
@@ -446,11 +462,18 @@ describe("runtime-v2 plugin entry", () => {
     const { hubClientInstances, recoveryConfigs } = installMocks(recoverMock);
     const { api, hooks } = buildFakeApi();
 
-    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
-    register(api);
+    jest.useFakeTimers();
+    try {
+      const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+      register(api);
 
-    const gatewayStart = hooks.get("gateway_start");
-    await gatewayStart?.();
+      const gatewayStart = hooks.get("gateway_start");
+      const startPromise = gatewayStart?.();
+      await jest.advanceTimersByTimeAsync(1);
+      await startPromise;
+    } finally {
+      jest.useRealTimers();
+    }
 
     expect(hubClientInstances).toHaveLength(1);
     expect(recoverMock).toHaveBeenCalledTimes(1);
@@ -551,19 +574,26 @@ describe("runtime-v2 plugin entry", () => {
       null,
     );
 
-    await expect(adapter.deliverInbound({
-      route_key: "xiaox@chorus:xiaov@openclaw",
-      local_anchor_id: "agent:xiaox:main",
-      adapted_content: "S0310 runtime throw-before-send",
-      metadata: {
-        sender_id: "xiaov@openclaw",
-        sender_culture: "zh-CN",
-        cultural_context: null,
-        conversation_id: "conv-throw",
-        turn_number: 1,
-        trace_id: "trace-throw-before-send",
-      },
-    })).rejects.toThrow("Injected transient delivery failure before send trace_id=trace-throw-before-send");
+    jest.useFakeTimers();
+    try {
+      await expect(adapter.deliverInbound({
+        route_key: "xiaox@chorus:xiaov@openclaw",
+        local_anchor_id: "agent:xiaox:main",
+        adapted_content: "S0310 runtime throw-before-send",
+        metadata: {
+          sender_id: "xiaov@openclaw",
+          sender_culture: "zh-CN",
+          cultural_context: null,
+          conversation_id: "conv-throw",
+          turn_number: 1,
+          trace_id: "trace-throw-before-send",
+        },
+      })).rejects.toThrow("Injected transient delivery failure before send trace_id=trace-throw-before-send");
+
+      await jest.runOnlyPendingTimersAsync();
+    } finally {
+      jest.useRealTimers();
+    }
 
     expect(fakeApi.logger.error).toHaveBeenCalledWith(
       expect.stringContaining("deliver error: Error: Injected transient delivery failure before send trace_id=trace-throw-before-send"),
@@ -610,7 +640,7 @@ describe("runtime-v2 plugin entry", () => {
       { agentId: "xiaov", sessionKey: "agent:xiaov:main" },
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
     expect(outbound.bindReply).toHaveBeenCalledWith(
       "xiaov@openclaw:xiaox@chorus",
@@ -675,7 +705,7 @@ describe("runtime-v2 plugin entry", () => {
       { agentId: "xiaov", sessionKey: "agent:xiaov:main" },
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
     expect(outbound.bindReply).not.toHaveBeenCalled();
     expect(outbound.submitRelay).not.toHaveBeenCalled();
@@ -722,7 +752,7 @@ describe("runtime-v2 plugin entry", () => {
       { agentId: "xiaov", sessionKey: "agent:xiaov:main" },
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
     expect(outbound.bindReply).not.toHaveBeenCalled();
     expect(outbound.submitRelay).not.toHaveBeenCalled();
@@ -778,7 +808,7 @@ describe("runtime-v2 plugin entry", () => {
       { agentId: "xiaov", sessionKey: "agent:xiaov:main" },
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
     expect(outbound.bindReply).toHaveBeenCalledWith(
       "xiaov@openclaw:xiaox@chorus",
@@ -842,7 +872,7 @@ describe("runtime-v2 plugin entry", () => {
       { agentId: "xiaov", sessionKey: "agent:xiaov:main" },
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
     expect(outbound.bindReply).not.toHaveBeenCalled();
 
@@ -875,7 +905,7 @@ describe("runtime-v2 plugin entry", () => {
       { agentId: "xiaov", sessionKey: "agent:xiaov:main" },
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
     expect(outbound.bindReply).toHaveBeenCalledTimes(1);
     expect(outbound.bindReply).toHaveBeenLastCalledWith(
@@ -931,7 +961,7 @@ describe("runtime-v2 plugin entry", () => {
       { agentId: "xiaov", sessionKey: "agent:xiaov:main" },
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
     beforePromptBuild?.(
       {
@@ -961,7 +991,7 @@ describe("runtime-v2 plugin entry", () => {
       { agentId: "xiaov", sessionKey: "agent:xiaov:main" },
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
     expect(outbound.bindReply).toHaveBeenNthCalledWith(
       1,

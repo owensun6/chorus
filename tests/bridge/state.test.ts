@@ -572,6 +572,87 @@ describe('DurableStateManager pruning', () => {
       cleanupDir(tempDir);
     }
   });
+
+  it('prunes facts with confirmed delivery once cursor is advanced', async () => {
+    const tempDir = createTempDir();
+    try {
+      const manager = new DurableStateManager(tempDir, 'agent-prune');
+      const facts: Record<string, InboundFact> = {};
+      for (let i = 0; i < 501; i++) {
+        facts[`delivered-${i}`] = {
+          ...retryableFact,
+          observed_at: `2026-03-24T10:${String(i).padStart(2, '0')}:00Z`,
+          hub_timestamp: `2026-03-24T10:${String(i).padStart(2, '0')}:00Z`,
+          delivery_evidence: {
+            delivered_at: `2026-03-24T10:${String(i).padStart(2, '0')}:30Z`,
+            method: 'test',
+            ref: null,
+          },
+          cursor_advanced: true,
+        };
+      }
+      manager.save({ ...manager.load(), inbound_facts: facts });
+
+      const result = await manager.mutate((s) => s);
+
+      expect(Object.keys(result.inbound_facts)).toHaveLength(500);
+      expect(result.inbound_facts['delivered-0']).toBeUndefined();
+    } finally {
+      cleanupDir(tempDir);
+    }
+  });
+
+  it('keeps relay evidence over cap when no relay is confirmed', async () => {
+    const tempDir = createTempDir();
+    try {
+      const manager = new DurableStateManager(tempDir, 'agent-prune');
+      const relays: Record<string, RelayRecord> = {};
+      for (let i = 0; i < 502; i++) {
+        relays[`pending-${i}`] = {
+          ...unconfirmedRelay,
+          idempotency_key: `idem-${i}`,
+          bound_turn_number: i + 1,
+        };
+      }
+      manager.save({ ...manager.load(), relay_evidence: relays });
+
+      const result = await manager.mutate((s) => s);
+
+      expect(Object.keys(result.relay_evidence)).toHaveLength(502);
+    } finally {
+      cleanupDir(tempDir);
+    }
+  });
+
+  it('sorts confirmed relays with null submitted_at using empty-string fallback', async () => {
+    const tempDir = createTempDir();
+    try {
+      const manager = new DurableStateManager(tempDir, 'agent-prune');
+      const relays: Record<string, RelayRecord> = {};
+      for (let i = 0; i < 499; i++) {
+        relays[`confirmed-${i}`] = confirmedRelay(`2026-01-${String(i + 1).padStart(2, '0')}T00:00:00Z`);
+      }
+      relays['confirmed-null-a'] = {
+        ...confirmedRelay('2026-12-01T00:00:00Z'),
+        submitted_at: null,
+        idempotency_key: 'idem-null-a',
+      };
+      relays['confirmed-null-b'] = {
+        ...confirmedRelay('2026-12-02T00:00:00Z'),
+        submitted_at: null,
+        idempotency_key: 'idem-null-b',
+      };
+      manager.save({ ...manager.load(), relay_evidence: relays });
+
+      const result = await manager.mutate((s) => s);
+
+      expect(Object.keys(result.relay_evidence)).toHaveLength(500);
+      expect(result.relay_evidence['confirmed-null-a']).toBeUndefined();
+      expect(result.relay_evidence['confirmed-null-b']).toBeDefined();
+    } finally {
+      cleanupDir(tempDir);
+    }
+  });
 });
 
 describe('computeRouteKey', () => {

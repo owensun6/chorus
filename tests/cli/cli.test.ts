@@ -221,21 +221,45 @@ describe("CLI: chorus-skill", () => {
       }
     });
 
-    it("succeeds for a valid openclaw installation (skill + bridge)", () => {
+    it("reports standby when installed without credentials", () => {
       const fakeHome = join(tmpdir(), "chorus-cli-verifyok-" + process.pid);
       const configDir = join(fakeHome, ".openclaw");
       mkdirSync(configDir, { recursive: true });
       writeFileSync(join(configDir, "openclaw.json"), JSON.stringify({ skills: {} }));
 
       try {
-        // First init
-        const initResult = run(
-          ["init", "--target", "openclaw"],
+        run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+
+        const { stdout, stderr, exitCode } = run(
+          ["verify", "--target", "openclaw"],
           { env: { HOME: fakeHome } },
         );
-        expect(initResult.exitCode).toBe(0);
+        expect(exitCode).toBe(1);
+        expect(stdout).toContain("SKILL.md exists");
+        expect(stdout).toContain("chorus-bridge complete");
+        expect(stderr).toContain("Bridge standby");
+      } finally {
+        rmSync(fakeHome, { recursive: true, force: true });
+      }
+    });
 
-        // Then verify
+    it("succeeds when installed with valid credentials", () => {
+      const fakeHome = join(tmpdir(), "chorus-cli-verifycred-" + process.pid);
+      const configDir = join(fakeHome, ".openclaw");
+      mkdirSync(configDir, { recursive: true });
+      writeFileSync(join(configDir, "openclaw.json"), JSON.stringify({ skills: {} }));
+
+      try {
+        run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+
+        const agentsDir = join(fakeHome, ".chorus", "agents");
+        mkdirSync(agentsDir, { recursive: true });
+        writeFileSync(join(agentsDir, "test.json"), JSON.stringify({
+          agent_id: "test@agchorus",
+          api_key: "ca_test123",
+          hub_url: "https://agchorus.com",
+        }));
+
         const { stdout, exitCode } = run(
           ["verify", "--target", "openclaw"],
           { env: { HOME: fakeHome } },
@@ -243,9 +267,8 @@ describe("CLI: chorus-skill", () => {
         expect(exitCode).toBe(0);
         expect(stdout).toContain("SKILL.md exists");
         expect(stdout).toContain("chorus-bridge complete");
-        expect(stdout).toContain("chorus skill enabled");
-        expect(stdout).toContain("chorus-bridge plugin enabled");
-        expect(stdout).toContain("Files installed");
+        expect(stdout).toContain("agent config");
+        expect(stdout).toContain("bridge ready");
       } finally {
         rmSync(fakeHome, { recursive: true, force: true });
       }

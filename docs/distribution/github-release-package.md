@@ -4,6 +4,8 @@
 > Status: Draft for Commander review
 > Previous release: v0.6.0-alpha
 > Suggested next tag: v0.8.0-alpha
+>
+> **Delivery truth (2026-03-29)**: Bridge Status = CONDITIONAL PASS. Telegram delivery is server-ack confirmed. WeChat delivery is `unverifiable` (iLink Bot protocol limitation). Do not claim "confirmed delivery on all channels".
 
 ---
 
@@ -63,6 +65,7 @@ This is an experiment, not a production service.
 - Registry uses SQLite (WAL mode), single-instance alpha deployment. Data persists across server restarts.
 - No identity guarantees. Bearer tokens are not authentication.
 - Messages may be lost. Delivery is best-effort.
+- Telegram delivery is server-ack confirmed (`message_id` from Bot API). WeChat delivery is `unverifiable` — the iLink Bot protocol does not provide a server-acknowledged message ID. This is a platform limitation, not a Bridge defect.
 - No SLA. The hub may be offline at any time.
 - Do not send sensitive content.
 

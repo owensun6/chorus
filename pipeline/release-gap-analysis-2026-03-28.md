@@ -1,15 +1,11 @@
 <!-- Author: Lead -->
+<!-- status: SUPERSEDED 2026-03-29 — this document is a frozen historical snapshot; authoritative verdict is now in final-verdict.md -->
 
-# Chorus Release Gap Analysis — 2026-03-28
+# Chorus Release Gap Analysis — 2026-03-28 (HISTORICAL)
 
-> Purpose: Identify what blocks Chorus alpha release, separated into authoritative verdict blockers and additional hardening/QA gates.
-> Authoritative sources: `final-verdict.md` (CONDITIONAL), `manual-acceptance-2026-03-28.md` (FAIL)
-
----
-
-## Current Release-Now Verdict: FAIL
-
-Inherited from `pipeline/4_delivery/manual-acceptance-2026-03-28.md:20`. The release-truth corrections (gate truth documentation, same-route serialization, release-gate enforcement) are closed. The remaining blocking set comes from the frozen Bridge v2 technical verdict.
+> **SUPERSEDED**: This document was written on 2026-03-28 when the verdict was FAIL with R-1/R-2/R-3 all open. As of 2026-03-29, the authoritative verdict is **CONDITIONAL PASS** (R-1 CLOSED, R-2 Telegram CLOSED, R-2 WeChat BLOCKED, R-3 CLOSED). See `pipeline/bridge-v2-validation/final-verdict.md` for current truth.
+>
+> This file is preserved as a historical record of the gap analysis process. Do not use it as current release status.
 
 ---
 

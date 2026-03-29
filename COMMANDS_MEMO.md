@@ -23,3 +23,17 @@ Env overrides:
 - `CHORUS_STATE_FILE=/absolute/path/to/<agent>.json`
 - `OPENCLAW_GATEWAY_LOG=/absolute/path/to/gateway.log`
 - `BRIDGE_LIVE_TIMEOUT_SECONDS=120`
+
+## Codex Window Mailbox
+
+```bash
+./bin/comm-watch.sh <agent>
+./bin/comm-send.sh <from> <to> [message]
+```
+
+Purpose: let two independent Codex windows communicate through `./.codex/comm/` without `tmux` or manual copy-paste for every turn.
+
+Protocol:
+- sender writes atomically into `./.codex/comm/inbox/<to>/`
+- receiver runs `./bin/comm-watch.sh <agent>` and processed messages are moved to `./.codex/comm/archive/<agent>/`
+- `./bin/comm-watch.sh <agent> --once` drains current inbox once and exits

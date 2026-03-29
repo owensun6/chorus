@@ -528,4 +528,23 @@
 
 **决策**:
 - release gate 以 explicit handle detection 为准，不再把 Jest 的模糊提示语当成硬失败条件
+
+### 2026-03-28 — Codex 产出审查 + 代码整改
+
+**操作**: 审查 Codex 的 Bridge v2 加固产出（5 commits, `03770f5..35b16d3`），识别规范违规，执行代码整改
+**结果**:
+- 审查报告冻结：`pipeline/bridge-v2-validation/codex-review-2026-03-28.md`（commit `a724eed`，hash 回填 `3fa03a7`）
+- 整改落地（4 项）：
+  - H-02: `bin/probe-sse-timestamp.sh` + `bin/release-gate.sh` 的 `json_field()` 从 Function 构造器改为 `split('.').reduce()` 安全路径访问
+  - M-01: `src/bridge/live-acceptance.ts` 6 处 + `src/scripts/probe-bridge-live.ts` 2 处 `let` 消除（reduce/find/some/chunks[]/递归 pollLoop）
+  - M-02: `compareCursorPosition` 从 `state.ts` export，`recovery.ts` import（消除重复定义）
+  - M-03: 13 个文件 `Author: Codex` → 合法兵种名
+- 未修复：H-01（分支覆盖率低于 80%）
+- 验证：`npx tsc --noEmit` 通过；`npx jest --runInBand --coverage=false` 32 suites / 429 tests 全绿，did-not-exit 告警仍存在（已有问题）
+- Commander 三轮审查纠偏：v1.0→v1.1（精度收紧）→v1.2（整改标记）→v2.0（当前态重写）
+
+**决策**:
+- Codex 功能正确性达 A 级，规范遵守是主要短板（未读 `.claude/rules/`）
+- `recovery.ts:169` 的 `for (let ...)` 是规则允许的 for-loop 例外，不计入违规
+- 报告中的覆盖率不锚定精确百分比，只断言"低于 80%"
 - 当前真实剩余阻塞收敛为：same-route 修复尚未冻结成提交 + Bridge v2 总体验证包仍是 `CONDITIONAL`

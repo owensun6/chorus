@@ -18,6 +18,13 @@ export interface RecoveryConfig {
 
 const DEFAULT_MAX_RETRIES = 5;
 
+const unrefTimer = <T extends ReturnType<typeof setTimeout>>(timer: T): T => {
+  if (typeof timer === 'object' && timer !== null && 'unref' in timer) {
+    timer.unref();
+  }
+  return timer;
+};
+
 /**
  * Filter Hub history messages, discarding items at or before cursor position.
  * Uses composite (timestamp, trace_id) total-order comparison.
@@ -49,7 +56,9 @@ const historyToSSEEvent = (msg: HubHistoryMessage): HubSSEEvent => ({
  * Sleep for a given number of milliseconds.
  */
 const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise((resolve) => {
+    unrefTimer(setTimeout(resolve, ms));
+  });
 
 /**
  * Recovery engine — startup scan + Hub catchup + SSE resume.

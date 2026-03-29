@@ -45,6 +45,13 @@ class RouteLock {
 
 const DEFAULT_DELIVER_TIMEOUT_MS = 30_000;
 
+const unrefTimer = <T extends ReturnType<typeof setTimeout>>(timer: T): T => {
+  if (typeof timer === 'object' && timer !== null && 'unref' in timer) {
+    timer.unref();
+  }
+  return timer;
+};
+
 export interface InboundPipelineConfig {
   readonly localAgentId: string;
   readonly localCulture: string;
@@ -268,7 +275,7 @@ export class InboundPipeline {
       const result = await Promise.race([
         deliveryPromise,
         new Promise<typeof TIMEOUT_SENTINEL>((resolve) => {
-          holder.timer = setTimeout(() => resolve(TIMEOUT_SENTINEL), timeoutMs);
+          holder.timer = unrefTimer(setTimeout(() => resolve(TIMEOUT_SENTINEL), timeoutMs));
         }),
       ]);
       if (holder.timer !== null) clearTimeout(holder.timer);

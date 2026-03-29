@@ -666,6 +666,13 @@ function matchHubCatchupTimeoutInjection(
 
 const HOST_DELIVERY_TIMEOUT_SENTINEL = Symbol("host_delivery_timeout");
 
+function unrefTimer<T extends ReturnType<typeof setTimeout>>(timer: T): T {
+  if (typeof timer === "object" && timer !== null && "unref" in timer) {
+    timer.unref();
+  }
+  return timer;
+}
+
 async function withHostDeliveryTimeout<T>(
   work: Promise<T>,
   timeoutMs: number,
@@ -674,7 +681,7 @@ async function withHostDeliveryTimeout<T>(
   const result = await Promise.race([
     work,
     new Promise<typeof HOST_DELIVERY_TIMEOUT_SENTINEL>((resolve) => {
-      holder.timer = setTimeout(() => resolve(HOST_DELIVERY_TIMEOUT_SENTINEL), timeoutMs);
+      holder.timer = unrefTimer(setTimeout(() => resolve(HOST_DELIVERY_TIMEOUT_SENTINEL), timeoutMs));
     }),
   ]);
   if (holder.timer !== null) clearTimeout(holder.timer);
@@ -1237,7 +1244,9 @@ async function onGatewayStart(log: Logger): Promise<void> {
         );
         hubClient.fetchHistory = async (...args: unknown[]) => {
           void args;
-          await new Promise((resolve) => setTimeout(resolve, timeoutMs));
+          await new Promise((resolve) => {
+            unrefTimer(setTimeout(resolve, timeoutMs));
+          });
           throw new Error(`Injected Hub catchup timeout after ${timeoutMs}ms`);
         };
       }

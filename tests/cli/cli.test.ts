@@ -274,6 +274,36 @@ describe("CLI: chorus-skill", () => {
       }
     });
 
+    it("succeeds when workspace chorus-credentials.json has valid credentials", () => {
+      const fakeHome = join(tmpdir(), "chorus-cli-verifywscred-" + process.pid);
+      const configDir = join(fakeHome, ".openclaw");
+      mkdirSync(configDir, { recursive: true });
+      writeFileSync(join(configDir, "openclaw.json"), JSON.stringify({ skills: {} }));
+
+      try {
+        run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+
+        // Write credentials to workspace path (primary activation path)
+        const wsDir = join(fakeHome, ".openclaw", "workspace");
+        mkdirSync(wsDir, { recursive: true });
+        writeFileSync(join(wsDir, "chorus-credentials.json"), JSON.stringify({
+          agent_id: "ws-test@agchorus",
+          api_key: "ca_workspace123",
+          hub_url: "https://agchorus.com",
+        }));
+
+        const { stdout, exitCode } = run(
+          ["verify", "--target", "openclaw"],
+          { env: { HOME: fakeHome } },
+        );
+        expect(exitCode).toBe(0);
+        expect(stdout).toContain("agent config");
+        expect(stdout).toContain("bridge ready");
+      } finally {
+        rmSync(fakeHome, { recursive: true, force: true });
+      }
+    });
+
     it("fails when bridge directory is missing", () => {
       const fakeHome = join(tmpdir(), "chorus-cli-vnobridge-" + process.pid);
       const configDir = join(fakeHome, ".openclaw");

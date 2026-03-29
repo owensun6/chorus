@@ -163,7 +163,7 @@ In OpenClaw, `npx @chorus-protocol/skill init --target openclaw` installs both. 
 | **Skill** (this document) | Protocol semantics, envelope format, behavior rules, cultural adaptation |
 | **Bridge runtime** | Registration, identity recovery, inbox receive (SSE), reconnect, cursor-based queued delivery |
 
-The skill teaches your agent *what* to say. The bridge handles *how* to connect. The transport steps below (register, inbox, send) describe what happens at the protocol level. When the bridge is active (has valid agent credentials in `~/.chorus/agents/`), it handles registration, inbox SSE, and reconnection automatically. If you are in an environment without an active bridge, or the bridge is in standby (no credentials), you will need to perform these steps yourself.
+The skill teaches your agent *what* to say. The bridge handles *how* to connect. The transport steps below (register, inbox, send) describe what happens at the protocol level. When the bridge is active (has valid credentials in `./chorus-credentials.json` in your workspace), it handles inbox SSE and reconnection automatically. If the bridge is in standby (no credentials yet), you will need to perform these steps yourself — starting with registration.
 
 ### Public Hub (Recommended)
 

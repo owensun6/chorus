@@ -15,6 +15,7 @@ const TARGETS = ["local", "openclaw", "claude-user", "claude-project"];
 const CHORUS_HOME = join(homedir(), ".chorus");
 const AGENTS_DIR = join(CHORUS_HOME, "agents");
 const CONFIG_PATH = join(CHORUS_HOME, "config.json");
+const WORKSPACE_CRED_PATH = join(homedir(), ".openclaw", "workspace", "chorus-credentials.json");
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -141,10 +142,19 @@ function removeBridge() {
   return true;
 }
 
-// Bridge reads agent configs from ~/.chorus/agents/*.json or ~/.chorus/config.json.
+// Bridge reads agent configs from (in priority order):
+//   1. ~/.openclaw/workspace/chorus-credentials.json  (workspace — primary)
+//   2. ~/.chorus/agents/*.json                        (multi-agent — compat)
+//   3. ~/.chorus/config.json                          (legacy single — compat)
 // Returns count of valid configs found.
 function countAgentConfigs() {
   let count = 0;
+  if (existsSync(WORKSPACE_CRED_PATH)) {
+    try {
+      const cfg = JSON.parse(readFileSync(WORKSPACE_CRED_PATH, "utf8"));
+      if (cfg?.agent_id && cfg?.api_key && cfg?.hub_url) count++;
+    } catch { /* skip malformed */ }
+  }
   if (existsSync(AGENTS_DIR)) {
     const files = readdirSync(AGENTS_DIR).filter((f) => f.endsWith(".json"));
     for (const file of files) {
@@ -245,7 +255,8 @@ if (command === "init") {
     } else {
       console.log(`\n⚠ No agent configs found yet. Bridge is installed but will start in standby mode.`);
       console.log(`  To activate: register your agent on the hub, then save credentials to:`);
-      console.log(`    ${AGENTS_DIR}/<agent-name>.json`);
+      console.log(`    ${WORKSPACE_CRED_PATH}  (primary — bridge watches this path)`);
+      console.log(`    ${AGENTS_DIR}/<name>.json  (also supported)`);
       console.log(`  File format: {"agent_id":"...","api_key":"ca_...","hub_url":"https://agchorus.com"}`);
     }
 
@@ -410,7 +421,9 @@ if (command === "init") {
         console.log(`\n✓ Activation ready — bridge ready.`);
       } else {
         console.error(`\n✗ Bridge standby — no valid agent credentials found`);
-        console.error(`  To activate, save credentials to: ${AGENTS_DIR}/<agent-name>.json`);
+        console.error(`  To activate, save credentials to:`);
+        console.error(`    ${WORKSPACE_CRED_PATH}  (primary — bridge watches this path)`);
+        console.error(`    ${AGENTS_DIR}/<name>.json  (also supported)`);
         console.error(`  Format: {"agent_id":"...","api_key":"ca_...","hub_url":"https://agchorus.com"}`);
         console.error(`\n  Register on the hub first if you don't have credentials:`);
         console.error(`    curl -X POST https://agchorus.com/register -H "Content-Type: application/json" \\`);

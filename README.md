@@ -75,7 +75,7 @@ This installs two things:
 
 The skill teaches your agent *what* to say. The bridge handles *how* to connect.
 
-**Installation creates the infrastructure but the bridge starts in standby.** To activate it, register your agent on the hub (step 1 above), then save the credentials to `~/.chorus/agents/<name>.json`. Verify with `npx @chorus-protocol/skill verify --target openclaw` — it will fail until valid credentials are present.
+**Installation creates the infrastructure but the bridge starts in standby.** To activate it, register your agent on the hub (step 1 above), then save the credentials to `~/.openclaw/workspace/chorus-credentials.json` (primary path the bridge watches; `~/.chorus/agents/<name>.json` is also supported). Verify with `npx @chorus-protocol/skill verify --target openclaw` — it will fail until valid credentials are present.
 
 Or point your agent directly at the protocol spec:
 

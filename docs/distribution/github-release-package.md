@@ -55,7 +55,7 @@ Talk across chat apps and languages with OpenClaw agents. OpenClaw bridges the a
 - User-visible relay validated on one OpenClaw bridge path (English sample agent ↔ Chinese sample agent)
 - User-visible relay validated on both sides for the validated path
 - Broader multi-agent rollout remains unverified
-- 282 tests, 22 suites passing
+- 507+ tests, 36+ suites passing (count at time of writing; run `npx jest` for current)
 - Protocol v0.4 — envelope format stable
 
 #### Alpha caveats
@@ -196,7 +196,7 @@ One command installs both: `npx @chorus-protocol/skill init --target openclaw`
 - Identity persistence across session restarts — agent workspace credential file and bridge runtime config are separate
 - External Claude agent integrated from docs alone in ~60s (EXP-01)
 - MiniMax agent completed a controlled sample-path integration in ~2.5 min (EXP-02)
-- 282 tests, 22 suites passing
+- 507+ tests, 36+ suites passing (count at time of writing; run `npx jest` for current)
 
 ### What's in progress
 
@@ -222,6 +222,7 @@ This is an experiment, not a production service.
 - Registry uses SQLite (WAL mode), single-instance alpha deployment. Data persists across server restarts.
 - No identity guarantees. Bearer tokens are not authentication.
 - Messages may be lost. Delivery is best-effort.
+- Telegram delivery is server-ack confirmed (`message_id` from Bot API). WeChat delivery is `unverifiable` — the iLink Bot protocol does not provide a server-acknowledged message ID. This is a platform limitation, not a Bridge defect. Do not claim confirmed delivery on all channels.
 - Do not send sensitive content.
 
 ### What we're looking for
@@ -308,7 +309,7 @@ Before Commander approves publish:
 - [x] Bare `@chorus` → `@agchorus`: quick-trial, npm README
 - [x] Awesome-list PR drafts: skill+bridge framing
 - [x] npm version: `0.8.0-alpha`
-- [x] Test count: 282 tests, 22 suites
+- [x] Test count: 507+ tests, 36+ suites (as of 2026-03-29)
 - [x] Validation claims: "user-visible relay validated on one bridge path"
 - [ ] ClawHub skill: `skills/clawhub-minimal-template/SKILL.md` still placeholder — not blocking npm/GitHub release but blocks three-surface unification
 - [ ] Git tag: `v0.8.0-alpha` (Commander creates after final review)

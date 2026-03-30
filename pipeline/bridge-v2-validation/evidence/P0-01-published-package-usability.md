@@ -154,8 +154,8 @@ The first test envelope included extra fields (`receiver_id`, `content_type`, `i
 
 ## Raw Evidence Files
 
-- `P0-01-gateway-raw.log` — Full Gateway startup + delivery log (with ANSI codes)
-- `P0-01-gateway-stripped.log` — Same, ANSI codes stripped
+- `P0-01-gateway-raw.txt` — Full Gateway startup + delivery log (with ANSI codes)
+- `P0-01-gateway-stripped.txt` — Same, ANSI codes stripped
 
 ---
 

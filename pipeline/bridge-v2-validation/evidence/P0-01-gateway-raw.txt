@@ -1,0 +1,180 @@
+[90m2026-03-30T13:15:06.017+08:00[39m [36m[gateway][39m [36mforce: no listeners on port 18789[39m
+[90m2026-03-30T13:15:06.843+08:00[39m [35m[plugins][39m [36m[chorus-bridge] registered, waiting for gateway_start[39m
+[90m2026-03-30T13:15:07.424+08:00[39m [35m[plugins][39m [33mchorus-bridge: loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (/Users/owenmacmini/.openclaw/extensions/chorus-bridge/index.ts)[39m
+[90m2026-03-30T13:15:07.426+08:00[39m [35m[plugins][39m [33mskill-router: loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (/Users/owenmacmini/.openclaw/extensions/skill-router/index.mjs)[39m
+[90m2026-03-30T13:15:07.428+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:15:07.430+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:15:07.431+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:15:07.432+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:15:07.477+08:00[39m [36m[gateway][39m [36m[chorus-bridge] registered, waiting for gateway_start[39m
+[90m2026-03-30T13:15:07.478+08:00[39m [36m[gateway][39m [33m[plugins] chorus-bridge: loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (/Users/owenmacmini/.openclaw/extensions/chorus-bridge/index.ts)[39m
+[90m2026-03-30T13:15:07.480+08:00[39m [36m[gateway][39m [33m[plugins] skill-router: loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (/Users/owenmacmini/.openclaw/extensions/skill-router/index.mjs)[39m
+[90m2026-03-30T13:15:07.481+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:15:07.482+08:00[39m [36m[gateway][39m [36m[plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/owenmacmini/.openclaw/extensions/chorus-bridge/index.ts)[39m
+[90m2026-03-30T13:15:07.483+08:00[39m [36m[gateway][39m [36m[plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=skill-router, source=/Users/owenmacmini/.openclaw/extensions/skill-router/index.mjs)[39m
+[90m2026-03-30T13:15:07.490+08:00[39m [35m[canvas][39m [36mhost mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/owenmacmini/.openclaw/canvas)[39m
+[90m2026-03-30T13:15:07.535+08:00[39m [36m[heartbeat][39m [36mstarted[39m
+[90m2026-03-30T13:15:07.538+08:00[39m [32m[health-monitor][39m [36mstarted (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)[39m
+[90m2026-03-30T13:15:07.540+08:00[39m [36m[gateway][39m [36magent model: minimax/MiniMax-M2.7[39m
+[90m2026-03-30T13:15:07.542+08:00[39m [36m[gateway][39m [36mlistening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 34626)[39m
+[90m2026-03-30T13:15:07.544+08:00[39m [36m[gateway][39m [36mlog file: /tmp/openclaw/openclaw-2026-03-30.log[39m
+[90m2026-03-30T13:15:07.547+08:00[39m [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+[90m2026-03-30T13:15:07.548+08:00[39m [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+[90m2026-03-30T13:15:07.574+08:00[39m [36m[browser/server][39m [36mBrowser control listening on http://127.0.0.1:18791/ (auth=token)[39m
+[90m2026-03-30T13:15:07.578+08:00[39m [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+[90m2026-03-30T13:15:07.579+08:00[39m [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+[90m2026-03-30T13:15:07.581+08:00[39m [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+[90m2026-03-30T13:15:07.582+08:00[39m [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+[90m2026-03-30T13:15:07.584+08:00[39m [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+[90m2026-03-30T13:15:07.585+08:00[39m [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+[90m2026-03-30T13:15:07.589+08:00[39m [33m[openclaw-weixin][39m [36m[15791d31fba0-im-bot] starting weixin provider (https://ilinkai.weixin.qq.com)[39m
+[90m2026-03-30T13:15:07.590+08:00[39m [33m[openclaw-weixin][39m [36m[15791d31fba0-im-bot] weixin logs: /tmp/openclaw/openclaw-2026-03-30.log[39m
+[90m2026-03-30T13:15:07.592+08:00[39m [33m[openclaw-weixin][39m [36mweixin monitor started (https://ilinkai.weixin.qq.com, account=15791d31fba0-im-bot)[39m
+[90m2026-03-30T13:15:07.594+08:00[39m [33m[openclaw-weixin][39m [36m[weixin] resuming from previous sync buf (108 bytes)[39m
+[90m2026-03-30T13:15:07.606+08:00[39m [35m[plugins][39m [90m[hooks] running gateway_start (1 handlers)[39m
+[90m2026-03-30T13:15:07.608+08:00[39m [36m[gateway][39m [36m[chorus-bridge] activated: xiaoyin@chorus from agents/01-xiaoyin.json[39m
+[90m2026-03-30T13:15:07.611+08:00[39m [36m[gateway][39m [36m[chorus-bridge] jiti loaded from /Users/owenmacmini/.npm-global/lib/node_modules/openclaw[39m
+[90m2026-03-30T13:15:07.612+08:00[39m [36m[gateway][39m [36m[chorus-bridge] loading runtime modules from /Users/owenmacmini/.openclaw/extensions/chorus-bridge/runtime[39m
+[90m2026-03-30T13:15:07.620+08:00[39m [36m[gateway][39m [36m[chorus-bridge] jiti loaded from /Users/owenmacmini/.npm-global/lib/node_modules/openclaw[39m
+[90m2026-03-30T13:15:07.621+08:00[39m [36m[gateway][39m [36m[chorus-bridge] WeChat channel adapter: available[39m
+[90m2026-03-30T13:15:07.622+08:00[39m [36m[gateway][39m [36m[chorus-bridge] Telegram channel adapter: available (built-in)[39m
+[90m2026-03-30T13:15:08.141+08:00[39m [36m[gateway][39m [33m[chorus-bridge] [xiaoyin] Recovery: Hub catchup attempt 1 failed: TypeError: fetch failed[39m
+[90m2026-03-30T13:15:08.712+08:00[39m [34m[telegram][39m [36m[default] starting provider (@xiaovvvvv_bot)[39m
+[90m2026-03-30T13:15:08.722+08:00[39m [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+[90m2026-03-30T13:15:08.725+08:00[39m [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+[90m2026-03-30T13:15:09.293+08:00[39m [34m[telegram][39m [36m[xiaoyin] starting provider (@xiaoyyyyyy_bot)[39m
+[90m2026-03-30T13:15:09.298+08:00[39m [34m[telegram][39m [36m[xiaot] starting provider (@xiaottttt_bot)[39m
+[90m2026-03-30T13:15:09.301+08:00[39m [34m[telegram][39m [36m[xiaox] starting provider (@xiaoxxxxx_bot)[39m
+[90m2026-03-30T13:15:09.304+08:00[39m [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+[90m2026-03-30T13:15:09.307+08:00[39m [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+[90m2026-03-30T13:15:09.313+08:00[39m [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+[90m2026-03-30T13:15:09.315+08:00[39m [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+[90m2026-03-30T13:15:09.319+08:00[39m [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+[90m2026-03-30T13:15:09.321+08:00[39m [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+[90m2026-03-30T13:15:09.729+08:00[39m [36m[gateway][39m [36m[chorus-bridge] [xiaoyin] V2 bridge active (state: /Users/owenmacmini/.chorus/state/xiaoyin)[39m
+[90m2026-03-30T13:18:37.837+08:00[39m [36m[gateway][39m [33m[chorus-bridge] [xiaoyin] Hub contract violation: SSE event schema mismatch: [[39m
+[33m  {[39m
+[33m    "code": "unrecognized_keys",[39m
+[33m    "keys": [[39m
+[33m      "receiver_id",[39m
+[33m      "content_type",[39m
+[33m      "intent"[39m
+[33m    ],[39m
+[33m    "path": [[39m
+[33m      "envelope"[39m
+[33m    ],[39m
+[33m    "message": "Unrecognized keys: \"receiver_id\", \"content_type\", \"intent\""[39m
+[33m  }[39m
+[33m][39m
+[90m2026-03-30T13:19:40.413+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.414+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.415+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.416+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.417+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.418+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.420+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.421+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.422+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.423+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.424+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.425+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.426+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.427+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.428+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.429+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.431+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.432+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.433+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.467+08:00[39m [36m[skills][39m [90mSanitized skill command name "Agent Browser" to "/agent_browser".[39m
+[90m2026-03-30T13:19:40.468+08:00[39m [36m[skills][39m [90mSanitized skill command name "agent-reach" to "/agent_reach".[39m
+[90m2026-03-30T13:19:40.469+08:00[39m [36m[skills][39m [90mSanitized skill command name "apple-reminders" to "/apple_reminders".[39m
+[90m2026-03-30T13:19:40.470+08:00[39m [36m[skills][39m [90mSanitized skill command name "CEO 军师团队" to "/ceo".[39m
+[90m2026-03-30T13:19:40.471+08:00[39m [36m[skills][39m [90mSanitized skill command name "drive-engine" to "/drive_engine".[39m
+[90m2026-03-30T13:19:40.472+08:00[39m [36m[skills][39m [90mSanitized skill command name "emoji-reaction-automator" to "/emoji_reaction_automator".[39m
+[90m2026-03-30T13:19:40.473+08:00[39m [36m[skills][39m [90mSanitized skill command name "find-skills" to "/find_skills".[39m
+[90m2026-03-30T13:19:40.475+08:00[39m [36m[skills][39m [90mSanitized skill command name "link-archiver" to "/link_archiver".[39m
+[90m2026-03-30T13:19:40.476+08:00[39m [36m[skills][39m [90mSanitized skill command name "minimax-search" to "/minimax_search".[39m
+[90m2026-03-30T13:19:40.477+08:00[39m [36m[skills][39m [90mSanitized skill command name "minimax-vision" to "/minimax_vision".[39m
+[90m2026-03-30T13:19:40.478+08:00[39m [36m[skills][39m [90mSanitized skill command name "openclaw-self-security-audit" to "/openclaw_self_security_audit".[39m
+[90m2026-03-30T13:19:40.479+08:00[39m [36m[skills][39m [90mSanitized skill command name "qwen-image" to "/qwen_image".[39m
+[90m2026-03-30T13:19:40.480+08:00[39m [36m[skills][39m [90mSanitized skill command name "self-improvement" to "/self_improvement".[39m
+[90m2026-03-30T13:19:40.481+08:00[39m [36m[skills][39m [90mSanitized skill command name "terminal-launcher" to "/terminal_launcher".[39m
+[90m2026-03-30T13:19:40.482+08:00[39m [36m[skills][39m [90mSanitized skill command name "video-frames" to "/video_frames".[39m
+[90m2026-03-30T13:19:40.484+08:00[39m [36m[skills][39m [90mSanitized skill command name "youtube-scout" to "/youtube_scout".[39m
+[90m2026-03-30T13:19:40.485+08:00[39m [36m[skills][39m [90mSanitized skill command name "coding-agent" to "/coding_agent".[39m
+[90m2026-03-30T13:19:40.486+08:00[39m [36m[skills][39m [90mSanitized skill command name "gh-issues" to "/gh_issues".[39m
+[90m2026-03-30T13:19:40.487+08:00[39m [36m[skills][39m [90mSanitized skill command name "openai-whisper" to "/openai_whisper".[39m
+[90m2026-03-30T13:19:40.488+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-base" to "/lark_base".[39m
+[90m2026-03-30T13:19:40.489+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-calendar" to "/lark_calendar".[39m
+[90m2026-03-30T13:19:40.490+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-contact" to "/lark_contact".[39m
+[90m2026-03-30T13:19:40.491+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-doc" to "/lark_doc".[39m
+[90m2026-03-30T13:19:40.492+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-drive" to "/lark_drive".[39m
+[90m2026-03-30T13:19:40.493+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-event" to "/lark_event".[39m
+[90m2026-03-30T13:19:40.494+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-im" to "/lark_im".[39m
+[90m2026-03-30T13:19:40.495+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-mail" to "/lark_mail".[39m
+[90m2026-03-30T13:19:40.496+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-minutes" to "/lark_minutes".[39m
+[90m2026-03-30T13:19:40.498+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-openapi-explorer" to "/lark_openapi_explorer".[39m
+[90m2026-03-30T13:19:40.499+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-shared" to "/lark_shared".[39m
+[90m2026-03-30T13:19:40.500+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-sheets" to "/lark_sheets".[39m
+[90m2026-03-30T13:19:40.501+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-skill-maker" to "/lark_skill_maker".[39m
+[90m2026-03-30T13:19:40.502+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-task" to "/lark_task".[39m
+[90m2026-03-30T13:19:40.503+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-vc" to "/lark_vc".[39m
+[90m2026-03-30T13:19:40.504+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-whiteboard" to "/lark_whiteboard".[39m
+[90m2026-03-30T13:19:40.505+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-wiki" to "/lark_wiki".[39m
+[90m2026-03-30T13:19:40.506+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-workflow-meeting-summary" to "/lark_workflow_meeting_summary".[39m
+[90m2026-03-30T13:19:40.507+08:00[39m [36m[skills][39m [90mSanitized skill command name "lark-workflow-standup-report" to "/lark_workflow_standup_report".[39m
+[90m2026-03-30T13:19:40.512+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:19:40.513+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:19:40.515+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:19:40.516+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:19:40.545+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.546+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.547+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.548+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.549+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.550+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.551+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.552+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.553+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.555+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.556+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.557+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.558+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.559+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.560+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.561+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.562+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.563+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.564+08:00[39m [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-30T13:19:40.599+08:00[39m [31m[diagnostic][39m [90mlane enqueue: lane=session:agent:xiaoyin:chorus:xiaox@chorus queueSize=1[39m
+[90m2026-03-30T13:19:40.600+08:00[39m [31m[diagnostic][39m [90mlane dequeue: lane=session:agent:xiaoyin:chorus:xiaox@chorus waitMs=2 queueSize=0[39m
+[90m2026-03-30T13:19:40.601+08:00[39m [31m[diagnostic][39m [90mlane enqueue: lane=main queueSize=1[39m
+[90m2026-03-30T13:19:40.603+08:00[39m [31m[diagnostic][39m [90mlane dequeue: lane=main waitMs=2 queueSize=0[39m
+[90m2026-03-30T13:19:40.607+08:00[39m [35m[plugins][39m [36m[chorus-bridge] registered, waiting for gateway_start[39m
+[90m2026-03-30T13:19:40.609+08:00[39m [35m[plugins][39m [33mchorus-bridge: loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (/Users/owenmacmini/.openclaw/extensions/chorus-bridge/index.ts)[39m
+[90m2026-03-30T13:19:40.610+08:00[39m [35m[plugins][39m [33mskill-router: loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (/Users/owenmacmini/.openclaw/extensions/skill-router/index.mjs)[39m
+[90m2026-03-30T13:19:40.612+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:19:40.614+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:19:40.616+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:19:40.617+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:19:40.618+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:19:40.634+08:00[39m [33m[agent/embedded][39m [90membedded run start: runId=ee4d678b-55b5-4b65-997e-2ee9432841ef sessionId=af8357f2-ec91-4797-bd10-8482af56478c provider=minimax model=MiniMax-M2.7 thinking=off messageChannel=chorus-bridge[39m
+[90m2026-03-30T13:19:40.652+08:00[39m [35m[plugins][39m [36mhook runner initialized with 2 registered hooks[39m
+[90m2026-03-30T13:19:40.682+08:00[39m [31m[diagnostic][39m [90msession state: sessionId=af8357f2-ec91-4797-bd10-8482af56478c sessionKey=agent:xiaoyin:chorus:xiaox@chorus prev=idle new=processing reason="run_started" queueDepth=0[39m
+[90m2026-03-30T13:19:40.683+08:00[39m [31m[diagnostic][39m [90mrun registered: sessionId=af8357f2-ec91-4797-bd10-8482af56478c totalActive=1[39m
+[90m2026-03-30T13:19:40.684+08:00[39m [35m[plugins][39m [90m[hooks] running before_prompt_build (1 handlers, sequential)[39m
+[90m2026-03-30T13:19:40.686+08:00[39m [35m[plugins][39m [36m[chorus-bridge] before_prompt_build injected Chorus router context (agent=xiaoyin, activePeer=none)[39m
+[90m2026-03-30T13:19:40.687+08:00[39m [33m[agent/embedded][39m [90mhooks: applied prependSystemContext/appendSystemContext (621+0 chars)[39m
+[90m2026-03-30T13:19:40.688+08:00[39m [33m[agent/embedded][39m [90membedded run prompt start: runId=ee4d678b-55b5-4b65-997e-2ee9432841ef sessionId=af8357f2-ec91-4797-bd10-8482af56478c[39m
+[90m2026-03-30T13:19:40.690+08:00[39m [33m[agent/embedded][39m [90m[context-diag] pre-prompt: sessionKey=agent:xiaoyin:chorus:xiaox@chorus messages=0 roleCounts=none historyTextChars=0 maxMessageTextChars=0 historyImageBlocks=0 systemPromptChars=46347 promptChars=4226 promptImages=0 provider=minimax/MiniMax-M2.7 sessionFile=/Users/owenmacmini/.openclaw/agents/xiaoyin/sessions/af8357f2-ec91-4797-bd10-8482af56478c.jsonl[39m
+[90m2026-03-30T13:19:40.693+08:00[39m [33m[agent/embedded][39m [90membedded run agent start: runId=ee4d678b-55b5-4b65-997e-2ee9432841ef[39m
+[90m2026-03-30T13:19:47.908+08:00[39m [33m[agent/embedded][39m [90membedded run agent end: runId=ee4d678b-55b5-4b65-997e-2ee9432841ef isError=false[39m
+[90m2026-03-30T13:19:47.914+08:00[39m [33m[agent/embedded][39m [90membedded run prompt end: runId=ee4d678b-55b5-4b65-997e-2ee9432841ef sessionId=af8357f2-ec91-4797-bd10-8482af56478c durationMs=7227[39m
+[90m2026-03-30T13:19:47.918+08:00[39m [35m[plugins][39m [90m[hooks] running agent_end (1 handlers)[39m
+[90m2026-03-30T13:19:47.923+08:00[39m [31m[diagnostic][39m [90msession state: sessionId=af8357f2-ec91-4797-bd10-8482af56478c sessionKey=agent:xiaoyin:chorus:xiaox@chorus prev=processing new=idle reason="run_completed" queueDepth=0[39m
+[90m2026-03-30T13:19:47.925+08:00[39m [31m[diagnostic][39m [90mrun cleared: sessionId=af8357f2-ec91-4797-bd10-8482af56478c totalActive=0[39m
+[90m2026-03-30T13:19:47.931+08:00[39m [33m[agent/embedded][39m [90membedded run done: runId=ee4d678b-55b5-4b65-997e-2ee9432841ef sessionId=af8357f2-ec91-4797-bd10-8482af56478c durationMs=7326 aborted=false[39m
+[90m2026-03-30T13:19:47.936+08:00[39m [31m[diagnostic][39m [90mlane task done: lane=main durationMs=7331 active=0 queued=0[39m
+[90m2026-03-30T13:19:47.938+08:00[39m [31m[diagnostic][39m [90mlane task done: lane=session:agent:xiaoyin:chorus:xiaox@chorus durationMs=7336 active=0 queued=0[39m
+[90m2026-03-30T13:19:49.022+08:00[39m [36m[gateway][39m [36m[chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"3ea0a1d5-2819-497a-873b-29010d15a2f7","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"120","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-30T05:19:49.015Z"}[39m
+[90m2026-03-30T13:19:50.419+08:00[39m [36m[gateway][39m [36m[chorus-bridge] outbound relay OK: trace_id=5f10bb4f-aa27-4bd0-9c9d-e6ebe69aeefd route_key=xiaoyin@chorus:xiaox@chorus[39m

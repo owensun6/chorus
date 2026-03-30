@@ -548,3 +548,23 @@
 - `recovery.ts:169` 的 `for (let ...)` 是规则允许的 for-loop 例外，不计入违规
 - 报告中的覆盖率不锚定精确百分比，只断言"低于 80%"
 - 当前真实剩余阻塞收敛为：same-route 修复尚未冻结成提交 + Bridge v2 总体验证包仍是 `CONDITIONAL`
+
+### 2026-03-29 — Onboarding/Activation 产品缺陷修复 + Cold-Start 验收
+
+**操作**: 诊断 MacBook 空白 OpenClaw 安装后 bridge disabled 根因，修复凭证双轨不通、verify 假阳性、源码路径硬依赖三个缺陷
+**结果**:
+- 根因诊断：安装器创建空 `~/.chorus/agents/`，但整个流程中无任何环节创建 bridge 所需的凭证文件；SKILL.md 说"bridge 自动处理"但 bridge 处于 disabled 状态
+- 3 个 Worker 并行修复（独立 worktree，零冲突合入）：
+  - W1 `094c684`: verify exit 1 on standby + 文档对齐
+  - W2 `c2217fc`: workspace 凭证加载 + 5s 轮询热激活
+  - W3 `a649f13`+`1dec0b4`: SKILL.md 冷启动激活语义 + acceptance spec
+- 收口轮 `67b8c28`: 统一主路径为 `~/.openclaw/workspace/chorus-credentials.json`
+- 源码路径硬依赖修复 `0b9aad5`+`8ae072c`: 9 个运行时模块打包进 extension/runtime/，jiti alias 解析 zod
+- MacBook cold-start 验收 PASS `3e41bf1`: 无 XDISK、无源码仓库，V2 bridge active
+- 523 tests / 36 suites 全绿
+- 发现 OpenClaw Gateway 问题：chorus-bridge 插件加载阻断 Telegram channel 启动（不在 Chorus 范围）
+
+**决策**:
+- Commander 关单 onboarding/activation 缺陷
+- E2E 内容对话验收被 OpenClaw Gateway 插件-channel 互斥问题阻塞，不在本轮修复范围
+- cold-start evidence 冻结为基础设施路径验收（install→credentials→activation），agent 行为路径待 Telegram 恢复后单独验证

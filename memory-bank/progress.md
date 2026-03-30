@@ -568,3 +568,25 @@
 - Commander 关单 onboarding/activation 缺陷
 - E2E 内容对话验收被 OpenClaw Gateway 插件-channel 互斥问题阻塞，不在本轮修复范围
 - cold-start evidence 冻结为基础设施路径验收（install→credentials→activation），agent 行为路径待 Telegram 恢复后单独验证
+
+### 2026-03-30 13:00
+
+**操作**: npm 发布整改（3 轮 rectification list）+ P0-01 已发布包可用性闸门
+**结果**:
+- v0.8.0-alpha 发现 baseline 错误（缺 10 commits），retroactive tag + bump to 0.8.0-alpha.1 + npm publish
+- `bin/pre-publish-check.sh` 创建：17 bridge files + 4 skill templates + tag==HEAD + registry clean
+- P0-01 E2E 内容对话 PASS：
+  - 从 npm 包干净重装（`chorus-skill uninstall` → `init --target openclaw`）
+  - chorus-bridge + 4 Telegram bots 在同一 Gateway 进程共存（互斥问题已解决）
+  - 完整链路：inbound SSE → agent content → `telegram_server_ack` (msg_id=120) → outbound relay
+  - 互斥根因：旧安装从源码路径加载 runtime（heavy jiti），npm 包 bundled runtime 加载快，不阻塞 Telegram
+- 证据入库：`pipeline/bridge-v2-validation/evidence/P0-01-*`（3 文件）
+- monitor.md 更新：P0-01 行 `[x]` PASS
+- release doc 更新：E2E 从 BLOCKED → PASS
+- 远端同步：`d70f9d5` local = remote
+
+**决策**:
+- Commander 签字：P0-01 CLOSED (PASS)
+- 不需要 alpha.2
+- 不需要把 OpenClaw 标为产品阻断
+- 互斥根因归属 Chorus 侧（源码路径加载），已在 npm 包中修复

@@ -1,6 +1,6 @@
 {
   "name": "@chorus-protocol/skill",
-  "version": "0.8.0-alpha",
+  "version": "0.8.0-alpha.1",
   "description": "Chorus Protocol — Link agents across platforms. Install the Chorus Skill package for your agent.",
   "bin": {
     "chorus-skill": "./cli.mjs"

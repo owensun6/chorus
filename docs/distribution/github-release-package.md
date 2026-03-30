@@ -1,18 +1,37 @@
 # GitHub Release Materials Package
 
 > Updated: 2026-03-30
-> Status: Rectified — v0.8.0-alpha published from wrong baseline, correcting with v0.8.0-alpha.1
-> Previous npm publish: `@chorus-protocol/skill@0.8.0-alpha` from `6b0a2b2` (missing 10 commits of critical fixes)
-> Current tag: `v0.8.0-alpha` → `6b0a2b2` (retroactive traceability only)
-> Next tag: `v0.8.0-alpha.1` → current HEAD after rectification complete
+> Status: **PUBLISHED** — `@chorus-protocol/skill@0.8.0-alpha.1` live on npm
 
 ---
 
-## 0. Baseline Rectification Record
+## 0. Published Release Record
 
-### What happened
+### v0.8.0-alpha.1 (current)
 
-On 2026-03-29, `@chorus-protocol/skill@0.8.0-alpha` was published to npm from commit `6b0a2b2`. After publish, 10 additional commits landed on main (094c684..70102e3) containing 3 critical product fixes:
+| Field | Value |
+|-------|-------|
+| npm | `@chorus-protocol/skill@0.8.0-alpha.1` |
+| dist-tags | `latest: 0.8.0-alpha.1`, `alpha: 0.8.0-alpha.1` |
+| git tag | `v0.8.0-alpha.1` → `c0c7800` |
+| git remote | pushed (main + tags) |
+| tarball | 33 files, 64.8 kB packed, 241.4 kB unpacked |
+| tests | 523 passed, 36 suites |
+| hub health | `agchorus.com/health` green at publish time |
+| pre-publish-check | PASS (17 bridge files + 4 skill templates + tag==HEAD + registry clean) |
+| bridge verdict | CONDITIONAL PASS |
+
+### v0.8.0-alpha (superseded)
+
+| Field | Value |
+|-------|-------|
+| npm | `@chorus-protocol/skill@0.8.0-alpha` (no longer `latest`) |
+| git tag | `v0.8.0-alpha` → `6b0a2b2` (retroactive traceability) |
+| issue | Published from wrong baseline, missing 10 commits of critical onboarding fixes |
+
+### Baseline rectification history
+
+On 2026-03-29, `@chorus-protocol/skill@0.8.0-alpha` was published from commit `6b0a2b2`. After publish, 10 commits landed (094c684..70102e3) containing 3 critical fixes:
 
 | Commit | Fix |
 |--------|-----|
@@ -20,21 +39,11 @@ On 2026-03-29, `@chorus-protocol/skill@0.8.0-alpha` was published to npm from co
 | `c2217fc` + `67b8c28` | 凭证双轨不通 — workspace 路径优先 + 5s 轮询热激活 |
 | `0b9aad5` + `8ae072c` | 源码路径硬依赖 — 9 个运行时模块打包 + jiti zod alias |
 
-### Rectification path (tag-then-publish)
-
-1. `v0.8.0-alpha` tag → `6b0a2b2`（追溯标记，不重新发布）
-2. bump `package.json` → `0.8.0-alpha.1`
-3. commit all rectification changes
-4. git tag `v0.8.0-alpha.1` on that commit
-5. `./bin/pre-publish-check.sh` — 校验 clean tree + tests + tag==HEAD + tarball 文件集 + registry 无冲突
-6. `cd packages/chorus-skill && npm publish`
-7. `git push && git push --tags`
-
-> **时序铁律**: 先 tag 再 publish。`pre-publish-check.sh` 强制要求 tag 已存在且指向 HEAD，否则阻断。
+Rectification executed 2026-03-30: retroactive tag on `6b0a2b2` → bump to `0.8.0-alpha.1` → commit → tag → pre-publish-check PASS → npm publish → push.
 
 ---
 
-## 1. Release Notes Draft
+## 1. Release Notes (published)
 
 ### Tag: `v0.8.0-alpha.1`
 
@@ -111,26 +120,10 @@ npx @chorus-protocol/skill init --target openclaw
 
 ---
 
-## 2. Pre-publish Checklist (tag-then-publish)
-
-Sequence: commit → tag → pre-publish-check → npm publish → push
-
-- [x] Retroactive tag `v0.8.0-alpha` on `6b0a2b2`
-- [x] Version bumped to `0.8.0-alpha.1` in `packages/chorus-skill/package.json`
-- [x] Test count verified: 523 tests, 36 suites (2026-03-30)
-- [x] `bin/pre-publish-check.sh` created (validates tarball against BRIDGE_REQUIRED_FILES)
-- [ ] `agchorus.com/health` is green
-- [ ] Commander reviews release notes
-- [ ] Commit rectification changes
-- [ ] Git tag `v0.8.0-alpha.1` on commit
-- [ ] `./bin/pre-publish-check.sh` passes
-- [ ] `cd packages/chorus-skill && npm publish`
-- [ ] `git push && git push --tags`
-
-## 3. Acceptance Boundary
+## 2. Acceptance Boundary
 
 **In scope for v0.8.0-alpha.1:**
-- All fixes from 094c684..HEAD (verify exit code, credential path, runtime bundling)
+- All fixes from 094c684..c0c7800 (verify exit code, credential path, runtime bundling)
 - Cold-start PASS on machine without source repo
 - Bridge v2 CONDITIONAL PASS (Telegram confirmed, WeChat unverifiable)
 - 523 tests / 36 suites green
@@ -140,11 +133,7 @@ Sequence: commit → tag → pre-publish-check → npm publish → push
 - WeChat delivery confirmation (BLOCKED by iLink Bot protocol, external issue)
 - Full multi-agent autonomous conversation validation
 
-## 4. Stale Domain / Claim Inventory
-
-Carried forward from previous version — all `chorus-alpha.fly.dev` → `agchorus.com` updates completed. See git history for details.
-
-### Overclaim audit (things we must NOT say)
+## 3. Overclaim Audit
 
 | Phrase | Status | Safe alternative |
 |--------|--------|-----------------|
@@ -153,3 +142,15 @@ Carried forward from previous version — all `chorus-alpha.fly.dev` → `agchor
 | "bridge 已全面闭环" | ❌ Not yet | "User-visible relay validated on one OpenClaw bridge path" |
 | "confirmed delivery on all channels" | ❌ Never | "Telegram server-ack confirmed; WeChat unverifiable (protocol limitation)" |
 | "Protocol v0.4 — stable" | ⚠️ Qualified | "Protocol v0.4 — envelope format stable" |
+
+## 4. Future Publish Procedure (tag-then-publish)
+
+For the next release, follow this sequence:
+
+1. Bump version in `packages/chorus-skill/package.json`
+2. Commit
+3. `git tag v<version>` on that commit
+4. `./bin/pre-publish-check.sh` — must PASS (clean tree + tests + tag==HEAD + tarball files + registry clean)
+5. `cd packages/chorus-skill && npm publish --tag alpha`
+6. `npm dist-tag add @chorus-protocol/skill@<version> latest`
+7. `git push && git push --tags`

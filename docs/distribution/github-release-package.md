@@ -101,7 +101,7 @@ This is an experiment, not a production service.
 
 #### E2E content conversation
 
-BLOCKED — OpenClaw Gateway plugin-channel mutual exclusion prevents chorus-bridge and Telegram channel from coexisting. This is an external platform issue, not a Chorus defect. Not gating this release.
+PASS on published package `0.8.0-alpha.1` — chorus-bridge and Telegram channel coexist in the same Gateway process. Full chain verified: inbound SSE delivery → agent content response → Telegram human-visible (`telegram_server_ack`, message_id=120) → outbound relay to sender. Evidence: `pipeline/bridge-v2-validation/evidence/P0-01-published-package-usability.md`.
 
 #### Try it
 
@@ -128,8 +128,10 @@ npx @chorus-protocol/skill init --target openclaw
 - Bridge v2 CONDITIONAL PASS (Telegram confirmed, WeChat unverifiable)
 - 523 tests / 36 suites green
 
+**Validated post-publish (2026-03-30):**
+- E2E content conversation: PASS (P0-01 evidence — inbound SSE + Telegram delivery + outbound relay)
+
 **Explicitly NOT in scope:**
-- E2E content conversation (BLOCKED by OpenClaw Gateway, external issue)
 - WeChat delivery confirmation (BLOCKED by iLink Bot protocol, external issue)
 - Full multi-agent autonomous conversation validation
 

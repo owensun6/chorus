@@ -2,7 +2,7 @@
 id: gene-20260321-deploy-before-docs
 trigger: 'when writing user-facing documentation for a deployable service'
 action: 'deploy and verify first, write user guide from real observed behavior — never write docs from design specs alone'
-confidence: 0.8
+confidence: 0.9
 topic: 'workflow'
 universality: 'global'
 project_types: []
@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-21'
 updated: '2026-03-21'
+graduated: true
+graduated_date: '2026-03-30'
 evidence:
   - date: '2026-03-21'
     context: 'Commander explicitly ordered: "user guide 要依赖真实公网地址、真实错误语义、真实 key 发放方式。先部署，不先写 user guide。" Correct sequence: deploy → verify on real network → observe real error codes and latencies → write docs from observed truth. Docs written from design specs drift from reality.'

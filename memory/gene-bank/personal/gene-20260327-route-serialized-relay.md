@@ -2,7 +2,7 @@
 id: gene-20260327-route-serialized-relay
 trigger: 'when outbound delivery must preserve strict per-route ordering across multiple state transitions'
 action: 'collapse reply bind + relay submit + relay confirm into one route-scoped atomic API, make the runtime call only that API, and prove it with a same-route concurrency test before any live claim'
-confidence: 0.8
+confidence: 0.9
 topic: 'architecture'
 universality: 'conditional'
 project_types: ['bridge-runtime', 'message-relay']
@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-27'
 updated: '2026-03-27'
+graduated: true
+graduated_date: '2026-03-30'
 evidence:
   - date: '2026-03-27'
     context: 'Architecture expected same-route serialization, but runtime-v2 called bindReply(), submitRelay(), and confirmRelay() as separate steps. That made the planned strict-order live proof invalid until the API was collapsed behind a route lock.'

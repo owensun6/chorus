@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-29'
 updated: '2026-03-29'
+graduated: true
+graduated_date: '2026-03-30'
 evidence:
   - date: '2026-03-29'
     context: 'runtime-v2.ts hardcoded /Volumes/XDISK/chorus as CHORUS_PROJECT. On MacBook without XDISK, loadRuntimeModules() failed with Cannot find module. Fix: bundle 9 runtime modules in extension/runtime/, resolve from __dirname first.'

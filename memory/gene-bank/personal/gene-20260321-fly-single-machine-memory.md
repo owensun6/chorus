@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-21'
 updated: '2026-03-21'
+graduated: true
+graduated_date: '2026-03-30'
 evidence:
   - date: '2026-03-21'
     context: 'Fly.io created 2 machines by default. POST /agents went to machine A, GET /agents went to machine B — empty response. In-memory registry was split across replicas with no sync. Had to destroy second machine and lock max=1.'

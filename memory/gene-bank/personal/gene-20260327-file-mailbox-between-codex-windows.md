@@ -2,7 +2,7 @@
 id: gene-20260327-file-mailbox-between-codex-windows
 trigger: 'when coordination is needed between two independent Codex windows in the same repo'
 action: 'use ./.codex/comm as a shared mailbox with bin/comm-send.sh and bin/comm-watch.sh; bootstrap the peer once; if direct script execution is blocked on macOS, remove com.apple.provenance xattr before debugging further'
-confidence: 0.8
+confidence: 0.9
 topic: 'workflow'
 universality: 'conditional'
 project_types: ['multi-agent', 'local-collaboration']
@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-27'
 updated: '2026-03-27'
+graduated: true
+graduated_date: '2026-03-30'
 evidence:
   - date: '2026-03-27'
     context: 'User was manually relaying messages between two Codex windows. Direct UI-to-UI injection was not possible, but a shared filesystem mailbox under .codex/comm removed the need for per-turn copy-paste after a one-time bootstrap prompt in the peer window.'

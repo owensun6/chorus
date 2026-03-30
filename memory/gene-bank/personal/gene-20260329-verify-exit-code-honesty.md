@@ -2,7 +2,7 @@
 id: gene-20260329-verify-exit-code-honesty
 trigger: 'when a verify/check command has partial success (some checks pass, some fail)'
 action: 'exit non-zero if ANY actionable check fails — never let "installation OK but not activated" report as success. Split output into layers (integrity vs readiness) but final exit code must reflect the worst layer.'
-confidence: 0.8
+confidence: 0.9
 topic: 'workflow'
 universality: 'global'
 project_types: []
@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-29'
 updated: '2026-03-29'
+graduated: true
+graduated_date: '2026-03-30'
 evidence:
   - date: '2026-03-29'
     context: 'chorus-skill verify --target openclaw printed warning about missing credentials but exited 0. Users saw "verified" and assumed everything worked. Fix: exit 1 when bridge is in standby, clearly separate installation integrity (pass) from activation readiness (fail).'

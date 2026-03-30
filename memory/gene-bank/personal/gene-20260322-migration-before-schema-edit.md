@@ -2,7 +2,7 @@
 id: gene-20260322-migration-before-schema-edit
 trigger: 'when modifying a database table schema that already has a version-tracked migration system'
 action: 'do add a NEW migration version instead of editing the existing migration SQL in-place'
-confidence: 0.8
+confidence: 0.9
 topic: 'architecture'
 universality: 'global'
 project_types: []
@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-22'
 updated: '2026-03-22'
+graduated: true
+graduated_date: '2026-03-30'
 evidence:
   - date: '2026-03-22'
     context: 'Changed api_keys column from api_key to api_key_hash by editing MIGRATIONS[0] in-place. Existing v1 databases already had the old schema applied and recorded version=1, so the migration system skipped the change. Commander caught this in review — new code queried a non-existent column on existing DBs.'

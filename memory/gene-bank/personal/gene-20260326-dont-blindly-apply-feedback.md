@@ -2,7 +2,7 @@
 id: gene-20260326-dont-blindly-apply-feedback
 trigger: 'when applying review feedback or expert suggestions to code or architecture'
 action: 'do critically evaluate each point against existing architecture before implementing — flag conflicts instead of blindly applying'
-confidence: 0.8
+confidence: 0.9
 topic: 'workflow'
 universality: 'global'
 project_types: []
@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-26'
 updated: '2026-03-26'
+graduated: true
+graduated_date: '2026-03-30'
 evidence:
   - date: '2026-03-24'
     context: 'Bridge v2 架构审查中不加判断应用专家反馈，引入 status-semantics Bug 和跨文档不一致，反复阻塞 Gate'

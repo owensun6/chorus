@@ -182,3 +182,21 @@ Stage 7: 合并记录（本地 merge / PR URL / 分支保留说明）
 - **Trigger**: 在 package.json 中写 repository/homepage/bugs URL 时
 - **Action**: 先 `git remote -v` 验证。无 remote 则留空，不猜测。发布后用户会被导向这些地址
 - **Evidence**: package.json 填了 github.com/anthropics/chorus（猜测值），Commander 发现无 remote 可证明
+
+### Fly Single-Machine Memory (graduated: gene-20260321-fly-single-machine-memory)
+
+- **Trigger**: 在 Fly.io 部署内存有状态服务
+- **Action**: 设 `max_machines_running = 1` + `auto_stop_machines = off`，防止跨副本状态不一致
+- **Evidence**: Fly.io 默认创建 2 台 machine，POST 到 A 而 GET 到 B — 返回空。设单机后一致
+
+### File Mailbox Between Codex Windows (graduated: gene-20260327-file-mailbox-between-codex-windows)
+
+- **Trigger**: 两个独立 Codex 窗口需要在同一仓库中协调
+- **Action**: 用 `./.codex/comm` 作共享邮箱配合 `bin/comm-send.sh` 和 `bin/comm-watch.sh`；macOS 上若脚本不能执行，先 `xattr -d com.apple.provenance` 再排查
+- **Evidence**: 用户手动在两个 Codex 窗口间转发消息。共享文件邮箱方案解决了无法直接注入的问题
+
+### Route-Serialized Relay (graduated: gene-20260327-route-serialized-relay)
+
+- **Trigger**: 出站投递需要跨多个状态转换保持严格路由顺序
+- **Action**: 将 reply bind + relay submit + relay confirm 折叠为一个路由作用域的原子 API，运行时只调那一个 API，并用 same-route 并发测试证明正确性
+- **Evidence**: 架构预期 same-route 串行化，但 runtime-v2 将 bindReply/submitRelay/confirmRelay 作为独立步骤调用导致时序问题

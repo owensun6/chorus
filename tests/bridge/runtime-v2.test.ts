@@ -1200,7 +1200,6 @@ describe("runtime-v2 plugin entry", () => {
       "123456",
       expect.any(String),
       expect.objectContaining({
-        cfg: fakeApi.config,
         accountId: "tg-main",
         textMode: "markdown",
       }),
@@ -1369,16 +1368,15 @@ describe("runtime-v2 plugin entry", () => {
     expect(receipt.method).toBe("telegram_server_ack");
     expect(receipt.ref).toBe("98765");
 
-    // Verify accountId=default passed to official helpers
+    // Verify accountId=default passed to official helpers (cfg omitted — helpers use own loadConfig)
     expect(fakeApi.runtime.channel.telegram.resolveTelegramToken).toHaveBeenCalledWith(
-      fakeApi.config,
+      undefined,
       expect.objectContaining({ accountId: "default" }),
     );
     expect(fakeApi.runtime.channel.telegram.sendMessageTelegram).toHaveBeenCalledWith(
       "789012",
       expect.any(String),
       expect.objectContaining({
-        cfg: fakeApi.config,
         accountId: "default",
         textMode: "markdown",
       }),
@@ -1425,7 +1423,7 @@ describe("runtime-v2 plugin entry", () => {
 
     // Verify fallback resolved to accountId=default and chatId=789012
     expect(fakeApi.runtime.channel.telegram.resolveTelegramToken).toHaveBeenCalledWith(
-      fakeApi.config,
+      undefined,
       expect.objectContaining({ accountId: "default" }),
     );
     expect(fakeApi.runtime.channel.telegram.sendMessageTelegram).toHaveBeenCalledWith(

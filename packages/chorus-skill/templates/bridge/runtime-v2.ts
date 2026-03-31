@@ -899,7 +899,9 @@ export class OpenClawHostAdapter {
         throw new Error(`no_wx_base_url accountId=${target.accountId} agent=${this.ctx.name}`);
       }
     } else if (target.channel === "telegram") {
-      const tokenResolution = ch.telegram.resolveTelegramToken(cfg, { accountId: target.accountId });
+      // cfg omitted: let the official helper use its own loadConfig() — plugin API config
+      // does not carry channels.telegram, so passing it would always yield source=none.
+      const tokenResolution = ch.telegram.resolveTelegramToken(undefined, { accountId: target.accountId });
       if (!tokenResolution?.token) {
         throw new Error(`no_tg_bot_token accountId=${target.accountId} agent=${this.ctx.name}`);
       }
@@ -1121,7 +1123,6 @@ If you have nothing to say back to the remote agent, simply omit [chorus_reply] 
                 }
                 try {
                   const result = await ch.telegram.sendMessageTelegram(chatId, userText, {
-                    cfg,
                     accountId: target.accountId,
                     textMode: "markdown",
                   });

@@ -352,7 +352,7 @@ const mockSessionAndSSE = (ssePayload: string, sessionToken: string = 'cs_test_s
 
 describe('HubClient.connectSSE', () => {
   it('test_connectSSE_delivers_valid_events: parses message events and calls onEvent', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
     const ssePayload =
       `event: connected\ndata: {"agent_id":"a@h"}\n\n` +
       `event: message\ndata: ${JSON.stringify({
@@ -381,7 +381,7 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('test_connectSSE_discards_invalid_events: missing timestamp logs error, SSE continues', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
     const ssePayload =
       `event: message\ndata: ${JSON.stringify({
         trace_id: 't-bad',
@@ -417,7 +417,7 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('skips SSE blocks without data lines or message event types', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
     const ssePayload =
       `event: message\n\n` +
       `data: ${JSON.stringify({
@@ -456,7 +456,7 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('retries after SSE HTTP failure', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
     // Attempt 1: session OK, SSE fails
     fetchMock
       .mockResolvedValueOnce(new Response(JSON.stringify({ success: true, data: { session_token: 'cs_1', expires_in_seconds: 300 } }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
@@ -483,7 +483,7 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('does not reconnect when the stream ends after an explicit disconnect', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
     const ssePayload =
       `event: message\ndata: ${JSON.stringify({
         trace_id: 't-1',
@@ -515,7 +515,7 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('suppresses reconnect and error logging on intentional abort', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
     // Session exchange succeeds, SSE hangs until abort
     fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ success: true, data: { session_token: 'cs_abort', expires_in_seconds: 300 } }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
     fetchMock.mockImplementationOnce((...args: Parameters<typeof fetch>) => {
@@ -542,7 +542,7 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('test_disconnect_stops_reconnection: disconnect prevents further fetch calls', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
     // Session exchange fails → triggers reconnect
     fetchMock.mockRejectedValueOnce(new Error('network down'));
 
@@ -561,7 +561,7 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('test_sse_buffer_overflow: oversized frame without delimiters triggers onError and terminates', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
     const oversizedPayload = 'data: ' + 'x'.repeat(65_000); // >64KB, no \n\n delimiter
 
     const encoder = new TextEncoder();
@@ -605,7 +605,7 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('test_connectSSE_url_format: uses session handshake (not api key in URL)', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
     mockSessionAndSSE('', 'cs_my_session_token');
 
     const client = makeClient('https://hub.example.com');

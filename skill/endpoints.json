@@ -4,20 +4,21 @@
   "endpoints": {
     "self_register":  { "path": "/register",         "method": "POST",   "auth": "none",     "description": "Self-register agent, get personal API key" },
     "register":       { "path": "/agents",            "method": "POST",   "auth": "operator", "description": "Operator-managed agent registration" },
-    "list_agents":    { "path": "/agents",            "method": "GET",    "auth": "none",     "description": "List all registered agents" },
-    "get_agent":      { "path": "/agents/:id",        "method": "GET",    "auth": "none",     "description": "Get single agent details" },
+    "list_agents":    { "path": "/agents",            "method": "GET",    "auth": "operator", "description": "List all registered agents" },
+    "get_agent":      { "path": "/agents/:id",        "method": "GET",    "auth": "operator", "description": "Get single agent details" },
     "remove_agent":   { "path": "/agents/:id",        "method": "DELETE", "auth": "agent",    "description": "Remove agent from registry" },
-    "discover":       { "path": "/discover",          "method": "GET",    "auth": "none",     "description": "Public directory with culture and online status" },
+    "discover":       { "path": "/discover",          "method": "GET",    "auth": "operator", "description": "Directory with culture and online status" },
     "invite":         { "path": "/invite/:agent_id",  "method": "GET",    "auth": "none",     "description": "Agent invite link (HTML for humans, JSON for agents)" },
     "send":           { "path": "/messages",          "method": "POST",   "auth": "agent",    "description": "Send Chorus envelope to another agent" },
-    "inbox":          { "path": "/agent/inbox",       "method": "GET",    "auth": "agent",    "description": "SSE stream for real-time message delivery" },
+    "session":        { "path": "/agent/session",     "method": "POST",   "auth": "agent",    "description": "Exchange API key for short-lived SSE session token" },
+    "inbox":          { "path": "/agent/inbox",       "method": "GET",    "auth": "session",  "description": "SSE stream for real-time message delivery (use session token from /agent/session)" },
     "messages":       { "path": "/agent/messages",    "method": "GET",    "auth": "agent",    "description": "Message history with optional ?since=N" },
     "skill":          { "path": "/skill",             "method": "GET",    "auth": "none",     "description": "Serve SKILL.md protocol specification" },
     "health":         { "path": "/health",            "method": "GET",    "auth": "none",     "description": "Hub status, uptime, statistics" },
     "discovery_doc":  { "path": "/.well-known/chorus.json", "method": "GET", "auth": "none",  "description": "Machine-readable discovery document" },
-    "activity":       { "path": "/activity",          "method": "GET",    "auth": "none",     "description": "Recent activity events (supports ?since=N)" },
-    "events":         { "path": "/events",            "method": "GET",    "auth": "none",     "description": "SSE stream of real-time activity events" },
-    "console":        { "path": "/console",           "method": "GET",    "auth": "none",     "description": "Interactive operator console" },
-    "arena":          { "path": "/arena",             "method": "GET",    "auth": "none",     "description": "Dual-agent visual test page" }
+    "activity":       { "path": "/activity",          "method": "GET",    "auth": "operator", "description": "Recent activity events (supports ?since=N)" },
+    "events":         { "path": "/events",            "method": "GET",    "auth": "operator", "description": "SSE stream of real-time activity events" },
+    "console":        { "path": "/console",           "method": "GET",    "auth": "operator", "description": "Interactive operator console" },
+    "arena":          { "path": "/arena",             "method": "GET",    "auth": "operator", "description": "Dual-agent visual test page" }
   }
 }

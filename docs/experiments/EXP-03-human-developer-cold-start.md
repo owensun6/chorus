@@ -12,14 +12,15 @@ EXP-02 proved a non-Claude AI could do cold-start from raw docs. E-03-01 proved 
 
 This is a documentation and install path usability test. It is not a market validation, product-market fit study, or user experience research.
 
-### Architecture context (v0.8.0-alpha.1)
+### Architecture context (v0.8.0-alpha.7)
 
-The current Chorus architecture uses **SSE-based inbox delivery** through OpenClaw Gateway:
+The current Chorus architecture uses **SSE-based inbox delivery** through OpenClaw Gateway. Since alpha.6, the bridge delegates Telegram delivery to the host's official channel helper (no private sending stack). Since alpha.7, the SKILL.md activation flow includes an explicit restart consent checkpoint.
 
 ```
 npx init → bridge installed → register on Hub → save credentials
-→ Gateway restart → bridge activates (SSE) → Hub delivers message
-→ bridge routes to agent → agent replies → Telegram delivery
+→ checkpoint written → user consents to restart → Gateway restart
+→ bridge activates (SSE) → Hub delivers message
+→ bridge routes to agent → agent replies via host channel → Telegram delivery
 ```
 
 The subject does NOT need to:
@@ -184,7 +185,7 @@ The task prompt sent to the subject:
 > **Setup (do this first):**
 >
 > ```bash
-> npx @chorus-protocol/skill@0.8.0-alpha.1 init --target openclaw
+> npx @chorus-protocol/skill@0.8.0-alpha.7 init --target openclaw
 > ```
 >
 > This installs documentation and a bridge runtime into your OpenClaw. Read the installed files (especially SKILL.md) — they describe how to connect your agent to a messaging network.
@@ -504,8 +505,8 @@ Execute before each experiment run. All items must pass.
 ### 13.1 Version gate (BLOCKING)
 
 ```
-[ ] npm version check: npm view @chorus-protocol/skill version shows 0.8.0-alpha.1
-[ ] Install test: npx @chorus-protocol/skill@0.8.0-alpha.1 --help runs without error
+[ ] npm version check: npm view @chorus-protocol/skill@0.8.0-alpha.7 version shows 0.8.0-alpha.7
+[ ] Install test: npx @chorus-protocol/skill@0.8.0-alpha.7 --help runs without error
 ```
 
 ### 13.2 Hub and infrastructure
@@ -521,7 +522,7 @@ Execute before each experiment run. All items must pass.
 
 ```
 [ ] From a clean OpenClaw environment (no prior Chorus state):
-    npx @chorus-protocol/skill@0.8.0-alpha.1 init --target openclaw
+    npx @chorus-protocol/skill@0.8.0-alpha.7 init --target openclaw
     npx @chorus-protocol/skill verify --target openclaw
     Init exits 0, verify reports installation integrity PASS (activation may be standby — that's expected)
 [ ] Verify installed SKILL.md contains registration instructions and credential path

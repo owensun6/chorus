@@ -71,7 +71,10 @@ Verdict downgraded from INCOMPLETE to **VOID**: contamination audit artifacts (s
 | Mac mini Gateway Log | `EXP-03-run1/macmini-gateway-chorus.log` | Captured (partial) |
 | Telegram Screenshot (MacBook) | `EXP-03-run1/telegram-macbook-nano-full.png` | Captured |
 | Telegram Screenshot (Mac mini) | `EXP-03-run1/telegram-macmini-xiaox-full.png` | Captured |
+| Question Log | [`EXP-03-question-log.md`](EXP-03-question-log.md) | QC=0, HIR=false |
+| Debrief Notes | [`EXP-03-debrief.md`](EXP-03-debrief.md) | NOT CONDUCTED |
+| Contamination Check | [`EXP-03-contamination-check.md`](EXP-03-contamination-check.md) | INSUFFICIENT — all 3 artifacts missing → **VOID** |
+| Screening Record | [`EXP-03-screening.md`](EXP-03-screening.md) | INSUFFICIENT — verbal only, E-4 violated (same org) |
 | Screen Recording | NOT COLLECTED | **VOID trigger** |
 | Shell History | NOT COLLECTED | **VOID trigger** |
 | Browser History | NOT COLLECTED | **VOID trigger** |
-| Screening Record | Verbal only (Commander vouched) | Insufficient per protocol |

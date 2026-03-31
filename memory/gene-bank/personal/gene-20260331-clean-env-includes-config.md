@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-31'
 updated: '2026-03-31'
+graduated: true
+graduated_date: '2026-03-31'
 evidence:
   - date: '2026-03-31'
     context: 'Deleted chorus-bridge/ and skills/chorus/ but left openclaw.json plugin references. Gateway hit recursive stack overflow: config warning → console.warn → logger init → read config → warning → infinite loop. Required Commander intervention to clean openclaw.json manually.'

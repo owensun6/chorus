@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-31'
 updated: '2026-03-31'
+graduated: true
+graduated_date: '2026-03-31'
 evidence:
   - date: '2026-03-31'
     context: '7 SSE tests passed on macOS but failed on Ubuntu CI. 4 iterations of doNotFake combinations all failed. Final fix: preserve real setTimeout, remove fake timers from 5 tests that dont need timer control, use 50ms real delay for async settling.'

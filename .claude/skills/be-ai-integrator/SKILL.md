@@ -93,3 +93,9 @@ description: 'Backend AI Integrator - LLM/MCP 子系统接入，Prompt 工程，
 - **Trigger**: 首次调用任何 MCP 工具或集成新外部工具时
 - **Action**: 先用最小输入调用一次，读取完整返回结构，不要基于工具名假设输出形态。如果返回了预期之外的代码/数据，评估是否改变下游工作流
 - **Evidence**: Stitch MCP `get_screen` 返回 screenshot + htmlCode（完整 HTML+Tailwind），但 UX 只用了截图。假设"线框工具=只出图片"导致 fe-ui-builder 从零构建而非复用 Stitch 代码
+
+### Cold Start Agent Name Mismatch (graduated: gene-20260331-cold-start-agent-name-mismatch)
+
+- **Trigger**: 插件用外部 agent identity（如 Chorus agent_id）查找宿主资源
+- **Action**: 不假设外部身份名 = 宿主 agent 名。先精确匹配，再扫描单 agent 环境做无歧义 fallback，多 agent 歧义时 fail fast
+- **Evidence**: Chorus agent "goooo" 查 `~/.openclaw/agents/goooo/` 不存在，实际在 `agents/main/`。单候选 fallback 修复

@@ -60,3 +60,13 @@ Stage 6 第一道漏斗启动
     ↓
 PASS → 通知 qa-02 启动 | FAIL → Worker 返工，后续漏斗不启动
 ```
+
+---
+
+## 经验补丁（Gene Bank 毕业）
+
+### Fake Timers vs ReadableStream (graduated: gene-20260331-fake-timers-setimmediate)
+
+- **Trigger**: Jest fake timers + ReadableStream / Node 内部异步 API
+- **Action**: 不在消费 ReadableStream 的测试中用 `jest.useFakeTimers()`。Node 用 setImmediate 做流调度，fake-timers 拦截它导致流阻塞。doNotFake 不可靠。用真实 setTimeout + 短延迟做异步 settle
+- **Evidence**: 7 个 SSE 测试 macOS 通过但 Ubuntu CI 失败，4 轮 doNotFake 组合全失败，最终移除 fake timers + 50ms 真实延迟修复

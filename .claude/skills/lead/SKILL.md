@@ -200,3 +200,15 @@ Stage 7: 合并记录（本地 merge / PR URL / 分支保留说明）
 - **Trigger**: 出站投递需要跨多个状态转换保持严格路由顺序
 - **Action**: 将 reply bind + relay submit + relay confirm 折叠为一个路由作用域的原子 API，运行时只调那一个 API，并用 same-route 并发测试证明正确性
 - **Evidence**: 架构预期 same-route 串行化，但 runtime-v2 将 bindReply/submitRelay/confirmRelay 作为独立步骤调用导致时序问题
+
+### Check Real Log Path (graduated: gene-20260331-check-real-log-path)
+
+- **Trigger**: 排查时日志文件无相关条目
+- **Action**: 先确认你在读正确的日志文件——检查进程启动输出中的实际 log path（如 `/tmp/` vs `~/.openclaw/logs/`）
+- **Evidence**: 上一个会话读 `~/.openclaw/logs/gateway.log` 找不到投递错误；实际 runtime log 在 `/tmp/openclaw/`（JSON 格式），立刻看到 `no_tg_bot_token`
+
+### Clean Env Includes Config (graduated: gene-20260331-clean-env-includes-config)
+
+- **Trigger**: 清理实验或冷启动环境
+- **Action**: 不只删 chorus 文件——还要清 openclaw.json 中的 plugin/skill 引用 + npx cache。残留 config 引用导致 gateway 递归栈溢出
+- **Evidence**: 删了 chorus-bridge/ 和 skills/chorus/ 但留了 openclaw.json plugin 引用，gateway 无限循环崩溃

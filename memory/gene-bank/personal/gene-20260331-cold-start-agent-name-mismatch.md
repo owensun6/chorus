@@ -11,6 +11,8 @@ source: 'session'
 campaign_id: 'chorus'
 created: '2026-03-31'
 updated: '2026-03-31'
+graduated: true
+graduated_date: '2026-03-31'
 evidence:
   - date: '2026-03-31'
     context: 'Chorus agent "goooo@agchorus" tried to look up sessions at ~/.openclaw/agents/goooo/ but OpenClaw single-agent setup stores sessions at ~/.openclaw/agents/main/. Name mismatch caused no_delivery_target. Fixed by scanning all agent dirs and using unambiguous single fallback.'

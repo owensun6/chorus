@@ -41,7 +41,7 @@ describe("runtime-v2 plugin entry", () => {
     );
   };
 
-  const seedTelegramRuntime = (agentName: string): void => {
+  const seedTelegramRuntimeMultiAccount = (agentName: string): void => {
     fs.mkdirSync(path.join(fakeHome, ".openclaw", "agents", agentName, "sessions"), { recursive: true });
     fs.writeFileSync(
       path.join(fakeHome, ".openclaw", "agents", agentName, "sessions", "sessions.json"),
@@ -66,6 +66,66 @@ describe("runtime-v2 plugin entry", () => {
                 botToken: "test-bot-token",
               },
             },
+          },
+        },
+      }),
+      "utf-8",
+    );
+  };
+
+  // Alias for backward compat with existing tests
+  const seedTelegramRuntime = seedTelegramRuntimeMultiAccount;
+
+  const seedTelegramRuntimeDefaultOnly = (agentName: string): void => {
+    fs.mkdirSync(path.join(fakeHome, ".openclaw", "agents", agentName, "sessions"), { recursive: true });
+    fs.writeFileSync(
+      path.join(fakeHome, ".openclaw", "agents", agentName, "sessions", "sessions.json"),
+      JSON.stringify({
+        [`agent:${agentName}:main`]: {
+          deliveryContext: {
+            channel: "telegram",
+            to: "telegram:789012",
+            accountId: "default",
+          },
+        },
+      }),
+      "utf-8",
+    );
+    fs.writeFileSync(
+      path.join(fakeHome, ".openclaw", "openclaw.json"),
+      JSON.stringify({
+        channels: {
+          telegram: {
+            botToken: "flat-bot-token",
+          },
+        },
+      }),
+      "utf-8",
+    );
+  };
+
+  // Fallback: OpenClaw agent dir name differs from Chorus agent name
+  const seedTelegramRuntimeFallback = (openclawAgentName: string): void => {
+    fs.mkdirSync(path.join(fakeHome, ".openclaw", "agents", openclawAgentName, "sessions"), { recursive: true });
+    fs.writeFileSync(
+      path.join(fakeHome, ".openclaw", "agents", openclawAgentName, "sessions", "sessions.json"),
+      JSON.stringify({
+        [`agent:${openclawAgentName}:main`]: {
+          deliveryContext: {
+            channel: "telegram",
+            to: "telegram:789012",
+            accountId: "default",
+          },
+        },
+      }),
+      "utf-8",
+    );
+    fs.writeFileSync(
+      path.join(fakeHome, ".openclaw", "openclaw.json"),
+      JSON.stringify({
+        channels: {
+          telegram: {
+            botToken: "flat-bot-token",
           },
         },
       }),
@@ -531,6 +591,10 @@ describe("runtime-v2 plugin entry", () => {
         channel: {
           routing: {
             resolveAgentRoute: jest.fn().mockReturnValue({ agentId: "agent:xiaox:main" }),
+          },
+          telegram: {
+            resolveTelegramToken: jest.fn().mockReturnValue({ token: "test-bot-token", source: "config" }),
+            sendMessageTelegram: jest.fn().mockResolvedValue({ messageId: "99999", chatId: "123456" }),
           },
           session: {
             resolveStorePath: jest.fn().mockReturnValue(path.join(fakeHome, "session-store.json")),
@@ -1029,6 +1093,10 @@ describe("runtime-v2 plugin entry", () => {
           routing: {
             resolveAgentRoute: jest.fn().mockReturnValue({ agentId: "agent:xiaox:main" }),
           },
+          telegram: {
+            resolveTelegramToken: jest.fn().mockReturnValue({ token: "test-bot-token", source: "config" }),
+            sendMessageTelegram: jest.fn().mockResolvedValue({ messageId: "98765", chatId: "123456" }),
+          },
           session: {
             resolveStorePath: jest.fn().mockReturnValue(path.join(fakeHome, "session-store.json")),
             recordInboundSession: jest.fn().mockResolvedValue(undefined),
@@ -1081,7 +1149,7 @@ describe("runtime-v2 plugin entry", () => {
     },
   };
 
-  it("Telegram delivery returns confirmed with message_id ref when API returns server ack", async () => {
+  it("Telegram delivery returns confirmed with message_id ref when official helper succeeds", async () => {
     seedTelegramRuntime("xiaox");
     fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results"), { recursive: true });
 
@@ -1089,14 +1157,6 @@ describe("runtime-v2 plugin entry", () => {
       ...jest.requireActual("node:os"),
       homedir: () => fakeHome,
     }));
-
-    const fetchMock = jest.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ ok: true, result: { message_id: 98765 } }),
-      text: async () => "",
-    });
-    (globalThis as any).fetch = fetchMock;
 
     const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
 
@@ -1136,10 +1196,18 @@ describe("runtime-v2 plugin entry", () => {
       expect.stringContaining("98765"),
     );
 
-    delete (globalThis as any).fetch;
+    expect(fakeApi.runtime.channel.telegram.sendMessageTelegram).toHaveBeenCalledWith(
+      "123456",
+      expect.any(String),
+      expect.objectContaining({
+        cfg: fakeApi.config,
+        accountId: "tg-main",
+        textMode: "markdown",
+      }),
+    );
   });
 
-  it("Telegram 400 fallback resend returns confirmed with message_id ref", async () => {
+  it("Telegram delivery rethrows when official sendMessageTelegram fails", async () => {
     seedTelegramRuntime("xiaox");
     fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results"), { recursive: true });
 
@@ -1148,24 +1216,12 @@ describe("runtime-v2 plugin entry", () => {
       homedir: () => fakeHome,
     }));
 
-    const fetchMock = jest.fn()
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-        json: async () => ({ ok: false }),
-        text: async () => "Bad Request",
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => ({ ok: true, result: { message_id: 55555 } }),
-        text: async () => "",
-      });
-    (globalThis as any).fetch = fetchMock;
-
     const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
 
     const fakeApi = buildTelegramDeliveryHarness();
+    fakeApi.runtime.channel.telegram.sendMessageTelegram.mockRejectedValue(
+      new Error("Telegram API 403: bot was blocked by the user"),
+    );
     const adapter = new OpenClawHostAdapter(
       {
         config: {
@@ -1183,37 +1239,22 @@ describe("runtime-v2 plugin entry", () => {
       null,
     );
 
-    const receipt = await adapter.deliverInbound(deliverInboundParams);
-
-    expect(receipt.status).toBe("confirmed");
-    expect(receipt.method).toBe("telegram_server_ack");
-    expect(receipt.ref).toBe("55555");
-
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-
-    delete (globalThis as any).fetch;
+    await expect(adapter.deliverInbound(deliverInboundParams))
+      .rejects.toThrow("Telegram API 403: bot was blocked by the user");
   });
 
-  it("Telegram delivery falls back to unverifiable when API response lacks message_id", async () => {
+  it("Telegram delivery throws no_tg_bot_token when resolveTelegramToken returns no token", async () => {
     seedTelegramRuntime("xiaox");
-    fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results"), { recursive: true });
 
     jest.doMock("node:os", () => ({
       ...jest.requireActual("node:os"),
       homedir: () => fakeHome,
     }));
 
-    const fetchMock = jest.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ ok: true, result: {} }),
-      text: async () => "",
-    });
-    (globalThis as any).fetch = fetchMock;
-
     const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
 
     const fakeApi = buildTelegramDeliveryHarness();
+    fakeApi.runtime.channel.telegram.resolveTelegramToken.mockReturnValue({ token: "", source: "none" });
     const adapter = new OpenClawHostAdapter(
       {
         config: {
@@ -1231,18 +1272,8 @@ describe("runtime-v2 plugin entry", () => {
       null,
     );
 
-    const receipt = await adapter.deliverInbound(deliverInboundParams);
-
-    expect(receipt.status).toBe("unverifiable");
-    expect(receipt.method).toBe("telegram_api_accepted");
-    expect(receipt.ref).toBeNull();
-
-    const deliveryFile = path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results", "trace-tg-ack.json");
-    const deliveryRecord = JSON.parse(fs.readFileSync(deliveryFile, "utf-8"));
-    expect(deliveryRecord.status).toBe("unverifiable");
-    expect(deliveryRecord.terminal_disposition).toBe("delivery_unverifiable");
-
-    delete (globalThis as any).fetch;
+    await expect(adapter.deliverInbound(deliverInboundParams))
+      .rejects.toThrow("no_tg_bot_token accountId=tg-main agent=xiaox");
   });
 
   it("Telegram delivery timeout produces unverifiable receipt, not confirmed", async () => {
@@ -1296,6 +1327,114 @@ describe("runtime-v2 plugin entry", () => {
     const deliveryFile = path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results", "trace-tg-ack.json");
     const deliveryRecord = JSON.parse(fs.readFileSync(deliveryFile, "utf-8"));
     expect(deliveryRecord.status).toBe("unverifiable");
+  });
+
+  // --- Default-only Telegram (single agent, flat config, accountId=default) ---
+
+  it("Default-only Telegram delivery: accountId=default passes through to official helpers", async () => {
+    seedTelegramRuntimeDefaultOnly("xiaox");
+    fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results"), { recursive: true });
+
+    jest.doMock("node:os", () => ({
+      ...jest.requireActual("node:os"),
+      homedir: () => fakeHome,
+    }));
+
+    const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
+
+    const fakeApi = buildTelegramDeliveryHarness();
+    const adapter = new OpenClawHostAdapter(
+      {
+        config: {
+          agent_id: "xiaox@chorus",
+          api_key: "test-key",
+          hub_url: "https://hub.example",
+          culture: "zh-CN",
+          preferred_language: "zh-CN",
+        },
+        name: "xiaox",
+        stateDir: path.join(fakeHome, ".chorus", "state", "xiaox"),
+      },
+      fakeApi as never,
+      fakeApi.logger,
+      null,
+    );
+
+    const receipt = await adapter.deliverInbound({
+      ...deliverInboundParams,
+      metadata: { ...deliverInboundParams.metadata, trace_id: "trace-default-tg" },
+    });
+
+    expect(receipt.status).toBe("confirmed");
+    expect(receipt.method).toBe("telegram_server_ack");
+    expect(receipt.ref).toBe("98765");
+
+    // Verify accountId=default passed to official helpers
+    expect(fakeApi.runtime.channel.telegram.resolveTelegramToken).toHaveBeenCalledWith(
+      fakeApi.config,
+      expect.objectContaining({ accountId: "default" }),
+    );
+    expect(fakeApi.runtime.channel.telegram.sendMessageTelegram).toHaveBeenCalledWith(
+      "789012",
+      expect.any(String),
+      expect.objectContaining({
+        cfg: fakeApi.config,
+        accountId: "default",
+        textMode: "markdown",
+      }),
+    );
+  });
+
+  it("Fallback route: agent name mismatch walks single-candidate fallback to default accountId", async () => {
+    // Chorus agent name is "goooo" but OpenClaw agent dir is "main"
+    seedTelegramRuntimeFallback("main");
+    fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "goooo", "delivery-results"), { recursive: true });
+
+    jest.doMock("node:os", () => ({
+      ...jest.requireActual("node:os"),
+      homedir: () => fakeHome,
+    }));
+
+    const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
+
+    const fakeApi = buildTelegramDeliveryHarness();
+    const adapter = new OpenClawHostAdapter(
+      {
+        config: {
+          agent_id: "goooo@chorus",
+          api_key: "test-key",
+          hub_url: "https://hub.example",
+          culture: "en",
+          preferred_language: "en",
+        },
+        name: "goooo",
+        stateDir: path.join(fakeHome, ".chorus", "state", "goooo"),
+      },
+      fakeApi as never,
+      fakeApi.logger,
+      null,
+    );
+
+    const receipt = await adapter.deliverInbound({
+      ...deliverInboundParams,
+      metadata: { ...deliverInboundParams.metadata, trace_id: "trace-fallback-tg" },
+    });
+
+    expect(receipt.status).toBe("confirmed");
+    expect(receipt.method).toBe("telegram_server_ack");
+
+    // Verify fallback resolved to accountId=default and chatId=789012
+    expect(fakeApi.runtime.channel.telegram.resolveTelegramToken).toHaveBeenCalledWith(
+      fakeApi.config,
+      expect.objectContaining({ accountId: "default" }),
+    );
+    expect(fakeApi.runtime.channel.telegram.sendMessageTelegram).toHaveBeenCalledWith(
+      "789012",
+      expect.any(String),
+      expect.objectContaining({
+        accountId: "default",
+      }),
+    );
   });
 
   // --- Credential loading and activation watcher tests ---

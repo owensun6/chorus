@@ -36,13 +36,13 @@
 | P-04-01 | commander | all required | [ ] | `final-verdict.md` = PASS |
 | P-04-02 | commander | all required | [x] | `final-verdict.md` = CONDITIONAL |
 | P-04-03 | commander | all required | [ ] | `final-verdict.md` = FAIL |
-| P0-01 | be-ai-integrator | P-04-02 | [x] | `evidence/P0-01-published-package-usability.md` = PASS |
+| P0-01 | be-ai-integrator | P-04-02 | [x] | `evidence/P0-01-published-package-usability.md` = PASS (human-visible confirmed 2026-03-31) |
 
 ## Current Launch Window
 
 | Runnable Now | Reason |
 |---|---|
-| P0-01 closed | E2E content conversation PASS on published `0.8.0-alpha.1` (2026-03-30). Prior mutual exclusion resolved by bundled runtime. |
+| P0-01 closed | Bidirectional E2E PASS (2026-03-31). xiaoyin↔xiaox autonomous multi-turn, Commander confirmed human-visible on both Telegram bots. |
 
 ## Notes
 

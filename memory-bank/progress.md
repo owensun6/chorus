@@ -1,5 +1,27 @@
 # Chorus Protocol — Progress Log
 
+### 2026-03-31 20:15 (restart consent + alpha.7 + doc hardening + EXP-03 retest)
+
+**操作**:
+1. Restart consent checkpoint: task spec 冻结 + EN/zh-CN SKILL.md 模板实现（gateway 重启前必须写 checkpoint + 征求用户同意）
+2. Alpha.7 发布: bump → tag `v0.8.0-alpha.7` → npm publish → registry 验证 PASS
+3. Doc hardening: skill/ 同步 packages/（5 文件）、EXP-03 版本锁 alpha.7、CI stale version gate
+4. CI 修复: hub-client SSE 测试在 Ubuntu 上 7 个失败，根因 @sinonjs/fake-timers 拦截 setImmediate。修复：保存真实 setTimeout + 移除不必要的 fake timers（4 轮迭代）
+5. EXP-03 重测: MacBook 环境清理 + Mac mini 清理 + 受试者（Commander 同事）执行
+
+**结果**:
+- alpha.7 npm 发布成功，CI 529/529 全绿（commit `dd169c2`）
+- EXP-03 重测结果 **INCOMPLETE**: 安装+注册+bridge 激活全自主完成，但 Chorus 消息未在 Telegram 可见
+  - Hub 侧 `delivered_via=sse` 确认消息到达 bridge
+  - Bridge → Telegram 投递链断裂（根因待排查）
+  - 两台机器的 agent 都跳过了 restart consent checkpoint，直接自行重启 gateway
+  - MacBook agent 注册为 `test2-macbook@agchorus`，小x 注册为 `xiaox@chorus`（旧凭证残留被重写，缺 hub_url）
+
+**决策**:
+- EXP-03 此轮标记 INCOMPLETE，不标 FAIL（安装链路完整，投递链断裂是 IMPL 问题）
+- Restart consent checkpoint 未被 agent 遵守——SKILL.md 软约束对 agent 行为约束力不足
+- 小x 凭证问题: 旧 `chorus-credentials.json` 被恢复，缺 `hub_url` 字段
+
 ### 2026-03-18 22:00
 
 **操作**: Phase 0 收尾 + Phase 1 Stage 0 完成

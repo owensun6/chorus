@@ -31,6 +31,29 @@ export function resolveDeliveryTargetFromSessions(
 }
 
 /**
+ * Scan multiple agent session stores for Telegram delivery targets.
+ * Returns all unique targets found. The caller decides what to do:
+ * - 0 results: no delivery possible
+ * - 1 result: unambiguous fallback (single-agent / default-only setup)
+ * - 2+ results: ambiguous, caller must fail fast
+ */
+export function collectTelegramTargetsFromAgentDirs(
+  agentDirs: ReadonlyArray<{ readonly name: string; readonly sessions: Record<string, any> | null }>,
+): DeliveryTarget[] {
+  const targets: DeliveryTarget[] = [];
+  for (const dir of agentDirs) {
+    if (!dir.sessions) continue;
+    const mainSession = dir.sessions[`agent:${dir.name}:main`];
+    if (!mainSession?.deliveryContext) continue;
+    const { channel, to, accountId } = mainSession.deliveryContext;
+    if (channel === "telegram" && to) {
+      targets.push({ channel, to, accountId });
+    }
+  }
+  return targets;
+}
+
+/**
  * Derive receiver culture prefs from agent config.
  * Returns null if the config has no culture — caller decides how to handle.
  */

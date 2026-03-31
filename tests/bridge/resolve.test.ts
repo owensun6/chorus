@@ -1,5 +1,6 @@
 import {
   buildOutboundEnvelope,
+  collectTelegramTargetsFromAgentDirs,
   deriveChorusSessionKey,
   deriveOutboundReceiver,
   diagnoseUserText,
@@ -131,5 +132,90 @@ describe("bridge resolve helpers", () => {
     expect(deriveChorusSessionKey("xiaov", "peer id", null)).toBe(
       "agent:xiaov:chorus:peer_id",
     );
+  });
+});
+
+describe("collectTelegramTargetsFromAgentDirs", () => {
+  it("returns matching target when agent-specific channel exists", () => {
+    const dirs = [
+      {
+        name: "xiaoyin",
+        sessions: {
+          "agent:xiaoyin:main": {
+            deliveryContext: { channel: "telegram", to: "telegram:111", accountId: "xiaoyin" },
+          },
+        },
+      },
+    ];
+    const result = collectTelegramTargetsFromAgentDirs(dirs);
+    expect(result).toEqual([
+      { channel: "telegram", to: "telegram:111", accountId: "xiaoyin" },
+    ]);
+  });
+
+  it("returns single target for default-only channel (fallback succeeds)", () => {
+    const dirs = [
+      {
+        name: "main",
+        sessions: {
+          "agent:main:main": {
+            deliveryContext: { channel: "telegram", to: "telegram:999", accountId: "default" },
+          },
+        },
+      },
+    ];
+    const result = collectTelegramTargetsFromAgentDirs(dirs);
+    expect(result).toEqual([
+      { channel: "telegram", to: "telegram:999", accountId: "default" },
+    ]);
+  });
+
+  it("returns multiple targets when multiple channels exist (caller must fail fast)", () => {
+    const dirs = [
+      {
+        name: "xiaoyin",
+        sessions: {
+          "agent:xiaoyin:main": {
+            deliveryContext: { channel: "telegram", to: "telegram:111", accountId: "xiaoyin" },
+          },
+        },
+      },
+      {
+        name: "xiaox",
+        sessions: {
+          "agent:xiaox:main": {
+            deliveryContext: { channel: "telegram", to: "telegram:222", accountId: "xiaox" },
+          },
+        },
+      },
+    ];
+    const result = collectTelegramTargetsFromAgentDirs(dirs);
+    expect(result).toHaveLength(2);
+  });
+
+  it("skips agents without sessions or without Telegram delivery", () => {
+    const dirs = [
+      { name: "broken", sessions: null },
+      {
+        name: "weixin-only",
+        sessions: {
+          "agent:weixin-only:main": {
+            deliveryContext: { channel: "openclaw-weixin", to: "wx:abc", accountId: "wx1" },
+          },
+        },
+      },
+      {
+        name: "main",
+        sessions: {
+          "agent:main:main": {
+            deliveryContext: { channel: "telegram", to: "telegram:999", accountId: "default" },
+          },
+        },
+      },
+    ];
+    const result = collectTelegramTargetsFromAgentDirs(dirs);
+    expect(result).toEqual([
+      { channel: "telegram", to: "telegram:999", accountId: "default" },
+    ]);
   });
 });

@@ -12,6 +12,7 @@ import { homedir } from "node:os";
 import { buildTrustBoundary } from "./guard";
 import {
   resolveDeliveryTargetFromSessions,
+  collectTelegramTargetsFromAgentDirs,
   resolveReceiverPrefs,
   primarySubtag,
   splitReplyParts,
@@ -734,6 +735,7 @@ async function withHostDeliveryTimeout<T>(
 }
 
 function resolveDeliveryTarget(agentName: string) {
+  // 1. Try agent-specific target (Chorus agent name matches OpenClaw agent name)
   const sessionsPath = join(
     OPENCLAW_DIR,
     "agents",
@@ -742,7 +744,27 @@ function resolveDeliveryTarget(agentName: string) {
     "sessions.json",
   );
   const sessions = readJSON(sessionsPath) as Record<string, any> | null;
-  return resolveDeliveryTargetFromSessions(sessions, agentName);
+  const specific = resolveDeliveryTargetFromSessions(sessions, agentName);
+  if (specific) return specific;
+
+  // 2. Fallback: scan all OpenClaw agent dirs for Telegram delivery targets.
+  //    Single-agent / default-only setups have a Chorus agent name that
+  //    differs from the OpenClaw agent name (e.g. "goooo" vs "main").
+  const agentsDir = join(OPENCLAW_DIR, "agents");
+  if (!existsSync(agentsDir)) return null;
+  const dirs = readdirSync(agentsDir, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && d.name !== agentName)
+    .map((d) => {
+      const p = join(agentsDir, d.name, "sessions", "sessions.json");
+      return { name: d.name, sessions: readJSON(p) as Record<string, any> | null };
+    });
+  const candidates = collectTelegramTargetsFromAgentDirs(dirs);
+
+  // Exactly one Telegram target → unambiguous fallback (single-agent setup)
+  if (candidates.length === 1) return candidates[0];
+
+  // 0 or 2+: no delivery target (ambiguous = fail fast, no fuzzy delivery)
+  return null;
 }
 
 function saveDeliveryResult(

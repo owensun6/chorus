@@ -1,5 +1,14 @@
 # Chorus Protocol — Progress Log
 
+### 2026-03-31 20:30 (EXP-03 Run 1 冻结 + 审计产物补全)
+
+**操作**: 补写 4 个缺失审计产物（question-log, debrief, contamination-check, screening），链接到 summary
+**结果**: EXP-03 Run 1 产物冻结完成（10 个文件），verdict = VOID
+**决策**:
+- VOID 原因双重：(1) 污染审计 3 项全缺（录屏/shell history/browser history），(2) E-4 违反（受试者与 Commander 同组织）
+- 实质发现记 IMPL：bridge 收到 SSE 但未转发到 Telegram
+- 排查 bridge→TG 投递失败是下一个 P0
+
 ### 2026-03-31 20:15 (restart consent + alpha.7 + doc hardening + EXP-03 retest)
 
 **操作**:

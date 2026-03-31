@@ -29,6 +29,17 @@ jobs:
       - name: Check skill template sync
         run: bash scripts/sync-skill-templates.sh --check
 
+      - name: Check EXP-03 version pins
+        run: |
+          PKG_VERSION=$(node -p "require('./packages/chorus-skill/package.json').version")
+          STALE=$(grep -n '@chorus-protocol/skill@[0-9]' docs/experiments/EXP-03-human-developer-cold-start.md | grep -v "@${PKG_VERSION}" || true)
+          if [ -n "$STALE" ]; then
+            echo "STALE version pins in EXP-03 (expected @${PKG_VERSION}):"
+            echo "$STALE"
+            exit 1
+          fi
+          echo "EXP-03 version pins match package.json ($PKG_VERSION)"
+
       - name: Type check
         run: npx tsc --noEmit
 

@@ -921,10 +921,8 @@ export class OpenClawHostAdapter {
       throw new Error(`no_agent_route target=${target.to} agent=${this.ctx.name}`);
     }
 
-    const receiverPrefs = resolveReceiverPrefs(this.ctx.config);
-    if (!receiverPrefs) {
-      throw new Error(`no_culture_config agent=${this.ctx.name}`);
-    }
+    const receiverPrefs = resolveReceiverPrefs(this.ctx.config)
+      ?? { culture: "en", preferredLanguage: "en" };
 
     let contextToken: string | undefined;
     let account: { baseUrl: string; token?: string } | undefined;

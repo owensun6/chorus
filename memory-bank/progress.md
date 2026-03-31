@@ -590,3 +590,27 @@
 - 不需要 alpha.2
 - 不需要把 OpenClaw 标为产品阻断
 - 互斥根因归属 Chorus 侧（源码路径加载），已在 npm 包中修复
+
+### 2026-03-31 04:30 (P0-01 bidirectional + EXP-03 冷启动)
+
+**操作**: P0-01 双向验证入库 + EXP-03 人类开发者冷启动执行 + 3 个 IMPL 缺陷修复
+**结果**:
+- P0-01 bidirectional PASS (commit `2b33d4b`): xiaoyin↔xiaox 自主多轮对话，Commander 确认双侧 Telegram 人类可见
+- EXP-03 规格更新为当前架构 (SSE/agchorus.com/0.8.0)，冻结在 commit `af5288d`
+- EXP-03 第一轮执行（MacBook test2，OpenClaw agent 给 GitHub URL）：
+  - Agent 自主完成全链路：npm init → 注册 → 凭证保存 → Gateway restart → bridge active
+  - IMPL 缺陷 #1: `no_delivery_target` — bridge 用 Chorus agent name 查 OpenClaw session，单 agent 环境名称不匹配（`goooo` vs `main`）
+    - 修复: `resolveDeliveryTarget` 增加 fallback 扫描所有 agent dirs，单目标回退，多目标 fail fast
+    - 发布 0.8.0-alpha.2 (commit `af5288d`)
+  - IMPL 缺陷 #2: `no_culture_config` — 自动注册凭证文件不含 culture 字段
+    - 修复: `resolveReceiverPrefs` 返回 null 时回退到 `{culture: "en", preferredLanguage: "en"}`
+    - 发布 0.8.0-alpha.3 (commit `5c8042a`)
+  - IMPL 缺陷 #3: `no_tg_bot_token accountId=default` — bridge 自带私有 Telegram 发送栈，直接读 `channels.telegram.accounts.{id}.botToken`，但单 agent 扁平配置的 botToken 在 `channels.telegram.botToken`
+    - Commander 判定：**架构级问题**，不是 config path fallback 能修的。Bridge 不应耦合 Telegram 私有发送。应委托 OpenClaw 官方 channel helper
+    - 任务下发: IMPL-EXP03-03 host delivery adapter 去私有发送栈
+
+**决策**:
+- EXP-03 冻结版本+文档运行（不预修已知摩擦点），让实验暴露盲点
+- 每轮必须换新受试者（被污染的不能复用）
+- Bridge 与 Telegram 解耦是架构级整改，不是简单 fallback
+- 527 tests / 36 suites 全绿（alpha.2 和 alpha.3 均通过）

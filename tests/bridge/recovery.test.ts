@@ -662,4 +662,55 @@ describe('RecoveryEngine', () => {
     expect(finalState.cursor.last_completed_trace_id).toBe('live-trace');
     expect(finalState.cursor.last_completed_timestamp).toBe('2026-03-24T12:05:00.000Z');
   });
+
+  // ---------------------------------------------------------------------------
+  // Regression: transient deliverInbound failure → second recover() retries and succeeds
+  // Models the production bug where first delivery threw no_tg_bot_token,
+  // config was fixed, and recovery on next restart completed the delivery.
+  // ---------------------------------------------------------------------------
+
+  it('recovery retries incomplete fact after transient deliverInbound failure', async () => {
+    const stateManager = new DurableStateManager(tmpDir, AGENT_ID);
+    seedContinuity(stateManager);
+
+    const hubMessages = [
+      makeHubMsg('transient-trace', '2026-03-24T11:00:00.000Z', 'Token missing first time'),
+    ];
+
+    // Phase 1: deliverInbound throws (simulates no_tg_bot_token)
+    const failingAdapter = makeHostAdapter({
+      deliverInbound: jest.fn().mockRejectedValue(new Error('no_tg_bot_token accountId=default')),
+    });
+    const hubClient1 = makeHubClient(hubMessages);
+    const pipelineErrors: string[] = [];
+    const inbound1 = new InboundPipeline(stateManager, failingAdapter, CONFIG, (msg) => pipelineErrors.push(msg));
+    const outbound1 = new OutboundPipeline(stateManager, CONFIG);
+    const engine1 = new RecoveryEngine(REC_CONFIG);
+
+    await engine1.recover(stateManager, inbound1, outbound1, hubClient1, failingAdapter, () => {});
+
+    // Fact was observed but delivery failed — stays incomplete
+    const afterFail = stateManager.load();
+    const failedFact = afterFail.inbound_facts['transient-trace'];
+    expect(failedFact).toBeDefined();
+    expect(failedFact.delivery_evidence).toBeNull();
+    expect(failedFact.cursor_advanced).toBe(false);
+    expect(pipelineErrors.some((e) => e.includes('Transient delivery failure'))).toBe(true);
+
+    // Phase 2: deliverInbound succeeds (simulates config fix + restart)
+    const succeedingAdapter = makeHostAdapter();
+    const hubClient2 = makeHubClient(hubMessages);
+    const inbound2 = new InboundPipeline(stateManager, succeedingAdapter, CONFIG);
+    const outbound2 = new OutboundPipeline(stateManager, CONFIG);
+    const engine2 = new RecoveryEngine(REC_CONFIG);
+
+    await engine2.recover(stateManager, inbound2, outbound2, hubClient2, succeedingAdapter, () => {});
+
+    // Fact now has delivery evidence and cursor advanced
+    const afterRecovery = stateManager.load();
+    const recoveredFact = afterRecovery.inbound_facts['transient-trace'];
+    expect(recoveredFact.delivery_evidence).not.toBeNull();
+    expect(recoveredFact.cursor_advanced).toBe(true);
+    expect(succeedingAdapter.deliverInbound).toHaveBeenCalled();
+  });
 });

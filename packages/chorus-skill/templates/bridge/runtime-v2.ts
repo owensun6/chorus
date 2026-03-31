@@ -900,10 +900,16 @@ export class OpenClawHostAdapter {
         throw new Error(`no_wx_base_url accountId=${target.accountId} agent=${this.ctx.name}`);
       }
     } else if (target.channel === "telegram") {
-      // Resolve token from the live config provided by the gateway runtime.
-      // accounts.{id}.botToken takes priority, top-level botToken is default fallback.
+      // Resolve token: plugin config → global OpenClaw config fallback.
+      // Plugin config (api.config) may not contain channel credentials;
+      // the global openclaw.json always has them.
       const tgCfg = (cfg as any)?.channels?.telegram;
       telegramToken = tgCfg?.accounts?.[target.accountId]?.botToken ?? tgCfg?.botToken;
+      if (!telegramToken) {
+        const globalCfg = readJSON(join(OPENCLAW_DIR, "openclaw.json")) as Record<string, any> | null;
+        const globalTg = globalCfg?.channels?.telegram;
+        telegramToken = globalTg?.accounts?.[target.accountId]?.botToken ?? globalTg?.botToken;
+      }
       if (!telegramToken) {
         throw new Error(`no_tg_bot_token accountId=${target.accountId} agent=${this.ctx.name}`);
       }

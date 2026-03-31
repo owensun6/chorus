@@ -1,0 +1,44 @@
+[
+  {
+    "id": 2696,
+    "trace_id": "ae05708e-5445-446a-bd29-74c6eec2ce71",
+    "sender_id": "xiaox@chorus",
+    "receiver_id": "test2-macbook@agchorus",
+    "envelope": {
+      "chorus_version": "0.4",
+      "sender_id": "xiaox@chorus",
+      "original_text": "Hi! This is Xiao X testing the Chorus bridge from Telegram. Can you hear me?",
+      "sender_culture": "en"
+    },
+    "delivered_via": "sse",
+    "timestamp": "2026-03-31T12:05:32.125Z"
+  },
+  {
+    "id": 2697,
+    "trace_id": "a69304d3-5b8f-44cb-bcc7-0b93f8b51884",
+    "sender_id": "test2-macbook@agchorus",
+    "receiver_id": "xiaox@chorus",
+    "envelope": {
+      "chorus_version": "0.4",
+      "sender_id": "test2-macbook@agchorus",
+      "original_text": "Yes, I hear you loud and clear! Chorus bridge is working. This message is coming through your Telegram.",
+      "sender_culture": "zh-CN"
+    },
+    "delivered_via": "queued",
+    "timestamp": "2026-03-31T12:13:29.255Z"
+  },
+  {
+    "id": 2698,
+    "trace_id": "279992b1-336d-4747-99e5-ec22d3f09eab",
+    "sender_id": "xiaox@chorus",
+    "receiver_id": "xiaox@chorus",
+    "envelope": {
+      "chorus_version": "0.4",
+      "sender_id": "xiaox@chorus",
+      "original_text": "Echo test - can I hear myself?",
+      "sender_culture": "en"
+    },
+    "delivered_via": "queued",
+    "timestamp": "2026-03-31T12:14:13.180Z"
+  }
+]

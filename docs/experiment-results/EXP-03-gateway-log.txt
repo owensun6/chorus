@@ -1,0 +1,948 @@
+2026-03-29T18:22:02.729+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T18:22:02.731+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T18:22:02.736+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T18:22:02.757+08:00 [heartbeat] started
+2026-03-29T18:22:02.758+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T18:22:02.769+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T18:22:02.769+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 25617)
+2026-03-29T18:22:02.770+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T18:22:02.785+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T18:22:03.118+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T18:22:03.161+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T18:22:03.201+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T18:22:03.242+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T18:52:02.824+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:12:36.469+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-29T19:12:36.499+08:00 [gateway] signal SIGUSR1 received
+2026-03-29T19:12:36.500+08:00 [gateway] received SIGUSR1; restarting
+2026-03-29T19:12:36.506+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T19:12:36.511+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-29T19:12:39.319+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T19:12:39.350+08:00 [heartbeat] started
+2026-03-29T19:12:39.350+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T19:12:39.363+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T19:12:39.364+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 38169)
+2026-03-29T19:12:39.364+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T19:12:39.376+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-29T19:12:39.376+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-29T19:12:39.397+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T19:12:41.278+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-29T19:12:41.285+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-29T19:12:41.286+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-29T19:13:20.107+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-29T19:13:20.109+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-29T19:13:55.268+08:00 [telegram] sendMessage ok chat=5465779468 message=75
+2026-03-29T19:26:16.820+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-29T19:26:16.825+08:00 [gateway] signal SIGUSR1 received
+2026-03-29T19:26:16.825+08:00 [gateway] received SIGUSR1; restarting
+2026-03-29T19:26:16.838+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T19:26:16.846+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-29T19:26:19.407+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:26:19.409+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T19:26:19.414+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T19:26:19.439+08:00 [heartbeat] started
+2026-03-29T19:26:19.440+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T19:26:19.453+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T19:26:19.454+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 41640)
+2026-03-29T19:26:19.454+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T19:26:19.470+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T19:26:19.812+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:26:19.855+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:26:19.895+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:26:19.936+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:26:19.971+08:00 [gateway] [chorus-bridge] activated: openclaw-agent@agchorus from agents/openclaw-agent.json
+2026-03-29T19:26:19.972+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-29T19:27:00.249+08:00 [gateway] signal SIGTERM received
+2026-03-29T19:27:00.252+08:00 [gateway] received SIGTERM; shutting down
+2026-03-29T19:27:00.295+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T19:27:01.323+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:27:01.329+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T19:27:01.338+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T19:27:01.357+08:00 [heartbeat] started
+2026-03-29T19:27:01.358+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T19:27:01.369+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T19:27:01.369+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 41864)
+2026-03-29T19:27:01.370+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T19:27:01.385+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T19:27:01.713+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:27:01.761+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:27:01.799+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:27:01.838+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:27:01.872+08:00 [gateway] [chorus-bridge] no credentials found, watching for activation...
+2026-03-29T19:27:06.894+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:27:06.900+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T19:27:06.908+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T19:27:06.926+08:00 [heartbeat] started
+2026-03-29T19:27:06.927+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T19:27:06.938+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T19:27:06.938+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 41920)
+2026-03-29T19:27:06.939+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T19:27:06.954+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T19:27:07.282+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:27:07.329+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:27:07.369+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:27:07.408+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:27:07.442+08:00 [gateway] [chorus-bridge] no credentials found, watching for activation...
+2026-03-29T19:34:43.167+08:00 [gateway] signal SIGTERM received
+2026-03-29T19:34:43.170+08:00 [gateway] received SIGTERM; shutting down
+2026-03-29T19:34:43.216+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T19:34:44.209+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:34:44.215+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T19:34:44.223+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T19:34:44.242+08:00 [heartbeat] started
+2026-03-29T19:34:44.243+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T19:34:44.254+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T19:34:44.254+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 43911)
+2026-03-29T19:34:44.255+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T19:34:44.270+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T19:34:44.595+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:34:44.641+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:34:44.679+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:34:44.718+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:34:44.749+08:00 [gateway] [chorus-bridge] no credentials found, watching for activation...
+2026-03-29T19:35:57.624+08:00 [gateway] signal SIGTERM received
+2026-03-29T19:35:57.627+08:00 [gateway] received SIGTERM; shutting down
+2026-03-29T19:35:57.673+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T19:35:58.653+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:35:58.659+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T19:35:58.667+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T19:35:58.687+08:00 [heartbeat] started
+2026-03-29T19:35:58.688+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T19:35:58.699+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T19:35:58.699+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 44319)
+2026-03-29T19:35:58.700+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T19:35:58.715+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T19:35:59.039+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:35:59.086+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:35:59.125+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:35:59.164+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T19:35:59.198+08:00 [gateway] [chorus-bridge] no credentials found, watching for activation...
+2026-03-29T19:46:09.678+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus.enabled, plugins.allow, plugins.entries.chorus-bridge.enabled)
+2026-03-29T19:46:09.681+08:00 [gateway] signal SIGUSR1 received
+2026-03-29T19:46:09.682+08:00 [gateway] received SIGUSR1; restarting
+2026-03-29T19:46:09.689+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T19:46:09.696+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-29T19:46:12.403+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T19:46:12.434+08:00 [heartbeat] started
+2026-03-29T19:46:12.435+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T19:46:12.446+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T19:46:12.446+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 48344)
+2026-03-29T19:46:12.447+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T19:46:12.459+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-29T19:46:12.459+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-29T19:46:12.480+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T19:46:14.075+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-29T19:46:14.080+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-29T19:46:14.082+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-29T19:46:17.779+08:00 [gateway] signal SIGTERM received
+2026-03-29T19:46:17.782+08:00 [gateway] received SIGTERM; shutting down
+2026-03-29T19:46:17.804+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T19:46:18.843+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T19:46:18.862+08:00 [heartbeat] started
+2026-03-29T19:46:18.863+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T19:46:18.874+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T19:46:18.875+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 48476)
+2026-03-29T19:46:18.875+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T19:46:18.888+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-29T19:46:18.888+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-29T19:46:18.907+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T19:46:20.571+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-29T19:46:20.574+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-29T19:46:20.575+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-29T20:29:23.393+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus.enabled, plugins.allow, plugins.entries.chorus-bridge.enabled)
+2026-03-29T20:29:23.424+08:00 [gateway] signal SIGUSR1 received
+2026-03-29T20:29:23.426+08:00 [gateway] received SIGUSR1; restarting
+2026-03-29T20:29:23.436+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T20:29:23.442+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-29T20:29:26.304+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:29:26.305+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T20:29:26.310+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T20:29:26.342+08:00 [heartbeat] started
+2026-03-29T20:29:26.342+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T20:29:26.356+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T20:29:26.356+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 59541)
+2026-03-29T20:29:26.356+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T20:29:26.374+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T20:29:26.724+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:29:26.771+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:29:26.811+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:29:26.853+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:29:26.889+08:00 [gateway] [chorus-bridge] no credentials found, watching for activation...
+2026-03-29T20:29:38.391+08:00 [gateway] signal SIGTERM received
+2026-03-29T20:29:38.394+08:00 [gateway] received SIGTERM; shutting down
+2026-03-29T20:29:38.440+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T20:29:39.506+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:29:39.512+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T20:29:39.517+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T20:29:39.535+08:00 [heartbeat] started
+2026-03-29T20:29:39.535+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T20:29:39.547+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T20:29:39.547+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 59638)
+2026-03-29T20:29:39.547+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T20:29:39.567+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T20:29:39.898+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:29:39.945+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:29:39.988+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:29:40.028+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:29:40.063+08:00 [gateway] [chorus-bridge] no credentials found, watching for activation...
+2026-03-29T20:30:10.072+08:00 [gateway] [chorus-bridge] activated: test2-coldstart@agchorus from workspace/chorus-credentials.json
+2026-03-29T20:30:10.074+08:00 [gateway] [chorus-bridge] credentials detected, activating...
+2026-03-29T20:30:10.080+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-29T20:30:10.082+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-29T20:31:47.340+08:00 [gateway] signal SIGTERM received
+2026-03-29T20:31:47.342+08:00 [gateway] received SIGTERM; shutting down
+2026-03-29T20:31:47.391+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T20:31:48.478+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:31:48.479+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T20:31:48.485+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T20:31:48.504+08:00 [heartbeat] started
+2026-03-29T20:31:48.505+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T20:31:48.516+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T20:31:48.517+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 60248)
+2026-03-29T20:31:48.517+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T20:31:48.532+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T20:31:48.866+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:31:48.909+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:31:48.949+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:31:48.991+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:31:49.026+08:00 [gateway] [chorus-bridge] activated: test2-coldstart@agchorus from workspace/chorus-credentials.json
+2026-03-29T20:31:49.027+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-29T20:31:49.028+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-29T20:32:44.700+08:00 [gateway] signal SIGTERM received
+2026-03-29T20:32:44.702+08:00 [gateway] received SIGTERM; shutting down
+2026-03-29T20:32:44.747+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T20:32:45.835+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:32:45.836+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T20:32:45.841+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T20:32:45.860+08:00 [heartbeat] started
+2026-03-29T20:32:45.861+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T20:32:45.873+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T20:32:45.873+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 60530)
+2026-03-29T20:32:45.874+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T20:32:45.889+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T20:32:46.219+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:32:46.261+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:32:46.300+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:32:46.342+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T20:32:46.377+08:00 [gateway] [chorus-bridge] activated: test2-coldstart@agchorus from workspace/chorus-credentials.json
+2026-03-29T20:32:46.378+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-29T20:32:46.378+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-29T20:32:46.390+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-29T20:32:46.390+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-29T20:32:47.560+08:00 [gateway] [chorus-bridge] [test2-coldstart] V2 bridge active (state: /Users/test2/.chorus/state/test2-coldstart)
+2026-03-29T21:02:45.944+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T21:05:06.437+08:00 [gateway] signal SIGTERM received
+2026-03-29T21:05:06.440+08:00 [gateway] received SIGTERM; shutting down
+2026-03-29T21:05:06.483+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T21:05:08.093+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T21:05:08.099+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-29T21:05:08.107+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T21:05:08.138+08:00 [heartbeat] started
+2026-03-29T21:05:08.139+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T21:05:08.152+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T21:05:08.152+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 68630)
+2026-03-29T21:05:08.153+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T21:05:08.170+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T21:05:08.504+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T21:05:08.544+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T21:05:08.585+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T21:05:08.625+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-29T21:05:08.659+08:00 [gateway] [chorus-bridge] activated: test2-coldstart@agchorus from workspace/chorus-credentials.json
+2026-03-29T21:05:08.660+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-29T21:05:08.661+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-29T21:05:08.667+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-29T21:05:08.668+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-29T21:05:09.193+08:00 [gateway] update available (latest): v2026.3.28 (current v2026.3.24). Run: openclaw update
+2026-03-29T21:05:09.764+08:00 [gateway] [chorus-bridge] [test2-coldstart] V2 bridge active (state: /Users/test2/.chorus/state/test2-coldstart)
+2026-03-29T21:08:37.950+08:00 [gateway] signal SIGTERM received
+2026-03-29T21:08:37.952+08:00 [gateway] received SIGTERM; shutting down
+2026-03-29T21:08:37.990+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-29T21:08:39.419+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-29T21:08:39.450+08:00 [heartbeat] started
+2026-03-29T21:08:39.451+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-29T21:08:39.464+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-29T21:08:39.464+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 69789)
+2026-03-29T21:08:39.465+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-29.log
+2026-03-29T21:08:39.479+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-29T21:08:39.479+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-29T21:08:39.501+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-29T21:08:42.014+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-29T21:08:42.021+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-29T21:08:42.023+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-29T21:08:52.943+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-29T21:08:52.944+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T12:31:25.446+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T12:31:43.362+08:00 [gateway-tool] gateway tool: restart requested (delayMs=default, reason=none)
+2026-03-31T12:31:53.051+08:00 [reload] all operations and replies completed; restarting gateway now
+2026-03-31T12:31:53.054+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T12:31:53.056+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T12:31:53.096+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T12:31:53.107+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T12:31:55.866+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:31:55.872+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T12:31:55.880+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T12:31:55.911+08:00 [heartbeat] started
+2026-03-31T12:31:55.912+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T12:31:55.923+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T12:31:55.923+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 52369)
+2026-03-31T12:31:55.924+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T12:31:55.939+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T12:31:56.286+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:31:56.337+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:31:56.378+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:31:56.418+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:31:56.453+08:00 [gateway] [chorus-bridge] activated: goooo@agchorus from workspace/chorus-credentials.json
+2026-03-31T12:31:56.454+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T12:31:56.454+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T12:31:56.461+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T12:31:56.462+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T12:31:57.510+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:31:57.530+08:00 [gateway] [chorus-bridge] [goooo] V2 bridge active (state: /Users/test2/.chorus/state/goooo)
+2026-03-31T12:55:41.995+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T12:55:42.018+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T12:55:42.018+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T12:55:42.024+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T12:55:42.030+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T12:55:44.870+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T12:55:44.907+08:00 [heartbeat] started
+2026-03-31T12:55:44.907+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T12:55:44.919+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T12:55:44.920+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 61096)
+2026-03-31T12:55:44.920+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T12:55:44.933+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T12:55:44.934+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T12:55:44.954+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T12:55:46.695+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-31T12:55:46.700+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T12:55:46.702+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T12:57:21.112+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T12:57:21.112+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T12:57:34.559+08:00 [telegram] sendMessage ok chat=5465779468 message=84
+2026-03-31T12:57:56.695+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T12:58:08.812+08:00 [gateway-tool] gateway tool: restart requested (delayMs=default, reason=none)
+2026-03-31T12:58:29.296+08:00 [reload] all operations and replies completed; restarting gateway now
+2026-03-31T12:58:29.300+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T12:58:29.303+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T12:58:29.355+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T12:58:29.368+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T12:58:29.368+08:00 [gateway] received SIGUSR1 during shutdown; ignoring
+2026-03-31T12:58:29.370+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T12:58:32.097+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:58:32.099+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T12:58:32.104+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T12:58:32.133+08:00 [heartbeat] started
+2026-03-31T12:58:32.134+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T12:58:32.148+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T12:58:32.148+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 61922)
+2026-03-31T12:58:32.149+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T12:58:32.166+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T12:58:32.525+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:58:32.574+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:58:32.614+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:58:32.657+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:58:32.693+08:00 [gateway] [chorus-bridge] activated: test2@agchorus from workspace/chorus-credentials.json
+2026-03-31T12:58:32.694+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T12:58:32.694+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T12:58:32.702+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T12:58:32.702+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T12:58:33.743+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T12:58:33.762+08:00 [gateway] [chorus-bridge] [test2] V2 bridge active (state: /Users/test2/.chorus/state/test2)
+2026-03-31T13:09:56.072+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T13:09:56.077+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T13:09:56.077+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T13:09:56.083+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T13:09:56.090+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T13:09:58.980+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T13:09:59.028+08:00 [heartbeat] started
+2026-03-31T13:09:59.028+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T13:09:59.042+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T13:09:59.043+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 65039)
+2026-03-31T13:09:59.043+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T13:09:59.056+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T13:09:59.057+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T13:09:59.085+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T13:10:00.798+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-31T13:10:00.803+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T13:10:00.805+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T13:10:51.236+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T13:10:51.236+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T13:11:08.152+08:00 [telegram] sendMessage ok chat=5465779468 message=88
+2026-03-31T13:11:33.339+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T13:12:15.796+08:00 [gateway-tool] gateway tool: restart requested (delayMs=default, reason=none)
+2026-03-31T13:12:24.814+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T13:12:24.816+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T13:12:24.862+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T13:12:24.873+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T13:12:27.558+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T13:12:27.559+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T13:12:27.564+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T13:12:27.593+08:00 [heartbeat] started
+2026-03-31T13:12:27.593+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T13:12:27.606+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T13:12:27.607+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 65778)
+2026-03-31T13:12:27.607+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T13:12:27.623+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T13:12:27.986+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T13:12:28.030+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T13:12:28.072+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T13:12:28.112+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T13:12:28.148+08:00 [gateway] [chorus-bridge] activated: telegram-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T13:12:28.149+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T13:12:28.150+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T13:12:28.157+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T13:12:28.157+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T13:12:29.199+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T13:12:29.499+08:00 [gateway] [chorus-bridge] [telegram-agent] V2 bridge active (state: /Users/test2/.chorus/state/telegram-agent)
+2026-03-31T14:04:57.908+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T14:04:57.935+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T14:04:57.936+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T14:04:57.943+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T14:04:57.950+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T14:05:00.791+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:00.792+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T14:05:00.798+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T14:05:00.830+08:00 [heartbeat] started
+2026-03-31T14:05:00.831+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T14:05:00.843+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T14:05:00.844+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 88950)
+2026-03-31T14:05:00.844+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T14:05:00.862+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T14:05:01.217+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:01.261+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:01.304+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:01.347+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:01.384+08:00 [gateway] [chorus-bridge] activated: telegram-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T14:05:01.385+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T14:05:01.385+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T14:05:01.392+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T14:05:01.393+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T14:05:02.854+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:02.894+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:02.933+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:02.973+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:03.034+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=telegram-agent, activePeer=none)
+2026-03-31T14:05:13.135+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T14:05:13.136+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T14:05:14.354+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"00e6f230-8a9d-4859-a476-b851a254ae86","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"91","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T06:05:14.350Z"}
+2026-03-31T14:05:15.090+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=aa8d9173-31a1-438c-8a8e-0d75defbf57a route_key=telegram-agent@agchorus:xiaox@chorus
+2026-03-31T14:05:15.349+08:00 [gateway] [chorus-bridge] [telegram-agent] V2 bridge active (state: /Users/test2/.chorus/state/telegram-agent)
+2026-03-31T14:05:34.683+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:34.722+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:34.761+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:34.805+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:05:34.818+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=telegram-agent, activePeer=none)
+2026-03-31T14:05:46.564+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"922df263-b03d-4008-99d6-99eb5be8f2e5","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"92","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T06:05:46.562Z"}
+2026-03-31T14:05:47.389+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=abfcbbca-2d81-4a93-9082-344b09d55170 route_key=telegram-agent@agchorus:xiaox@chorus
+2026-03-31T14:05:56.765+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=telegram-agent, activePeer=none)
+2026-03-31T14:06:08.682+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"993d8ffa-c0a5-45b0-b7bb-5fe1eb4bbf72","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"93","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T06:06:08.680Z"}
+2026-03-31T14:06:09.447+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=2d5ff89c-b138-4a65-aaee-6782c111bd86 route_key=telegram-agent@agchorus:xiaox@chorus
+2026-03-31T14:35:00.932+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:51:37.267+08:00 [gateway] signal SIGTERM received
+2026-03-31T14:51:37.272+08:00 [gateway] received SIGTERM; shutting down
+2026-03-31T14:51:37.331+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T14:51:38.422+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:51:38.428+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T14:51:38.440+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T14:51:38.475+08:00 [heartbeat] started
+2026-03-31T14:51:38.476+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T14:51:38.491+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T14:51:38.491+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 4526)
+2026-03-31T14:51:38.492+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T14:51:38.514+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T14:51:38.872+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:51:38.920+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:51:38.960+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:51:39.000+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:51:39.034+08:00 [gateway] [chorus-bridge] activated: telegram-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T14:51:39.035+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T14:51:39.035+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T14:51:39.042+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T14:51:39.043+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T14:51:39.923+08:00 [gateway] [chorus-bridge] [telegram-agent] V2 bridge active (state: /Users/test2/.chorus/state/telegram-agent)
+2026-03-31T14:58:25.453+08:00 [gateway] signal SIGTERM received
+2026-03-31T14:58:25.458+08:00 [gateway] received SIGTERM; shutting down
+2026-03-31T14:58:25.510+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T14:58:26.534+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:58:26.539+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T14:58:26.548+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T14:58:26.580+08:00 [heartbeat] started
+2026-03-31T14:58:26.580+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T14:58:26.593+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T14:58:26.593+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 7924)
+2026-03-31T14:58:26.594+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T14:58:26.612+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T14:58:26.958+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:58:27.005+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:58:27.044+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:58:27.084+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T14:58:27.119+08:00 [gateway] [chorus-bridge] activated: telegram-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T14:58:27.120+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T14:58:27.120+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T14:58:27.127+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T14:58:27.128+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T14:58:28.064+08:00 [gateway] [chorus-bridge] [telegram-agent] V2 bridge active (state: /Users/test2/.chorus/state/telegram-agent)
+2026-03-31T14:59:14.679+08:00 [gateway] signal SIGTERM received
+2026-03-31T14:59:14.683+08:00 [gateway] received SIGTERM; shutting down
+2026-03-31T14:59:14.722+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:02:04.611+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:02:04.640+08:00 [heartbeat] started
+2026-03-31T15:02:04.641+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:02:04.654+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:02:04.654+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 9872)
+2026-03-31T15:02:04.654+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:02:04.676+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:02:25.073+08:00 [gateway] signal SIGTERM received
+2026-03-31T15:02:25.075+08:00 [gateway] received SIGTERM; shutting down
+2026-03-31T15:02:25.114+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:05:45.830+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:05:45.836+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T15:05:45.841+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:05:45.883+08:00 [heartbeat] started
+2026-03-31T15:05:45.883+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:05:45.900+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:05:45.901+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 11879)
+2026-03-31T15:05:45.901+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:05:45.923+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:05:46.255+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:05:46.299+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:05:46.342+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:05:46.383+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:05:46.449+08:00 [gateway] [chorus-bridge] activated: telegram-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T15:05:46.451+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T15:05:46.451+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T15:05:46.478+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T15:05:46.479+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T15:05:47.598+08:00 [gateway] [chorus-bridge] [telegram-agent] V2 bridge active (state: /Users/test2/.chorus/state/telegram-agent)
+2026-03-31T15:05:49.036+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T15:05:49.040+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T15:05:49.041+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T15:05:49.048+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:05:49.055+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T15:05:51.295+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:05:51.316+08:00 [heartbeat] started
+2026-03-31T15:05:51.316+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:05:51.328+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:05:51.329+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 11955)
+2026-03-31T15:05:51.329+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:05:51.342+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T15:05:51.342+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T15:05:51.365+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:05:53.144+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-31T15:05:53.151+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T15:05:53.152+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T15:05:56.554+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T15:05:56.555+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T15:06:14.639+08:00 [telegram] sendMessage ok chat=5465779468 message=98
+2026-03-31T15:06:15.335+08:00 [telegram] sendMessage ok chat=5465779468 message=99
+2026-03-31T15:06:35.771+08:00 [telegram] sendMessage ok chat=5465779468 message=101
+2026-03-31T15:09:54.050+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T15:10:06.592+08:00 [reload] all operations and replies completed; restarting gateway now
+2026-03-31T15:10:06.594+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T15:10:06.596+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T15:10:06.640+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:10:06.650+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T15:10:09.425+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:10:09.426+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T15:10:09.431+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:10:09.461+08:00 [heartbeat] started
+2026-03-31T15:10:09.461+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:10:09.473+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:10:09.473+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 13391)
+2026-03-31T15:10:09.474+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:10:09.491+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:10:09.841+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:10:09.883+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:10:09.924+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:10:09.966+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:10:09.999+08:00 [gateway] [chorus-bridge] activated: telegram-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T15:10:10.000+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T15:10:10.000+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T15:10:10.007+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T15:10:10.007+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T15:10:10.877+08:00 [gateway] [chorus-bridge] [telegram-agent] V2 bridge active (state: /Users/test2/.chorus/state/telegram-agent)
+2026-03-31T15:25:38.849+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T15:25:38.884+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T15:25:38.884+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T15:25:38.892+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:25:38.898+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T15:25:41.506+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:25:41.537+08:00 [heartbeat] started
+2026-03-31T15:25:41.538+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:25:41.549+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:25:41.549+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 16041)
+2026-03-31T15:25:41.550+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:25:41.562+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T15:25:41.563+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T15:25:41.585+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:25:43.420+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-31T15:25:43.425+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T15:25:43.427+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T15:26:04.319+08:00 [gateway-tool] gateway tool: restart requested (delayMs=default, reason=none)
+2026-03-31T15:26:12.740+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T15:26:12.742+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T15:26:13.838+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T15:26:13.842+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T15:26:13.890+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:26:13.898+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T15:26:16.174+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:26:16.193+08:00 [heartbeat] started
+2026-03-31T15:26:16.194+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:26:16.205+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:26:16.206+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 16226)
+2026-03-31T15:26:16.206+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:26:16.218+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T15:26:16.218+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T15:26:16.240+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:26:17.546+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T15:26:17.546+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T15:26:19.248+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-31T15:26:19.254+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T15:26:19.255+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T15:26:31.073+08:00 [ws] ⇄ res ✓ channels.status 1427ms conn=5f1a87ff…06e3 id=ff5516f7…bc57
+2026-03-31T15:26:31.181+08:00 [ws] ⇄ res ✓ doctor.memory.status 101ms conn=12eaebb4…6e79 id=93201ffe…b363
+2026-03-31T15:29:48.133+08:00 [telegram] sendMessage ok chat=5465779468 message=109
+2026-03-31T15:32:52.349+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T15:33:18.212+08:00 [gateway-tool] gateway tool: restart requested (delayMs=default, reason=none)
+2026-03-31T15:33:27.229+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T15:33:27.232+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T15:33:27.289+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:33:27.300+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T15:33:29.802+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:33:29.807+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T15:33:29.816+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:33:29.843+08:00 [heartbeat] started
+2026-03-31T15:33:29.844+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:33:29.855+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:33:29.855+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 18157)
+2026-03-31T15:33:29.856+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:33:29.873+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:33:30.211+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:33:30.258+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:33:30.297+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:33:30.336+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:33:30.370+08:00 [gateway] [chorus-bridge] activated: test2-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T15:33:30.371+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T15:33:30.372+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T15:33:30.379+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T15:33:30.379+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T15:33:31.420+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:33:31.542+08:00 [gateway] [chorus-bridge] [test2-agent] V2 bridge active (state: /Users/test2/.chorus/state/test2-agent)
+2026-03-31T15:39:12.391+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T15:39:12.393+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T15:39:12.394+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T15:39:12.399+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:39:12.405+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T15:39:15.104+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:39:15.105+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T15:39:15.110+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:39:15.137+08:00 [heartbeat] started
+2026-03-31T15:39:15.138+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:39:15.149+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:39:15.150+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 19634)
+2026-03-31T15:39:15.150+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:39:15.167+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:39:15.512+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:39:15.553+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:39:15.595+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:39:15.635+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:39:15.668+08:00 [gateway] [chorus-bridge] activated: test2-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T15:39:15.669+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T15:39:15.669+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T15:39:15.676+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T15:39:15.676+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T15:39:16.842+08:00 [gateway] [chorus-bridge] [test2-agent] V2 bridge active (state: /Users/test2/.chorus/state/test2-agent)
+2026-03-31T15:39:39.641+08:00 [gateway] signal SIGTERM received
+2026-03-31T15:39:39.644+08:00 [gateway] received SIGTERM; shutting down
+2026-03-31T15:39:39.684+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:39:40.692+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:39:40.698+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T15:39:40.708+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:39:40.737+08:00 [heartbeat] started
+2026-03-31T15:39:40.738+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:39:40.752+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:39:40.752+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 19807)
+2026-03-31T15:39:40.753+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:39:40.771+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:39:41.146+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:39:41.193+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:39:41.233+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:39:41.272+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:39:41.307+08:00 [gateway] [chorus-bridge] activated: test2-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T15:39:41.308+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T15:39:41.308+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T15:39:41.314+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T15:39:41.315+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T15:39:42.317+08:00 [gateway] [chorus-bridge] [test2-agent] V2 bridge active (state: /Users/test2/.chorus/state/test2-agent)
+2026-03-31T15:45:51.379+08:00 [gateway] signal SIGTERM received
+2026-03-31T15:45:51.382+08:00 [gateway] received SIGTERM; shutting down
+2026-03-31T15:45:51.425+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:45:52.575+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:45:52.577+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T15:45:52.582+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:45:52.610+08:00 [heartbeat] started
+2026-03-31T15:45:52.611+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:45:52.623+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:45:52.624+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 21466)
+2026-03-31T15:45:52.624+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:45:52.642+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:45:53.004+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:45:53.047+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:45:53.089+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:45:53.131+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:45:53.170+08:00 [gateway] [chorus-bridge] activated: test2-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T15:45:53.171+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T15:45:53.171+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T15:45:53.178+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T15:45:53.178+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T15:45:54.436+08:00 [gateway] [chorus-bridge] [diag] cfg keys=["meta","env","models","agents","commands","channels","gateway","skills","plugins","messages"] channels=["telegram"] tg=["enabled","dmPolicy","botToken","allowFrom","groupPolicy","streaming"]
+2026-03-31T15:45:54.441+08:00 [gateway] [chorus-bridge] [test2-agent] V2 bridge active (state: /Users/test2/.chorus/state/test2-agent)
+2026-03-31T15:46:11.018+08:00 [gateway] [chorus-bridge] [diag] cfg keys=["meta","env","models","agents","commands","channels","gateway","skills","plugins","messages"] channels=["telegram"] tg=["enabled","dmPolicy","botToken","allowFrom","groupPolicy","streaming"]
+2026-03-31T15:51:28.091+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T15:51:28.097+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T15:51:28.098+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T15:51:28.104+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T15:51:28.112+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T15:51:33.746+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:33.748+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T15:51:33.753+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T15:51:33.782+08:00 [heartbeat] started
+2026-03-31T15:51:33.783+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T15:51:33.797+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T15:51:33.798+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 23084)
+2026-03-31T15:51:33.798+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T15:51:33.821+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T15:51:34.178+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:34.220+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:34.262+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:34.303+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:34.339+08:00 [gateway] [chorus-bridge] activated: test2-agent@agchorus from workspace/chorus-credentials.json
+2026-03-31T15:51:34.340+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T15:51:34.340+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T15:51:34.347+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T15:51:34.347+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T15:51:35.887+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:35.927+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:35.967+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:36.006+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:36.065+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=test2-agent, activePeer=none)
+2026-03-31T15:51:54.974+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T15:51:54.975+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T15:51:56.254+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"627be5a1-f99c-4cb1-a30b-5fc477fd95e0","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"112","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T07:51:56.251Z"}
+2026-03-31T15:51:56.391+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:56.431+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:56.469+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:56.507+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T15:51:56.516+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=test2-agent, activePeer=none)
+2026-03-31T15:51:56.948+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=d815cd3e-4fa1-4c46-837a-bcf7c4a80308 route_key=test2-agent@agchorus:xiaox@chorus
+2026-03-31T15:52:10.049+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"2faab8ee-2f25-44a5-81bf-8315c14a215f","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"113","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T07:52:10.046Z"}
+2026-03-31T15:52:10.144+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=test2-agent, activePeer=none)
+2026-03-31T15:52:11.004+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=11dccefe-ab6c-4cfe-9fc6-83892210aeb2 route_key=test2-agent@agchorus:xiaox@chorus
+2026-03-31T15:52:21.321+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"959d9825-5bc0-4869-8117-0f7227a59ec7","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"114","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T07:52:21.318Z"}
+2026-03-31T15:52:21.416+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=test2-agent, activePeer=none)
+2026-03-31T15:52:21.860+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=d15e8050-891e-4037-bc63-8046afbd8684 route_key=test2-agent@agchorus:xiaox@chorus
+2026-03-31T15:52:21.870+08:00 [gateway] [chorus-bridge] [test2-agent] V2 bridge active (state: /Users/test2/.chorus/state/test2-agent)
+2026-03-31T15:52:25.087+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"b7a26960-f0b6-4259-b7d0-c1353e4cd8ce","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"115","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T07:52:25.084Z"}
+2026-03-31T15:52:25.604+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=test2-agent, activePeer=none)
+2026-03-31T15:52:25.792+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=c79e12c1-343c-4f43-a2a1-5d9ea5ef9d05 route_key=test2-agent@agchorus:xiaox@chorus
+2026-03-31T15:52:29.302+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"60443f32-b7ad-488d-adf6-baa0a016b6da","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"116","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T07:52:29.298Z"}
+2026-03-31T15:52:29.386+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=test2-agent, activePeer=none)
+2026-03-31T15:52:29.993+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=894edde9-d326-4df8-ae94-38b4f80db625 route_key=test2-agent@agchorus:xiaox@chorus
+2026-03-31T15:52:32.920+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"b2973ab0-14f3-4d37-9714-038bde2ae970","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"117","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T07:52:32.916Z"}
+2026-03-31T15:52:33.395+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=651743d5-2956-4ce6-9471-da0f0217a84d route_key=test2-agent@agchorus:xiaox@chorus
+2026-03-31T15:52:34.891+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=test2-agent, activePeer=none)
+2026-03-31T15:52:39.670+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"6a475315-d21f-43e2-be51-50e9f5461283","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"118","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T07:52:39.667Z"}
+2026-03-31T15:52:39.757+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=test2-agent, activePeer=none)
+2026-03-31T15:52:41.061+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=6bf467fa-1499-4cea-9351-90c5954967d2 route_key=test2-agent@agchorus:xiaox@chorus
+2026-03-31T15:52:43.410+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"a7d0f692-6eb7-42d4-9bd1-dd0ca244bf08","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"119","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T07:52:43.407Z"}
+2026-03-31T15:52:43.499+08:00 [gateway] [chorus-bridge] before_prompt_build injected Chorus router context (agent=test2-agent, activePeer=none)
+2026-03-31T15:52:43.891+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=d5621faf-a18b-4862-9ecf-d1905c0daffd route_key=test2-agent@agchorus:xiaox@chorus
+2026-03-31T15:52:47.158+08:00 [gateway] [chorus-bridge] [bridge:delivery] {"event":"delivery_confirmed","trace_id":"1a2712c3-4e87-40e7-9666-86fb15ec8f00","peer":"xiaox@chorus","channel":"telegram","method":"telegram_server_ack","ref":"120","terminal_disposition":"delivery_confirmed","timestamp":"2026-03-31T07:52:47.155Z"}
+2026-03-31T15:52:47.820+08:00 [gateway] [chorus-bridge] outbound relay OK: trace_id=a06714ae-10a9-4471-9554-4228d430be9d route_key=test2-agent@agchorus:xiaox@chorus
+2026-03-31T16:13:42.257+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T16:13:42.287+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T16:13:42.288+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T16:13:42.294+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T16:13:42.300+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T16:13:45.003+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T16:13:45.036+08:00 [heartbeat] started
+2026-03-31T16:13:45.037+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T16:13:45.050+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T16:13:45.051+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 28656)
+2026-03-31T16:13:45.051+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T16:13:45.068+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T16:13:45.068+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T16:13:45.094+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T16:13:47.228+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-31T16:13:47.234+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T16:13:47.235+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T16:17:59.751+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T16:17:59.752+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T16:18:19.521+08:00 [telegram] sendMessage ok chat=5465779468 message=123
+2026-03-31T16:19:36.149+08:00 [reload] config change detected; evaluating reload (skills.entries.chorus, plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T16:20:05.429+08:00 [gateway-tool] gateway tool: restart requested (delayMs=default, reason=none)
+2026-03-31T16:20:36.792+08:00 [gateway] signal SIGTERM received
+2026-03-31T16:20:36.793+08:00 [gateway] received SIGTERM; shutting down
+2026-03-31T16:20:36.803+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T16:20:37.784+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:20:37.790+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T16:20:37.798+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T16:20:37.829+08:00 [heartbeat] started
+2026-03-31T16:20:37.830+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T16:20:37.841+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T16:20:37.842+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 30576)
+2026-03-31T16:20:37.842+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T16:20:37.860+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T16:20:38.230+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:20:38.279+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:20:38.321+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:20:38.362+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:20:38.398+08:00 [gateway] [chorus-bridge] no credentials found, watching for activation...
+2026-03-31T16:20:39.443+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:21:33.409+08:00 [gateway] [chorus-bridge] activated: telegram-5465779468@agchorus from workspace/chorus-credentials.json
+2026-03-31T16:21:33.410+08:00 [gateway] [chorus-bridge] credentials detected, activating...
+2026-03-31T16:21:33.414+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T16:21:33.416+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T16:21:33.437+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T16:21:33.438+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T16:21:34.832+08:00 [gateway] [chorus-bridge] [telegram-5465779468] V2 bridge active (state: /Users/test2/.chorus/state/telegram-5465779468)
+2026-03-31T16:21:37.490+08:00 [gateway] signal SIGTERM received
+2026-03-31T16:21:37.491+08:00 [gateway] received SIGTERM; shutting down
+2026-03-31T16:21:37.498+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T16:21:38.477+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:21:38.483+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T16:21:38.491+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T16:21:38.519+08:00 [heartbeat] started
+2026-03-31T16:21:38.519+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T16:21:38.532+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T16:21:38.532+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 30909)
+2026-03-31T16:21:38.532+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T16:21:38.550+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T16:21:38.886+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:21:38.933+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:21:38.973+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:21:39.014+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T16:21:39.050+08:00 [gateway] [chorus-bridge] activated: telegram-5465779468@agchorus from workspace/chorus-credentials.json
+2026-03-31T16:21:39.051+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T16:21:39.051+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T16:21:39.056+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T16:21:39.056+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T16:21:40.118+08:00 [gateway] [chorus-bridge] [telegram-5465779468] V2 bridge active (state: /Users/test2/.chorus/state/telegram-5465779468)
+2026-03-31T16:57:26.584+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:43:24.650+08:00 [gateway] device pairing auto-approved device=a98efbfc6b9c8477f95c8974ab35643e9da8e58871f3546802c3803773b917e5 role=operator
+2026-03-31T19:54:39.881+08:00 [gateway] signal SIGTERM received
+2026-03-31T19:54:39.881+08:00 [gateway] received SIGTERM; shutting down
+2026-03-31T19:54:39.895+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T19:54:40.885+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:54:40.891+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T19:54:40.896+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T19:54:40.927+08:00 [heartbeat] started
+2026-03-31T19:54:40.928+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T19:54:40.940+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T19:54:40.940+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 43245)
+2026-03-31T19:54:40.941+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T19:54:40.962+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T19:54:41.301+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:54:41.346+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:54:41.387+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:54:41.426+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:54:41.459+08:00 [gateway] [chorus-bridge] activated: test2-macbook@agchorus from workspace/chorus-credentials.json
+2026-03-31T19:54:41.460+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T19:54:41.460+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T19:54:41.467+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T19:54:41.467+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T19:54:42.082+08:00 [gateway] [chorus-bridge] [test2-macbook] V2 bridge active (state: /Users/test2/.chorus/state/test2-macbook)
+2026-03-31T19:54:54.213+08:00 [reload] config change detected; evaluating reload (plugins.allow, plugins.entries.chorus-bridge)
+2026-03-31T19:54:54.216+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T19:54:54.216+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T19:54:54.224+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T19:54:54.231+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T19:54:56.454+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:54:56.455+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T19:54:56.460+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T19:54:56.479+08:00 [heartbeat] started
+2026-03-31T19:54:56.479+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T19:54:56.490+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T19:54:56.490+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 43418)
+2026-03-31T19:54:56.491+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T19:54:56.498+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T19:54:56.499+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T19:54:56.523+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T19:54:56.863+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:54:56.910+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:54:56.955+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:54:56.997+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:54:57.028+08:00 [gateway] [chorus-bridge] activated: test2-macbook@agchorus from workspace/chorus-credentials.json
+2026-03-31T19:54:57.029+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T19:54:57.030+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T19:54:57.034+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T19:54:57.034+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T19:54:57.801+08:00 [gateway] [chorus-bridge] [test2-macbook] V2 bridge active (state: /Users/test2/.chorus/state/test2-macbook)
+2026-03-31T19:54:58.307+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-31T19:54:58.316+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T19:54:58.318+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T19:54:58.449+08:00 [gateway] signal SIGTERM received
+2026-03-31T19:54:58.449+08:00 [gateway] received SIGTERM; shutting down
+2026-03-31T19:55:01.191+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T19:55:01.192+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T19:55:02.622+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:55:02.664+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:55:02.704+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:55:02.745+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:55:04.484+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:55:04.485+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T19:55:04.490+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T19:55:04.509+08:00 [heartbeat] started
+2026-03-31T19:55:04.510+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T19:55:04.521+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T19:55:04.521+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 43554)
+2026-03-31T19:55:04.522+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T19:55:04.529+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T19:55:04.530+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T19:55:04.554+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T19:55:04.888+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:55:04.935+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:55:04.981+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:55:05.024+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T19:55:05.056+08:00 [gateway] [chorus-bridge] activated: test2-macbook@agchorus from workspace/chorus-credentials.json
+2026-03-31T19:55:05.057+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T19:55:05.058+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T19:55:05.062+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T19:55:05.062+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T19:55:06.688+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-31T19:55:06.697+08:00 [gateway] [chorus-bridge] [test2-macbook] V2 bridge active (state: /Users/test2/.chorus/state/test2-macbook)
+2026-03-31T19:55:06.699+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T19:55:06.700+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T19:56:25.698+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T19:56:25.698+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T19:56:44.352+08:00 [telegram] sendMessage ok chat=5465779468 message=129
+2026-03-31T19:59:58.315+08:00 [gateway-tool] gateway tool: restart requested (delayMs=default, reason=none)
+2026-03-31T20:01:04.936+08:00 [gateway] signal SIGUSR1 received
+2026-03-31T20:01:04.938+08:00 [gateway] received SIGUSR1; restarting
+2026-03-31T20:01:04.991+08:00 [gmail-watcher] gmail watcher stopped
+2026-03-31T20:01:04.999+08:00 [gateway] restart mode: full process restart (supervisor restart)
+2026-03-31T20:01:07.217+08:00 [gateway] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T20:01:07.218+08:00 [gateway] [plugins] loaded without install/load-path provenance; treat as untracked local code and pin trust via plugins.allow or install records (plugin=chorus-bridge, source=/Users/test2/.openclaw/extensions/chorus-bridge/index.ts)
+2026-03-31T20:01:07.223+08:00 [canvas] host mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/test2/.openclaw/canvas)
+2026-03-31T20:01:07.252+08:00 [heartbeat] started
+2026-03-31T20:01:07.252+08:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-03-31T20:01:07.264+08:00 [gateway] agent model: minimax/MiniMax-M2.7
+2026-03-31T20:01:07.264+08:00 [gateway] listening on ws://127.0.0.1:18789, ws://[::1]:18789 (PID 45791)
+2026-03-31T20:01:07.264+08:00 [gateway] log file: /tmp/openclaw/openclaw-2026-03-31.log
+2026-03-31T20:01:07.272+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T20:01:07.272+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T20:01:07.297+08:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-03-31T20:01:07.632+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T20:01:07.679+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T20:01:07.724+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T20:01:07.766+08:00 [plugins] [chorus-bridge] registered, waiting for gateway_start
+2026-03-31T20:01:07.807+08:00 [gateway] [chorus-bridge] activated: test2-macbook@agchorus from workspace/chorus-credentials.json
+2026-03-31T20:01:07.809+08:00 [gateway] [chorus-bridge] jiti loaded from /Users/test2/.npm-global/lib/node_modules/openclaw
+2026-03-31T20:01:07.810+08:00 [gateway] [chorus-bridge] loading runtime modules from /Users/test2/.openclaw/extensions/chorus-bridge/runtime
+2026-03-31T20:01:07.818+08:00 [gateway] [chorus-bridge] WeChat channel adapter: unavailable (weixin plugin directory not found)
+2026-03-31T20:01:07.819+08:00 [gateway] [chorus-bridge] Telegram channel adapter: available (built-in)
+2026-03-31T20:01:08.624+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T20:01:08.625+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)
+2026-03-31T20:01:09.513+08:00 [gateway] [chorus-bridge] [test2-macbook] V2 bridge active (state: /Users/test2/.chorus/state/test2-macbook)
+2026-03-31T20:01:10.025+08:00 [telegram] [default] starting provider (@Nannnnnno_bot)
+2026-03-31T20:01:10.030+08:00 [telegram] autoSelectFamily=true (default-node22)
+2026-03-31T20:01:10.032+08:00 [telegram] dnsResultOrder=ipv4first (default-node22)

@@ -586,14 +586,13 @@ describe("runtime-v2 plugin entry", () => {
     let dispatcherOnError: ((err: unknown) => void) | null = null;
 
     const fakeApi = {
-      config: {},
+      config: { channels: { telegram: { enabled: true, botToken: "test-bot-token" } } },
       runtime: {
         channel: {
           routing: {
             resolveAgentRoute: jest.fn().mockReturnValue({ agentId: "agent:xiaox:main" }),
           },
           telegram: {
-            resolveTelegramToken: jest.fn().mockReturnValue({ token: "test-bot-token", source: "config" }),
             sendMessageTelegram: jest.fn().mockResolvedValue({ messageId: "99999", chatId: "123456" }),
           },
           session: {
@@ -1087,14 +1086,13 @@ describe("runtime-v2 plugin entry", () => {
     let capturedOnError: ((err: unknown) => void) | null = null;
 
     const fakeApi = {
-      config: {},
+      config: { channels: { telegram: { enabled: true, botToken: "test-bot-token" } } },
       runtime: {
         channel: {
           routing: {
             resolveAgentRoute: jest.fn().mockReturnValue({ agentId: "agent:xiaox:main" }),
           },
           telegram: {
-            resolveTelegramToken: jest.fn().mockReturnValue({ token: "test-bot-token", source: "config" }),
             sendMessageTelegram: jest.fn().mockResolvedValue({ messageId: "98765", chatId: "123456" }),
           },
           session: {
@@ -1200,7 +1198,7 @@ describe("runtime-v2 plugin entry", () => {
       "123456",
       expect.any(String),
       expect.objectContaining({
-        accountId: "tg-main",
+        token: "test-bot-token",
         textMode: "markdown",
       }),
     );
@@ -1242,7 +1240,7 @@ describe("runtime-v2 plugin entry", () => {
       .rejects.toThrow("Telegram API 403: bot was blocked by the user");
   });
 
-  it("Telegram delivery throws no_tg_bot_token when resolveTelegramToken returns no token", async () => {
+  it("Telegram delivery throws no_tg_bot_token when config has no botToken", async () => {
     seedTelegramRuntime("xiaox");
 
     jest.doMock("node:os", () => ({
@@ -1253,7 +1251,8 @@ describe("runtime-v2 plugin entry", () => {
     const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
 
     const fakeApi = buildTelegramDeliveryHarness();
-    fakeApi.runtime.channel.telegram.resolveTelegramToken.mockReturnValue({ token: "", source: "none" });
+    // Config with no botToken — simulates missing Telegram configuration
+    (fakeApi as any).config = { channels: { telegram: { enabled: true } } };
     const adapter = new OpenClawHostAdapter(
       {
         config: {
@@ -1368,16 +1367,12 @@ describe("runtime-v2 plugin entry", () => {
     expect(receipt.method).toBe("telegram_server_ack");
     expect(receipt.ref).toBe("98765");
 
-    // Verify accountId=default passed to official helpers (cfg omitted — helpers use own loadConfig)
-    expect(fakeApi.runtime.channel.telegram.resolveTelegramToken).toHaveBeenCalledWith(
-      undefined,
-      expect.objectContaining({ accountId: "default" }),
-    );
+    // Verify token resolved from flat config and passed to sendMessageTelegram
     expect(fakeApi.runtime.channel.telegram.sendMessageTelegram).toHaveBeenCalledWith(
       "789012",
       expect.any(String),
       expect.objectContaining({
-        accountId: "default",
+        token: "test-bot-token",
         textMode: "markdown",
       }),
     );
@@ -1421,16 +1416,12 @@ describe("runtime-v2 plugin entry", () => {
     expect(receipt.status).toBe("confirmed");
     expect(receipt.method).toBe("telegram_server_ack");
 
-    // Verify fallback resolved to accountId=default and chatId=789012
-    expect(fakeApi.runtime.channel.telegram.resolveTelegramToken).toHaveBeenCalledWith(
-      undefined,
-      expect.objectContaining({ accountId: "default" }),
-    );
+    // Verify fallback resolved to chatId=789012 with token from flat config
     expect(fakeApi.runtime.channel.telegram.sendMessageTelegram).toHaveBeenCalledWith(
       "789012",
       expect.any(String),
       expect.objectContaining({
-        accountId: "default",
+        token: "test-bot-token",
       }),
     );
   });

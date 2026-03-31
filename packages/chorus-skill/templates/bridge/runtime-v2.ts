@@ -885,6 +885,7 @@ export class OpenClawHostAdapter {
 
     let contextToken: string | undefined;
     let account: { baseUrl: string; token?: string } | undefined;
+    let telegramToken: string | undefined;
 
     if (target.channel === "openclaw-weixin") {
       if (!this.weixinMods) {
@@ -899,10 +900,11 @@ export class OpenClawHostAdapter {
         throw new Error(`no_wx_base_url accountId=${target.accountId} agent=${this.ctx.name}`);
       }
     } else if (target.channel === "telegram") {
-      // cfg omitted: let the official helper use its own loadConfig() — plugin API config
-      // does not carry channels.telegram, so passing it would always yield source=none.
-      const tokenResolution = ch.telegram.resolveTelegramToken(undefined, { accountId: target.accountId });
-      if (!tokenResolution?.token) {
+      // Resolve token from the live config provided by the gateway runtime.
+      // accounts.{id}.botToken takes priority, top-level botToken is default fallback.
+      const tgCfg = (cfg as any)?.channels?.telegram;
+      telegramToken = tgCfg?.accounts?.[target.accountId]?.botToken ?? tgCfg?.botToken;
+      if (!telegramToken) {
         throw new Error(`no_tg_bot_token accountId=${target.accountId} agent=${this.ctx.name}`);
       }
     } else {
@@ -1123,7 +1125,7 @@ If you have nothing to say back to the remote agent, simply omit [chorus_reply] 
                 }
                 try {
                   const result = await ch.telegram.sendMessageTelegram(chatId, userText, {
-                    accountId: target.accountId,
+                    token: telegramToken,
                     textMode: "markdown",
                   });
                   return { kind: "ok" as const, messageId: result.messageId };

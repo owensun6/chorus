@@ -16,11 +16,12 @@ const makeClient = (hubUrl: string, config?: ConstructorParameters<typeof HubCli
   trackedClients.push(client);
   return client;
 };
-const flushMicrotasks = async (turns: number = 6): Promise<void> => {
-  for (let i = 0; i < turns; i += 1) {
-    await Promise.resolve();
-  }
-};
+/** Wait for async work to settle. Uses a real 50ms delay to handle
+ *  platform differences in ReadableStream scheduling (Ubuntu CI uses
+ *  setImmediate/queueMicrotask paths that faked timers intercept). */
+const settle = (ms = 50): Promise<void> => new Promise((r) => { (globalThis as any).__realSetTimeout(r, ms); });
+// Preserve the real setTimeout before any test can fake it.
+(globalThis as any).__realSetTimeout = globalThis.setTimeout;
 
 afterAll(() => {
   global.fetch = originalFetch;
@@ -30,7 +31,7 @@ afterEach(async () => {
   for (const client of trackedClients.splice(0)) {
     client.disconnect();
   }
-  await flushMicrotasks();
+  await settle();
   jest.clearAllTimers();
   jest.useRealTimers();
   fetchMock.mockClear();
@@ -352,7 +353,6 @@ const mockSessionAndSSE = (ssePayload: string, sessionToken: string = 'cs_test_s
 
 describe('HubClient.connectSSE', () => {
   it('test_connectSSE_delivers_valid_events: parses message events and calls onEvent', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick', 'setImmediate', 'performance'] });
     const ssePayload =
       `event: connected\ndata: {"agent_id":"a@h"}\n\n` +
       `event: message\ndata: ${JSON.stringify({
@@ -371,9 +371,9 @@ describe('HubClient.connectSSE', () => {
       received.push({ trace_id: event.trace_id, hub_timestamp: event.hub_timestamp });
     });
 
-    await flushMicrotasks();
+    await settle();
     client.disconnect();
-    await flushMicrotasks();
+    await settle();
 
     expect(received).toHaveLength(1);
     expect(received[0].trace_id).toBe('t-1');
@@ -381,7 +381,6 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('test_connectSSE_discards_invalid_events: missing timestamp logs error, SSE continues', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick', 'setImmediate', 'performance'] });
     const ssePayload =
       `event: message\ndata: ${JSON.stringify({
         trace_id: 't-bad',
@@ -406,9 +405,9 @@ describe('HubClient.connectSSE', () => {
       received.push(event.trace_id);
     }, (msg) => { errors.push(msg); });
 
-    await flushMicrotasks();
+    await settle();
     client.disconnect();
-    await flushMicrotasks();
+    await settle();
 
     // Invalid event discarded, valid one received
     expect(received).toEqual(['t-good']);
@@ -417,7 +416,6 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('skips SSE blocks without data lines or message event types', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick', 'setImmediate', 'performance'] });
     const ssePayload =
       `event: message\n\n` +
       `data: ${JSON.stringify({
@@ -448,9 +446,9 @@ describe('HubClient.connectSSE', () => {
       received.push(event.trace_id);
     });
 
-    await flushMicrotasks();
+    await settle();
     client.disconnect();
-    await flushMicrotasks();
+    await settle();
 
     expect(received).toEqual(['t-good']);
   });
@@ -471,15 +469,15 @@ describe('HubClient.connectSSE', () => {
 
     client.connectSSE('agent-a', 'key-1', () => {}, (msg) => { errors.push(msg); });
 
-    await flushMicrotasks(20);
+    await settle();
     expect(fetchMock).toHaveBeenCalledTimes(2); // session + SSE (503)
     expect(errors.length).toBeGreaterThan(0);
 
     await jest.advanceTimersByTimeAsync(2000);
-    await flushMicrotasks(20);
+    await settle();
     expect(fetchMock).toHaveBeenCalledTimes(4); // retry: session + SSE
     client.disconnect();
-    await flushMicrotasks();
+    await settle();
   });
 
   it('does not reconnect when the stream ends after an explicit disconnect', async () => {
@@ -504,11 +502,11 @@ describe('HubClient.connectSSE', () => {
       }
     });
 
-    await flushMicrotasks(10);
+    await settle();
 
     const callsAfterDisconnect = fetchMock.mock.calls.length;
     await jest.advanceTimersByTimeAsync(10000);
-    await flushMicrotasks(10);
+    await settle();
 
     // After disconnect, no additional fetch calls should happen (no reconnect)
     expect(fetchMock.mock.calls.length).toBe(callsAfterDisconnect);
@@ -531,7 +529,7 @@ describe('HubClient.connectSSE', () => {
     const errors: string[] = [];
     client.connectSSE('agent-a', 'key-1', () => {}, (msg) => { errors.push(msg); });
 
-    await flushMicrotasks();
+    await settle();
     client.disconnect();
     await Promise.resolve();
     await Promise.resolve();
@@ -549,19 +547,18 @@ describe('HubClient.connectSSE', () => {
     const client = makeClient('https://hub.example.com');
     client.connectSSE('agent-a', 'key-1', () => {});
 
-    await flushMicrotasks();
+    await settle();
     client.disconnect();
 
     const callsBefore = fetchMock.mock.calls.length;
 
     await jest.advanceTimersByTimeAsync(2000);
-    await flushMicrotasks();
+    await settle();
 
     expect(fetchMock.mock.calls.length).toBe(callsBefore);
   });
 
   it('test_sse_buffer_overflow: oversized frame without delimiters triggers onError and terminates', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick', 'setImmediate', 'performance'] });
     const oversizedPayload = 'data: ' + 'x'.repeat(65_000); // >64KB, no \n\n delimiter
 
     const encoder = new TextEncoder();
@@ -595,9 +592,9 @@ describe('HubClient.connectSSE', () => {
       received.push(event.trace_id);
     }, (msg) => { errors.push(msg); });
 
-    await flushMicrotasks(10);
+    await settle();
     client.disconnect();
-    await flushMicrotasks();
+    await settle();
 
     expect(received).toHaveLength(0);
     expect(errors.length).toBeGreaterThanOrEqual(1);
@@ -605,15 +602,14 @@ describe('HubClient.connectSSE', () => {
   });
 
   it('test_connectSSE_url_format: uses session handshake (not api key in URL)', async () => {
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick', 'setImmediate', 'performance'] });
     mockSessionAndSSE('', 'cs_my_session_token');
 
     const client = makeClient('https://hub.example.com');
     client.connectSSE('agent-a', 'my-api-key', () => {});
 
-    await flushMicrotasks();
+    await settle();
     client.disconnect();
-    await flushMicrotasks();
+    await settle();
 
     // First call: POST /agent/session with API key in Authorization header
     const [sessionUrl, sessionOpts] = fetchMock.mock.calls[0];

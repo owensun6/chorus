@@ -5,6 +5,9 @@ import { join } from "path";
 import { tmpdir } from "os";
 
 const CLI_PATH = join(__dirname, "../../packages/chorus-skill/cli.mjs");
+const PACKAGE_VERSION = JSON.parse(
+  readFileSync(join(__dirname, "../../packages/chorus-skill/package.json"), "utf8"),
+).version;
 
 // Derive bridge file list from CLI source — single source of truth.
 // If cli.mjs changes BRIDGE_REQUIRED_FILES, this test automatically follows.
@@ -17,6 +20,51 @@ const BRIDGE_REQUIRED_FILES: string[] = (() => {
     .map((s) => s.replace(/["\s]/g, ""))
     .filter(Boolean);
 })();
+
+const openClawConfigPath = (home: string) => join(home, ".openclaw", "openclaw.json");
+const restartGatePath = (home: string) => join(home, ".chorus", "restart-consent.json");
+const workspaceDir = (home: string) => join(home, ".openclaw", "workspace");
+const activationProofPath = (home: string, agentId: string) =>
+  join(home, ".chorus", "state", agentId.split("@")[0], `activation-proof.${agentId}.json`);
+
+const clearRestartGate = (home: string) => {
+  const config = JSON.parse(readFileSync(openClawConfigPath(home), "utf8"));
+  if (Array.isArray(config.tools?.deny)) {
+    config.tools.deny = config.tools.deny.filter((entry: string) => entry !== "gateway");
+    if (config.tools.deny.length === 0) {
+      delete config.tools.deny;
+    }
+    if (config.tools && Object.keys(config.tools).length === 0) {
+      delete config.tools;
+    }
+  }
+  writeFileSync(openClawConfigPath(home), JSON.stringify(config));
+  rmSync(restartGatePath(home), { force: true });
+};
+
+const writeWorkspaceCredential = (home: string, agentId = "ws-test@agchorus") => {
+  const wsDir = workspaceDir(home);
+  mkdirSync(wsDir, { recursive: true });
+  writeFileSync(join(wsDir, "chorus-credentials.json"), JSON.stringify({
+    agent_id: agentId,
+    api_key: "ca_workspace123",
+    hub_url: "https://agchorus.com",
+  }));
+  return wsDir;
+};
+
+const writeActivationProof = (home: string, agentId: string, activatedAt: string) => {
+  const proofPath = activationProofPath(home, agentId);
+  mkdirSync(join(home, ".chorus", "state", agentId.split("@")[0]), { recursive: true });
+  writeFileSync(proofPath, JSON.stringify({
+    schema_version: 1,
+    agent_id: agentId,
+    activated_at: activatedAt,
+    proof_source: "chorus-bridge/runtime-v2 activateBridge",
+    state_dir: join(home, ".chorus", "state", agentId.split("@")[0]),
+  }));
+  return proofPath;
+};
 
 const run = (
   args: string[],
@@ -195,6 +243,16 @@ describe("CLI: chorus-skill", () => {
       expect(config.skills.entries.chorus.enabled).toBe(true);
       expect(config.plugins.entries["chorus-bridge"].enabled).toBe(true);
       expect(config.plugins.allow).toContain("chorus-bridge");
+      expect(config.tools.deny).toContain("gateway");
+
+      const gate = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      expect(gate.status).toBe("armed");
+      expect(gate.toolName).toBe("gateway");
+      expect(gate.packageVersion).toBe(PACKAGE_VERSION);
+      expect(stdout).toContain("Restart consent gate armed");
+
+      const installedSkill = readFileSync(join(skillDir, "SKILL.md"), "utf8");
+      expect(installedSkill).toContain(`npx @chorus-protocol/skill@${PACKAGE_VERSION} restart-consent request`);
     });
   });
 
@@ -221,7 +279,7 @@ describe("CLI: chorus-skill", () => {
       }
     });
 
-    it("reports standby when installed without credentials", () => {
+    it("reports restart gate when install is pending approval", () => {
       const fakeHome = join(tmpdir(), "chorus-cli-verifyok-" + process.pid);
       const configDir = join(fakeHome, ".openclaw");
       mkdirSync(configDir, { recursive: true });
@@ -237,13 +295,13 @@ describe("CLI: chorus-skill", () => {
         expect(exitCode).toBe(1);
         expect(stdout).toContain("SKILL.md exists");
         expect(stdout).toContain("chorus-bridge complete");
-        expect(stderr).toContain("Bridge standby");
+        expect(stderr).toContain("Restart consent gate active");
       } finally {
         rmSync(fakeHome, { recursive: true, force: true });
       }
     });
 
-    it("succeeds when installed with valid credentials", () => {
+    it("succeeds when gateway is already loaded and credentials are present", () => {
       const fakeHome = join(tmpdir(), "chorus-cli-verifycred-" + process.pid);
       const configDir = join(fakeHome, ".openclaw");
       mkdirSync(configDir, { recursive: true });
@@ -251,6 +309,7 @@ describe("CLI: chorus-skill", () => {
 
       try {
         run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+        clearRestartGate(fakeHome);
 
         const agentsDir = join(fakeHome, ".chorus", "agents");
         mkdirSync(agentsDir, { recursive: true });
@@ -274,7 +333,7 @@ describe("CLI: chorus-skill", () => {
       }
     });
 
-    it("succeeds when workspace chorus-credentials.json has valid credentials", () => {
+    it("succeeds when workspace chorus-credentials.json has valid credentials and no restart gate is pending", () => {
       const fakeHome = join(tmpdir(), "chorus-cli-verifywscred-" + process.pid);
       const configDir = join(fakeHome, ".openclaw");
       mkdirSync(configDir, { recursive: true });
@@ -282,15 +341,10 @@ describe("CLI: chorus-skill", () => {
 
       try {
         run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+        clearRestartGate(fakeHome);
 
         // Write credentials to workspace path (primary activation path)
-        const wsDir = join(fakeHome, ".openclaw", "workspace");
-        mkdirSync(wsDir, { recursive: true });
-        writeFileSync(join(wsDir, "chorus-credentials.json"), JSON.stringify({
-          agent_id: "ws-test@agchorus",
-          api_key: "ca_workspace123",
-          hub_url: "https://agchorus.com",
-        }));
+        writeWorkspaceCredential(fakeHome);
 
         const { stdout, exitCode } = run(
           ["verify", "--target", "openclaw"],
@@ -299,6 +353,35 @@ describe("CLI: chorus-skill", () => {
         expect(exitCode).toBe(0);
         expect(stdout).toContain("agent config");
         expect(stdout).toContain("bridge ready");
+      } finally {
+        rmSync(fakeHome, { recursive: true, force: true });
+      }
+    });
+
+    it("credentials-only path: verify reports missing credentials without triggering restart gate", () => {
+      const fakeHome = join(tmpdir(), "chorus-cli-credonly-" + process.pid);
+      const configDir = join(fakeHome, ".openclaw");
+      mkdirSync(configDir, { recursive: true });
+      writeFileSync(join(configDir, "openclaw.json"), JSON.stringify({ skills: {} }));
+
+      try {
+        // Install and then clear the restart gate (simulates completed restart consent flow)
+        run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+        clearRestartGate(fakeHome);
+
+        // Do NOT write any credentials — this is the credentials-only path
+
+        const { stdout, stderr, exitCode } = run(
+          ["verify", "--target", "openclaw"],
+          { env: { HOME: fakeHome } },
+        );
+        expect(exitCode).toBe(1);
+        expect(stdout).toContain("Installation integrity");
+        expect(stderr).toContain("Bridge standby");
+        expect(stderr).toContain("no valid agent credentials found");
+        // Must NOT mention restart gate
+        expect(stderr).not.toContain("Restart consent gate");
+        expect(stderr).not.toContain("restart-consent");
       } finally {
         rmSync(fakeHome, { recursive: true, force: true });
       }
@@ -354,7 +437,7 @@ describe("CLI: chorus-skill", () => {
           expect(exitCode).toBe(1);
           expect(stderr).toContain(`chorus-bridge incomplete — missing: ${missingFile}`);
           expect(stderr).toContain(
-            "npx @chorus-protocol/skill uninstall --target openclaw && npx @chorus-protocol/skill init --target openclaw",
+            `npx @chorus-protocol/skill@${PACKAGE_VERSION} uninstall --target openclaw && npx @chorus-protocol/skill@${PACKAGE_VERSION} init --target openclaw`,
           );
         } finally {
           rmSync(fakeHome, { recursive: true, force: true });
@@ -382,6 +465,301 @@ describe("CLI: chorus-skill", () => {
       } finally {
         rmSync(fakeHome, { recursive: true, force: true });
       }
+    });
+  });
+
+  describe("restart-consent", () => {
+    const fakeHome = join(tmpdir(), "chorus-cli-restart-gate-" + process.pid);
+    const configDir = join(fakeHome, ".openclaw");
+
+    beforeEach(() => {
+      mkdirSync(configDir, { recursive: true });
+      writeFileSync(join(configDir, "openclaw.json"), JSON.stringify({ skills: {} }));
+      run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+    });
+
+    afterEach(() => {
+      rmSync(fakeHome, { recursive: true, force: true });
+    });
+
+    it("writes checkpoint before emitting blocked state", () => {
+      const wsDir = workspaceDir(fakeHome);
+      const checkpointPath = join(wsDir, "chorus-restart-checkpoint.md");
+
+      const { stdout, stderr, exitCode } = run(
+        [
+          "restart-consent",
+          "request",
+          "--workspace",
+          wsDir,
+          "--restart-required-for",
+          "gateway needs to load chorus-bridge plugin after install",
+          "--user-goal",
+          "activate Chorus",
+          "--current-identity",
+          "unknown",
+          "--completed-steps",
+          "skill installed; bridge installed",
+          "--next-step-after-restart",
+          "verify bridge activation",
+          "--resume-message",
+          "Resuming Chorus activation after restart.",
+        ],
+        { env: { HOME: fakeHome } },
+      );
+
+      expect(exitCode).toBe(1);
+      expect(stdout).toContain("Restart checkpoint written");
+      expect(stderr).toContain("Restart blocked pending explicit approval");
+      expect(existsSync(checkpointPath)).toBe(true);
+      const gate = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      expect(gate.status).toBe("awaiting_approval");
+      expect(gate.checkpointPath).toBe(checkpointPath);
+    });
+
+    it("does not unlock restart on ambiguous approval", () => {
+      const wsDir = workspaceDir(fakeHome);
+      run(
+        [
+          "restart-consent",
+          "request",
+          "--workspace",
+          wsDir,
+          "--restart-required-for",
+          "gateway needs to load chorus-bridge plugin after install",
+          "--user-goal",
+          "activate Chorus",
+          "--current-identity",
+          "unknown",
+          "--completed-steps",
+          "skill installed; bridge installed",
+          "--next-step-after-restart",
+          "verify bridge activation",
+          "--resume-message",
+          "Resuming Chorus activation after restart.",
+        ],
+        { env: { HOME: fakeHome } },
+      );
+
+      const { stderr, exitCode } = run(
+        ["restart-consent", "approve", "--reply", "maybe later"],
+        { env: { HOME: fakeHome } },
+      );
+
+      expect(exitCode).toBe(1);
+      expect(stderr).toContain("Restart remains blocked");
+      const config = JSON.parse(readFileSync(openClawConfigPath(fakeHome), "utf8"));
+      expect(config.tools.deny).toContain("gateway");
+    });
+
+    it("keeps gate active when complete has no post-restart proof", () => {
+      const wsDir = workspaceDir(fakeHome);
+
+      run(
+        [
+          "restart-consent",
+          "request",
+          "--workspace",
+          wsDir,
+          "--restart-required-for",
+          "gateway needs to load chorus-bridge plugin after install",
+          "--user-goal",
+          "activate Chorus",
+          "--current-identity",
+          "unknown",
+          "--completed-steps",
+          "skill installed; bridge installed",
+          "--next-step-after-restart",
+          "verify bridge activation",
+          "--resume-message",
+          "Resuming Chorus activation after restart.",
+        ],
+        { env: { HOME: fakeHome } },
+      );
+
+      run(
+        ["restart-consent", "approve", "--reply", "yes"],
+        { env: { HOME: fakeHome } },
+      );
+
+      writeWorkspaceCredential(fakeHome, "no-proof@agchorus");
+
+      const complete = run(
+        ["restart-consent", "complete"],
+        { env: { HOME: fakeHome } },
+      );
+
+      expect(complete.exitCode).toBe(1);
+      expect(complete.stderr).toContain("post-restart proof missing");
+      expect(complete.stderr).toContain("bridge activation proof missing");
+      expect(existsSync(restartGatePath(fakeHome))).toBe(true);
+
+      const verify = run(
+        ["verify", "--target", "openclaw"],
+        { env: { HOME: fakeHome } },
+      );
+      expect(verify.exitCode).toBe(1);
+      expect(verify.stderr).toContain("Restart consent gate active");
+    });
+
+    it("keeps gate active when workspace proof identity mismatches checkpoint identity", () => {
+      const wsDir = workspaceDir(fakeHome);
+
+      run(
+        [
+          "restart-consent",
+          "request",
+          "--workspace",
+          wsDir,
+          "--restart-required-for",
+          "gateway needs to load chorus-bridge plugin after install",
+          "--user-goal",
+          "activate Chorus",
+          "--current-identity",
+          "expected@agchorus",
+          "--completed-steps",
+          "skill installed; bridge installed",
+          "--next-step-after-restart",
+          "verify bridge activation",
+          "--resume-message",
+          "Resuming Chorus activation after restart.",
+        ],
+        { env: { HOME: fakeHome } },
+      );
+
+      const approve = run(
+        ["restart-consent", "approve", "--reply", "yes"],
+        { env: { HOME: fakeHome } },
+      );
+      expect(approve.exitCode).toBe(0);
+
+      const approvedGate = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      writeWorkspaceCredential(fakeHome, "other@agchorus");
+      writeActivationProof(
+        fakeHome,
+        "other@agchorus",
+        new Date(Date.parse(approvedGate.approvedAt) + 1_000).toISOString(),
+      );
+
+      const complete = run(
+        ["restart-consent", "complete"],
+        { env: { HOME: fakeHome } },
+      );
+
+      expect(complete.exitCode).toBe(1);
+      expect(complete.stderr).toContain("workspace credential agent_id other@agchorus does not match checkpoint identity expected@agchorus");
+      expect(existsSync(restartGatePath(fakeHome))).toBe(true);
+
+      const verify = run(
+        ["verify", "--target", "openclaw"],
+        { env: { HOME: fakeHome } },
+      );
+      expect(verify.exitCode).toBe(1);
+      expect(verify.stderr).toContain("Restart consent gate active");
+    });
+
+    it("unlocks restart on explicit approval and clears artifacts on complete once proof exists", () => {
+      const wsDir = workspaceDir(fakeHome);
+      const checkpointPath = join(wsDir, "chorus-restart-checkpoint.md");
+
+      run(
+        [
+          "restart-consent",
+          "request",
+          "--workspace",
+          wsDir,
+          "--restart-required-for",
+          "gateway needs to load chorus-bridge plugin after install",
+          "--user-goal",
+          "activate Chorus",
+          "--current-identity",
+          "unknown",
+          "--completed-steps",
+          "skill installed; bridge installed",
+          "--next-step-after-restart",
+          "verify bridge activation",
+          "--resume-message",
+          "Resuming Chorus activation after restart.",
+        ],
+        { env: { HOME: fakeHome } },
+      );
+
+      const approve = run(
+        ["restart-consent", "approve", "--reply", "yes"],
+        { env: { HOME: fakeHome } },
+      );
+      expect(approve.exitCode).toBe(0);
+      expect(approve.stdout).toContain("Restart approved");
+
+      const configAfterApprove = JSON.parse(readFileSync(openClawConfigPath(fakeHome), "utf8"));
+      expect(configAfterApprove.tools?.deny ?? []).not.toContain("gateway");
+
+      const approvedGate = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      const agentId = "proof-agent@agchorus";
+      writeWorkspaceCredential(fakeHome, agentId);
+      const runtimeProofPath = writeActivationProof(
+        fakeHome,
+        agentId,
+        new Date(Date.parse(approvedGate.approvedAt) + 1_000).toISOString(),
+      );
+
+      const complete = run(
+        ["restart-consent", "complete"],
+        { env: { HOME: fakeHome } },
+      );
+      expect(complete.exitCode).toBe(0);
+      expect(complete.stdout).toContain("Restart recovery completed");
+      expect(complete.stdout).toContain("chorus-restart-proof.json");
+      expect(existsSync(checkpointPath)).toBe(false);
+      expect(existsSync(restartGatePath(fakeHome))).toBe(false);
+      expect(existsSync(join(wsDir, "chorus-restart-proof.json"))).toBe(true);
+      const completionProof = JSON.parse(readFileSync(join(wsDir, "chorus-restart-proof.json"), "utf8"));
+      expect(completionProof.activation_proof_path).toBe(runtimeProofPath);
+      expect(completionProof.helper_package_spec).toBe(`@chorus-protocol/skill@${PACKAGE_VERSION}`);
+      expect(completionProof.checkpoint_identity).toBe("unknown");
+      expect(completionProof.resolved_proof_agent_id).toBe(agentId);
+    });
+
+    it("preserves a user-defined gateway deny after approval", () => {
+      rmSync(fakeHome, { recursive: true, force: true });
+      mkdirSync(configDir, { recursive: true });
+      writeFileSync(join(configDir, "openclaw.json"), JSON.stringify({
+        skills: {},
+        tools: { deny: ["gateway"] },
+      }));
+      run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+
+      const wsDir = workspaceDir(fakeHome);
+      run(
+        [
+          "restart-consent",
+          "request",
+          "--workspace",
+          wsDir,
+          "--restart-required-for",
+          "gateway needs to load chorus-bridge plugin after install",
+          "--user-goal",
+          "activate Chorus",
+          "--current-identity",
+          "unknown",
+          "--completed-steps",
+          "skill installed; bridge installed",
+          "--next-step-after-restart",
+          "verify bridge activation",
+          "--resume-message",
+          "Resuming Chorus activation after restart.",
+        ],
+        { env: { HOME: fakeHome } },
+      );
+
+      const approve = run(
+        ["restart-consent", "approve", "--reply", "yes"],
+        { env: { HOME: fakeHome } },
+      );
+
+      expect(approve.exitCode).toBe(0);
+      const configAfterApprove = JSON.parse(readFileSync(openClawConfigPath(fakeHome), "utf8"));
+      expect(configAfterApprove.tools?.deny ?? []).toContain("gateway");
     });
   });
 

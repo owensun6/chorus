@@ -5,6 +5,8 @@ import * as path from "path";
 const makeTempHome = (): string =>
   fs.mkdtempSync(path.join(os.tmpdir(), "chorus-runtime-v2-"));
 const originalExistsSync = fs.existsSync.bind(fs);
+const activationProofPathFor = (home: string, agentId: string): string =>
+  path.join(home, ".chorus", "state", agentId.split("@")[0], `activation-proof.${agentId}.json`);
 
 describe("runtime-v2 plugin entry", () => {
   let fakeHome: string;
@@ -56,21 +58,6 @@ describe("runtime-v2 plugin entry", () => {
       }),
       "utf-8",
     );
-    fs.writeFileSync(
-      path.join(fakeHome, ".openclaw", "openclaw.json"),
-      JSON.stringify({
-        channels: {
-          telegram: {
-            accounts: {
-              "tg-main": {
-                botToken: "test-bot-token",
-              },
-            },
-          },
-        },
-      }),
-      "utf-8",
-    );
   };
 
   // Alias for backward compat with existing tests
@@ -91,17 +78,6 @@ describe("runtime-v2 plugin entry", () => {
       }),
       "utf-8",
     );
-    fs.writeFileSync(
-      path.join(fakeHome, ".openclaw", "openclaw.json"),
-      JSON.stringify({
-        channels: {
-          telegram: {
-            botToken: "flat-bot-token",
-          },
-        },
-      }),
-      "utf-8",
-    );
   };
 
   // Fallback: OpenClaw agent dir name differs from Chorus agent name
@@ -115,17 +91,6 @@ describe("runtime-v2 plugin entry", () => {
             channel: "telegram",
             to: "telegram:789012",
             accountId: "default",
-          },
-        },
-      }),
-      "utf-8",
-    );
-    fs.writeFileSync(
-      path.join(fakeHome, ".openclaw", "openclaw.json"),
-      JSON.stringify({
-        channels: {
-          telegram: {
-            botToken: "flat-bot-token",
           },
         },
       }),
@@ -586,7 +551,7 @@ describe("runtime-v2 plugin entry", () => {
     let dispatcherOnError: ((err: unknown) => void) | null = null;
 
     const fakeApi = {
-      config: { channels: { telegram: { enabled: true, botToken: "test-bot-token" } } },
+      config: { channels: { telegram: { enabled: true } } },
       runtime: {
         channel: {
           routing: {
@@ -1200,7 +1165,7 @@ describe("runtime-v2 plugin entry", () => {
       "123456",
       expect.any(String),
       expect.objectContaining({
-        token: "test-bot-token",
+        accountId: "tg-main",
         textMode: "markdown",
       }),
     );
@@ -1240,115 +1205,6 @@ describe("runtime-v2 plugin entry", () => {
 
     await expect(adapter.deliverInbound(deliverInboundParams))
       .rejects.toThrow("Telegram API 403: bot was blocked by the user");
-  });
-
-  it("Telegram delivery throws no_tg_bot_token when config has no botToken", async () => {
-    seedTelegramRuntime("xiaox");
-    // Also remove botToken from global openclaw.json so the fallback doesn't find it
-    fs.writeFileSync(
-      path.join(fakeHome, ".openclaw", "openclaw.json"),
-      JSON.stringify({ channels: { telegram: { enabled: true } } }),
-      "utf-8",
-    );
-
-    jest.doMock("node:os", () => ({
-      ...jest.requireActual("node:os"),
-      homedir: () => fakeHome,
-    }));
-
-    const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
-
-    const fakeApi = buildTelegramDeliveryHarness();
-    // Config with no botToken — simulates missing Telegram configuration
-    (fakeApi as any).config = { channels: { telegram: { enabled: true } } };
-    const adapter = new OpenClawHostAdapter(
-      {
-        config: {
-          agent_id: "xiaox@chorus",
-          api_key: "test-key",
-          hub_url: "https://hub.example",
-          culture: "zh-CN",
-          preferred_language: "zh-CN",
-        },
-        name: "xiaox",
-        stateDir: path.join(fakeHome, ".chorus", "state", "xiaox"),
-      },
-      fakeApi as never,
-      fakeApi.logger,
-      null,
-    );
-
-    await expect(adapter.deliverInbound(deliverInboundParams))
-      .rejects.toThrow("no_tg_bot_token accountId=tg-main agent=xiaox");
-  });
-
-  it("Token fallback: no global config → throws, after writing openclaw.json → succeeds", async () => {
-    // Phase 1: seed sessions but NO openclaw.json — simulates the production bug
-    fs.mkdirSync(path.join(fakeHome, ".openclaw", "agents", "xiaox", "sessions"), { recursive: true });
-    fs.writeFileSync(
-      path.join(fakeHome, ".openclaw", "agents", "xiaox", "sessions", "sessions.json"),
-      JSON.stringify({
-        "agent:xiaox:main": {
-          deliveryContext: { channel: "telegram", to: "telegram:123456", accountId: "default" },
-        },
-      }),
-      "utf-8",
-    );
-    fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results"), { recursive: true });
-
-    jest.doMock("node:os", () => ({
-      ...jest.requireActual("node:os"),
-      homedir: () => fakeHome,
-    }));
-
-    const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
-
-    const fakeApi = buildTelegramDeliveryHarness();
-    (fakeApi as any).config = { channels: { telegram: { enabled: true } } };
-    const adapter = new OpenClawHostAdapter(
-      {
-        config: {
-          agent_id: "xiaox@chorus",
-          api_key: "test-key",
-          hub_url: "https://hub.example",
-          culture: "zh-CN",
-          preferred_language: "zh-CN",
-        },
-        name: "xiaox",
-        stateDir: path.join(fakeHome, ".chorus", "state", "xiaox"),
-      },
-      fakeApi as never,
-      fakeApi.logger,
-      null,
-    );
-
-    // First attempt: no global config → no_tg_bot_token
-    await expect(adapter.deliverInbound(deliverInboundParams))
-      .rejects.toThrow("no_tg_bot_token accountId=default agent=xiaox");
-
-    // Phase 2: write global openclaw.json (simulates ops fix)
-    fs.writeFileSync(
-      path.join(fakeHome, ".openclaw", "openclaw.json"),
-      JSON.stringify({
-        channels: { telegram: { botToken: "recovered-token" } },
-      }),
-      "utf-8",
-    );
-
-    // Second attempt (recovery retry): token found → delivery_confirmed
-    const receipt = await adapter.deliverInbound({
-      ...deliverInboundParams,
-      metadata: { ...deliverInboundParams.metadata, trace_id: "trace-recovery" },
-    });
-
-    expect(receipt.status).toBe("confirmed");
-    expect(receipt.method).toBe("telegram_server_ack");
-
-    expect(fakeApi.runtime.channel.telegram.sendMessageTelegram).toHaveBeenCalledWith(
-      "123456",
-      expect.any(String),
-      expect.objectContaining({ token: "recovered-token" }),
-    );
   });
 
   it("Telegram delivery timeout produces unverifiable receipt, not confirmed", async () => {
@@ -1406,7 +1262,7 @@ describe("runtime-v2 plugin entry", () => {
 
   // --- Default-only Telegram (single agent, flat config, accountId=default) ---
 
-  it("Default-only Telegram delivery: accountId=default resolves token from global openclaw.json", async () => {
+  it("Default-only Telegram delivery: accountId=default delegates to channel helper", async () => {
     seedTelegramRuntimeDefaultOnly("xiaox");
     fs.mkdirSync(path.join(fakeHome, ".chorus", "state", "xiaox", "delivery-results"), { recursive: true });
 
@@ -1418,8 +1274,6 @@ describe("runtime-v2 plugin entry", () => {
     const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
 
     const fakeApi = buildTelegramDeliveryHarness();
-    // Plugin config has no botToken — token must come from global openclaw.json
-    (fakeApi as any).config = { channels: { telegram: { enabled: true } } };
     const adapter = new OpenClawHostAdapter(
       {
         config: {
@@ -1446,12 +1300,11 @@ describe("runtime-v2 plugin entry", () => {
     expect(receipt.method).toBe("telegram_server_ack");
     expect(receipt.ref).toBe("98765");
 
-    // Verify token resolved from global openclaw.json flat config (not plugin config)
     expect(fakeApi.runtime.channel.telegram.sendMessageTelegram).toHaveBeenCalledWith(
       "789012",
       expect.any(String),
       expect.objectContaining({
-        token: "flat-bot-token",
+        accountId: "default",
         textMode: "markdown",
       }),
     );
@@ -1470,8 +1323,6 @@ describe("runtime-v2 plugin entry", () => {
     const { OpenClawHostAdapter } = await import("../../packages/chorus-skill/templates/bridge/runtime-v2");
 
     const fakeApi = buildTelegramDeliveryHarness();
-    // Plugin config has no botToken — token must come from global openclaw.json
-    (fakeApi as any).config = { channels: { telegram: { enabled: true } } };
     const adapter = new OpenClawHostAdapter(
       {
         config: {
@@ -1497,12 +1348,11 @@ describe("runtime-v2 plugin entry", () => {
     expect(receipt.status).toBe("confirmed");
     expect(receipt.method).toBe("telegram_server_ack");
 
-    // Verify fallback resolved to chatId=789012 with token from global openclaw.json
     expect(fakeApi.runtime.channel.telegram.sendMessageTelegram).toHaveBeenCalledWith(
       "789012",
       expect.any(String),
       expect.objectContaining({
-        token: "flat-bot-token",
+        accountId: "default",
       }),
     );
   });
@@ -1552,6 +1402,11 @@ describe("runtime-v2 plugin entry", () => {
     expect(api.logger.info).toHaveBeenCalledWith(
       expect.stringContaining("activated: workspace-agent@chorus from workspace/chorus-credentials.json"),
     );
+    const activationProof = JSON.parse(
+      fs.readFileSync(activationProofPathFor(fakeHome, "workspace-agent@chorus"), "utf-8"),
+    );
+    expect(activationProof.agent_id).toBe("workspace-agent@chorus");
+    expect(activationProof.proof_source).toBe("chorus-bridge/runtime-v2 activateBridge");
   });
 
   it("gateway_start loads configs from ~/.chorus/agents/ (backward compat)", async () => {

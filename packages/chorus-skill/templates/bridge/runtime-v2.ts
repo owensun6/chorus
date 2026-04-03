@@ -53,6 +53,7 @@ const HOST_TIMEOUT_INJECTION_PATH = join(DEBUG_DIR, "host-timeout.json");
 const HUB_CATCHUP_TIMEOUT_INJECTION_PATH = join(DEBUG_DIR, "hub-catchup-timeout.json");
 const DEFAULT_HOST_DELIVERY_TIMEOUT_MS = 15_000;
 const TAG = "[chorus-bridge]";
+const ACTIVATION_PROOF_SOURCE = "chorus-bridge/runtime-v2 activateBridge";
 
 type ChorusConfig = {
   readonly agent_id: string;
@@ -237,6 +238,26 @@ function ensureAgentDirs(ctx: AgentRuntimeContext): void {
 function stateFilePathForAgent(agentId: string): string {
   const name = agentId.split("@")[0];
   return join(CHORUS_DIR, "state", name, `${agentId}.json`);
+}
+
+function activationProofPathForAgent(agentId: string): string {
+  const name = agentId.split("@")[0];
+  return join(CHORUS_DIR, "state", name, `activation-proof.${agentId}.json`);
+}
+
+function recordActivationProof(ctx: AgentRuntimeContext, log: Logger): void {
+  const proofPath = activationProofPathForAgent(ctx.config.agent_id);
+  try {
+    writeJSON(proofPath, {
+      schema_version: 1,
+      agent_id: ctx.config.agent_id,
+      activated_at: new Date().toISOString(),
+      proof_source: ACTIVATION_PROOF_SOURCE,
+      state_dir: ctx.stateDir,
+    });
+  } catch (err) {
+    log.error(`${TAG} [${ctx.name}] activation proof write FAILED: ${String(err)}`);
+  }
 }
 
 function resolveStateFilePath(agentId: string | undefined): string | null {
@@ -885,7 +906,6 @@ export class OpenClawHostAdapter {
 
     let contextToken: string | undefined;
     let account: { baseUrl: string; token?: string } | undefined;
-    let telegramToken: string | undefined;
 
     if (target.channel === "openclaw-weixin") {
       if (!this.weixinMods) {
@@ -899,21 +919,7 @@ export class OpenClawHostAdapter {
       if (!account?.baseUrl) {
         throw new Error(`no_wx_base_url accountId=${target.accountId} agent=${this.ctx.name}`);
       }
-    } else if (target.channel === "telegram") {
-      // Resolve token: plugin config → global OpenClaw config fallback.
-      // Plugin config (api.config) may not contain channel credentials;
-      // the global openclaw.json always has them.
-      const tgCfg = (cfg as any)?.channels?.telegram;
-      telegramToken = tgCfg?.accounts?.[target.accountId]?.botToken ?? tgCfg?.botToken;
-      if (!telegramToken) {
-        const globalCfg = readJSON(join(OPENCLAW_DIR, "openclaw.json")) as Record<string, any> | null;
-        const globalTg = globalCfg?.channels?.telegram;
-        telegramToken = globalTg?.accounts?.[target.accountId]?.botToken ?? globalTg?.botToken;
-      }
-      if (!telegramToken) {
-        throw new Error(`no_tg_bot_token accountId=${target.accountId} agent=${this.ctx.name}`);
-      }
-    } else {
+    } else if (target.channel !== "telegram") {
       throw new Error(`unsupported_channel channel=${target.channel} agent=${this.ctx.name}`);
     }
 
@@ -1131,7 +1137,7 @@ If you have nothing to say back to the remote agent, simply omit [chorus_reply] 
                 }
                 try {
                   const result = await ch.telegram.sendMessageTelegram(chatId, userText, {
-                    token: telegramToken,
+                    accountId: target.accountId,
                     textMode: "markdown",
                   });
                   return { kind: "ok" as const, messageId: result.messageId };
@@ -1358,6 +1364,7 @@ async function activateBridge(configs: readonly ChorusConfig[], log: Logger): Pr
           });
         },
       );
+      recordActivationProof(ctx, log);
       log.info(`${TAG} [${ctx.name}] V2 bridge active (state: ${ctx.stateDir})`);
     } catch (err) {
       log.error(`${TAG} [${ctx.name}] V2 startup FAILED: ${String(err)}`);

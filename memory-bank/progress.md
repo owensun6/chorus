@@ -1,5 +1,208 @@
 # Chorus Protocol — Progress Log
 
+## 2026-04-01（续，13.2 已闭环；整体 pre-flight 仍待 13.4）
+
+**操作**: 在显式放行后补完 Run 2 pre-flight 剩余两项：conductor self-test + browser console check
+**结果**:
+
+- conductor self-test 已完成：
+  - direct Hub send response 返回 `delivery=delivered_sse`
+  - sender=`run2-selftest-1775054319392@chorus`
+  - inbound trace=`6ce7e751-abd5-41e1-aa52-38beb8d547e2`
+  - gateway log 已记录 `delivery_confirmed`
+  - xiaoyin state/relay 记录已闭合，reply relay `cb0460ed-2d99-4f0b-a7d3-657496cbf597` 为 `confirmed=true`
+- browser console check 已完成：
+  - headless Chrome 成功加载 `https://agchorus.com/console`
+  - HTTP `200`
+  - title / H1 = `Chorus Alpha Console`
+  - 截图已落盘到 `pipeline/bridge-v2-validation/evidence/EXP-03-run2-console-check-20260401.png`
+- pre-flight evidence 已更新为：
+  - `Section 13.2 rerun = PASS`
+  - 但整体 run pre-flight 仍 **not cleared**，因为 `Section 13.4`（subject/session logistics）仍 pending
+
+**决策**:
+
+- 不改 spec，不换 conductor identity，不启动 Run 2
+- 当前唯一剩余 gate 是 `13.4`：选定受试者、做 subject environment pre-check、arm 录屏与 shell/browser history
+- 只有 `13.4` 关闭后，整体 pre-flight 才能转为 cleared
+
+## 2026-04-01（续，13.4 执行包已备好；现在缺真实受试者）
+
+**操作**: 继续推进 Section 13.4，但只做本地可完成的准备工作
+**结果**:
+
+- 已新增运行包 [EXP-03-run2-subject-precheck-20260401.md](/Volumes/XDISK/chorus/pipeline/bridge-v2-validation/evidence/EXP-03-run2-subject-precheck-20260401.md)，把以下内容固定成可执行记录单：
+  - subject selection / screening
+  - written consent
+  - Section 13.4 machine pre-check
+  - Section 13.5 session logistics
+  - screen recording / shell history / browser history capture plan
+- 主 pre-flight 证据已链接这份运行包，明确说明：流程已备好，但目前仍没有真实受试者数据可填
+
+**决策**:
+
+- 在不改 spec、不换 conductor identity、不启动 Run 2 的前提下，当前最大阻塞已经收敛为：需要你给出一个合格的真实受试者并完成现场核验
+- 一旦受试者确定，下一步只按这份运行包逐项填完 13.4 / 13.5，然后再重判 pre-flight 是否 cleared
+
+## 2026-04-01（续，补当前 agents 目录快照；冻结继续）
+
+**操作**: 按整改清单补 Section 13.2 证据，但继续冻结在 pre-flight，不启动 conductor self-test，也不开始 Run 2
+**结果**:
+
+- `pipeline/bridge-v2-validation/evidence/EXP-03-run2-preflight-20260401.md` 已补当前 `~/.chorus/agents/` 目录级快照，明确当前实际内容是 `01-xiaoyin.json`，不是只保留“empty”文字描述
+- `curl -s https://agchorus.com/health` 当前仍返回 `status=ok`（`2026-04-01T14:25:11.804Z`）
+- `curl -s https://agchorus.com/discover` 当前真实 JSON 结构为 `data[]`；`jq '.data[] | select(.agent_id=="xiaoyin@chorus")'` 在 `2026-04-01T14:26:14.700Z` 仍显示 `xiaoyin@chorus online=true`
+- gateway 当前运行证据未漂移：`2026-04-01T22:11:53.385+08:00 [gateway] [chorus-bridge] [xiaoyin] V2 bridge active (state: /Users/owenmacmini/.chorus/state/xiaoyin)`
+
+**决策**:
+
+- 不走 spec 改绑分支；原 conductor identity `xiaoyin@chorus` 继续有效
+- Section 13.2 仍然只算 partial rerun：online 已确认，但 self-test / browser console check 依旧未做
+- pre-flight 维持 `entered but not cleared`；在新放行前，禁止 conductor self-test 与 Run 2
+
+### 2026-04-01（续，Run 2 继续冻结；后续只允许补完 13.2 剩余两项）
+
+**操作**: 接收新的整改边界，冻结 pre-flight 在当前状态，不进入 Run 2
+**结果**:
+- 当前冻结继续有效：不改 spec，不换 conductor identity，不启动 Run 2
+- 若后续继续推进，允许补的检查只剩两项：
+  - conductor self-test
+  - browser console check
+- 只有这两项补完后，才允许重新判定 pre-flight 是否 cleared
+
+**决策**:
+- 在新的显式放行前，不做任何额外 pre-flight 扩展动作
+- 当前状态维持：pre-flight entered but not cleared
+
+### 2026-04-01（续，xiaoyin conductor identity 已恢复；13.2 只做了冻结条件下的部分重跑）
+
+**操作**: 按 Run 2 pre-flight 整改清单恢复 `xiaoyin@chorus` 合法凭证链，并补目录级证据快照
+**结果**:
+- pre-flight evidence 已补进 `~/.chorus/agents/` 的目录级快照，明确记录恢复前该目录确实为空
+- 已恢复 `~/.chorus/agents/01-xiaoyin.json`，保留原 conductor identity，不走 spec 改绑分支
+- gateway 无需手动重启即重新激活 `xiaoyin@chorus`
+  - 证据点：`2026-04-01T22:08:21.341+08:00 [gateway] [chorus-bridge] activated: xiaoyin@chorus from agents/01-xiaoyin.json`
+- Section 13.2 已在冻结约束下重跑：
+  - `curl -s https://agchorus.com/health` 仍为 `status=ok`
+  - `curl -s https://agchorus.com/discover` 已显示 `xiaoyin@chorus online=true`
+  - 但 conductor self-test 仍按整改要求保持 **未执行**
+- `~/.openclaw/workspace/chorus-credentials.json` 的旧格式 `xiaox@chorus` 凭证仍在，并继续被 bridge 记为 malformed；本轮未清理，以保留证据真实性
+
+**决策**:
+- 不启动 conductor self-test，不开始 Run 2
+- `xiaoyin@chorus` credential-loss blocker 已关闭，但 Section 13.2 只算 partial rerun，不能宣称 pre-flight cleared
+- 当前冻结点：等待后续明确批准再补 self-test / browser console check，然后才可能进入受试者 pre-flight
+
+### 2026-04-01（续，Run 2 pre-flight 阻塞根因已定位到 conductor credential 丢失）
+
+**操作**: 继续推进 pre-flight，排查为什么 `xiaoyin@chorus` 长时间离线
+**结果**:
+- Hub 当下仍健康：`curl -s https://agchorus.com/health` 返回 `status=ok`，但 `discover` 仍显示 `xiaoyin@chorus online=false`
+- `openclaw status` 确认本机 gateway 进程本身是活的，不是“服务没起”
+- 真正阻塞点已缩到本机 credential 链：
+  - `~/.openclaw/logs/gateway.err.log` 持续报 `workspace/chorus-credentials.json (missing required fields)`
+  - `~/.openclaw/workspace/chorus-credentials.json` 是旧格式 `xiaox@chorus` 凭证，只含 `agent_id/api_key`，缺 `hub_url`
+  - `~/.openclaw/workspace-xiaoyin/chorus-credentials.json` 缺失
+  - 历史日志证明 `xiaoyin@chorus` 之前依赖 `~/.chorus/agents/01-xiaoyin.json` 激活，但该文件现已不存在
+  - `~/.chorus/agents/` 为空，`~/.chorus/state/` 也没有 `xiaoyin` 状态残留
+- pre-flight evidence 已补写本地诊断根因，并且 `npx markdownlint-cli pipeline/bridge-v2-validation/evidence/EXP-03-run2-preflight-20260401.md` 通过
+
+**决策**:
+- Run 2 pre-flight 仍是 BLOCKED，但阻塞口径已从泛化的“conductor 在线门未过”收紧为“conductor identity credential loss / stale local credential state”
+- 在恢复 `xiaoyin@chorus` 的合法凭证前，不启动 conductor self-test，更不进入受试者执行
+- 若要改用其他 conductor identity，必须先显式改实验规格和 sender identity，不能静默替换
+
+### 2026-04-01（续，alpha.8 npm 发布完成；Run 2 版本门禁已清）
+
+**操作**: 发布包含 Telegram fallback、proof-based restart gate、identity-first proof 绑定的新 npm 版本，并回填 EXP-03 run version
+**结果**:
+- `@chorus-protocol/skill@0.8.0-alpha.8` 已发布到 npm，`alpha` dist-tag 已从 `0.8.0-alpha.7` 移到 `0.8.0-alpha.8`
+- registry smoke 通过：`npm view @chorus-protocol/skill@0.8.0-alpha.8 version` 返回 `0.8.0-alpha.8`
+- registry smoke 通过：`npx @chorus-protocol/skill@0.8.0-alpha.8 --help` 可正常执行
+- EXP-03 spec 已回填 `VERSION_UNDER_TEST=0.8.0-alpha.8`，顶层状态改为“run version published; awaiting Run 2 pre-flight”
+- 发布映射已记录：`0.8.0-alpha.8` 是从 base `HEAD 2dfa4997` + 当时 dirty worktree 发出；`bd8e7bd` 在祖先链上
+
+**决策**:
+- Run 2 的“必须使用已发布 npm 版本”门禁已清除，但实验本身仍未开始
+- 由于 alpha.8 不是从干净 tag 发出，后续 evidence / report 必须显式写明这是 dirty worktree publish，不能伪装成纯 tag release
+- 下一阶段只做 Run 2 pre-flight、受试者执行和证据采集；不要在同一轮再混入新的功能改动
+
+### 2026-04-01（续，Run 2 pre-flight 已进入；当前卡在 conductor 在线门）
+
+**操作**: 冻结 Run 2 pre-flight 记录，执行 published-package smoke 与 Hub 可达性检查
+**结果**:
+- 新增 pre-flight evidence：`pipeline/bridge-v2-validation/evidence/EXP-03-run2-preflight-20260401.md`
+- pre-flight 记录已固定写入 `@chorus-protocol/skill@0.8.0-alpha.8`、`dist.shasum=af7732068ce9afe018f895fd87fd8c5ee3ec1a1e`、`dist.integrity=sha512-v9/eikmYQv1BmAlWV6y8kxYyk49iV/cfIY2ORR8qAycWjVR1j9jDOVm06i82AcrZDRxV9umDUDy7DQA7cGDyEQ==`
+- pre-flight smoke 通过：隔离 temp HOME 下 `npx @chorus-protocol/skill@0.8.0-alpha.8 init --target openclaw` exit `0`；`verify --target openclaw` 安装完整性 PASS 后按预期阻塞在 restart gate
+- Hub health 通过：`status=ok`
+- `discover` 可达，但当前 `xiaoyin@chorus` 为 `online=false`
+- EXP-03 spec 已增加 pinned-install audit 规则：任何 unpinned install 直接记 `PROTOCOL DEVIATION: UNPINNED INSTALL`，且不得拿后续 artifact 证明 published-package path 真实性
+
+**决策**:
+- Run 2 pre-flight 已进入，但还未 cleared
+- 当前阻塞是 conductor online/self-test gate；在 `xiaoyin@chorus` 恢复在线并完成自测前，不启动受试者执行
+- Subject screening / 录屏 / shell history / browser history capture 仍是 pending 项
+
+### 2026-04-01（续，restart consent hard gate 已实现并验证）
+
+**操作**: 在 `packages/chorus-skill/cli.mjs` 实装 install-time restart consent hard gate，并补齐 proof-based completion / version pin 回归
+**结果**:
+- `init --target openclaw` 现在会在 fresh install 时写入 `~/.chorus/restart-consent.json`，并临时把 `gateway` 加入 `~/.openclaw/openclaw.json` 的 `tools.deny`
+- `restart-consent.json` 现在记录 `packageVersion`；CLI 和 EN/zh-CN 模板里的 helper 命令都 pin 到安装版本
+- 新增 `restart-consent status|request|approve|complete` CLI 子命令：先写 `chorus-restart-checkpoint.md`，再等待用户明确同意；`complete` 改成 **proof-based**，没有 post-restart runtime evidence 就拒绝清 gate
+- proof 解析改成 **identity-first**：`currentIdentity` 只要不是 `unknown`，就必须绑定到同一 agent；workspace credential 若与 checkpoint identity 不一致，`complete` 直接失败
+- bridge `runtime-v2` 成功激活后会写出 durable activation proof；`complete` 只接受 approval 之后的新 proof，并额外写 `chorus-restart-proof.json`
+- `verify --target openclaw` 在 gate 仍激活时会明确报 blocked，不再把“已安装但未获准重启”误报成 ready
+- EN / zh-CN SKILL 模板已同步到 helper 流程；局部 restart section lint 已清理
+- 回归验证通过：`node --check packages/chorus-skill/cli.mjs`
+- 回归验证通过：`npm test -- --runInBand tests/cli/cli.test.ts`（48/48）
+- 回归验证通过：`npm test -- --runInBand tests/bridge/runtime-v2.test.ts --coverage=false`（26/26）
+
+**决策**:
+- 当前最早可执行 enforcement point 是 OpenClaw core `tools.deny` 对 `gateway` 工具的临时封锁，不再声称 bridge runtime/plugin hook 能拦住首次未授权重启
+- gate 的收尾标准已从“agent 自报恢复完成”升级为“runtime 留下 post-restart proof + helper 写出 completion proof”
+- 证明链现在要求“checkpoint identity = resolved proof agent”；不再允许 workspace credential 把恢复链路静默切到另一个 agent
+- 这次修复的闭环范围冻结在 delegated fresh-install 的首次重启门禁；npm publish 和 EXP-03 Run 2 继续冻结到下一个阶段
+- 模板整文件仍有历史 markdownlint 债，但本轮只修了 restart section 相关段落，不扩散范围
+
+### 2026-04-01（续，已下发 P0 实现任务）
+
+**操作**: 针对 delegated EXP-03 的最高优先级阻塞，签发代码实现任务
+**结果**:
+- 新增任务规格 `pipeline/tasks/TASK_SPEC_EXP03_RESTART_CONSENT_HARD_GATE.md`
+- 任务明确要求：restart consent 必须是**代码级**门禁；禁止 runtime-v2-only 修复；fresh install 首次重启前必须已有 enforcement point
+
+**决策**:
+- 当前唯一 P0 实现任务：先做 restart consent hard gate
+- npm publish / Run 2 / 新受试者执行都排在这个任务之后
+- Run 2 仍冻结：必须是已发布 npm 版本，且同时包含 `bd8e7bd` 与 hard gate 修复
+
+### 2026-04-01 (EXP-03 规格改为 delegated path + Run 2 门禁收紧)
+
+**操作**: 根据 EXP-03 Run 1 真实执行轨迹和 `bd8e7bd` 修复后的当前态，重写实验规格，纠正“人类手工安装”假设
+**结果**:
+- `docs/experiments/EXP-03-human-developer-cold-start.md` 已改为 **Human-Delegated Cold-Start Integration**
+- 新增 Section 0 `VERSION_UNDER_TEST`：Run 2 明确阻塞在“已发布 npm 版本且包含 `bd8e7bd` Telegram token fallback 修复”
+- PASS 条件收紧为 delegated 真实路径：受试者必须直接对自己的 OpenClaw agent 下达任务；禁止人工 takeover；restart consent 变成硬门槛；agent 虚报成功记 FAIL
+- debrief / artifacts / pre-flight checklist 已同步到 delegated 路径；新增 restart checkpoint 证据要求
+- `npx markdownlint-cli docs/experiments/EXP-03-human-developer-cold-start.md` 通过
+
+**决策**:
+- EXP-03 不再允许拿“手工跑 npx / 读 docs / 改 JSON”的旧口径解释 Run 2
+- alpha.7 和任何未发布本地代码都不允许作为 Run 2 版本基线
+- restart consent 仍是开放实现风险，但现在被规格显式提升为 PASS/FAIL 门槛，不再是软提醒
+
+### 2026-03-31 21:15 (Bridge→TG 投递失败根因修复)
+
+**操作**: 排查并修复 bridge 收到 SSE 消息后未转发到 Telegram 的 P0 阻塞
+**结果**: `bd8e7bd` — 531/531 tests green，MacBook live 验证 3/3 delivery_confirmed
+**决策**:
+- 根因：`deliverInbound` 从 `api.config`（plugin config）读 Telegram botToken，部分 OpenClaw 运行时的 plugin config 不含 channel credentials，token 仅在全局 `~/.openclaw/openclaw.json`
+- 修复：plugin config 无 token 时 fallback 读全局 openclaw.json
+- 测试 harness 去掉默认 botToken，default-only/fallback 测试断言 `flat-bot-token`（来自全局 config）
+- recovery 回归测试走真 `RecoveryEngine.recover()` 路径（两轮 recover：throw → incomplete → succeed → cursor_advanced）
+- 证据文件（docs/evidence/）暂未入提交，待后续整理
+
 ### 2026-03-31 20:30 (EXP-03 Run 1 冻结 + 审计产物补全)
 
 **操作**: 补写 4 个缺失审计产物（question-log, debrief, contamination-check, screening），链接到 summary

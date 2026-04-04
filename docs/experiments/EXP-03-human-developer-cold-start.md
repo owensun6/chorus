@@ -1,15 +1,15 @@
 # EXP-03: Human-Delegated Cold-Start Integration
 
-2026-03-21 (original) | 2026-04-01 (delegated-path revision) | Status: RUN VERSION PUBLISHED; AWAITING RUN 2 PRE-FLIGHT
+2026-03-21 (original) | 2026-04-01 (delegated-path revision) | 2026-04-03 (alpha.9 version bump) | Status: RUN 2 PRE-FLIGHT IN PROGRESS
 
 ---
 
 ## 0. Run Parameters
 
-- `VERSION_UNDER_TEST`: `0.8.0-alpha.8`
-- Package under test: `@chorus-protocol/skill@0.8.0-alpha.8`
-- Run 2 blocker: do not execute until `VERSION_UNDER_TEST` is a published npm version that includes the Telegram bot token fallback fix from commit `bd8e7bd` or a later published equivalent. This blocker is cleared for `0.8.0-alpha.8`.
-- Release mapping: `0.8.0-alpha.8` was published on 2026-04-01 from base `HEAD 2dfa4997` plus the then-current dirty worktree; see `memory-bank/progress.md` for the exact scope note.
+- `VERSION_UNDER_TEST`: `0.8.0-alpha.9`
+- Package under test: `@chorus-protocol/skill@0.8.0-alpha.9`
+- Run 2 blocker: CLEARED. `0.8.0-alpha.9` includes IMPL-EXP03-03 (private Telegram sending stack removed) + restart consent gate test + activation proof recording.
+- Release mapping: `0.8.0-alpha.9` was published on 2026-04-03 from commit `bbf7f9c` (tag `v0.8.0-alpha.9`). Changes since alpha.8: removed bridge-level Telegram token resolution (accountId delegation), added credentials-only path test, added activation proof recording in runtime-v2.
 - This experiment is valid only against published npm artifacts. Local worktree installs, scp'd bridge files, and unpublished commits invalidate the run.
 
 ---
@@ -22,9 +22,9 @@ EXP-02 proved a non-Claude AI could do cold-start from raw docs. E-03-01 proved 
 
 This is a delegated setup usability test. The installed docs are still under test, but they are consumed primarily by the subject's agent during execution. This experiment does **not** measure manual shell-by-shell readability for a human operator. If manual doc execution is needed, that is a separate experiment.
 
-### Architecture context (`@chorus-protocol/skill@0.8.0-alpha.8`)
+### Architecture context (`@chorus-protocol/skill@0.8.0-alpha.9`)
 
-The current Chorus architecture uses **SSE-based inbox delivery** through OpenClaw Gateway. The run version must already include the Telegram token fallback fix from `bd8e7bd` or a later published equivalent.
+The current Chorus architecture uses **SSE-based inbox delivery** through OpenClaw Gateway. The run version must include IMPL-EXP03-03 (private Telegram sending stack removed) and restart consent gate enforcement.
 
 The delegated activation flow is:
 
@@ -105,13 +105,13 @@ The subject receives exactly these materials and nothing else:
 |---|----------|----------|---------|
 | M-1 | Opening instruction | Text message sent directly to the subject | See Section 5 |
 | M-2 | Hub URL | In opening instruction | `https://agchorus.com` |
-| M-3 | Package identifier + version under test | In opening instruction | `@chorus-protocol/skill@0.8.0-alpha.8` |
+| M-3 | Package identifier + version under test | In opening instruction | `@chorus-protocol/skill@0.8.0-alpha.9` |
 
 **Note**: No API key is pre-provided. The subject's agent must discover the self-registration flow from the installed docs and obtain its own `api_key` via `POST /register`.
 
 ### What the subject's agent discovers itself
 
-- SKILL.md, PROTOCOL.md, TRANSPORT.md, examples/ — installed by `npx @chorus-protocol/skill@0.8.0-alpha.8 init --target openclaw`
+- SKILL.md, PROTOCOL.md, TRANSPORT.md, examples/ — installed by `npx @chorus-protocol/skill@0.8.0-alpha.9 init --target openclaw`
 - `envelope.schema.json` — installed alongside SKILL.md
 - Bridge runtime files at `~/.openclaw/extensions/chorus-bridge/`
 - The project name "Chorus" — visible in the installed docs
@@ -211,7 +211,7 @@ The opening instruction sent to the subject:
 
 > Send this to your OpenClaw agent:
 >
-> "Install Chorus from the published npm package `@chorus-protocol/skill@0.8.0-alpha.8` and connect it to `https://agchorus.com`.
+> "Install Chorus from the published npm package `@chorus-protocol/skill@0.8.0-alpha.9` and connect it to `https://agchorus.com`.
 >
 > Get me to the point where I can see a Chorus message in Telegram.
 >
@@ -235,11 +235,11 @@ If the subject asks the Conductor for protocol help, the Conductor can only say 
 
 ### Pinned package rule (Conductor audit)
 
-Run 2 is valid only if the install path stays pinned to the exact published artifact under test: `@chorus-protocol/skill@0.8.0-alpha.8`.
+Run 2 is valid only if the install path stays pinned to the exact published artifact under test: `@chorus-protocol/skill@0.8.0-alpha.9`.
 
 - Valid install examples:
-  - `npx @chorus-protocol/skill@0.8.0-alpha.8 init --target openclaw`
-  - `npx @chorus-protocol/skill@0.8.0-alpha.8 verify --target openclaw`
+  - `npx @chorus-protocol/skill@0.8.0-alpha.9 init --target openclaw`
+  - `npx @chorus-protocol/skill@0.8.0-alpha.9 verify --target openclaw`
 - Protocol deviation examples:
   - `npx @chorus-protocol/skill init --target openclaw`
   - `npx @chorus-protocol/skill@latest ...`
@@ -555,12 +555,12 @@ Execute before each experiment run. All items must pass.
 
 ```text
 [x] Fill Section 0 `VERSION_UNDER_TEST`
-[x] `npm view @chorus-protocol/skill@0.8.0-alpha.8 version` returns `0.8.0-alpha.8`
-[x] `npm view @chorus-protocol/skill@0.8.0-alpha.8 dist.shasum` returns `af7732068ce9afe018f895fd87fd8c5ee3ec1a1e`
-[x] `npm view @chorus-protocol/skill@0.8.0-alpha.8 dist.integrity` returns `sha512-v9/eikmYQv1BmAlWV6y8kxYyk49iV/cfIY2ORR8qAycWjVR1j9jDOVm06i82AcrZDRxV9umDUDy7DQA7cGDyEQ==`
-[x] Release mapping recorded: `0.8.0-alpha.8` → base `HEAD 2dfa4997` + dirty worktree publish
-[x] Published version includes Telegram token fallback fix from `bd8e7bd` or later equivalent
-[x] `npx @chorus-protocol/skill@0.8.0-alpha.8 --help` runs without error
+[x] `npm view @chorus-protocol/skill@0.8.0-alpha.9 version` returns `0.8.0-alpha.9`
+[x] `npm view @chorus-protocol/skill@0.8.0-alpha.9 dist.shasum` returns `9021a0d05d9a684b370d9f5651ba83b7766ed0ec`
+[x] `npm view @chorus-protocol/skill@0.8.0-alpha.9 dist.integrity` returns `sha512-I0UfAs/lWsFWbNmlmgJI4f+qrMTtyE8eEtDHk9VKF3ASA1xxcNYhntyjrCgfE2mHqyTo3Z4WF9jIAC6NlSN+ag==`
+[x] Release mapping recorded: `0.8.0-alpha.9` → commit `bbf7f9c` (tag `v0.8.0-alpha.9`)
+[x] Published version includes IMPL-EXP03-03 (private TG stack removed) + restart gate test
+[x] `npx @chorus-protocol/skill@0.8.0-alpha.9 --help` runs without error
 ```
 
 ### 13.2 Hub and infrastructure
@@ -576,8 +576,8 @@ Execute before each experiment run. All items must pass.
 
 ```text
 [ ] From a clean OpenClaw environment (no prior Chorus state):
-    `npx @chorus-protocol/skill@0.8.0-alpha.8 init --target openclaw`
-    `npx @chorus-protocol/skill@0.8.0-alpha.8 verify --target openclaw`
+    `npx @chorus-protocol/skill@0.8.0-alpha.9 init --target openclaw`
+    `npx @chorus-protocol/skill@0.8.0-alpha.9 verify --target openclaw`
     Init exits 0; verify reports installation integrity PASS and then blocks on restart consent gate (fresh install expected)
 [ ] Verify installed SKILL.md contains registration instructions and credential path
 [ ] Verify `~/.openclaw/extensions/chorus-bridge/runtime/` contains the bundled runtime modules
@@ -603,7 +603,7 @@ Execute before each experiment run. All items must pass.
 [ ] Timer is ready (60 min countdown)
 [ ] Conductor has https://agchorus.com/console open in a separate browser tab
 [ ] Conductor has the Step 4 curl command prepared with their API key
-[x] Opening instruction prepared with `0.8.0-alpha.8` filled in
+[x] Opening instruction prepared with `0.8.0-alpha.9` filled in
 [ ] Subject will send the opening instruction directly to their own agent
 [ ] If restart is requested, Conductor is ready to capture checkpoint evidence before approval
 ```

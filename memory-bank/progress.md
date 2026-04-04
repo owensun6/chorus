@@ -1,5 +1,30 @@
 # Chorus Protocol — Progress Log
 
+## 2026-04-03 EXP-03 Run 2 PASS + IMPL-EXP03-03 修复 + alpha.9 发布
+
+**操作**: 执行 3 个待办任务 + EXP-03 Run 2 全流程
+
+**结果**:
+
+- IMPL-EXP03-03 完成：bridge 去私有 Telegram 发送栈，`sendMessageTelegram` 改用 `accountId` 委托 OpenClaw channel helper（commit `f222b70`）
+- RESTART_CONSENT_HARD_GATE：新增 credentials-only 路径测试（commit `f222b70`）
+- `@chorus-protocol/skill@0.8.0-alpha.9` 发布（commit `bbf7f9c`，tag `v0.8.0-alpha.9`，shasum `9021a0d0`）
+- Mac mini + MacBook Chorus 安装痕迹全清
+- MacBook SSH 修复（用户名 test2，ed25519 公钥）
+- EXP-03 pre-flight 13.1-13.3 全 PASS，conductor 改为 xiaox@chorus（xiaoyin key 丢失）
+- EXP-03 Run 2 执行：18:40 开场 → 18:41 安装 → 18:42 批准重启 → 18:46 Telegram 消息可见
+  - Agent: openclaw-test@agchorus
+  - Hub trace: `0c02a49a`，delivery_confirmed，telegram_server_ack ref=147
+  - C-1 到 C-11 全部满足 → **PASS**
+- Friction event: Telegram polling 断连（IMPL-EXP03-04），根因为 approve 写 openclaw.json 触发连锁 reload
+- 整改规格 `TASK_SPEC_EXP03_TELEGRAM_POLLING_DISCONNECT.md` 已写入
+
+**决策**:
+
+- Conductor 从 xiaoyin@chorus 改为 xiaox@chorus（API key 在清理 ~/.chorus/ 时丢失，生产 Hub 无法本地删除）
+- EXP-03 PASS 不因 Telegram 断连降级（C-6 在 18:46 已达成，断连发生在之后）
+- IMPL-EXP03-04 approve 不写 openclaw.json，complete 合并清理
+
 ## 2026-04-01（续，13.2 已闭环；整体 pre-flight 仍待 13.4）
 
 **操作**: 在显式放行后补完 Run 2 pre-flight 剩余两项：conductor self-test + browser console check

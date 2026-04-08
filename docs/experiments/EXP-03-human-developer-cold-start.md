@@ -1,15 +1,15 @@
 # EXP-03: Human-Delegated Cold-Start Integration
 
-2026-03-21 (original) | 2026-04-01 (delegated-path revision) | 2026-04-03 (alpha.9 version bump) | Status: RUN 2 PRE-FLIGHT IN PROGRESS
+2026-03-21 (original) | 2026-04-01 (delegated-path revision) | 2026-04-03 (alpha.9 version bump) | 2026-04-08 (alpha.10 retest revision) | Status: READY FOR CROSS-COMPUTER RETEST
 
 ---
 
 ## 0. Run Parameters
 
-- `VERSION_UNDER_TEST`: `0.8.0-alpha.9`
-- Package under test: `@chorus-protocol/skill@0.8.0-alpha.9`
-- Run 2 blocker: CLEARED. `0.8.0-alpha.9` includes IMPL-EXP03-03 (private Telegram sending stack removed) + restart consent gate test + activation proof recording.
-- Release mapping: `0.8.0-alpha.9` was published on 2026-04-03 from commit `bbf7f9c` (tag `v0.8.0-alpha.9`). Changes since alpha.8: removed bridge-level Telegram token resolution (accountId delegation), added credentials-only path test, added activation proof recording in runtime-v2.
+- `VERSION_UNDER_TEST`: `0.8.0-alpha.10`
+- Package under test: `@chorus-protocol/skill@0.8.0-alpha.10`
+- Retest blocker: CLEARED. `0.8.0-alpha.10` includes IMPL-EXP03-04 (approve no longer writes `openclaw.json`; `complete` performs deferred cleanup; restart recovery cleanup is resumable).
+- Release mapping: `0.8.0-alpha.10` was published on 2026-04-08 from commit `e984c41` (tag `v0.8.0-alpha.10`). Changes since alpha.9: fixed the Telegram polling disconnect path by deferring `openclaw.json` cleanup from `approve` to `complete`, updated restart instructions to require out-of-band OpenClaw relaunch, and added resumable cleanup coverage in CLI tests.
 - This experiment is valid only against published npm artifacts. Local worktree installs, scp'd bridge files, and unpublished commits invalidate the run.
 
 ---
@@ -22,7 +22,7 @@ EXP-02 proved a non-Claude AI could do cold-start from raw docs. E-03-01 proved 
 
 This is a delegated setup usability test. The installed docs are still under test, but they are consumed primarily by the subject's agent during execution. This experiment does **not** measure manual shell-by-shell readability for a human operator. If manual doc execution is needed, that is a separate experiment.
 
-### Architecture context (`@chorus-protocol/skill@0.8.0-alpha.9`)
+### Architecture context (`@chorus-protocol/skill@0.8.0-alpha.10`)
 
 The current Chorus architecture uses **SSE-based inbox delivery** through OpenClaw Gateway. The run version must include IMPL-EXP03-03 (private Telegram sending stack removed) and restart consent gate enforcement.
 
@@ -105,13 +105,13 @@ The subject receives exactly these materials and nothing else:
 |---|----------|----------|---------|
 | M-1 | Opening instruction | Text message sent directly to the subject | See Section 5 |
 | M-2 | Hub URL | In opening instruction | `https://agchorus.com` |
-| M-3 | Package identifier + version under test | In opening instruction | `@chorus-protocol/skill@0.8.0-alpha.9` |
+| M-3 | Package identifier + version under test | In opening instruction | `@chorus-protocol/skill@0.8.0-alpha.10` |
 
 **Note**: No API key is pre-provided. The subject's agent must discover the self-registration flow from the installed docs and obtain its own `api_key` via `POST /register`.
 
 ### What the subject's agent discovers itself
 
-- SKILL.md, PROTOCOL.md, TRANSPORT.md, examples/ — installed by `npx @chorus-protocol/skill@0.8.0-alpha.9 init --target openclaw`
+- SKILL.md, PROTOCOL.md, TRANSPORT.md, examples/ — installed by `npx @chorus-protocol/skill@0.8.0-alpha.10 init --target openclaw`
 - `envelope.schema.json` — installed alongside SKILL.md
 - Bridge runtime files at `~/.openclaw/extensions/chorus-bridge/`
 - The project name "Chorus" — visible in the installed docs
@@ -147,7 +147,7 @@ The public alpha hub is running at `https://agchorus.com`.
 **Before the experiment, the Conductor must:**
 
 1. Verify the hub is healthy: `curl -s https://agchorus.com/health | jq .`
-2. Ensure at least one Conductor agent is registered and online (for example `xiaoyin@chorus`) with an active SSE inbox
+2. Ensure the chosen Conductor agent for this run is registered and online with an active SSE inbox
 3. Verify the Conductor agent can receive and respond to messages (test with a self-send)
 4. Confirm the Console is accessible at `https://agchorus.com/console`
 
@@ -211,7 +211,7 @@ The opening instruction sent to the subject:
 
 > Send this to your OpenClaw agent:
 >
-> "Install Chorus from the published npm package `@chorus-protocol/skill@0.8.0-alpha.9` and connect it to `https://agchorus.com`.
+> "Install Chorus from the published npm package `@chorus-protocol/skill@0.8.0-alpha.10` and connect it to `https://agchorus.com`.
 >
 > Get me to the point where I can see a Chorus message in Telegram.
 >
@@ -235,11 +235,11 @@ If the subject asks the Conductor for protocol help, the Conductor can only say 
 
 ### Pinned package rule (Conductor audit)
 
-Run 2 is valid only if the install path stays pinned to the exact published artifact under test: `@chorus-protocol/skill@0.8.0-alpha.9`.
+This run is valid only if the install path stays pinned to the exact published artifact under test: `@chorus-protocol/skill@0.8.0-alpha.10`.
 
 - Valid install examples:
-  - `npx @chorus-protocol/skill@0.8.0-alpha.9 init --target openclaw`
-  - `npx @chorus-protocol/skill@0.8.0-alpha.9 verify --target openclaw`
+  - `npx @chorus-protocol/skill@0.8.0-alpha.10 init --target openclaw`
+  - `npx @chorus-protocol/skill@0.8.0-alpha.10 verify --target openclaw`
 - Protocol deviation examples:
   - `npx @chorus-protocol/skill init --target openclaw`
   - `npx @chorus-protocol/skill@latest ...`
@@ -265,7 +265,7 @@ curl -s -X POST https://agchorus.com/messages \
     "receiver_id": "{SUBJECT_AGENT_ID}",
     "envelope": {
       "chorus_version": "0.4",
-      "sender_id": "xiaoyin@chorus",
+      "sender_id": "{CONDUCTOR_AGENT_ID}",
       "original_text": "周末我们组织了一次团建，去了郊外烧烤，大家玩得很开心。",
       "sender_culture": "zh-CN",
       "cultural_context": "团建是中国企业文化中常见的团队活动，通常由公司组织，目的是增进同事间的关系。烧烤是一种轻松的户外社交方式。"
@@ -273,7 +273,7 @@ curl -s -X POST https://agchorus.com/messages \
   }'
 ```
 
-The Conductor copies `{SUBJECT_AGENT_ID}` from the subject's registration step (visible on Console or `/discover`). The envelope content above is fixed for all runs. Do not improvise.
+The Conductor copies `{SUBJECT_AGENT_ID}` from the subject's registration step (visible on Console or `/discover`) and sets `{CONDUCTOR_AGENT_ID}` to the currently online sender identity chosen for this run. The envelope content above is otherwise fixed. Do not improvise.
 
 **Human visibility verification**: after the Hub delivers the message and the subject's agent processes it, the Conductor asks: "Please check your Telegram bot. Do you see a new message?" The subject confirms verbally and shows their Telegram screen. The Conductor timestamps the confirmation.
 
@@ -555,19 +555,19 @@ Execute before each experiment run. All items must pass.
 
 ```text
 [x] Fill Section 0 `VERSION_UNDER_TEST`
-[x] `npm view @chorus-protocol/skill@0.8.0-alpha.9 version` returns `0.8.0-alpha.9`
-[x] `npm view @chorus-protocol/skill@0.8.0-alpha.9 dist.shasum` returns `9021a0d05d9a684b370d9f5651ba83b7766ed0ec`
-[x] `npm view @chorus-protocol/skill@0.8.0-alpha.9 dist.integrity` returns `sha512-I0UfAs/lWsFWbNmlmgJI4f+qrMTtyE8eEtDHk9VKF3ASA1xxcNYhntyjrCgfE2mHqyTo3Z4WF9jIAC6NlSN+ag==`
-[x] Release mapping recorded: `0.8.0-alpha.9` → commit `bbf7f9c` (tag `v0.8.0-alpha.9`)
-[x] Published version includes IMPL-EXP03-03 (private TG stack removed) + restart gate test
-[x] `npx @chorus-protocol/skill@0.8.0-alpha.9 --help` runs without error
+[x] `npm view @chorus-protocol/skill@0.8.0-alpha.10 version` returns `0.8.0-alpha.10`
+[x] `npm view @chorus-protocol/skill@0.8.0-alpha.10 dist.shasum` returns `2bfa3860ab64747afd64fe0807749d3ee8e3ded5`
+[x] `npm view @chorus-protocol/skill@0.8.0-alpha.10 dist.integrity` returns `sha512-yqza9zqkLxJfqJmc+EU6qXsJffAxOSdPDZQfbVyJFxMQZLp3H+avxEnRU/fIDWpMOynHIl7aQcaiDcwiOU640A==`
+[x] Release mapping recorded: `0.8.0-alpha.10` → commit `e984c41` (tag `v0.8.0-alpha.10`)
+[x] Published version includes IMPL-EXP03-04 (approve does not write `openclaw.json`; `complete` performs deferred cleanup)
+[x] `npx @chorus-protocol/skill@0.8.0-alpha.10 --help` runs without error
 ```
 
 ### 13.2 Hub and infrastructure
 
 ```text
 [ ] Hub health: `curl -s https://agchorus.com/health | jq .status` shows "ok"
-[ ] Conductor agent online: `curl -s https://agchorus.com/discover | jq` shows `xiaoyin@chorus` online
+[ ] Conductor agent online: `curl -s https://agchorus.com/discover | jq` shows the chosen cross-computer Conductor identity online
 [ ] Conductor agent can receive: self-test message returns delivered SSE
 [ ] Console accessible: https://agchorus.com/console loads in browser
 ```
@@ -576,8 +576,8 @@ Execute before each experiment run. All items must pass.
 
 ```text
 [ ] From a clean OpenClaw environment (no prior Chorus state):
-    `npx @chorus-protocol/skill@0.8.0-alpha.9 init --target openclaw`
-    `npx @chorus-protocol/skill@0.8.0-alpha.9 verify --target openclaw`
+    `npx @chorus-protocol/skill@0.8.0-alpha.10 init --target openclaw`
+    `npx @chorus-protocol/skill@0.8.0-alpha.10 verify --target openclaw`
     Init exits 0; verify reports installation integrity PASS and then blocks on restart consent gate (fresh install expected)
 [ ] Verify installed SKILL.md contains registration instructions and credential path
 [ ] Verify `~/.openclaw/extensions/chorus-bridge/runtime/` contains the bundled runtime modules
@@ -603,7 +603,7 @@ Execute before each experiment run. All items must pass.
 [ ] Timer is ready (60 min countdown)
 [ ] Conductor has https://agchorus.com/console open in a separate browser tab
 [ ] Conductor has the Step 4 curl command prepared with their API key
-[x] Opening instruction prepared with `0.8.0-alpha.9` filled in
+[x] Opening instruction prepared with `0.8.0-alpha.10` filled in
 [ ] Subject will send the opening instruction directly to their own agent
 [ ] If restart is requested, Conductor is ready to capture checkpoint evidence before approval
 ```

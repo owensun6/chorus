@@ -1,6 +1,8 @@
 <!-- Author: Dao-Yi -->
-<!-- status: DRAFT -->
-<!-- implementation: parse-layer + execution-layer landed (uncommitted); symlink reverted; both machines cleaned to cold-start state -->
+<!-- status: APPROVED -->
+<!-- approved-by: Commander -->
+<!-- approved-at: 2026-04-08 -->
+<!-- implementation: parse-layer + execution-layer landed in commit 7b35fe3 (0.8.0-alpha.11); symlink reverted; both machines cleaned to cold-start state -->
 
 # EXP-03 Run 3 — Addendum Findings Report
 

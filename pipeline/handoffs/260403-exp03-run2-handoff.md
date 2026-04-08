@@ -83,3 +83,99 @@
 - **禁止**: 修改 EXP-03 判定结果（PASS 已由 Commander 确认）
 - **注意**: approve 改为不写 openclaw.json 后，gateway tool 在 approve 到 complete 之间仍然被 deny — agent 必须在 approve 之后、gateway.restart 之前，由 OpenClaw 的 reload 自动重启（而非 agent 调用被 deny 的 gateway tool）。需要验证这个时序是否仍然可行。
 - **注意**: MacBook 上 Chorus 安装痕迹已在 Run 2 中重新产生（init + credentials + bridge），如需再次清理需 SSH 到 test2@100.124.109.56
+
+---
+
+## 补充分析（2026-04-04，小v）
+
+### 静态分析结论
+
+这次 Telegram polling 断连问题，表面上看是 Chorus install / consent 流程的问题，实质上是：
+
+> `restart-consent approve` 把“逻辑状态变化”实现成了对 `openclaw.json` 的再次写入，而 `openclaw.json` 又是 OpenClaw 的热配置文件，会触发 watcher reload，从而绕过 restart consent 原本想控制的重启时机。
+
+换句话说，当前 bug 的根因不只是“多写一次配置”，而是：
+- **gate 状态**（armed / awaiting_approval / approved / complete）
+- **运行时副作用**（`tools.deny.gateway` 变化导致 OpenClaw reload）
+
+这两层状态被耦合在了一起。
+
+### 已确认的代码事实
+
+1. `init --target openclaw` 的 `registerOpenClaw()` 会：
+   - 注册 skill
+   - 注册 bridge plugin
+   - 调 `applyRestartGateBlock(config)`
+   - `writeJSON(OPENCLAW_CONFIG_PATH, config)`
+
+   这对应第一次 `openclaw.json` 写入。
+
+2. `restart-consent approve` 当前实现会：
+   - `readOpenClawConfig()`
+   - `restoreRestartGateBlock(config, gate)`
+   - `writeJSON(OPENCLAW_CONFIG_PATH, config)`
+   - 然后 `writeRestartGate(...status:"approved")`
+
+   这说明 approve 阶段确实会再次写 `openclaw.json`，与 task spec 描述一致。
+
+3. `restart-consent complete` 当前主要负责：
+   - 校验 post-restart proof
+   - 写 completion proof
+   - 删除 checkpoint
+   - 删除 gate
+
+   它目前**不是**承担 `openclaw.json` 清理的主位置。
+
+### 我认同的修复方向
+
+我认同 `TASK_SPEC_EXP03_TELEGRAM_POLLING_DISCONNECT.md` 的主方案：
+
+- `approve` 只更新 `~/.chorus/restart-consent.json`
+- `approve` 不写 `openclaw.json`
+- `complete` 再统一执行：
+  1. remove `gateway` from `tools.deny`
+  2. 单次写回 `openclaw.json`
+  3. 删除 gate / checkpoint
+
+这能把总写次数压到：
+- `init`: 1 次
+- `complete`: 1 次
+- `approve`: 0 次
+
+并把“授权”和“副作用配置写入”重新解耦。
+
+### 仍需验证的关键风险
+
+真正需要下一位实现 agent 重点验证的，不是“能不能删掉 approve 里的写配置”，而是：
+
+> **approve 不再写 openclaw.json 之后，approve → restart → complete 这条时序是否仍然闭环？**
+
+尤其要查清楚：
+
+1. 在 approve 之后、complete 之前，`tools.deny.gateway` 仍存在时：
+   - agent 是否还能合法完成 restart 流程？
+   - 这条链到底依赖显式 `gateway.restart`，还是依赖某次自动 reload？
+
+2. 如果把 approve 的配置写入拿掉：
+   - 是否会修掉 Telegram polling 断连
+   - 但同时让 consent flow 卡在“已批准、却没有实际 restart 发生”的中间态
+
+3. `tools.deny.gateway` 的约束边界要重新确认：
+   - 它到底只限制 agent 调用 gateway tool
+   - 还是也间接影响当前恢复路径中的某些自动步骤
+
+### 建议后续修复 agent 先做的事（只读/验证优先）
+
+1. 复盘 OpenClaw 对 `openclaw.json` 的 reload 语义
+   - 是全量重启、局部 reload、还是 plugin reload
+   - 为什么 Telegram polling 在第二次后丢失恢复能力
+
+2. 画出 approve → restart → complete 的真实时序图
+   - 当前成功路径究竟依赖哪次 reload / 哪个 restart
+
+3. 明确 `gateway` deny 在整个 consent window 内的真实行为边界
+   - 避免修掉 reload 问题后又引入“批准后无法完成重启”的新阻塞
+
+### 一句话给下一位修复者
+
+**这不是一个简单的“删掉一行 writeJSON”问题，而是一个“把逻辑状态与运行时副作用重新解耦”的问题。**

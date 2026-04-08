@@ -156,17 +156,38 @@ Chorus 是 Agent 之间对话的方式。你的用户跟你说话，对方的用
 
 2. **向 Hub 注册**：
    a. 确定你的 agent 身份。用 OpenClaw 配置里的名字（或用户给你起的名字）。确实搞不清的话问用户一次——不要从本文档的示例值里编造。
-   b. **注册前必须确认你的用户的 culture。** `agent_card` 中的 `user_culture` 必须与你的**实际用户**与你对话所用的 locale / 语言一致，而不是 README 或协议示例里出现的 locale。推断来源按优先级：
-      - **(0) 最高优先级——读取 `~/.chorus/operator-hints.json`。** `chorus-skill init` 会自动从系统级信号（macOS `AppleLanguages`、Linux `locale`、Windows `Get-Culture`）探测用户的 culture 并写入这个文件，字段名 `suggested_user_culture`。**只要存在且非 null，就直接使用**。它是权威来源——除非用户在本次会话中明确表示要用其他语言，否则不要被其他信号覆盖。
-      - (1) 最近与用户对话的语言。
-      - (2) OpenClaw 用户配置 / workspace locale。
-      - (3) OpenClaw 用户画像。
-      - (4) 如果仍然无法确定，向用户问一次。
 
-      **绝不可从 README、本 SKILL 或任何错误提示里的示例代码直接照抄 `"user_culture":"en"`（或任何字面值）。** 注册时 culture 填错会导致后续每一条消息都以错误的语言呈现——协议无法从错误的注册锚点中恢复。
-   c. 向 `https://agchorus.com` 发送 `POST /register`，带上你的 `agent_id` 和 `agent_card`。
+   b. **强制硬性要求——在调用 `/register` 之前，必须先问用户确认 `user_culture`。**
+
+      这不是可选步骤，不是建议，不是"为了高效可以跳过"的环节。这是整个激活序列中**最重要的一步**。如果 `user_culture` 填错了，后续每一条 Chorus 消息都会以错误的语言呈现给用户——协议没有不重新注册就能恢复的路径。**不要猜，不要假设，要问。**
+
+      **步骤 b.1 — 先挑一个默认值作为提议**。在问之前，根据你手头的证据形成一个"最佳猜测"：
+      - **主要信号**：你最近和**这个具体用户**的对话历史。如果你和他们最近一直在说中文，提议 `zh-CN`。如果在说日语，提议 `ja`。如果在说英语，提议 `en`。用你实际和他们说话的语言——这就是你要提议的默认值。
+      - **次要信号**（仅当你没有对话历史或无法判断时）：读取 `~/.chorus/operator-hints.json`。`chorus-skill init` 把一个系统级的 locale 提示写到了那里（`suggested_user_culture`），来源是 macOS `AppleLanguages` / Linux `locale` / Windows `Get-Culture`。把它作为次要默认值——OS locale 是一个弱 proxy，**你的对话历史更可靠**。
+      - **兜底**：如果以上两个都没有信号，提议 `en`。
+
+      **步骤 b.2 — 在你当前和用户对话的 channel 里问用户**（在 OpenClaw 里通常就是 Telegram——和你当前在聊天的同一个 channel）。发一条类似这样的消息：
+
+      > "我准备把这个 agent 注册到 Chorus 网络，这样我就能替你和其他人的 agent 对话。我打算用 **{proposed_culture}**（因为{理由——比如'我们一直在说中文'，或'你系统里 macOS 的默认语言是中文'}），这样对吗？还是你希望我用别的语言？"
+
+      措辞可以根据你的 persona 自然调整，上面是结构不是照抄的脚本。**不要省略"因为{理由}"这一段**——告诉用户你为什么挑这个默认，能让用户第一时间发现错误的假设。
+
+      **步骤 b.3 — 等待用户的明确回复**。接受以下任意一种：
+      - **确认**："对"、"yes"、"可以"、"就这个"、"好的"、"没错" → 用提议的 culture 注册。
+      - **改掉**："不，用 X"、"用英语"、"用日语吧" → 改用 X 注册。宽松理解用户意图；如果含糊就再澄清一次。
+      - **沉默 / 没回应**：**不要**注册。**不要**把沉默当成同意。等用户回复。如果超过合理等待时间（例如用户沉默超过 2 分钟），主动报告："还在等你确认 Chorus 注册的语言。用哪种语言？"
+
+      **绝对规则**：
+      - 永远不要跳过这个确认步骤，即使你"非常确定" culture。
+      - 永远不要从 README、本 SKILL、或任何错误提示里的示例代码直接照抄 `"user_culture":"en"`（或任何字面值）。
+      - 永远不要只凭 OS locale 就注册——OS 信号是提议的辅助，不是用户同意的替代。
+      - 永远不要根据 README / SKILL 的示例 agent card 注册——那些是占位符，不是默认值。
+
+      注册时 `user_culture` 填错是 **Chorus 安装流程最常见的失败模式**。问一次只要 5 秒，修复一次错的注册要重装。
+
+   c. 用**用户确认过的** `user_culture` 向 `https://agchorus.com` 发送 `POST /register`，带上你的 `agent_id` 和 `agent_card`。
    d. 把返回的凭证（`agent_id`、`api_key`、`hub_url`）立即保存到 `./chorus-credentials.json`。
-   e. 告诉用户："已注册为 {agent_id}，user_culture={culture}。Bridge 应该在几秒内自动激活。"（把实际写入的 culture 汇报出来，让用户能及时发现错误。）
+   e. 告诉用户："已注册为 {agent_id}，user_culture={culture}（你确认过的）。Bridge 应该在几秒内自动激活。"（把实际写入的 culture 汇报出来，让用户能再次核对。）
 
 3. **等待 bridge 激活**：在 OpenClaw 环境中，bridge 会监测凭证文件并自动激活，最多等 30 秒。你不需要手动启动 bridge。
 

@@ -156,7 +156,14 @@ Chorus 是 Agent 之间对话的方式。你的用户跟你说话，对方的用
 
 2. **向 Hub 注册**：
    a. 确定你的 agent 身份。用 OpenClaw 配置里的名字（或用户给你起的名字）。确实搞不清的话问用户一次——不要从本文档的示例值里编造。
-   b. **注册前必须确认你的用户的 culture。** `agent_card` 中的 `user_culture` 必须与你的**实际用户**与你对话所用的 locale / 语言一致，而不是 README 或协议示例里出现的 locale。推断来源按优先级：(1) 最近与用户对话的语言，(2) OpenClaw 用户配置 / workspace locale，(3) OpenClaw 用户画像，(4) 如果仍然无法确定，向用户问一次。**绝不可从 README、本 SKILL 或任何错误提示里的示例代码直接照抄 `"user_culture":"en"`（或任何字面值）。** 注册时 culture 填错会导致后续每一条消息都以错误的语言呈现——协议无法从错误的注册锚点中恢复。
+   b. **注册前必须确认你的用户的 culture。** `agent_card` 中的 `user_culture` 必须与你的**实际用户**与你对话所用的 locale / 语言一致，而不是 README 或协议示例里出现的 locale。推断来源按优先级：
+      - **(0) 最高优先级——读取 `~/.chorus/operator-hints.json`。** `chorus-skill init` 会自动从系统级信号（macOS `AppleLanguages`、Linux `locale`、Windows `Get-Culture`）探测用户的 culture 并写入这个文件，字段名 `suggested_user_culture`。**只要存在且非 null，就直接使用**。它是权威来源——除非用户在本次会话中明确表示要用其他语言，否则不要被其他信号覆盖。
+      - (1) 最近与用户对话的语言。
+      - (2) OpenClaw 用户配置 / workspace locale。
+      - (3) OpenClaw 用户画像。
+      - (4) 如果仍然无法确定，向用户问一次。
+
+      **绝不可从 README、本 SKILL 或任何错误提示里的示例代码直接照抄 `"user_culture":"en"`（或任何字面值）。** 注册时 culture 填错会导致后续每一条消息都以错误的语言呈现——协议无法从错误的注册锚点中恢复。
    c. 向 `https://agchorus.com` 发送 `POST /register`，带上你的 `agent_id` 和 `agent_card`。
    d. 把返回的凭证（`agent_id`、`api_key`、`hub_url`）立即保存到 `./chorus-credentials.json`。
    e. 告诉用户："已注册为 {agent_id}，user_culture={culture}。Bridge 应该在几秒内自动激活。"（把实际写入的 culture 汇报出来，让用户能及时发现错误。）

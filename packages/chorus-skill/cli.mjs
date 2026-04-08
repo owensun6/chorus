@@ -4,6 +4,7 @@ import { readFileSync, mkdirSync, writeFileSync, existsSync, cpSync, rmSync, rea
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { homedir } from "os";
+import { execFileSync } from "child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(readFileSync(join(__dirname, "package.json"), "utf8"));
@@ -445,6 +446,143 @@ function ensureChorusDirs() {
   mkdirSync(AGENTS_DIR, { recursive: true });
 }
 
+// Normalize macOS AppleLanguages entries like "zh-Hans-CN", "zh-Hans-US",
+// "zh-Hant-TW", "en-US" into BCP 47 culture tags agents can use at
+// registration: zh-Hans-* → zh-CN, zh-Hant-* → zh-TW, plain "xx-YY" preserved,
+// bare "xx" preserved. Unknown shapes return null.
+function normalizeAppleLanguageTag(raw) {
+  if (typeof raw !== "string" || raw.length === 0) return null;
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("zh-Hans")) return "zh-CN";
+  if (trimmed.startsWith("zh-Hant")) return "zh-TW";
+  const m = trimmed.match(/^([a-z]{2,3})(?:-([A-Z]{2}))?$/);
+  if (m) return m[2] ? `${m[1]}-${m[2]}` : m[1];
+  return null;
+}
+
+// Normalize `LANG` / `LC_ALL` style values like "zh_CN.UTF-8", "en_US.UTF-8",
+// "ja_JP", "en" into BCP 47 culture tags.
+function normalizePosixLocale(raw) {
+  if (typeof raw !== "string" || raw.length === 0) return null;
+  const head = raw.split(".")[0].split("@")[0].trim();
+  if (!head) return null;
+  const m = head.match(/^([a-z]{2,3})(?:[_-]([A-Za-z]{2,4}))?$/);
+  if (!m) return null;
+  if (!m[2]) return m[1];
+  return `${m[1]}-${m[2].toUpperCase()}`;
+}
+
+// Detect the user's preferred culture from OS-level signals. Returns
+// `{ culture, source, rawDetection }` on success or `null` when no signal
+// is available. Uses OS-native probes in priority order:
+// 1. macOS: `defaults read -g AppleLanguages` (authoritative system-selected
+//    interface language — reflects the user's actual choice, not terminal LANG)
+// 2. Linux: `/etc/locale.conf` LANG field, then `locale` command
+// 3. Windows: `(Get-Culture).Name` via PowerShell
+// 4. Fallback: POSIX-style LANG / LC_ALL environment variables
+// 5. Fallback: Node Intl API (derives from LANG, least reliable)
+function detectUserCulture() {
+  const platform = process.platform;
+
+  // 1. macOS AppleLanguages
+  if (platform === "darwin") {
+    try {
+      const out = execFileSync("defaults", ["read", "-g", "AppleLanguages"], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      });
+      const match = out.match(/"([A-Za-z-]+)"/);
+      if (match) {
+        const normalized = normalizeAppleLanguageTag(match[1]);
+        if (normalized) {
+          return {
+            culture: normalized,
+            source: "macOS AppleLanguages",
+            rawDetection: match[1],
+          };
+        }
+      }
+    } catch { /* defaults unavailable or no entry */ }
+  }
+
+  // 2. Linux locale.conf
+  if (platform === "linux") {
+    try {
+      if (existsSync("/etc/locale.conf")) {
+        const content = readFileSync("/etc/locale.conf", "utf8");
+        const m = content.match(/^LANG=(.+)$/m);
+        if (m) {
+          const normalized = normalizePosixLocale(m[1].replace(/^["']|["']$/g, ""));
+          if (normalized) {
+            return {
+              culture: normalized,
+              source: "Linux /etc/locale.conf",
+              rawDetection: m[1],
+            };
+          }
+        }
+      }
+    } catch { /* file unreadable */ }
+  }
+
+  // 3. Windows Get-Culture
+  if (platform === "win32") {
+    try {
+      const out = execFileSync("powershell", ["-NoProfile", "-Command", "(Get-Culture).Name"], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }).trim();
+      if (out) {
+        return {
+          culture: out,
+          source: "Windows Get-Culture",
+          rawDetection: out,
+        };
+      }
+    } catch { /* powershell unavailable */ }
+  }
+
+  // 4. Fallback: LANG / LC_ALL env vars
+  const envLang = process.env.LC_ALL || process.env.LANG;
+  if (envLang) {
+    const normalized = normalizePosixLocale(envLang);
+    if (normalized && normalized !== "en" && normalized !== "C" && normalized !== "POSIX") {
+      return {
+        culture: normalized,
+        source: `env ${process.env.LC_ALL ? "LC_ALL" : "LANG"}`,
+        rawDetection: envLang,
+      };
+    }
+  }
+
+  return null;
+}
+
+const OPERATOR_HINTS_PATH = join(CHORUS_HOME, "operator-hints.json");
+
+// Write the detected culture signal to a well-known file under ~/.chorus/.
+// Agents are expected to read this at registration time as the highest-
+// priority source for `user_culture` (see SKILL.md Activation sequence).
+// If detection failed (`detection === null`), write a hints file that
+// records the negative result so agents know detection was attempted.
+function writeOperatorHints(detection) {
+  const payload = {
+    schema_version: 1,
+    written_at: new Date().toISOString(),
+    detection_performed: true,
+    suggested_user_culture: detection?.culture ?? null,
+    detection_source: detection?.source ?? null,
+    raw_detection: detection?.rawDetection ?? null,
+    platform: process.platform,
+    notes: detection
+      ? "This is the highest-priority hint for user_culture when registering your chorus agent on the hub. See SKILL.md Activation sequence for the full priority ordering."
+      : "Automatic detection found no reliable OS-level culture signal. Fall back to lower-priority inference sources (recent conversation language, OpenClaw user config, interactive prompt).",
+  };
+  mkdirSync(CHORUS_HOME, { recursive: true });
+  writeFileSync(OPERATOR_HINTS_PATH, JSON.stringify(payload, null, 2));
+  return payload;
+}
+
 function describeRestartGateStatus(status) {
   if (status === "awaiting_approval") return "checkpoint written; explicit approval still required";
   if (status === "approved") return "approved; restart OpenClaw outside the gateway tool path, then finish recovery";
@@ -636,6 +774,27 @@ if (command === "init") {
   ensureChorusDirs();
   console.log(`✓ Chorus dirs initialized (${CHORUS_HOME})`);
 
+  // Detect user_culture from OS-level signals and write ~/.chorus/operator-hints.json.
+  // Agents must read this file at registration time — it is the most
+  // authoritative inference source for user_culture (see SKILL.md).
+  const cultureUserFlag = getFlag("--user-culture");
+  let cultureDetection = null;
+  if (cultureUserFlag) {
+    cultureDetection = { culture: cultureUserFlag, source: "--user-culture flag", rawDetection: cultureUserFlag };
+  } else {
+    cultureDetection = detectUserCulture();
+  }
+  const hintsPayload = writeOperatorHints(cultureDetection);
+  if (cultureDetection) {
+    console.log(`✓ Detected user_culture hint: ${cultureDetection.culture} (from ${cultureDetection.source})`);
+    console.log(`  Written to ${OPERATOR_HINTS_PATH}`);
+    console.log(`  Agents MUST use this when registering. If wrong, pass --user-culture <locale> on next init, or edit the file.`);
+  } else {
+    console.log(`⚠ No reliable user_culture signal detected on this platform (${process.platform}).`);
+    console.log(`  Agents will need to infer from other sources (recent conversation, OpenClaw user config, ask user).`);
+    console.log(`  Override with: chorus-skill init --target openclaw --user-culture <locale>  (e.g. zh-CN, en, ja)`);
+  }
+
   // === Phase 2: Register in openclaw.json AFTER files are written ===
   // Rollback boundary: any failure in registerOpenClaw() (return false OR throw)
   // must clean up files written in Phase 1.
@@ -751,6 +910,12 @@ if (command === "init") {
       resumeMessage,
     }));
 
+    // IMPL-EXP03-09: re-requesting invalidates any prior approval.
+    // Without this reset, calling `request` a second time (e.g. after a
+    // previous `approve` succeeded but needs re-checkpointing) would leave
+    // the prior `approvedAt` + `approvalReply` fields in place while the
+    // status gets demoted back to "awaiting_approval", producing the
+    // inconsistent half-state observed on MacBook in EXP-03 Run 4.
     writeRestartGate({
       ...gate,
       status: "awaiting_approval",
@@ -758,6 +923,8 @@ if (command === "init") {
       currentIdentity,
       checkpointPath,
       checkpointWrittenAt: new Date().toISOString(),
+      approvedAt: null,
+      approvalReply: null,
     });
 
     console.log(`✓ Restart checkpoint written: ${checkpointPath}`);
@@ -773,6 +940,35 @@ if (command === "init") {
       console.error(`✗ restart-consent approve requires --reply <text>`);
       process.exit(1);
     }
+
+    // IMPL-EXP03-09 recovery path: detect a pre-existing half-state gate
+    // (approvedAt or approvalReply set from a prior buggy CLI version, but
+    // status still < "approved"). A checkpoint must still exist for recovery
+    // to be valid — without a checkpoint we have no proof the agent actually
+    // prepared for restart.
+    const hasStaleApprovalFields = Boolean(gate.approvedAt || gate.approvalReply);
+    const isBelowApproved = gate.status !== "approved";
+    const hasCheckpoint = Boolean(gate.checkpointPath) && existsSync(gate.checkpointPath);
+    if (hasStaleApprovalFields && isBelowApproved && hasCheckpoint) {
+      if (!isExplicitRestartApproval(reply)) {
+        console.error(`✗ Restart remains blocked — explicit approval required (recovery path detected)`);
+        console.error(`  Accepted examples: yes | restart now | 现在重启`);
+        process.exit(1);
+      }
+      writeRestartGate({
+        ...gate,
+        status: "approved",
+        approvedAt: gate.approvedAt || new Date().toISOString(),
+        approvalReply: gate.approvalReply || reply,
+      });
+      console.log(`✓ Recovered from previously-inconsistent gate state — status transitioned to approved`);
+      console.log(`  (Pre-existing approvedAt=${gate.approvedAt || "<new>"}, approvalReply=${gate.approvalReply || "<new>"})`);
+      for (const line of buildApprovedRestartInstructions(gate)) {
+        console.log(`  ${line}`);
+      }
+      process.exit(0);
+    }
+
     if (gate.status !== "awaiting_approval" || !gate.checkpointPath) {
       console.error(`✗ Restart approval blocked — checkpoint must be written first via restart-consent request`);
       process.exit(1);

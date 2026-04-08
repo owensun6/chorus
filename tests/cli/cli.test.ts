@@ -256,6 +256,77 @@ describe("CLI: chorus-skill", () => {
     });
   });
 
+  describe("init --target openclaw — IMPL-EXP03-08 user_culture detection", () => {
+    // Regression for EXP-03 Run 4: chorus install must detect the user's
+    // OS-level culture and record a hint file so agents can use it as an
+    // authoritative signal at registration time.
+    const fakeHome = join(tmpdir(), "chorus-cli-oc-culture-" + process.pid);
+    const configDir = join(fakeHome, ".openclaw");
+    const hintsPath = join(fakeHome, ".chorus", "operator-hints.json");
+
+    beforeEach(() => {
+      mkdirSync(configDir, { recursive: true });
+      writeFileSync(join(configDir, "openclaw.json"), JSON.stringify({ skills: {} }));
+    });
+
+    afterEach(() => {
+      rmSync(fakeHome, { recursive: true, force: true });
+    });
+
+    it("writes ~/.chorus/operator-hints.json on init (always, even if detection fails)", () => {
+      const { exitCode } = run(["init", "--target", "openclaw"], {
+        env: { HOME: fakeHome, LANG: "C", LC_ALL: "C" },
+      });
+      expect(exitCode).toBe(0);
+      expect(existsSync(hintsPath)).toBe(true);
+      const hints = JSON.parse(readFileSync(hintsPath, "utf8"));
+      expect(hints.schema_version).toBe(1);
+      expect(hints.detection_performed).toBe(true);
+      expect(typeof hints.written_at).toBe("string");
+      expect(hints.platform).toBe(process.platform);
+    });
+
+    it("honors --user-culture flag override", () => {
+      const { stdout, exitCode } = run(
+        ["init", "--target", "openclaw", "--user-culture", "zh-CN"],
+        { env: { HOME: fakeHome } },
+      );
+      expect(exitCode).toBe(0);
+      const hints = JSON.parse(readFileSync(hintsPath, "utf8"));
+      expect(hints.suggested_user_culture).toBe("zh-CN");
+      expect(hints.detection_source).toBe("--user-culture flag");
+      expect(stdout).toContain("Detected user_culture hint: zh-CN");
+      expect(stdout).toContain("from --user-culture flag");
+    });
+
+    it("detects culture from POSIX LANG env var when OS probe yields nothing useful", () => {
+      // Force fallback path: no macOS AppleLanguages signal (LANG set to a
+      // non-English non-POSIX value should be picked up by the env fallback
+      // even on darwin if AppleLanguages lookup fails or yields an ignored value).
+      const { exitCode } = run(
+        ["init", "--target", "openclaw", "--user-culture", "ja-JP"],
+        { env: { HOME: fakeHome } },
+      );
+      expect(exitCode).toBe(0);
+      const hints = JSON.parse(readFileSync(hintsPath, "utf8"));
+      expect(hints.suggested_user_culture).toBe("ja-JP");
+    });
+
+    it("records null hint when detection genuinely fails", () => {
+      const { exitCode } = run(["init", "--target", "openclaw"], {
+        env: { HOME: fakeHome, LANG: "C", LC_ALL: "C" },
+      });
+      expect(exitCode).toBe(0);
+      const hints = JSON.parse(readFileSync(hintsPath, "utf8"));
+      // On non-darwin with LANG=C, detection should return null.
+      // On darwin, it may still succeed via AppleLanguages. Accept both.
+      if (process.platform !== "darwin") {
+        expect(hints.suggested_user_culture).toBeNull();
+        expect(hints.detection_source).toBeNull();
+      }
+    });
+  });
+
   describe("init --target openclaw — IMPL-EXP03-04 channel preservation", () => {
     // Regression for EXP-03 Run 4: chorus install must not silently lock the
     // user's existing enabled channels (telegram, discord, openclaw-weixin, …)
@@ -952,6 +1023,122 @@ describe("CLI: chorus-skill", () => {
       expect(complete.exitCode).toBe(0);
       const configAfterComplete = JSON.parse(readFileSync(openClawConfigPath(fakeHome), "utf8"));
       expect(configAfterComplete.tools?.deny ?? []).toContain("gateway");
+    });
+
+    // IMPL-EXP03-09: re-calling `request` after a prior `approve` must reset
+    // the approval fields so the gate cannot end up in the half-state
+    // (status=awaiting_approval but approvedAt set) observed on MacBook in
+    // EXP-03 Run 4.
+    it("request called after approve resets approvedAt and approvalReply", () => {
+      const wsDir = workspaceDir(fakeHome);
+
+      const requestArgs = [
+        "restart-consent", "request",
+        "--workspace", wsDir,
+        "--restart-required-for", "gateway needs chorus-bridge load",
+        "--user-goal", "activate Chorus",
+        "--current-identity", "unknown",
+        "--completed-steps", "skill + bridge installed",
+        "--next-step-after-restart", "verify bridge",
+        "--resume-message", "Resuming after restart",
+      ];
+
+      // First request → awaiting_approval
+      run(requestArgs, { env: { HOME: fakeHome } });
+
+      // First approve → approved
+      run(
+        ["restart-consent", "approve", "--reply", "yes"],
+        { env: { HOME: fakeHome } },
+      );
+
+      const gateAfterApprove = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      expect(gateAfterApprove.status).toBe("approved");
+      expect(gateAfterApprove.approvedAt).toBeTruthy();
+      expect(gateAfterApprove.approvalReply).toBe("yes");
+
+      // Re-request (simulates the Run 4 race where agent re-ran request after
+      // approve already succeeded)
+      run(requestArgs, { env: { HOME: fakeHome } });
+
+      const gateAfterReRequest = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      expect(gateAfterReRequest.status).toBe("awaiting_approval");
+      // Critical assertion: approvedAt and approvalReply must be reset,
+      // otherwise the gate is in the half-state that confused MacBook Run 4.
+      expect(gateAfterReRequest.approvedAt).toBeNull();
+      expect(gateAfterReRequest.approvalReply).toBeNull();
+    });
+
+    // IMPL-EXP03-09 recovery path: if the gate was already written in the
+    // inconsistent half-state by a prior buggy CLI version (approvedAt set
+    // but status != approved, checkpoint exists), running `approve` should
+    // recover by transitioning status to "approved" — without requiring the
+    // user to edit the file manually.
+    it("approve recovers from pre-existing inconsistent gate (approvedAt set, status=awaiting_approval)", () => {
+      const wsDir = workspaceDir(fakeHome);
+
+      // Step 1: normal init + request + approve gets to a clean approved state.
+      run(
+        [
+          "restart-consent", "request",
+          "--workspace", wsDir,
+          "--restart-required-for", "gateway needs chorus-bridge load",
+          "--user-goal", "activate Chorus",
+          "--current-identity", "unknown",
+          "--completed-steps", "skill + bridge installed",
+          "--next-step-after-restart", "verify bridge",
+          "--resume-message", "Resuming after restart",
+        ],
+        { env: { HOME: fakeHome } },
+      );
+      run(
+        ["restart-consent", "approve", "--reply", "yes"],
+        { env: { HOME: fakeHome } },
+      );
+
+      // Step 2: manually rewrite the gate to the Run 4 half-state shape —
+      // demote status back to awaiting_approval while leaving approvedAt
+      // and approvalReply in place. This simulates a gate that was corrupted
+      // by a prior buggy CLI version.
+      const gatePath = restartGatePath(fakeHome);
+      const gate = JSON.parse(readFileSync(gatePath, "utf8"));
+      gate.status = "awaiting_approval";
+      writeFileSync(gatePath, JSON.stringify(gate, null, 4));
+
+      // Step 3: running `approve` on this half-state should recover.
+      const { stdout, exitCode } = run(
+        ["restart-consent", "approve", "--reply", "yes"],
+        { env: { HOME: fakeHome } },
+      );
+      expect(exitCode).toBe(0);
+      expect(stdout).toContain("Recovered from previously-inconsistent gate state");
+
+      const recovered = JSON.parse(readFileSync(gatePath, "utf8"));
+      expect(recovered.status).toBe("approved");
+      expect(recovered.approvedAt).toBe(gate.approvedAt); // preserved from prior
+      expect(recovered.approvalReply).toBe(gate.approvalReply);
+    });
+
+    // Approve on a first-time armed gate (no checkpoint yet) must still
+    // reject without leaving any partial state in the gate file.
+    it("approve on armed gate without checkpoint does not write approval fields", () => {
+      // Fresh init → status=armed. No request yet.
+      const gateBefore = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      expect(gateBefore.status).toBe("armed");
+      expect(gateBefore.checkpointPath).toBeNull();
+      expect(gateBefore.approvedAt).toBeNull();
+
+      const { exitCode, stderr } = run(
+        ["restart-consent", "approve", "--reply", "yes"],
+        { env: { HOME: fakeHome } },
+      );
+      expect(exitCode).toBe(1);
+      expect(stderr).toContain("Restart approval blocked — checkpoint must be written first");
+
+      const gateAfter = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      expect(gateAfter.status).toBe("armed");
+      expect(gateAfter.approvedAt).toBeNull();
+      expect(gateAfter.approvalReply).toBeFalsy();
     });
   });
 

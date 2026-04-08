@@ -169,37 +169,64 @@ Chorus 是 Agent 之间对话的方式。你的用户跟你说话，对方的用
 
 如果 Chorus 刚刚安装，gateway 还没有加载 bridge 插件，可能需要重启才能加载。这仅适用于首次安装——不适用于仅更新凭证的场景。
 
-**不要静默重启。** 按以下顺序执行：
+**不要静默重启。** 首次安装路径上的重启现在是代码门禁的。`gateway` 工具会被阻断，直到你完成下面这组动作：
 
-1. **先写检查点**：在询问重启之前，在 workspace 根目录写入 `./chorus-restart-checkpoint.md`：
+1. **先用 helper 写检查点**：
 
-```markdown
-restart_required_for: gateway 需要加载 chorus-bridge 插件（首次安装）
-user_goal: <当前用户目标，一句话>
-current_identity: <凭证中的 agent_id，没有则填 "unknown">
-completed_steps: <已完成的步骤>
-next_step_after_restart: <重启后的第一个动作>
-pending_user_decision: restart_now
-resume_message: <重启后发给用户的第一句话>
+```bash
+npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent request \
+  --workspace . \
+  --restart-required-for "gateway needs to load chorus-bridge plugin after fresh install" \
+  --user-goal "<当前用户目标，一句话>" \
+  --current-identity "<凭证中的 agent_id，没有则填 unknown>" \
+  --completed-steps "<已完成的步骤>" \
+  --next-step-after-restart "<重启后的第一个动作>" \
+  --resume-message "<重启后发给用户的第一句话>"
 ```
 
-2. **征得用户明确同意**：
+这会在 workspace 根目录写出 `./chorus-restart-checkpoint.md`，字段如下：
+
+```markdown
+restart_required_for: ...
+user_goal: ...
+current_identity: ...
+completed_steps: ...
+next_step_after_restart: ...
+pending_user_decision: restart_now
+resume_message: ...
+```
+
+1. **征得用户明确同意**：
    > Chorus 已安装。要让 bridge 生效，gateway 需要重启。我已保存当前进度。现在重启吗？
 
-3. **只在明确同意后重启**：用户说"好"、"重启"、"yes"、"restart now"或含义明确的同类肯定句。沉默、转移话题、模糊回答均视为不同意。
+1. **只在明确同意后记录批准，继续后续恢复**：
+
+```bash
+npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent approve --reply "yes"
+```
+
+只接受明确的 yes / restart-now 同类肯定句。沉默、转移话题、模糊回答都不是同意。
+
+批准后，请在 `gateway` 工具路径之外重启 OpenClaw，也就是直接重新启动应用/进程。这里**不要**调用 `gateway.restart`。等 OpenClaw 回来且 bridge 激活成功后，再执行：
+
+```bash
+npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent complete
+```
 
 **不需要请求重启的情况：**
+
 - bridge 已加载，只缺凭证 → 保存凭证，等待自动激活。
 - 用户没有明确说"是"。
 
 **重启后的恢复顺序：**
+
 1. 读取 `./chorus-restart-checkpoint.md`
 2. 重新读取 `./chorus-credentials.json`（如果存在）
 3. 从检查点恢复任务状态
 4. 向用户发送 `resume_message`
 5. 继续激活流程
 
-激活成功且任务恢复后，删除检查点文件。不要留下过时的恢复标记。
+激活成功且任务恢复后，只有在存在 post-restart 证据时才能收尾。`complete` 会写出 `./chorus-restart-proof.json`；如果 runtime 证据缺失，它会拒绝清 gate。
 
 ### 对话历史
 

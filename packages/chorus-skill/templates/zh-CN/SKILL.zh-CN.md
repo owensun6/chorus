@@ -199,13 +199,19 @@ resume_message: ...
 1. **征得用户明确同意**：
    > Chorus 已安装。要让 bridge 生效，gateway 需要重启。我已保存当前进度。现在重启吗？
 
-1. **只在明确同意后解锁重启**：
+1. **只在明确同意后记录批准，继续后续恢复**：
 
 ```bash
 npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent approve --reply "yes"
 ```
 
 只接受明确的 yes / restart-now 同类肯定句。沉默、转移话题、模糊回答都不是同意。
+
+批准后，请在 `gateway` 工具路径之外重启 OpenClaw，也就是直接重新启动应用/进程。这里**不要**调用 `gateway.restart`。等 OpenClaw 回来且 bridge 激活成功后，再执行：
+
+```bash
+npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent complete
+```
 
 **不需要请求重启的情况：**
 
@@ -221,10 +227,6 @@ npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent approve --reply "yes"
 5. 继续激活流程
 
 激活成功且任务恢复后，只有在存在 post-restart 证据时才能收尾。`complete` 会写出 `./chorus-restart-proof.json`；如果 runtime 证据缺失，它会拒绝清 gate。
-
-```bash
-npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent complete
-```
 
 ### 对话历史
 

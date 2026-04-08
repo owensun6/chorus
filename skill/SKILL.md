@@ -158,37 +158,64 @@ These are activation commands, not conversation starters. Do not interpret them 
 
 If Chorus was just installed and the bridge plugin is not yet loaded by the gateway, a restart may be needed to load it. This applies only to the initial install — not to credentials-only updates.
 
-**Do not restart silently.** Follow this sequence:
+**Do not restart silently.** Fresh-install restart is code-gated. The `gateway` tool is blocked until you complete this sequence:
 
-1. **Write checkpoint first**: Before asking about restart, persist `./chorus-restart-checkpoint.md` in the workspace root:
+1. **Write checkpoint via the helper**:
 
-```markdown
-restart_required_for: gateway needs to load chorus-bridge plugin after fresh install
-user_goal: <current user goal in one sentence>
-current_identity: <agent_id from credentials, or "unknown">
-completed_steps: <what has been finished so far>
-next_step_after_restart: <first action after restart>
-pending_user_decision: restart_now
-resume_message: <first sentence to send to user after restart>
+```bash
+npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent request \
+  --workspace . \
+  --restart-required-for "gateway needs to load chorus-bridge plugin after fresh install" \
+  --user-goal "<current user goal in one sentence>" \
+  --current-identity "<agent_id from credentials, or unknown>" \
+  --completed-steps "<what has been finished so far>" \
+  --next-step-after-restart "<first action after restart>" \
+  --resume-message "<first sentence to send to user after restart>"
 ```
 
-2. **Ask for explicit permission**:
+This writes `./chorus-restart-checkpoint.md` with:
+
+```markdown
+restart_required_for: ...
+user_goal: ...
+current_identity: ...
+completed_steps: ...
+next_step_after_restart: ...
+pending_user_decision: restart_now
+resume_message: ...
+```
+
+1. **Ask for explicit permission**:
    > Chorus is installed. To make the bridge take effect, the gateway needs a restart. I have saved our current progress. Do you want me to restart now?
 
-3. **Only restart on explicit approval**: "yes", "restart now", or an unambiguous equivalent. Silence, topic change, or vague response means no restart.
+1. **Record explicit approval before restart recovery continues**:
+
+```bash
+npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent approve --reply "yes"
+```
+
+Allowed replies are explicit yes / restart-now equivalents only. Silence, topic change, or vague response means no restart.
+
+After approval, restart OpenClaw **outside** the `gateway` tool path by relaunching the app/process. Do **not** call `gateway.restart` here. Once OpenClaw comes back and bridge activation succeeds, close the gate with:
+
+```bash
+npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent complete
+```
 
 **When NOT to request restart:**
+
 - Bridge is already loaded and only credentials are missing — save credentials and wait for auto-activation.
 - User has not explicitly said yes.
 
 **Post-restart recovery:**
+
 1. Read `./chorus-restart-checkpoint.md`
 2. Re-read `./chorus-credentials.json` if it exists
 3. Restore task state from checkpoint
 4. Send the `resume_message` to the user
 5. Continue activation
 
-Once activation succeeds and the task resumes, delete the checkpoint file. Do not leave it as a stale marker.
+Once activation succeeds and the task resumes, close the gate only after post-restart proof exists. `complete` will write `./chorus-restart-proof.json` and refuse to clear the gate if runtime proof is missing.
 
 ### What the Skill and Bridge Each Do
 

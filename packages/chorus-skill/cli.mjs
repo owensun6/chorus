@@ -284,6 +284,32 @@ function registerOpenClaw() {
   if (!config.plugins.entries) config.plugins.entries = {};
   config.plugins.entries["chorus-bridge"] = { enabled: true };
   if (!config.plugins.allow) config.plugins.allow = [];
+
+  // CRITICAL: OpenClaw treats `plugins.allow` as a strict allowlist that
+  // also gates `channels.<name>` instances. If we push only "chorus-bridge"
+  // into a previously empty/missing allow list, every existing enabled
+  // channel (telegram, discord, openclaw-weixin, …) gets locked out at the
+  // next supervisor restart — its provider never starts and the user loses
+  // their primary inbound surface. (This is the IMPL-EXP03-04 root cause
+  // discovered in EXP-03 Run 4: chorus install made MacBook's @Nannnnnno_bot
+  // telegram channel disappear because the user's plugins.allow had never
+  // contained "telegram" before.)
+  //
+  // Defensive merge: before adding chorus-bridge, scan `config.channels.*`
+  // for enabled channel adapters and ensure each one is also present in
+  // plugins.allow. This preserves the user's existing inbound surface
+  // regardless of how their allow list was previously populated.
+  const channelEntries = (config.channels && typeof config.channels === "object")
+    ? config.channels
+    : {};
+  for (const [channelName, channelCfg] of Object.entries(channelEntries)) {
+    if (!channelCfg || typeof channelCfg !== "object") continue;
+    if (channelCfg.enabled === false) continue;
+    if (!config.plugins.allow.includes(channelName)) {
+      config.plugins.allow.push(channelName);
+    }
+  }
+
   if (!config.plugins.allow.includes("chorus-bridge")) {
     config.plugins.allow.push("chorus-bridge");
   }

@@ -256,6 +256,102 @@ describe("CLI: chorus-skill", () => {
     });
   });
 
+  describe("init --target openclaw — IMPL-EXP03-04 channel preservation", () => {
+    // Regression for EXP-03 Run 4: chorus install must not silently lock the
+    // user's existing enabled channels (telegram, discord, openclaw-weixin, …)
+    // out of OpenClaw's plugins.allow strict allowlist.
+    const fakeHome = join(tmpdir(), "chorus-cli-oc-channels-" + process.pid);
+    const configDir = join(fakeHome, ".openclaw");
+
+    afterEach(() => {
+      rmSync(fakeHome, { recursive: true, force: true });
+    });
+
+    const writeOpenClawConfig = (cfg: Record<string, unknown>) => {
+      mkdirSync(configDir, { recursive: true });
+      writeFileSync(join(configDir, "openclaw.json"), JSON.stringify(cfg));
+    };
+
+    const readPluginsAllow = (): string[] => {
+      const cfg = JSON.parse(readFileSync(join(configDir, "openclaw.json"), "utf8"));
+      return cfg.plugins.allow;
+    };
+
+    it("pushes enabled channels into plugins.allow when allow was previously empty", () => {
+      writeOpenClawConfig({
+        skills: {},
+        channels: {
+          telegram: { enabled: true, botToken: "test-token" },
+        },
+      });
+      const { exitCode } = run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+      expect(exitCode).toBe(0);
+      const allow = readPluginsAllow();
+      // Both telegram (preserved) and chorus-bridge (newly added) must be present.
+      expect(allow).toContain("telegram");
+      expect(allow).toContain("chorus-bridge");
+    });
+
+    it("pushes multiple enabled channels into plugins.allow", () => {
+      writeOpenClawConfig({
+        skills: {},
+        channels: {
+          telegram: { enabled: true, botToken: "tg" },
+          discord: { enabled: true, botToken: "dc" },
+          "openclaw-weixin": { enabled: true },
+        },
+      });
+      const { exitCode } = run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+      expect(exitCode).toBe(0);
+      const allow = readPluginsAllow();
+      expect(allow).toEqual(expect.arrayContaining(["telegram", "discord", "openclaw-weixin", "chorus-bridge"]));
+    });
+
+    it("does NOT push channels that have enabled=false", () => {
+      writeOpenClawConfig({
+        skills: {},
+        channels: {
+          telegram: { enabled: true, botToken: "tg" },
+          discord: { enabled: false },
+          feishu: { enabled: false },
+        },
+      });
+      const { exitCode } = run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+      expect(exitCode).toBe(0);
+      const allow = readPluginsAllow();
+      expect(allow).toContain("telegram");
+      expect(allow).toContain("chorus-bridge");
+      expect(allow).not.toContain("discord");
+      expect(allow).not.toContain("feishu");
+    });
+
+    it("does not duplicate a channel that is already in plugins.allow", () => {
+      writeOpenClawConfig({
+        skills: {},
+        plugins: { allow: ["telegram"] },
+        channels: {
+          telegram: { enabled: true, botToken: "tg" },
+        },
+      });
+      const { exitCode } = run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+      expect(exitCode).toBe(0);
+      const allow = readPluginsAllow();
+      // telegram should appear exactly once.
+      expect(allow.filter((x: string) => x === "telegram")).toHaveLength(1);
+      expect(allow).toContain("chorus-bridge");
+    });
+
+    it("handles config without channels block (no error, no spurious adds)", () => {
+      writeOpenClawConfig({ skills: {} });
+      const { exitCode } = run(["init", "--target", "openclaw"], { env: { HOME: fakeHome } });
+      expect(exitCode).toBe(0);
+      const allow = readPluginsAllow();
+      expect(allow).toContain("chorus-bridge");
+      // No channels in config => only chorus-bridge added.
+      expect(allow).toEqual(["chorus-bridge"]);
+    });
+  });
+
   describe("verify --target", () => {
     it("rejects unknown target with exit 1", () => {
       const { stderr, exitCode } = run(["verify", "--target", "typo"]);

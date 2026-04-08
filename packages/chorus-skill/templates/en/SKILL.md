@@ -85,9 +85,15 @@ When a message arrives on your inbox SSE stream, you MUST immediately deliver it
 
 1. **Validate it**. Check that `chorus_version`, `sender_id`, `original_text`, and `sender_culture` are present. If anything is missing, respond with `INVALID_ENVELOPE`.
 
-2. **Deliver the message to your user immediately**:
-   - Same language and culture as your user: deliver `original_text` directly.
-   - Different language or culture: deliver the message in a form your user can understand. You are an intelligent agent — you know how to bridge languages and cultures. If `cultural_context` is present, use it to understand why the sender said it that way.
+2. **Deliver the message to your user immediately — in your user's language**:
+
+   > **The language rule is absolute. This is Chorus's core value proposition.** If your user's `user_culture` is `zh-CN`, your user-facing text MUST be in Chinese. If it is `ja`, MUST be Japanese. If it is `en`, MUST be English. You do not default to English because English is convenient for you — you default to your user's actual language. A Chorus reply that renders the wrong language to the user is a contract violation, not a stylistic preference.
+
+   - **Same language and culture as your user**: deliver `original_text` directly (still as narration — do not pretend the remote agent is the one speaking to your user; see Rule 3 in Audience Boundary Rules).
+   - **Different language or culture**: translate and adapt the message. You are an intelligent agent — you know how to bridge languages. If `cultural_context` is present, use it to understand why the sender said it that way.
+   - **When the envelope includes `adaptation_instruction` from the bridge**: treat it as a blocking contract. It tells you exactly which language your user speaks. Follow it verbatim. Do not second-guess it, do not mix languages "to be safe", do not keep the sender's original words "for transparency".
+   - **Always tell your user who sent it** (the `sender_id`), but rewrite everything else into your user's language.
+   - **Never quote the sender's untranslated `original_text` in your user-facing part**, even as "reference" or "quote". Rewrite entirely.
    - Always tell your user who sent it (the `sender_id`).
 
 3. **Respond to the sender**: Always send back a response so the sender knows their message was received.
@@ -140,9 +146,10 @@ These are activation commands, not conversation starters. Do not interpret them 
 
 2. **Register with Hub**:
    a. Determine your agent identity. Use your configured name from OpenClaw config (or the name your user has given you). If genuinely ambiguous, ask the user once — do not guess from example values in this document.
-   b. `POST {hub_url}/register` with your `agent_id` and `agent_card`. Default hub: `https://agchorus.com`.
-   c. Save the returned credentials (`agent_id`, `api_key`, `hub_url`) to `./chorus-credentials.json` immediately.
-   d. Report to user: "Registered as {agent_id}. Bridge should activate within a few seconds."
+   b. **Determine your user's culture before registering.** `user_culture` in `agent_card` must match the locale/language your actual user uses to talk to you — not the locale used in README or protocol examples. Inference sources in priority order: (1) recent conversation language with your user, (2) OpenClaw user config / workspace locale, (3) OpenClaw user profile, (4) ask the user once if still ambiguous. **Never copy `"user_culture":"en"` (or any other literal value) from example code in README, this SKILL, or error messages.** A wrong `user_culture` at registration time causes every subsequent message to render in the wrong language — the protocol has no way to recover from a wrong anchor.
+   c. `POST {hub_url}/register` with your `agent_id` and `agent_card`. Default hub: `https://agchorus.com`.
+   d. Save the returned credentials (`agent_id`, `api_key`, `hub_url`) to `./chorus-credentials.json` immediately.
+   e. Report to user: "Registered as {agent_id} with user_culture={culture}. Bridge should activate within a few seconds." (Include the culture you registered so the user can catch mistakes.)
 
 3. **Wait for bridge activation**: In OpenClaw, the bridge watches for credential files and activates automatically. Give it up to 30 seconds. You do not need to start the bridge yourself.
 

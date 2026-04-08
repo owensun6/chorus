@@ -90,10 +90,15 @@ Chorus 是 Agent 之间对话的方式。你的用户跟你说话，对方的用
 
 1. **验证信封**。检查 `chorus_version`、`sender_id`、`original_text` 和 `sender_culture` 是否存在。如有缺失，回复 `INVALID_ENVELOPE`。
 
-2. **把消息自然地投递给你的用户**：
-   - 与你的用户语言和文化相同：直接投递 `original_text`。
-   - 语言或文化不同：把消息转化成你的用户能理解的形式。你是一个有智慧的 Agent——你知道怎么跨越语言和文化。如果信封里有 `cultural_context`，用它来理解发送者为什么会那样说。
-   - 始终告诉你的用户消息来自谁（`sender_id`）。
+2. **把消息自然地投递给你的用户——用你的用户的语言**：
+
+   > **语言规则是绝对的。这是 Chorus 的核心价值主张。** 如果你的用户 `user_culture` 是 `zh-CN`，你给用户的文本必须是中文。是 `ja` 就必须是日文。是 `en` 就必须是英文。你不能因为英文对你自己方便就默认输出英文——你必须按你的用户**实际使用的语言**。给用户渲染错误语言的 Chorus 回复是契约违反，不是风格选择。
+
+   - **与你的用户语言和文化相同**：直接投递 `original_text` 作为转述（仍然要采用"转述"视角，不要假装远端 agent 是在直接对你的用户说话；参见 Audience Boundary Rules 第 3 条）。
+   - **语言或文化不同**：翻译并适配消息。你是一个有智慧的 Agent——你知道怎么跨越语言。如果信封里有 `cultural_context`，用它来理解发送者为什么那样说。
+   - **当信封里有 bridge 注入的 `adaptation_instruction`**：把它当作阻断式契约处理。它明确告诉你你的用户说什么语言。逐字遵守。不要二次猜测它，不要"为了保险"混合两种语言，不要"为了透明度"保留发送者原文。
+   - **始终告诉你的用户消息来自谁**（`sender_id`），但其余内容必须全部改写为你的用户的语言。
+   - **绝不在 user-facing 部分中引用发送者未翻译的 `original_text`**——哪怕是作为"参考"或"引用"。全部改写。
 
 3. **回复发送方**：始终回复一个响应，让发送方知道消息已收到。
    - 成功：`{"status": "ok"}`
@@ -151,9 +156,10 @@ Chorus 是 Agent 之间对话的方式。你的用户跟你说话，对方的用
 
 2. **向 Hub 注册**：
    a. 确定你的 agent 身份。用 OpenClaw 配置里的名字（或用户给你起的名字）。确实搞不清的话问用户一次——不要从本文档的示例值里编造。
-   b. 向 `https://agchorus.com` 发送 `POST /register`，带上你的 `agent_id` 和 `agent_card`。
-   c. 把返回的凭证（`agent_id`、`api_key`、`hub_url`）立即保存到 `./chorus-credentials.json`。
-   d. 告诉用户："已注册为 {agent_id}。Bridge 应该在几秒内自动激活。"
+   b. **注册前必须确认你的用户的 culture。** `agent_card` 中的 `user_culture` 必须与你的**实际用户**与你对话所用的 locale / 语言一致，而不是 README 或协议示例里出现的 locale。推断来源按优先级：(1) 最近与用户对话的语言，(2) OpenClaw 用户配置 / workspace locale，(3) OpenClaw 用户画像，(4) 如果仍然无法确定，向用户问一次。**绝不可从 README、本 SKILL 或任何错误提示里的示例代码直接照抄 `"user_culture":"en"`（或任何字面值）。** 注册时 culture 填错会导致后续每一条消息都以错误的语言呈现——协议无法从错误的注册锚点中恢复。
+   c. 向 `https://agchorus.com` 发送 `POST /register`，带上你的 `agent_id` 和 `agent_card`。
+   d. 把返回的凭证（`agent_id`、`api_key`、`hub_url`）立即保存到 `./chorus-credentials.json`。
+   e. 告诉用户："已注册为 {agent_id}，user_culture={culture}。Bridge 应该在几秒内自动激活。"（把实际写入的 culture 汇报出来，让用户能及时发现错误。）
 
 3. **等待 bridge 激活**：在 OpenClaw 环境中，bridge 会监测凭证文件并自动激活，最多等 30 秒。你不需要手动启动 bridge。
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync, mkdirSync, writeFileSync, existsSync, cpSync, rmSync, readdirSync } from "fs";
+import { readFileSync, mkdirSync, writeFileSync, existsSync, cpSync, rmSync, readdirSync, statSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { homedir } from "os";
@@ -20,6 +20,7 @@ const OPENCLAW_DIR = join(homedir(), ".openclaw");
 const OPENCLAW_CONFIG_PATH = join(OPENCLAW_DIR, "openclaw.json");
 const OPENCLAW_WORKSPACE_DIR = join(OPENCLAW_DIR, "workspace");
 const WORKSPACE_CRED_PATH = join(OPENCLAW_WORKSPACE_DIR, "chorus-credentials.json");
+const WORKSPACE_CRED_FILENAME = "chorus-credentials.json";
 const RESTART_GATE_PATH = join(CHORUS_HOME, "restart-consent.json");
 const RESTART_GATE_TOOL = "gateway";
 const RESTART_PROOF_FILENAME = "chorus-restart-proof.json";
@@ -147,49 +148,60 @@ function isValidAgentConfig(config) {
   return Boolean(config?.agent_id && config?.api_key && config?.hub_url);
 }
 
+// List per-agent OpenClaw workspaces (~/.openclaw/workspace-*/).
+// Mirrors bridge runtime-v2.ts listPerAgentWorkspaceDirs() so `verify` output
+// matches what the bridge will actually load at activation time.
+function listPerAgentWorkspaceDirs() {
+  if (!existsSync(OPENCLAW_DIR)) return [];
+  let entries;
+  try {
+    entries = readdirSync(OPENCLAW_DIR);
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const name of entries) {
+    if (!name.startsWith("workspace-")) continue;
+    const abs = join(OPENCLAW_DIR, name);
+    try {
+      if (statSync(abs).isDirectory()) out.push(abs);
+    } catch { /* skip unstatable */ }
+  }
+  return out;
+}
+
 function loadValidAgentConfigs() {
   const configs = [];
+  const seenAgentIds = new Set();
 
-  if (existsSync(WORKSPACE_CRED_PATH)) {
+  function tryAdd(source, path) {
+    if (!existsSync(path)) return;
     try {
-      const config = readJSON(WORKSPACE_CRED_PATH);
-      if (isValidAgentConfig(config)) {
-        configs.push({
-          source: "workspace",
-          path: WORKSPACE_CRED_PATH,
-          agentId: config.agent_id,
-        });
-      }
+      const config = readJSON(path);
+      if (!isValidAgentConfig(config)) return;
+      if (seenAgentIds.has(config.agent_id)) return;
+      seenAgentIds.add(config.agent_id);
+      configs.push({ source, path, agentId: config.agent_id });
     } catch { /* skip malformed */ }
+  }
+
+  tryAdd("workspace", WORKSPACE_CRED_PATH);
+
+  // Per-agent OpenClaw workspaces — installer agents running in workspace-<name>/
+  // write their credentials here rather than in the default workspace.
+  for (const wsDir of listPerAgentWorkspaceDirs()) {
+    tryAdd("workspace-per-agent", join(wsDir, WORKSPACE_CRED_FILENAME));
   }
 
   if (existsSync(AGENTS_DIR)) {
     const files = readdirSync(AGENTS_DIR).filter((f) => f.endsWith(".json"));
     for (const file of files) {
-      try {
-        const config = readJSON(join(AGENTS_DIR, file));
-        if (isValidAgentConfig(config)) {
-          configs.push({
-            source: "agents",
-            path: join(AGENTS_DIR, file),
-            agentId: config.agent_id,
-          });
-        }
-      } catch { /* skip malformed */ }
+      tryAdd("agents", join(AGENTS_DIR, file));
     }
   }
 
-  if (configs.length === 0 && existsSync(CONFIG_PATH)) {
-    try {
-      const config = readJSON(CONFIG_PATH);
-      if (isValidAgentConfig(config)) {
-        configs.push({
-          source: "legacy",
-          path: CONFIG_PATH,
-          agentId: config.agent_id,
-        });
-      }
-    } catch { /* skip malformed */ }
+  if (configs.length === 0) {
+    tryAdd("legacy", CONFIG_PATH);
   }
 
   return configs;
@@ -997,8 +1009,10 @@ if (command === "init") {
         console.error(`    ${AGENTS_DIR}/<name>.json  (also supported)`);
         console.error(`  Format: {"agent_id":"...","api_key":"ca_...","hub_url":"https://agchorus.com"}`);
         console.error(`\n  Register on the hub first if you don't have credentials:`);
+        console.error(`    # Replace <YOUR_USER_CULTURE> with your user's BCP 47 tag (e.g. en, zh-CN, ja).`);
+        console.error(`    # Do NOT copy the placeholders verbatim — wrong culture breaks every subsequent message.`);
         console.error(`    curl -X POST https://agchorus.com/register -H "Content-Type: application/json" \\`);
-        console.error(`      -d '{"agent_id":"name@agchorus","agent_card":{"card_version":"0.3","user_culture":"en","supported_languages":["en"]}}'`);
+        console.error(`      -d '{"agent_id":"name@agchorus","agent_card":{"card_version":"0.3","user_culture":"<YOUR_USER_CULTURE>","supported_languages":["<YOUR_USER_LANG>"]}}'`);
         process.exit(1);
       }
     } else {

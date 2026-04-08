@@ -1387,6 +1387,25 @@ describe("runtime-v2 plugin entry", () => {
     );
   };
 
+  const seedPerAgentWorkspaceCredential = (
+    workspaceSuffix: string,
+    overrides?: Record<string, unknown>,
+  ): void => {
+    const dir = path.join(fakeHome, ".openclaw", `workspace-${workspaceSuffix}`);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(
+      path.join(dir, "chorus-credentials.json"),
+      JSON.stringify({
+        agent_id: `${workspaceSuffix}-agent@chorus`,
+        api_key: `${workspaceSuffix}-key`,
+        hub_url: `https://hub.${workspaceSuffix}.example`,
+        owner_agent: workspaceSuffix,
+        ...overrides,
+      }),
+      "utf-8",
+    );
+  };
+
   it("gateway_start loads workspace credentials from ~/.openclaw/workspace/chorus-credentials.json", async () => {
     seedWorkspaceCredential();
     const { recover } = installMocks(jest.fn().mockResolvedValue({}));
@@ -1440,6 +1459,95 @@ describe("runtime-v2 plugin entry", () => {
     expect(recover).toHaveBeenCalledTimes(1);
     expect(api.logger.info).toHaveBeenCalledWith(
       expect.stringContaining("activated: legacy-agent@chorus from config.json"),
+    );
+  });
+
+  it("gateway_start loads credentials from per-agent workspace (~/.openclaw/workspace-<agent>/)", async () => {
+    // Regression test for EXP-03 Run 3: when the installer agent runs in a
+    // per-agent workspace (e.g. workspace-xiaoxia), its credentials must be
+    // discovered by the bridge, not silently ignored.
+    seedPerAgentWorkspaceCredential("xiaoxia");
+    const { recover } = installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+    await gatewayStart?.();
+
+    expect(recover).toHaveBeenCalledTimes(1);
+    expect(api.logger.info).toHaveBeenCalledWith(
+      expect.stringContaining("activated: xiaoxia-agent@chorus from workspace-xiaoxia/chorus-credentials.json"),
+    );
+  });
+
+  it("gateway_start loads credentials from multiple per-agent workspaces simultaneously", async () => {
+    seedPerAgentWorkspaceCredential("xiaoxia");
+    seedPerAgentWorkspaceCredential("xiaov");
+    const { recover } = installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+    await gatewayStart?.();
+
+    // Both per-agent workspaces contribute one agent each.
+    expect(recover).toHaveBeenCalledTimes(2);
+    const infoLogs = (api.logger.info as jest.Mock).mock.calls.map((c: unknown[]) => String(c[0]));
+    expect(infoLogs.some((m) => m.includes("activated: xiaoxia-agent@chorus"))).toBe(true);
+    expect(infoLogs.some((m) => m.includes("activated: xiaov-agent@chorus"))).toBe(true);
+  });
+
+  it("gateway_start deduplicates when the same agent_id appears in both default and per-agent workspaces", async () => {
+    // Same agent_id written to both ~/.openclaw/workspace/ and
+    // ~/.openclaw/workspace-xiaoxia/ should only be loaded once. The default
+    // workspace has higher priority.
+    seedWorkspaceCredential();
+    seedPerAgentWorkspaceCredential("xiaoxia", {
+      agent_id: "workspace-agent@chorus", // same as seedWorkspaceCredential()
+      api_key: "xiaoxia-override-key",
+    });
+    const { recover } = installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+    await gatewayStart?.();
+
+    // Only the default-workspace copy survives (priority order), not both.
+    expect(recover).toHaveBeenCalledTimes(1);
+    const infoLogs = (api.logger.info as jest.Mock).mock.calls.map((c: unknown[]) => String(c[0]));
+    expect(infoLogs.some((m) =>
+      m.includes("activated: workspace-agent@chorus from workspace/chorus-credentials.json"),
+    )).toBe(true);
+    expect(infoLogs.some((m) =>
+      m.includes("duplicate credential skipped: workspace-agent@chorus at workspace-xiaoxia/chorus-credentials.json"),
+    )).toBe(true);
+  });
+
+  it("gateway_start skips malformed per-agent workspace credential without breaking valid ones", async () => {
+    seedPerAgentWorkspaceCredential("broken", { api_key: "" }); // invalid
+    seedPerAgentWorkspaceCredential("xiaoxia"); // valid
+    const { recover } = installMocks(jest.fn().mockResolvedValue({}));
+    const { api, hooks } = buildFakeApi();
+
+    const register = (await import("../../packages/chorus-skill/templates/bridge/index")).default;
+    register(api);
+
+    const gatewayStart = hooks.get("gateway_start");
+    await gatewayStart?.();
+
+    expect(recover).toHaveBeenCalledTimes(1);
+    expect(api.logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining("malformed config skipped: workspace-broken/chorus-credentials.json"),
+    );
+    expect(api.logger.info).toHaveBeenCalledWith(
+      expect.stringContaining("activated: xiaoxia-agent@chorus from workspace-xiaoxia/chorus-credentials.json"),
     );
   });
 

@@ -1,80 +1,135 @@
-# EXP-03 Summary — Run 1
+# EXP-03: Human Developer Cold-Start — Results
 
-**Date**: 2026-03-31
-**Version**: `@chorus-protocol/skill@0.8.0-alpha.7`
-**Verdict**: **VOID** (contamination audit incomplete — no screen recording, no shell history export, no browser history export)
+2026-04-07
 
 ---
 
-## Metrics
+## Verdict: PASS
 
-| Metric | Value | Notes |
+Run 2 (2026-04-03, `@chorus-protocol/skill@0.8.0-alpha.9`) achieved the formal target of EXP-03: a cold-start subject on MacBook, acting through their own OpenClaw agent, installed Chorus from scratch and received a Telegram-confirmed Chorus message from an agent running on a separate Mac mini in about 6 minutes.
+
+The formal verdict is **PASS** because Run 2 was recorded as satisfying **C-1 through C-11**. The checked-in record anchors that verdict on the subject timeline (`18:40` cold-start request -> `18:41` install complete + restart request -> `18:42` explicit approval -> `18:46` Telegram visible), Hub trace `0c02a49a-4051-4391-8b22-ca27613f269d`, and `telegram_server_ack ref=147`.
+
+Run 1 (2026-03-31, `0.8.0-alpha.7`) remains archived as **VOID** and is kept only as background context and friction history.
+
+---
+
+## Run Matrix
+
+| Run | Date | Version | Subject / Setup | Verdict | Why |
+|-----|------|---------|-----------------|---------|-----|
+| Run 1 | 2026-03-31 | `0.8.0-alpha.7` | Commander's colleague on MacBook; same-org subject; incomplete audit capture | **VOID** | Missing contamination-audit artifacts (screen recording, shell history, browser history) and same-org screening violation; Telegram-visible Chorus delivery not reached |
+| Run 2 | 2026-04-03 | `0.8.0-alpha.9` | Cold-start subject on MacBook (`openclaw-test@agchorus`) talking to agent on separate Mac mini (`xiaox@chorus`) | **PASS** | Cross-machine cold-start install -> consented restart -> Telegram-confirmed delivery in ~6 min; C-1 through C-11 satisfied |
+| Run 3 | 2026-04-08 | `0.8.0-alpha.10` | Bidirectional A2A between Mac mini (`xiaox-test@agchorus`, per-agent workspace) and MacBook (`test2-air@agchorus`) | **PASS (addendum) / FAIL (product value)** | Plumbing contracts all satisfied (`delivery_confirmed`, SSE inbox, bidirectional trace), but both agents rendered Chinese user-facing text in English, violating the cross-cultural translation contract. See `EXP-03-run3-findings.md` for full diagnosis — Run 3 is recorded as an **addendum** and does not revise the Run 2 PASS verdict.|
+
+---
+
+## Metrics (Run 2 — Formal)
+
+| Metric | Value | Basis |
 |--------|-------|-------|
-| TTIC (Time to Install Complete) | ~3 min | Agent self-installed via `npx init` |
-| TTBA (Time to Bridge Active) | ~5 min | Agent self-restarted gateway without consent |
-| TTTV (Time to Telegram Visible) | **NOT REACHED** | Chorus message not visible on Telegram |
-| QC (Question Count) | 0 | Subject gave one instruction, agent did everything |
-| DDC (Documentation Defect Count) | 0 observed | Agent read SKILL.md successfully |
-| HIR (Human Intervention Required) | No | But environment cleanup was incomplete (Conductor error) |
-| IOS (Install One-Shot) | Yes | `npx init` succeeded first attempt |
-| ROS (Registration One-Shot) | Yes | `POST /register` succeeded first attempt |
-| COS (Credential Config One-Shot) | Yes | Credentials saved correctly |
-| GRM (Gateway Restart Method) | `gateway.restart` tool call | Agent self-restarted without user consent |
-| GUP (Give-Up Point) | N/A | Subject did not give up |
+| Time to Install Complete (TTIC) | ~1 min | `18:40` opening request -> `18:41` install complete + restart request |
+| Time to Telegram Visible (TTTV) | ~6 min | `18:40` opening request -> `18:46` Telegram-visible Chorus message |
+| Question Count (QC) | Within PASS threshold | Run 2 recorded as satisfying C-8 (`QC <= 3`) |
+| Human Intervention Required (HIR) | false | Run 2 recorded as satisfying C-9 |
+| Restart Consent Gate (RCG) | PASS | Explicit approval recorded at `18:42` before recovery completion |
+| Manual Takeover Required (MTR) | false | Run 2 recorded as satisfying C-6 without manual takeover |
+| Delivery Proof | `delivery_confirmed`, `telegram_server_ack ref=147` | Hub trace `0c02a49a-4051-4391-8b22-ca27613f269d` |
+| Topology | Cross-machine | Subject MacBook runtime <-> conductor Mac mini runtime |
 
-## Hard Criteria
+Note: the checked-in Run 2 record preserves TTIC and TTTV directly. It implies bridge activation happened before the `18:46` confirmed delivery, but the exact TTBA timestamp is not restated in the checked-in summary artifacts.
 
-| # | Criterion | Met? |
-|---|-----------|------|
-| C-1 | Install + verify passes | YES |
-| C-2 | Self-registration on Hub | YES |
-| C-3 | Credentials saved correctly | YES |
-| C-4 | Bridge activates, agent online | YES |
-| C-5 | Message visible on Telegram | **NO** |
-| C-6 | QC ≤ 3 | YES (0) |
-| C-7 | HIR = false | YES |
-| C-8 | No prior Chorus exposure | YES (verified by Commander) |
-| C-9 | TTTV ≤ 60 min | **NO** (not reached) |
+---
 
-## Verdict Reasoning
+## Run 2 Outcome
 
-C-5 not met: Hub confirmed `delivered_via=sse` (message reached bridge), but bridge did not forward to Telegram. Primary classification: **IMPL** (bridge delivery failure).
+What Run 2 demonstrates:
 
-Verdict downgraded from INCOMPLETE to **VOID**: contamination audit artifacts (screen recording, shell history export, browser history export) were not collected per Section 3.3 / Section 10.1. Without complete audit trail, no verdict other than VOID is permissible per protocol.
+- A human developer could delegate the install to their own OpenClaw agent from a true cold start.
+- The published package path stayed pinned to `@chorus-protocol/skill@0.8.0-alpha.9`.
+- Registration, credential save, restart-consent flow, bridge activation, Hub delivery, and Telegram-visible output closed end-to-end across two separate OpenClaw runtimes.
+- The evidence story is stronger than the older `xiaov <-> xiaox` wording: this was a MacBook subject talking to a Mac mini agent, not a same-runtime self-test.
 
-## Observed Friction Points
+What Run 2 does not prove:
 
-| # | Predicted | Occurred? | Category |
-|---|-----------|-----------|----------|
-| F-1 | Credential path unclear | No — agent handled automatically | N/A |
-| F-2 | Gateway restart unclear | No — agent self-restarted | IMPL (skipped consent) |
-| F-3 | Credential JSON format wrong | No | N/A |
-| F-4 | Verify standby confusion | Not tested | N/A |
-| F-5 | Wrong agent_id format | No | N/A |
-| F-6 | Bridge doesn't activate after credentials | No — activated after restart | N/A |
+- Sustained Telegram usability after install. The first message delivery worked; post-delivery stability became a separate follow-up defect.
+- Production readiness or SLA. This remains an alpha path with best-effort delivery semantics.
 
-## New Friction (Not Predicted)
+---
 
-| # | Description | Category |
-|---|-------------|----------|
-| NF-1 | Bridge receives Chorus message via SSE but does not forward to Telegram | IMPL |
-| NF-2 | Agent ignores SKILL.md restart consent checkpoint rules | IMPL / DOC |
-| NF-3 | Environment cleanup left stale openclaw.json plugin references, causing recursive stack overflow | ENV (Conductor error) |
-| NF-4 | Mac mini agent reused old credentials (`xiaox@chorus` without `hub_url`), stayed offline | IMPL / ENV |
+## Hard-Criteria Outcome (Run 2)
 
-## Evidence Artifacts
+| Criteria Block | Result | Basis |
+|----------------|--------|-------|
+| C-1 through C-5 | PASS | Cold-start subject used their own agent, installed the published package, self-registered, followed explicit restart consent, and reached an active bridge path before first delivery |
+| C-6 | PASS | Chorus message became visible on Telegram at `18:46` without manual takeover |
+| C-7 | PASS | Run 2 verdict was not downgraded for false status reporting |
+| C-8 through C-10 | PASS | Run 2 was recorded as a full PASS rather than CONDITIONAL PASS / VOID |
+| C-11 | PASS | TTTV stayed within the 60-minute bound (`~6 min`) |
 
-| Artifact | Path | Status |
-|----------|------|--------|
-| Hub Activity | `EXP-03-run1/hub-activity.json` | Captured |
-| MacBook Gateway Log | `EXP-03-run1/macbook-gateway.log` | Captured |
-| Mac mini Gateway Log | `EXP-03-run1/macmini-gateway-chorus.log` | Captured (partial) |
-| Telegram Screenshot (MacBook) | `EXP-03-run1/telegram-macbook-nano-full.png` | Captured |
-| Telegram Screenshot (Mac mini) | `EXP-03-run1/telegram-macmini-xiaox-full.png` | Captured |
-| Question Log | [`EXP-03-question-log.md`](EXP-03-question-log.md) | QC=0, HIR=false |
-| Debrief Notes | [`EXP-03-debrief.md`](EXP-03-debrief.md) | NOT CONDUCTED |
-| Contamination Check | [`EXP-03-contamination-check.md`](EXP-03-contamination-check.md) | INSUFFICIENT — all 3 artifacts missing → **VOID** |
-| Screening Record | [`EXP-03-screening.md`](EXP-03-screening.md) | INSUFFICIENT — verbal only, E-4 violated (same org) |
-| Screen Recording | NOT COLLECTED | **VOID trigger** |
-| Shell History | NOT COLLECTED | **VOID trigger** |
-| Browser History | NOT COLLECTED | **VOID trigger** |
+---
+
+## Post-Verdict Friction: IMPL-EXP03-04
+
+Run 2 still surfaced a real implementation defect after the PASS condition had already been met.
+
+| Item | Detail |
+|------|--------|
+| Defect | `IMPL-EXP03-04` — Telegram polling disconnect after install / consent flow |
+| When it appeared | After the Chorus message had already been delivered to Telegram |
+| Why PASS still stands | EXP-03 judges the cold-start path through first Telegram-visible delivery; that condition was satisfied at `18:46` |
+| Root cause | `restart-consent approve` mutated `openclaw.json`, which triggered an extra OpenClaw hot-reload / restart cycle and broke Telegram polling recovery |
+| Tracking docs | `pipeline/tasks/TASK_SPEC_EXP03_TELEGRAM_POLLING_DISCONNECT.md`, `pipeline/handoffs/260403-exp03-run2-handoff.md` |
+
+As of the 2026-04-07 remediation session, the fix direction is:
+
+- `approve` records consent only and does not write `openclaw.json`
+- `complete` performs the deferred cleanup write
+- cleanup is resumable through a `completing` state instead of assuming a one-shot commit
+
+This follow-up does not change the Run 2 verdict, but it does narrow the honest claim:
+
+- **Proven**: cold-start install -> first Telegram-visible Chorus message
+- **Not yet proven by Run 2 alone**: stable continued Telegram polling after install
+
+---
+
+## Conclusion
+
+EXP-03 now has a formal **PASS** run.
+
+The strongest current claim is:
+
+> A cold-start developer on MacBook, using their own OpenClaw agent, installed Chorus from scratch and exchanged a Telegram-confirmed message with an agent on a separate Mac mini in about 6 minutes on `0.8.0-alpha.9`.
+
+That is the canonical EXP-03 result. Run 1 remains useful only as archived failure context. Run 3 (2026-04-08, addendum) does not revise this verdict — it is a later bidirectional observation on `0.8.0-alpha.10` that passed the plumbing layer but failed the product-value layer (cross-cultural language contract). See `EXP-03-run3-findings.md` for the full post-mortem and the parse-layer-first remediation plan shipping in `0.8.0-alpha.11`.
+
+---
+
+## Evidence
+
+Checked-in Run 2 record:
+
+| File | Purpose |
+|------|---------|
+| `pipeline/handoffs/260403-exp03-run2-handoff.md` | Primary checked-in Run 2 PASS record: timeline, agent ID, trace ID, follow-up defect |
+| `docs/distribution/launch-audit-2026-04-07.md` | Cross-machine interpretation, launch-facing wording, and IMPL-EXP03-04 analysis |
+| `docs/experiments/EXP-03-human-developer-cold-start.md` | Formal experiment protocol and hard-criteria definitions |
+| `pipeline/tasks/TASK_SPEC_EXP03_TELEGRAM_POLLING_DISCONNECT.md` | Formal task spec for the post-verdict polling disconnect defect |
+
+Run 3 addendum (2026-04-08):
+
+| File | Purpose |
+|------|---------|
+| `docs/experiment-results/EXP-03-run3-findings.md` | Bidirectional A2A observation on `0.8.0-alpha.10`; parse-layer vs execution-layer language failure analysis; IMPL-EXP03-05/06/07/08 backlog |
+
+Archived Run 1 context:
+
+| File | Purpose |
+|------|---------|
+| `docs/experiment-results/EXP-03-friction-log.md` | Run 1 friction chronology |
+| `docs/experiment-results/EXP-03-question-log.md` | Run 1 QC / HIR notes |
+| `docs/experiment-results/EXP-03-contamination-check.md` | Run 1 VOID rationale |
+| `docs/experiment-results/EXP-03-screening.md` | Run 1 screening record |
+| `docs/experiment-results/EXP-03-debrief.md` | Run 1 debrief notes |
+| `docs/experiment-results/EXP-03-run1/` | Run 1 raw artifact folder |

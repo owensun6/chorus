@@ -2,6 +2,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  statSync,
   unlinkSync,
   writeFileSync,
   readdirSync,
@@ -46,6 +47,11 @@ const AGENTS_DIR = join(CHORUS_DIR, "agents");
 const CONFIG_PATH = join(CHORUS_DIR, "config.json");
 const OPENCLAW_DIR = join(homedir(), ".openclaw");
 const WORKSPACE_CRED_PATH = join(OPENCLAW_DIR, "workspace", "chorus-credentials.json");
+// Per-agent workspace dirs: ~/.openclaw/workspace-<agent>/chorus-credentials.json
+// OpenClaw supports multi-agent topologies where each agent has its own workspace
+// directory named workspace-<agent>. The bridge scans all of them so a credentials
+// file written by an installer agent in its own workspace is still discovered.
+const WORKSPACE_CRED_FILENAME = "chorus-credentials.json";
 const WEIXIN_SRC = join(OPENCLAW_DIR, "extensions", "openclaw-weixin", "src");
 const WEIXIN_DIR = join(OPENCLAW_DIR, "extensions", "openclaw-weixin");
 const DEBUG_DIR = join(CHORUS_DIR, "debug");
@@ -61,6 +67,16 @@ type ChorusConfig = {
   readonly hub_url: string;
   readonly culture?: string;
   readonly preferred_language?: string;
+  // The OpenClaw agent that owns this Chorus identity. When set, the bridge
+  // uses this as a hint that inbound envelopes for this identity should be
+  // routed to this specific agent (rather than the gateway's default agent).
+  // Written by installer agents or by chorus-skill tooling; optional for
+  // backward compatibility with existing credential files.
+  readonly owner_agent?: string;
+  // Path this config was loaded from. Not persisted in the JSON file — set at
+  // load time so downstream code can tell configs from different sources apart
+  // (e.g. which workspace-* directory a per-agent credential came from).
+  readonly _source_path?: string;
 };
 
 type Logger = {
@@ -472,31 +488,73 @@ function isValidConfig(cfg: unknown): cfg is ChorusConfig {
     && typeof rec.hub_url === "string" && rec.hub_url.length > 0;
 }
 
-function loadAgentConfigs(log: Logger): ChorusConfig[] {
-  const configs: ChorusConfig[] = [];
-
-  // 1. OpenClaw workspace credentials (highest priority)
-  if (existsSync(WORKSPACE_CRED_PATH)) {
-    const cfg = readJSON(WORKSPACE_CRED_PATH);
-    if (isValidConfig(cfg)) {
-      configs.push(cfg);
-      log.info(`${TAG} activated: ${cfg.agent_id} from workspace/chorus-credentials.json`);
-    } else {
-      log.warn(`${TAG} malformed config skipped: workspace/chorus-credentials.json (missing required fields)`);
+// List all `~/.openclaw/workspace-*/` directories (per-agent OpenClaw workspaces).
+// Returns absolute paths. Order is not guaranteed (depends on filesystem), so
+// callers that need determinism must sort.
+function listPerAgentWorkspaceDirs(): string[] {
+  if (!existsSync(OPENCLAW_DIR)) return [];
+  const out: string[] = [];
+  let entries: string[];
+  try {
+    entries = readdirSync(OPENCLAW_DIR);
+  } catch {
+    return [];
+  }
+  for (const name of entries) {
+    if (!name.startsWith("workspace-")) continue;
+    const abs = join(OPENCLAW_DIR, name);
+    try {
+      if (statSync(abs).isDirectory()) out.push(abs);
+    } catch {
+      // skip entries we cannot stat
     }
   }
+  return out;
+}
 
-  // 2. Multi-agent dir
+function loadAgentConfigs(log: Logger): ChorusConfig[] {
+  const configs: ChorusConfig[] = [];
+  const seenAgentIds = new Set<string>();
+
+  function tryAddConfig(rawCfg: unknown, sourcePath: string, sourceLabel: string) {
+    if (!isValidConfig(rawCfg)) {
+      log.warn(`${TAG} malformed config skipped: ${sourceLabel} (missing required fields)`);
+      return;
+    }
+    if (seenAgentIds.has(rawCfg.agent_id)) {
+      // A credential for this agent_id was already loaded from a
+      // higher-priority source — keep the first one and skip duplicates.
+      // This happens e.g. when the same creds are mirrored into both the
+      // default workspace and a per-agent workspace.
+      log.info(`${TAG} duplicate credential skipped: ${rawCfg.agent_id} at ${sourceLabel} (already loaded from higher-priority source)`);
+      return;
+    }
+    const cfg: ChorusConfig = { ...rawCfg, _source_path: sourcePath };
+    configs.push(cfg);
+    seenAgentIds.add(cfg.agent_id);
+    log.info(`${TAG} activated: ${cfg.agent_id} from ${sourceLabel}`);
+  }
+
+  // 1. OpenClaw default workspace credentials (highest priority for backward compat)
+  if (existsSync(WORKSPACE_CRED_PATH)) {
+    tryAddConfig(readJSON(WORKSPACE_CRED_PATH), WORKSPACE_CRED_PATH, "workspace/chorus-credentials.json");
+  }
+
+  // 1.5. OpenClaw per-agent workspaces (workspace-<agent>/chorus-credentials.json)
+  // Added in response to EXP-03 Run 3: installer agents running in
+  // workspace-<agent>/ previously had their credentials silently ignored.
+  for (const wsDir of listPerAgentWorkspaceDirs()) {
+    const credPath = join(wsDir, WORKSPACE_CRED_FILENAME);
+    if (!existsSync(credPath)) continue;
+    const label = `${wsDir.slice(OPENCLAW_DIR.length + 1)}/${WORKSPACE_CRED_FILENAME}`;
+    tryAddConfig(readJSON(credPath), credPath, label);
+  }
+
+  // 2. Multi-agent dir (~/.chorus/agents/<name>.json)
   if (existsSync(AGENTS_DIR)) {
     const files = readdirSync(AGENTS_DIR).filter((file) => file.endsWith(".json"));
     for (const file of files) {
-      const cfg = readJSON(join(AGENTS_DIR, file));
-      if (isValidConfig(cfg)) {
-        configs.push(cfg);
-        log.info(`${TAG} activated: ${cfg.agent_id} from agents/${file}`);
-      } else {
-        log.warn(`${TAG} malformed config skipped: agents/${file} (missing required fields)`);
-      }
+      tryAddConfig(readJSON(join(AGENTS_DIR, file)), join(AGENTS_DIR, file), `agents/${file}`);
     }
   }
 
@@ -504,8 +562,7 @@ function loadAgentConfigs(log: Logger): ChorusConfig[] {
   if (configs.length === 0) {
     const cfg = readJSON(CONFIG_PATH);
     if (isValidConfig(cfg)) {
-      configs.push(cfg);
-      log.info(`${TAG} activated: ${cfg.agent_id} from config.json`);
+      tryAddConfig(cfg, CONFIG_PATH, "config.json");
     }
   }
 
@@ -945,8 +1002,8 @@ export class OpenClawHostAdapter {
       receiver_preferred_language: receiverPrefs.preferredLanguage,
       must_adapt: mustAdapt,
       adaptation_instruction: mustAdapt
-        ? `CRITICAL: The receiver's language is ${receiverPrefs.preferredLanguage}. You MUST translate/adapt the message into ${receiverPrefs.preferredLanguage} before delivering. Do NOT forward the original ${params.metadata.sender_culture} text as-is. Output ONLY in ${receiverPrefs.preferredLanguage}.`
-        : null,
+        ? `BLOCKING LANGUAGE CONTRACT: Your local user speaks ${receiverPrefs.preferredLanguage} (user_culture=${receiverPrefs.culture}). The sender sent this in ${params.metadata.sender_culture}. You MUST translate and adapt the message into ${receiverPrefs.preferredLanguage} before delivering to your user. Output your user-facing text ONLY in ${receiverPrefs.preferredLanguage}. Do NOT forward the original ${params.metadata.sender_culture} text as-is. Do NOT mix languages. Do NOT include the sender's untranslated original_text "for reference". If your user-facing text contains any ${params.metadata.sender_culture} content, the Chorus contract is violated — this is treated as a protocol error, not a stylistic variation. The product value of Chorus is cross-cultural rendering, and this is the exact moment it must be honored.`
+        : `LANGUAGE CONFIRMATION: Your local user and the sender share the same language (${receiverPrefs.preferredLanguage}). Still rewrite the message into a natural third-person retelling — do NOT forward the sender's raw original_text verbatim; present it as "the remote agent says X" narration for your user.`,
       reply_format: `Your reply has two audiences. CRITICAL: both parts MUST be inside your final answer — anything placed after your main response is silently discarded by the runtime.
 
 This is a Chorus protocol turn, not a normal local chat turn.
@@ -1384,7 +1441,14 @@ async function onGatewayStart(log: Logger): Promise<void> {
 }
 
 export default function register(api: any): void {
-  if (!existsSync(AGENTS_DIR) && !existsSync(CONFIG_PATH) && !existsSync(WORKSPACE_CRED_PATH)) {
+  const anyPerAgentWorkspaceHasCreds = listPerAgentWorkspaceDirs()
+    .some((wsDir) => existsSync(join(wsDir, WORKSPACE_CRED_FILENAME)));
+  if (
+    !existsSync(AGENTS_DIR)
+    && !existsSync(CONFIG_PATH)
+    && !existsSync(WORKSPACE_CRED_PATH)
+    && !anyPerAgentWorkspaceHasCreds
+  ) {
     // No credential paths exist yet; hooks will still be registered
     // so that gateway_start can poll for late-arriving credentials.
   }

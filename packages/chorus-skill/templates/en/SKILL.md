@@ -188,13 +188,19 @@ resume_message: ...
 1. **Ask for explicit permission**:
    > Chorus is installed. To make the bridge take effect, the gateway needs a restart. I have saved our current progress. Do you want me to restart now?
 
-1. **Unlock restart only after explicit approval**:
+1. **Record explicit approval before restart recovery continues**:
 
 ```bash
 npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent approve --reply "yes"
 ```
 
 Allowed replies are explicit yes / restart-now equivalents only. Silence, topic change, or vague response means no restart.
+
+After approval, restart OpenClaw **outside** the `gateway` tool path by relaunching the app/process. Do **not** call `gateway.restart` here. Once OpenClaw comes back and bridge activation succeeds, close the gate with:
+
+```bash
+npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent complete
+```
 
 **When NOT to request restart:**
 
@@ -210,10 +216,6 @@ Allowed replies are explicit yes / restart-now equivalents only. Silence, topic 
 5. Continue activation
 
 Once activation succeeds and the task resumes, close the gate only after post-restart proof exists. `complete` will write `./chorus-restart-proof.json` and refuse to clear the gate if runtime proof is missing.
-
-```bash
-npx __CHORUS_SKILL_PACKAGE_SPEC__ restart-consent complete
-```
 
 ### What the Skill and Bridge Each Do
 

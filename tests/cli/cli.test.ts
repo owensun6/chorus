@@ -593,6 +593,8 @@ describe("CLI: chorus-skill", () => {
       expect(complete.stderr).toContain("post-restart proof missing");
       expect(complete.stderr).toContain("bridge activation proof missing");
       expect(existsSync(restartGatePath(fakeHome))).toBe(true);
+      const configAfterFailedComplete = JSON.parse(readFileSync(openClawConfigPath(fakeHome), "utf8"));
+      expect(configAfterFailedComplete.tools?.deny ?? []).toContain("gateway");
 
       const verify = run(
         ["verify", "--target", "openclaw"],
@@ -658,7 +660,7 @@ describe("CLI: chorus-skill", () => {
       expect(verify.stderr).toContain("Restart consent gate active");
     });
 
-    it("unlocks restart on explicit approval and clears artifacts on complete once proof exists", () => {
+    it("records approval without touching openclaw config and clears the deferred deny on complete once proof exists", () => {
       const wsDir = workspaceDir(fakeHome);
       const checkpointPath = join(wsDir, "chorus-restart-checkpoint.md");
 
@@ -684,15 +686,20 @@ describe("CLI: chorus-skill", () => {
         { env: { HOME: fakeHome } },
       );
 
+      const configBeforeApproveRaw = readFileSync(openClawConfigPath(fakeHome), "utf8");
       const approve = run(
         ["restart-consent", "approve", "--reply", "yes"],
         { env: { HOME: fakeHome } },
       );
       expect(approve.exitCode).toBe(0);
       expect(approve.stdout).toContain("Restart approved");
+      expect(approve.stdout).toContain("do not call gateway.restart");
+      expect(approve.stdout).toContain("restart-consent complete");
 
+      const configAfterApproveRaw = readFileSync(openClawConfigPath(fakeHome), "utf8");
+      expect(configAfterApproveRaw).toBe(configBeforeApproveRaw);
       const configAfterApprove = JSON.parse(readFileSync(openClawConfigPath(fakeHome), "utf8"));
-      expect(configAfterApprove.tools?.deny ?? []).not.toContain("gateway");
+      expect(configAfterApprove.tools?.deny ?? []).toContain("gateway");
 
       const approvedGate = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
       const agentId = "proof-agent@agchorus";
@@ -713,6 +720,8 @@ describe("CLI: chorus-skill", () => {
       expect(existsSync(checkpointPath)).toBe(false);
       expect(existsSync(restartGatePath(fakeHome))).toBe(false);
       expect(existsSync(join(wsDir, "chorus-restart-proof.json"))).toBe(true);
+      const configAfterComplete = JSON.parse(readFileSync(openClawConfigPath(fakeHome), "utf8"));
+      expect(configAfterComplete.tools?.deny ?? []).not.toContain("gateway");
       const completionProof = JSON.parse(readFileSync(join(wsDir, "chorus-restart-proof.json"), "utf8"));
       expect(completionProof.activation_proof_path).toBe(runtimeProofPath);
       expect(completionProof.helper_package_spec).toBe(`@chorus-protocol/skill@${PACKAGE_VERSION}`);
@@ -720,7 +729,76 @@ describe("CLI: chorus-skill", () => {
       expect(completionProof.resolved_proof_agent_id).toBe(agentId);
     });
 
-    it("preserves a user-defined gateway deny after approval", () => {
+    it("resumes complete cleanup after a partial failure that happens after openclaw.json is updated", () => {
+      const wsDir = workspaceDir(fakeHome);
+      const checkpointPath = join(wsDir, "chorus-restart-checkpoint.md");
+
+      run(
+        [
+          "restart-consent",
+          "request",
+          "--workspace",
+          wsDir,
+          "--restart-required-for",
+          "gateway needs to load chorus-bridge plugin after install",
+          "--user-goal",
+          "activate Chorus",
+          "--current-identity",
+          "unknown",
+          "--completed-steps",
+          "skill installed; bridge installed",
+          "--next-step-after-restart",
+          "verify bridge activation",
+          "--resume-message",
+          "Resuming Chorus activation after restart.",
+        ],
+        { env: { HOME: fakeHome } },
+      );
+
+      run(
+        ["restart-consent", "approve", "--reply", "yes"],
+        { env: { HOME: fakeHome } },
+      );
+
+      const approvedGate = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      const agentId = "retry-complete@agchorus";
+      writeWorkspaceCredential(fakeHome, agentId);
+      writeActivationProof(
+        fakeHome,
+        agentId,
+        new Date(Date.parse(approvedGate.approvedAt) + 1_000).toISOString(),
+      );
+
+      const failedComplete = run(
+        ["restart-consent", "complete"],
+        {
+          env: {
+            HOME: fakeHome,
+            CHORUS_DEBUG_RESTART_COMPLETE_FAIL_AT: "after_config_write",
+          },
+        },
+      );
+
+      expect(failedComplete.exitCode).toBe(1);
+      expect(failedComplete.stderr).toContain("Restart recovery cleanup failed");
+      const gateAfterFailure = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      expect(gateAfterFailure.status).toBe("completing");
+      const configAfterFailure = JSON.parse(readFileSync(openClawConfigPath(fakeHome), "utf8"));
+      expect(configAfterFailure.tools?.deny ?? []).not.toContain("gateway");
+      expect(existsSync(checkpointPath)).toBe(true);
+      expect(existsSync(join(wsDir, "chorus-restart-proof.json"))).toBe(true);
+
+      const retriedComplete = run(
+        ["restart-consent", "complete"],
+        { env: { HOME: fakeHome } },
+      );
+
+      expect(retriedComplete.exitCode).toBe(0);
+      expect(existsSync(restartGatePath(fakeHome))).toBe(false);
+      expect(existsSync(checkpointPath)).toBe(false);
+    });
+
+    it("preserves a user-defined gateway deny through complete", () => {
       rmSync(fakeHome, { recursive: true, force: true });
       mkdirSync(configDir, { recursive: true });
       writeFileSync(join(configDir, "openclaw.json"), JSON.stringify({
@@ -760,6 +838,24 @@ describe("CLI: chorus-skill", () => {
       expect(approve.exitCode).toBe(0);
       const configAfterApprove = JSON.parse(readFileSync(openClawConfigPath(fakeHome), "utf8"));
       expect(configAfterApprove.tools?.deny ?? []).toContain("gateway");
+
+      const approvedGate = JSON.parse(readFileSync(restartGatePath(fakeHome), "utf8"));
+      const agentId = "preexisting-deny@agchorus";
+      writeWorkspaceCredential(fakeHome, agentId);
+      writeActivationProof(
+        fakeHome,
+        agentId,
+        new Date(Date.parse(approvedGate.approvedAt) + 1_000).toISOString(),
+      );
+
+      const complete = run(
+        ["restart-consent", "complete"],
+        { env: { HOME: fakeHome } },
+      );
+
+      expect(complete.exitCode).toBe(0);
+      const configAfterComplete = JSON.parse(readFileSync(openClawConfigPath(fakeHome), "utf8"));
+      expect(configAfterComplete.tools?.deny ?? []).toContain("gateway");
     });
   });
 

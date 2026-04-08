@@ -65,6 +65,13 @@ function buildHelperCommand(subcommand, gate = null) {
   return `npx ${resolveHelperPackageSpec(version)} ${subcommand}`;
 }
 
+function buildApprovedRestartInstructions(gate) {
+  return [
+    `Restart OpenClaw now outside the gateway tool path (relaunch the app/process; do not call gateway.restart).`,
+    `After OpenClaw returns and bridge activation succeeds, run: ${buildHelperCommand("restart-consent complete", gate)}`,
+  ];
+}
+
 function normalizeApprovalText(text) {
   return text.trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -84,6 +91,12 @@ function writeRestartGate(state) {
 
 function removeRestartGate() {
   rmSync(RESTART_GATE_PATH, { force: true });
+}
+
+function maybeInjectRestartCompleteFailure(stage) {
+  if (process.env.CHORUS_DEBUG_RESTART_COMPLETE_FAIL_AT === stage) {
+    throw new Error(`debug injected restart-consent complete failure at ${stage}`);
+  }
 }
 
 function resolveCheckpointPath(workspaceDir) {
@@ -396,7 +409,8 @@ function ensureChorusDirs() {
 
 function describeRestartGateStatus(status) {
   if (status === "awaiting_approval") return "checkpoint written; explicit approval still required";
-  if (status === "approved") return "approved; waiting for post-restart proof + recovery completion";
+  if (status === "approved") return "approved; restart OpenClaw outside the gateway tool path, then finish recovery";
+  if (status === "completing") return "restart observed; cleanup is resumable via restart-consent complete";
   return "fresh install pending checkpoint + approval";
 }
 
@@ -602,7 +616,7 @@ if (command === "init") {
       process.exit(1);
     }
     console.log(`✓ Registered skill + bridge in ~/.openclaw/openclaw.json`);
-    console.log(`✓ Restart consent gate armed — gateway tool blocked until checkpoint + explicit approval`);
+    console.log(`✓ Restart consent gate armed — gateway tool remains blocked until restart recovery is completed`);
 
     // Report activation readiness
     const configCount = countAgentConfigs();
@@ -652,6 +666,11 @@ if (command === "init") {
     console.log(`  Status: ${describeRestartGateStatus(gate.status)}`);
     if (gate.workspaceDir) console.log(`  Workspace: ${gate.workspaceDir}`);
     if (gate.checkpointPath) console.log(`  Checkpoint: ${gate.checkpointPath}`);
+    if (gate.status === "approved" || gate.status === "completing") {
+      for (const line of buildApprovedRestartInstructions(gate)) {
+        console.log(`  ${line}`);
+      }
+    }
     process.exit(1);
   }
 
@@ -730,9 +749,6 @@ if (command === "init") {
       process.exit(1);
     }
 
-    const config = readOpenClawConfig();
-    restoreRestartGateBlock(config, gate);
-    writeJSON(OPENCLAW_CONFIG_PATH, config);
     writeRestartGate({
       ...gate,
       status: "approved",
@@ -740,11 +756,14 @@ if (command === "init") {
       approvalReply: reply,
     });
 
-    console.log(`✓ Restart approved — gateway tool unlocked for this recovery step`);
+    console.log(`✓ Restart approved — consent recorded; restart OpenClaw outside the gateway tool path`);
+    for (const line of buildApprovedRestartInstructions(gate)) {
+      console.log(`  ${line}`);
+    }
     process.exit(0);
   }
 
-  if (gate.status !== "approved") {
+  if (!["approved", "completing"].includes(gate.status)) {
     console.error(`✗ Cannot complete restart recovery while gate status is "${gate.status}"`);
     process.exit(1);
   }
@@ -759,27 +778,49 @@ if (command === "init") {
     process.exit(1);
   }
 
-  const completionProofPath = resolveRestartProofPath(gate.workspaceDir || process.cwd());
-  writeJSON(completionProofPath, {
-    schema_version: 1,
-    package_name: pkg.name,
-    package_version: gate.packageVersion || pkg.version,
-    helper_package_spec: resolveHelperPackageSpec(gate.packageVersion || pkg.version),
-    proof_recorded_at: new Date().toISOString(),
-    gate_approved_at: gate.approvedAt,
-    checkpoint_identity: gate.currentIdentity || null,
-    resolved_proof_agent_id: proofResult.resolvedProofAgentId || proofResult.agentId,
-    agent_id: proofResult.agentId,
-    activation_proof_path: proofResult.activationProofPath,
-    activation_proof: proofResult.activationProof,
-    checkpoint_path: gate.checkpointPath,
-    proof_source: ACTIVATION_PROOF_SOURCE,
-  });
+  const completionProofPath = gate.completionProofPath || resolveRestartProofPath(gate.workspaceDir || process.cwd());
+  const completingGate = {
+    ...gate,
+    status: "completing",
+    completionProofPath,
+    completionProofRecordedAt: new Date().toISOString(),
+  };
 
-  if (gate.checkpointPath && existsSync(gate.checkpointPath)) {
-    rmSync(gate.checkpointPath, { force: true });
+  try {
+    writeRestartGate(completingGate);
+    writeJSON(completionProofPath, {
+      schema_version: 1,
+      package_name: pkg.name,
+      package_version: gate.packageVersion || pkg.version,
+      helper_package_spec: resolveHelperPackageSpec(gate.packageVersion || pkg.version),
+      proof_recorded_at: completingGate.completionProofRecordedAt,
+      gate_approved_at: gate.approvedAt,
+      checkpoint_identity: gate.currentIdentity || null,
+      resolved_proof_agent_id: proofResult.resolvedProofAgentId || proofResult.agentId,
+      agent_id: proofResult.agentId,
+      activation_proof_path: proofResult.activationProofPath,
+      activation_proof: proofResult.activationProof,
+      checkpoint_path: gate.checkpointPath,
+      proof_source: ACTIVATION_PROOF_SOURCE,
+    });
+    maybeInjectRestartCompleteFailure("after_proof_write");
+
+    const config = readOpenClawConfig();
+    restoreRestartGateBlock(config, gate);
+    writeJSON(OPENCLAW_CONFIG_PATH, config);
+    maybeInjectRestartCompleteFailure("after_config_write");
+
+    if (gate.checkpointPath && existsSync(gate.checkpointPath)) {
+      rmSync(gate.checkpointPath, { force: true });
+    }
+    maybeInjectRestartCompleteFailure("after_checkpoint_clear");
+
+    removeRestartGate();
+  } catch (err) {
+    console.error(`✗ Restart recovery cleanup failed — ${err.message}`);
+    console.error(`  Fix the underlying issue, then retry: ${buildHelperCommand("restart-consent complete", completingGate)}`);
+    process.exit(1);
   }
-  removeRestartGate();
   console.log(`✓ Restart recovery completed — proof recorded at ${completionProofPath}`);
   console.log(`✓ Checkpoint cleared and gate closed`);
   process.exit(0);
@@ -936,6 +977,10 @@ if (command === "init") {
         }
         if (restartGate.status === "awaiting_approval") {
           console.error(`  Approval helper: ${buildHelperCommand('restart-consent approve --reply "yes"', restartGate)}`);
+        } else if (restartGate.status === "approved" || restartGate.status === "completing") {
+          for (const line of buildApprovedRestartInstructions(restartGate)) {
+            console.error(`  ${line}`);
+          }
         }
         process.exit(1);
       }
